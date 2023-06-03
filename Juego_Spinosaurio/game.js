@@ -800,8 +800,8 @@ function mostrarQuiz() {
 
   var preparedQuiz = prepareQuizOptions(quizData);
 
-  document.getElementById("quizTitle").textContent = preparedQuiz.title || "Pregunta final";
-  document.getElementById("quizSub").textContent = preparedQuiz.subtitle || "";
+  document.getElementById("quizTitle").textContent = "MUCH \u2022 Quiz Interactivo";
+  document.getElementById("quizSub").textContent = [preparedQuiz.title, preparedQuiz.subtitle].filter(Boolean).join(" \u00b7 ") || "Pregunta final";
   document.getElementById("quizQuestion").textContent = preparedQuiz.question || "";
 
   var box = document.getElementById("quizOptions"); box.innerHTML = "";

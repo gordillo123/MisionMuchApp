@@ -560,3 +560,379 @@ body {
   font-size: var(--quiz-option-font) !important;
   font-weight: 800 !important;
 }
+
+/* Final responsive lock: keep every station question clean, large, and inside the card. */
+:root {
+  --quiz-question-font: clamp(1.48rem, min(5.1vw, 4.15vh), 3rem);
+  --quiz-answer-font: clamp(1.18rem, min(4.15vw, 3.2vh), 1.9rem);
+  --quiz-timer-font: clamp(1.28rem, min(4.8vw, 3.35vh), 2.15rem);
+  --quiz-list-gap: clamp(0.55rem, 1.25vh, 1rem);
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  height: var(--quiz-app-height);
+  min-height: var(--quiz-app-height);
+  overflow: hidden !important;
+}
+
+#quizShell,
+.quiz-card,
+#quizView,
+.question-container {
+  min-width: 0;
+  min-height: 0;
+}
+
+#quizShell {
+  width: min(100%, 1180px) !important;
+  max-width: 1180px !important;
+  align-items: stretch !important;
+}
+
+.quiz-card {
+  max-height: 100%;
+  gap: clamp(0.46rem, 1.15vh, 0.95rem);
+  padding:
+    clamp(0.58rem, 1.55vh, 1.05rem)
+    clamp(0.82rem, 2vw, 1.45rem)
+    calc(clamp(0.58rem, 1.55vh, 1.05rem) + var(--quiz-safe-bottom));
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+}
+
+.header-section {
+  gap: clamp(0.18rem, 0.6vh, 0.45rem);
+}
+
+.header-section > .d-flex,
+.station-logo-strip {
+  width: min(100%, 920px);
+  margin-inline: auto;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: clamp(0.85rem, 2.5vw, 2.2rem) !important;
+  padding: clamp(0.24rem, 0.7vh, 0.55rem) clamp(0.35rem, 1vw, 0.75rem);
+}
+
+.logo-header {
+  display: block;
+  flex: 0 1 auto;
+  width: auto !important;
+  height: clamp(54px, 9.2vh, 88px) !important;
+  max-width: min(46%, 420px) !important;
+  object-fit: contain;
+}
+
+.logo-left,
+.logo-header.logo-agencia {
+  height: clamp(54px, 9.2vh, 88px) !important;
+  max-width: min(46%, 420px) !important;
+}
+
+.logo-right {
+  height: clamp(54px, 9.2vh, 88px) !important;
+  max-width: min(46%, 420px) !important;
+}
+
+.station-logo-strip {
+  margin-bottom: clamp(0.18rem, 0.6vh, 0.38rem);
+}
+
+.station-logo-strip img {
+  display: block;
+  flex: 0 1 auto;
+  width: auto;
+  height: clamp(50px, 8.4vh, 82px) !important;
+  max-width: clamp(90px, 20vw, 180px);
+  object-fit: contain;
+  padding: clamp(4px, 0.8vh, 8px) clamp(8px, 1.2vw, 12px);
+}
+
+.station-logo-strip .station-logo-much,
+.station-logo-strip .station-logo-sbeel {
+  height: clamp(50px, 8.4vh, 82px) !important;
+  max-width: clamp(105px, 22vw, 190px);
+}
+
+.station-logo-strip .station-logo-planetario {
+  height: clamp(50px, 8.4vh, 82px) !important;
+  max-width: clamp(100px, 21vw, 180px);
+}
+
+.app-title {
+  font-size: clamp(1.45rem, min(3.5vw, 3.45vh), 2.38rem) !important;
+  line-height: 1.02 !important;
+  text-align: center;
+  color: #0f172a;
+  background: linear-gradient(90deg, #f23f3a, #ff76b4 36%, #775aff 68%, #00b487);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.app-subtitle {
+  font-size: clamp(0.86rem, min(1.7vw, 1.7vh), 1.08rem);
+  font-weight: 700;
+}
+
+.controls-row {
+  gap: clamp(0.55rem, 1.25vw, 1.15rem) !important;
+}
+
+.btn-back-premium {
+  min-height: clamp(42px, 5.8vh, 58px);
+  padding: clamp(5px, 0.8vh, 8px) clamp(14px, 1.8vw, 24px) clamp(5px, 0.8vh, 8px) clamp(5px, 0.8vw, 9px);
+  font-size: clamp(0.86rem, min(1.7vw, 1.8vh), 1.08rem);
+}
+
+.back-icon-wrapper {
+  width: clamp(30px, 4.3vh, 42px);
+  height: clamp(30px, 4.3vh, 42px);
+}
+
+.sala-pill {
+  height: clamp(40px, 5.6vh, 56px);
+  padding-inline: clamp(1.05rem, 2.2vw, 1.8rem);
+  font-size: clamp(0.92rem, min(1.9vw, 1.9vh), 1.18rem);
+  font-weight: 900;
+}
+
+#quizView {
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: clamp(0.55rem, 1.15vh, 0.92rem);
+}
+
+.question-container {
+  align-content: stretch;
+  gap: clamp(0.5rem, 1.15vh, 0.9rem);
+  grid-template-rows: auto minmax(0, auto) auto minmax(0, 1fr) minmax(1.2rem, auto) auto;
+}
+
+.badge-question {
+  font-size: clamp(0.82rem, min(1.65vw, 1.55vh), 1.05rem) !important;
+  padding: clamp(0.42rem, 0.9vh, 0.68rem) clamp(0.95rem, 2vw, 1.45rem) !important;
+  font-weight: 900;
+}
+
+.question-text {
+  width: 100%;
+  max-width: min(1040px, 100%);
+  font-size: var(--quiz-question-font) !important;
+  line-height: 1.12 !important;
+  font-weight: 900 !important;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
+}
+
+.question-timer {
+  min-width: clamp(104px, 17vw, 180px) !important;
+  padding: clamp(0.38rem, 1.05vh, 0.68rem) clamp(0.82rem, 2.35vw, 1.5rem) !important;
+  font-size: var(--quiz-timer-font) !important;
+  line-height: 1 !important;
+  border-width: 2px;
+}
+
+#options,
+#options.options-list,
+.options-list {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-auto-rows: minmax(0, 1fr) !important;
+  gap: var(--quiz-list-gap) !important;
+  height: 100%;
+  max-width: min(1040px, 100%) !important;
+  max-height: none !important;
+  overflow: hidden !important;
+}
+
+#options > *,
+.options-list > * {
+  min-height: 0 !important;
+}
+
+#options .option-btn,
+#options.options-list .option-btn,
+.options-list .option-btn,
+.option-btn {
+  height: 100%;
+  min-height: 0 !important;
+  max-height: 100%;
+  padding: clamp(0.72rem, 1.95vh, 1.15rem) clamp(1.05rem, 3vw, 1.75rem) !important;
+  font-size: var(--quiz-answer-font) !important;
+  line-height: 1.15 !important;
+  border-radius: clamp(16px, 2vw, 24px) !important;
+  overflow: hidden;
+}
+
+.option-btn .emoji,
+#options .emoji,
+#options .option-btn .emoji {
+  width: clamp(28px, 4.2vw, 40px) !important;
+  height: clamp(28px, 4.2vw, 40px) !important;
+  font-size: clamp(0.78rem, 1.55vw, 1.02rem) !important;
+  border-radius: clamp(7px, 0.9vw, 10px);
+}
+
+#options .option-btn span:not(.emoji),
+#options.options-list .option-btn span:not(.emoji),
+.options-list .option-btn span:not(.emoji),
+.option-btn span:not(.emoji) {
+  min-width: 0;
+  max-width: 100%;
+  padding-inline: clamp(1.55rem, 7vw, 2.75rem);
+  font-size: var(--quiz-answer-font) !important;
+  line-height: 1.12 !important;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
+}
+
+.status-msg {
+  min-height: clamp(1rem, 2vh, 1.45rem);
+  font-size: clamp(0.95rem, min(2.6vw, 2.2vh), 1.28rem) !important;
+}
+
+.footer-info.score-panel,
+.score-panel {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: min(1040px, 100%);
+  margin-inline: auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.62rem, 1.4vw, 1rem) !important;
+  padding-top: clamp(0.52rem, 1.2vh, 0.82rem);
+  border-top: 1px solid rgba(148, 163, 184, 0.24);
+}
+
+.points-pill,
+.score-stat {
+  min-height: clamp(50px, 7vh, 76px);
+  min-width: 0 !important;
+  padding: clamp(0.72rem, 1.75vh, 1.05rem) clamp(1rem, 2.4vw, 1.6rem) !important;
+  font-size: clamp(1.08rem, min(2.8vw, 2.55vh), 1.52rem) !important;
+  font-weight: 900 !important;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.points-pill strong,
+.score-stat strong {
+  font-size: 1.18em;
+}
+
+#hint {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --quiz-question-font: clamp(1.32rem, min(6.7vw, 3.65vh), 2rem);
+    --quiz-answer-font: clamp(1.08rem, min(5.6vw, 2.95vh), 1.5rem);
+    --quiz-timer-font: clamp(1.12rem, min(5.4vw, 2.95vh), 1.6rem);
+    --quiz-list-gap: clamp(0.48rem, 1.08vh, 0.78rem);
+  }
+
+  .quiz-card {
+    padding:
+      clamp(0.5rem, 1.35vh, 0.75rem)
+      clamp(0.62rem, 2.8vw, 0.95rem)
+      calc(clamp(0.5rem, 1.35vh, 0.75rem) + var(--quiz-safe-bottom));
+  }
+
+  .logo-header {
+    height: clamp(42px, 7.5vh, 58px) !important;
+  }
+
+  .logo-left,
+  .logo-header.logo-agencia {
+    height: clamp(42px, 7.5vh, 58px) !important;
+  }
+
+  .logo-right {
+    height: clamp(42px, 7.5vh, 58px) !important;
+  }
+
+  .app-title {
+    font-size: clamp(1.2rem, min(6vw, 3.25vh), 1.68rem) !important;
+  }
+
+  .btn-back-premium {
+    min-height: clamp(36px, 5.3vh, 48px);
+    font-size: clamp(0.78rem, min(3.3vw, 1.95vh), 0.98rem);
+  }
+
+  .sala-pill {
+    height: clamp(34px, 5vh, 44px);
+    font-size: clamp(0.76rem, min(3.4vw, 1.9vh), 0.96rem);
+  }
+
+  .question-container {
+    grid-template-rows: auto minmax(0, auto) auto minmax(0, 1fr) minmax(1rem, auto) auto;
+  }
+
+  .question-text {
+    line-height: 1.08 !important;
+  }
+
+  #options .option-btn,
+  #options.options-list .option-btn,
+  .options-list .option-btn,
+  .option-btn {
+    border-radius: clamp(12px, 3.8vw, 18px);
+  }
+
+  .footer-info.score-panel,
+  .score-panel {
+    gap: clamp(0.42rem, 1.5vw, 0.7rem) !important;
+  }
+
+  .points-pill,
+  .score-stat {
+    min-height: clamp(42px, 6.2vh, 60px);
+    padding: clamp(0.52rem, 1.35vh, 0.82rem) clamp(0.62rem, 2.8vw, 1rem) !important;
+    font-size: clamp(0.9rem, min(4.1vw, 2.35vh), 1.18rem) !important;
+  }
+}
+
+@media (max-height: 700px) {
+  :root {
+    --quiz-question-font: clamp(1.12rem, min(5vw, 3.05vh), 1.72rem);
+    --quiz-answer-font: clamp(1rem, min(4.55vw, 2.55vh), 1.34rem);
+    --quiz-timer-font: clamp(1.02rem, min(4.6vw, 2.6vh), 1.36rem);
+    --quiz-list-gap: clamp(0.38rem, 0.9vh, 0.62rem);
+  }
+
+  .question-timer {
+    min-width: clamp(86px, 17vw, 132px) !important;
+    padding: clamp(0.28rem, 0.78vh, 0.48rem) clamp(0.68rem, 2vw, 1.05rem) !important;
+  }
+
+  #options .option-btn span:not(.emoji),
+  #options.options-list .option-btn span:not(.emoji),
+  .options-list .option-btn span:not(.emoji),
+  .option-btn span:not(.emoji) {
+    padding-inline: clamp(1.35rem, 6.5vw, 2.1rem);
+  }
+
+  .logo-header,
+  .logo-left,
+  .logo-header.logo-agencia,
+  .logo-right {
+    height: clamp(36px, 7.2vh, 54px) !important;
+  }
+
+  .app-title {
+    font-size: clamp(1.05rem, min(4.8vw, 2.85vh), 1.5rem) !important;
+  }
+
+  .points-pill,
+  .score-stat {
+    min-height: clamp(40px, 6vh, 56px);
+    font-size: clamp(0.86rem, min(3.8vw, 2.2vh), 1.08rem) !important;
+  }
+}

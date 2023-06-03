@@ -239,6 +239,20 @@
       filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
     }
 
+    .portada-agency-logo {
+      width: min(280px, 58vw);
+      max-width: 68%;
+      height: auto;
+      margin-bottom: 14px;
+      background: transparent !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+      object-fit: contain;
+      filter: drop-shadow(0 5px 8px rgba(15, 23, 42, 0.22));
+    }
+
     .portada-title {
       color: #111827;
       font-size: clamp(28px, 8vw, 42px);
@@ -451,6 +465,13 @@
         margin: 0 auto clamp(6px, 1.6vh, 12px);
       }
 
+      .portada-agency-logo {
+        width: clamp(180px, 28vw, 280px);
+        max-width: 42vw;
+        max-height: clamp(58px, 16vh, 94px);
+        margin: 0 auto clamp(5px, 1.4vh, 10px);
+      }
+
       .portada-title {
         font-size: clamp(32px, 9.5vh, 64px);
         line-height: 0.95;
@@ -589,9 +610,8 @@
       z-index: 10000;
       padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
       backdrop-filter: blur(2px);
-      overflow-y: auto !important;
+      overflow: hidden !important;
       overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
       touch-action: auto;
     }
 
@@ -605,17 +625,17 @@
       align-items: center;
       margin-bottom: 16px;
       gap: 8px;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 12px;
-      padding: 6px 12px;
-      border: 1px solid rgba(0, 0, 0, 0.05);
+      background: transparent;
+      border-radius: 0;
+      padding: 0;
+      border: 0;
     }
 
     .quiz-top-logos img {
-      height: clamp(24px, 6vh, 38px);
+      height: clamp(22px, 5.2vh, 34px);
       width: auto;
       object-fit: contain;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+      filter: none;
     }
 
     .quiz-card {
@@ -626,7 +646,11 @@
       box-shadow: 0 20px 60px rgba(0, 0, 0, .35);
       color: #111;
       padding: clamp(16px, 4.5vw, 28px);
-      margin: 32px auto;
+      max-height: calc(100svh - 28px);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
     .quiz-title {
@@ -646,7 +670,8 @@
 
     .quiz-q {
       font-weight: 800;
-      font-size: clamp(15px, 4vw, 18px);
+      font-size: clamp(20px, min(5vw, 4vh), 30px);
+      line-height: 1.12;
       margin: 0 0 8px;
       white-space: normal;
       overflow-wrap: break-word;
@@ -774,7 +799,7 @@
 
       .quiz-options {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: 1fr;
         gap: 8px;
         margin: 6px 0 8px;
       }
@@ -962,6 +987,12 @@
         max-width: 48vw;
       }
 
+      .portada-agency-logo {
+        width: min(280px, 76vw);
+        max-width: 76vw;
+        margin-bottom: 14px;
+      }
+
       .btn-play-portada {
         width: min(320px, 86vw);
       }
@@ -983,62 +1014,530 @@
     }
 
     /* Responsive quiz answer list and prominent counter */
+    .quiz-overlay.show {
+      display: grid;
+      overflow: hidden !important;
+    }
+
+    .quiz-card {
+      width: min(860px, 95vw);
+      max-height: calc(100svh - 20px);
+      gap: clamp(8px, 1.6vh, 16px);
+      padding: clamp(18px, 3.4vw, 34px);
+      margin: 0 auto;
+    }
+
+    .quiz-top-logos,
+    .quiz-title,
+    .quiz-sub,
+    .quiz-q,
+    .quiz-actions,
+    .quiz-msg {
+      flex: 0 0 auto;
+    }
+
+    .quiz-top-logos {
+      margin-bottom: 0;
+      gap: clamp(10px, 2vw, 18px);
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
+      border: 0;
+    }
+
+    .quiz-top-logos img {
+      height: clamp(28px, min(6.2vh, 5.4vw), 48px);
+      max-width: 32%;
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+    }
+
+    .quiz-title,
+    .quiz-sub,
+    .quiz-q {
+      margin-bottom: 0;
+    }
+
+    .quiz-title {
+      font-size: clamp(1.45rem, min(4.4vw, 4.5vh), 2.75rem);
+      line-height: 1.03;
+      color: #0f172a;
+      background: linear-gradient(90deg, #f23f3a, #ff76b4 36%, #775aff 68%, #00b487);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .quiz-sub {
+      font-size: clamp(1rem, min(2.6vw, 2.7vh), 1.4rem);
+      font-weight: 800;
+    }
+
+    .quiz-q {
+      font-size: clamp(1.5rem, min(5.1vw, 4.8vh), 3rem);
+      line-height: 1.1;
+      font-weight: 900;
+    }
+
     .quiz-timer {
       width: max-content;
-      min-width: clamp(92px, 22vw, 160px);
-      margin: 8px auto 14px !important;
-      padding: clamp(8px, 2vw, 12px) clamp(16px, 4vw, 24px);
+      min-width: 0;
+      flex: 0 0 auto;
+      margin: 0 auto !important;
+      padding: 0 clamp(4px, 1vw, 8px);
       border-radius: 999px;
-      background: rgba(254, 242, 242, 0.96);
-      border: 2px solid rgba(185, 28, 28, 0.2);
-      box-shadow: 0 12px 28px rgba(185, 28, 28, 0.16);
-      font-size: clamp(1.55rem, 5vw, 2.5rem) !important;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      font-size: clamp(1.35rem, min(4.7vw, 4.2vh), 2.2rem) !important;
       line-height: 1;
       font-variant-numeric: tabular-nums;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.85);
     }
 
     .quiz-options {
-      display: flex !important;
-      flex-direction: column !important;
-      grid-template-columns: none !important;
-      gap: clamp(8px, 1.8vw, 12px) !important;
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      grid-auto-rows: minmax(0, 1fr);
+      flex: 1 1 auto;
+      min-height: 0;
+      gap: clamp(9px, 1.7vh, 16px) !important;
       width: 100%;
-      max-width: min(620px, 100%);
+      max-width: min(760px, 100%);
       margin-left: auto;
       margin-right: auto;
+      overflow: hidden !important;
     }
 
     .quiz-opt {
       width: 100%;
-      min-height: clamp(46px, 8svh, 64px);
+      min-height: 0;
+      height: 100%;
       align-items: center;
-      padding: clamp(10px, 2.4vw, 14px) clamp(12px, 3vw, 18px);
-      font-size: clamp(0.95rem, 2.8vw, 1.15rem);
-      line-height: 1.2;
+      padding: clamp(12px, 2vh, 18px) clamp(16px, 3.4vw, 26px);
+      font-size: clamp(1.16rem, min(3.8vw, 3.35vh), 1.72rem);
+      line-height: 1.14;
+      border-radius: 18px;
+      font-weight: 900;
       overflow-wrap: anywhere;
     }
 
     .quiz-opt input {
+      width: clamp(20px, 3.2vw, 28px);
+      height: clamp(20px, 3.2vw, 28px);
       flex: 0 0 auto;
     }
 
+    .quiz-actions {
+      gap: clamp(10px, 1.8vw, 16px);
+      margin-top: 0;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      min-height: clamp(44px, 6vh, 60px);
+      padding: clamp(12px, 1.7vh, 16px) clamp(18px, 3vw, 28px);
+      font-size: clamp(1rem, min(2.8vw, 2.6vh), 1.3rem);
+      border-radius: 16px;
+    }
+
     @media (max-height: 520px) {
+      .quiz-card {
+        padding: clamp(10px, 2.6vh, 16px);
+        gap: clamp(5px, 1.2vh, 9px);
+      }
+
+      .quiz-top-logos {
+        padding: 0;
+      }
+
+      .quiz-top-logos img {
+        height: clamp(22px, 6.4vh, 32px);
+      }
+
+      .quiz-title {
+        font-size: clamp(1.05rem, 4.4vh, 1.45rem);
+      }
+
+      .quiz-sub {
+        display: none;
+      }
+
+      .quiz-q {
+        font-size: clamp(1.08rem, 4.9vh, 1.55rem);
+      }
+
       .quiz-timer {
-        min-width: 84px;
-        padding: 7px 14px;
-        font-size: clamp(1.2rem, 6svh, 1.8rem) !important;
+        min-width: 0;
+        padding: 0 6px;
+        font-size: clamp(1.08rem, 4.8svh, 1.45rem) !important;
       }
 
       .quiz-options {
         gap: 7px !important;
-        max-height: 38svh;
-        overflow-y: auto;
-        padding-right: 4px;
+        max-height: none;
+        overflow: hidden !important;
+        padding-right: 0;
       }
 
       .quiz-opt {
-        min-height: 40px;
+        min-height: 0;
         padding-block: 8px;
+        font-size: clamp(0.98rem, 3.9vh, 1.18rem);
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        min-height: 38px;
+        padding: 8px 14px;
+        font-size: clamp(0.9rem, 3.4vh, 1rem);
+      }
+    }
+
+    /* Landscape phone layout for the Spinosaurio station */
+    @media (orientation: landscape) {
+      body:not(.quiz-mode) {
+        display: block !important;
+        width: 100dvw;
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding: 0 !important;
+        gap: 0 !important;
+      }
+
+      body:not(.quiz-mode) .contenedor,
+      body:not(.quiz-mode) .stage {
+        width: 100vw !important;
+        width: 100dvw !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        max-height: 100vh !important;
+        flex: 0 0 100vh !important;
+        height: 100svh !important;
+        min-height: 100svh !important;
+        max-height: 100svh !important;
+        flex: 0 0 100svh !important;
+        height: 100dvh !important;
+        min-height: 100dvh !important;
+        max-height: 100dvh !important;
+        flex: 0 0 100dvh !important;
+      }
+
+      .hud-controls {
+        top: max(14px, calc(env(safe-area-inset-top) + 10px));
+        left: max(14px, calc(env(safe-area-inset-left) + 12px));
+        right: max(112px, calc(env(safe-area-inset-right) + 108px));
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(10px, 2vw, 20px);
+        z-index: 35;
+        pointer-events: none;
+      }
+
+      .hud-logos {
+        display: flex;
+        flex-direction: row !important;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(10px, 2.2vw, 22px);
+        max-width: min(72vw, 760px);
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+      }
+
+      .hud-logos img {
+        width: auto;
+        height: clamp(34px, 8.8vh, 48px);
+        height: clamp(34px, 8.8svh, 48px);
+        max-width: min(20vw, 190px);
+        max-height: 48px;
+        object-fit: contain;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        filter: saturate(1.05) contrast(1.04);
+        flex: 0 1 auto;
+      }
+
+      .exit-map-btn {
+        position: fixed;
+        top: max(16px, calc(env(safe-area-inset-top) + 12px));
+        left: max(16px, calc(env(safe-area-inset-left) + 12px));
+        width: auto;
+        height: auto;
+        min-width: 0;
+        padding: 5px 8px;
+        justify-content: center;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        color: #9b5c47;
+        font-size: clamp(13px, 3.1vh, 16px);
+        font-weight: 900;
+        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.65);
+        pointer-events: auto;
+        transform: none;
+        z-index: 60;
+      }
+
+      .exit-map-btn__icon {
+        display: none;
+      }
+
+      .exit-map-btn__label {
+        display: inline-flex;
+      }
+
+      .exit-map-btn:hover {
+        transform: scale(1.04);
+      }
+
+      .exit-map-btn:active {
+        transform: scale(0.96);
+      }
+
+      .score {
+        top: max(18px, calc(env(safe-area-inset-top) + 14px));
+        right: max(24px, calc(env(safe-area-inset-right) + 22px));
+        min-width: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        color: #9b5c47;
+        font-family: Verdana, Geneva, sans-serif;
+        font-size: clamp(24px, 5.7vh, 34px);
+        font-size: clamp(24px, 5.7svh, 34px);
+        line-height: 1;
+        text-align: center;
+        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.72);
+        z-index: 45;
+      }
+
+      .quiz-warning {
+        top: clamp(82px, 22vh, 126px);
+        top: clamp(82px, 22svh, 126px);
+        width: min(660px, calc(100vw - 168px));
+        max-width: calc(100vw - 40px);
+        padding: clamp(12px, 2vh, 18px) clamp(18px, 3vw, 28px);
+        padding: clamp(12px, 2svh, 18px) clamp(18px, 3vw, 28px);
+        border-radius: 20px;
+        font-size: clamp(18px, min(3.5vw, 5vh), 26px);
+        font-size: clamp(18px, min(3.5vw, 5svh), 26px);
+        line-height: 1.12;
+      }
+
+      .dino {
+        left: clamp(28px, 8vw, 58px);
+        bottom: max(2px, env(safe-area-inset-bottom));
+        z-index: 3;
+      }
+
+      .suelo {
+        z-index: 1;
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 430px) {
+      .hud-controls {
+        top: max(8px, calc(env(safe-area-inset-top) + 6px));
+        left: max(10px, calc(env(safe-area-inset-left) + 8px));
+        right: max(92px, calc(env(safe-area-inset-right) + 88px));
+      }
+
+      .hud-logos {
+        max-width: min(72vw, 640px);
+        gap: clamp(7px, 1.7vw, 14px);
+        padding: 0;
+      }
+
+      .hud-logos img {
+        height: clamp(30px, 8.8vh, 40px);
+        height: clamp(30px, 8.8svh, 40px);
+        max-width: min(19vw, 170px);
+        padding: 0;
+        border-radius: 0;
+      }
+
+      .exit-map-btn {
+        top: max(12px, calc(env(safe-area-inset-top) + 8px));
+        left: max(12px, calc(env(safe-area-inset-left) + 8px));
+        width: auto;
+        height: auto;
+        padding: 4px 7px;
+        font-size: clamp(12px, 3.6vh, 15px);
+      }
+
+      .score {
+        top: max(12px, calc(env(safe-area-inset-top) + 8px));
+        right: max(16px, calc(env(safe-area-inset-right) + 14px));
+        min-width: 0;
+        padding: 0;
+        border-radius: 0;
+        font-size: clamp(22px, 6vh, 29px);
+        font-size: clamp(22px, 6svh, 29px);
+      }
+
+      .quiz-warning {
+        top: clamp(88px, 25vh, 112px);
+        top: clamp(88px, 25svh, 112px);
+        width: min(560px, calc(100vw - 100px));
+        padding: 9px 14px;
+        border-radius: 16px;
+        font-size: clamp(14px, 4.4vh, 19px);
+        font-size: clamp(14px, 4.4svh, 19px);
+      }
+
+      .dino {
+        left: clamp(24px, 7vw, 44px);
+      }
+
+      .quiz-overlay {
+        padding: max(6px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+      }
+
+      .quiz-card {
+        width: min(940px, 96vw);
+        height: calc(100vh - 12px);
+        max-height: calc(100vh - 12px);
+        height: calc(100svh - 12px);
+        max-height: calc(100svh - 12px);
+        padding: clamp(8px, 2vh, 12px) clamp(12px, 2.6vw, 18px);
+        padding: clamp(8px, 2svh, 12px) clamp(12px, 2.6vw, 18px);
+        gap: 5px;
+        border-radius: 18px;
+        justify-content: flex-start;
+      }
+
+      .quiz-top-logos {
+        gap: 8px;
+        padding: 0;
+      }
+
+      .quiz-top-logos img {
+        height: clamp(20px, 6.2vh, 28px);
+        max-width: 32%;
+      }
+
+      .quiz-title {
+        font-size: clamp(1.05rem, 4.4vh, 1.45rem);
+        font-size: clamp(1.2rem, 5svh, 1.7rem);
+        line-height: 1;
+      }
+
+      .quiz-q {
+        max-width: min(760px, 100%);
+        margin-inline: auto;
+        font-size: clamp(1.05rem, 4.6vh, 1.45rem);
+        font-size: clamp(1.18rem, 5.2svh, 1.75rem);
+        line-height: 1.06;
+      }
+
+      .quiz-timer {
+        min-width: 0;
+        padding: 0 6px;
+        font-size: clamp(1.08rem, 4.7vh, 1.45rem) !important;
+        font-size: clamp(1.12rem, 5svh, 1.55rem) !important;
+      }
+
+      .quiz-options {
+        gap: 6px !important;
+      }
+
+      .quiz-opt {
+        padding: 6px 12px;
+        border-radius: 14px;
+        font-size: clamp(0.95rem, 3.8vh, 1.12rem);
+        font-size: clamp(1rem, 4.1svh, 1.28rem);
+        line-height: 1.1;
+      }
+
+      .quiz-actions {
+        margin-top: 2px;
+      }
+    }
+
+    @media (orientation: landscape) {
+      body:not(.quiz-mode) #btnExitToMap.exit-map-btn {
+        position: fixed !important;
+        top: max(12px, calc(env(safe-area-inset-top) + 8px)) !important;
+        left: max(12px, calc(env(safe-area-inset-left) + 8px)) !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        z-index: 120 !important;
+      }
+
+      body:not(.quiz-mode) #btnExitToMap.exit-map-btn:hover {
+        transform: scale(1.04) !important;
+      }
+
+      body:not(.quiz-mode) #btnExitToMap.exit-map-btn:active {
+        transform: scale(0.96) !important;
+      }
+    }
+
+    /* Mantener la agencia como logo principal frente a SATA en la mision. */
+    .hud-logos .hud-logo-agency {
+      height: clamp(42px, 10.5vh, 64px);
+      height: clamp(42px, 10.5svh, 64px);
+      max-width: min(30vw, 240px);
+      max-height: 64px;
+      filter: saturate(1.08) contrast(1.05) drop-shadow(0 2px 3px rgba(15, 23, 42, 0.16));
+    }
+
+    .hud-logos .hud-logo-sata {
+      height: clamp(22px, 5.8vh, 34px);
+      height: clamp(22px, 5.8svh, 34px);
+      max-width: min(16vw, 130px);
+      max-height: 34px;
+      opacity: 0.72;
+    }
+
+    .quiz-top-logos .quiz-logo-agency {
+      height: clamp(34px, min(8vh, 6vw), 58px);
+      max-width: 42%;
+      filter: saturate(1.08) contrast(1.05);
+    }
+
+    .quiz-top-logos .quiz-logo-sata {
+      height: clamp(20px, min(4.8vh, 4vw), 32px);
+      max-width: 24%;
+      opacity: 0.72;
+    }
+
+    @media (orientation: landscape) and (max-height: 430px) {
+      .hud-logos .hud-logo-agency {
+        height: clamp(40px, 11svh, 54px);
+        max-width: min(28vw, 210px);
+        max-height: 54px;
+      }
+
+      .hud-logos .hud-logo-sata {
+        height: clamp(20px, 5.8svh, 28px);
+        max-width: min(15vw, 112px);
+        max-height: 28px;
+      }
+
+      .quiz-top-logos .quiz-logo-agency {
+        height: clamp(30px, 8svh, 42px);
+      }
+
+      .quiz-top-logos .quiz-logo-sata {
+        height: clamp(18px, 4.8svh, 24px);
       }
     }
   </style>
@@ -1056,12 +1555,12 @@
   <div id="portadaOverlay" class="portada-overlay show">
 
     <div class="portada-top-logos">
-      <img src="Logo-Ag-14.png" alt="Gobierno de Chiapas">
+      <img src="logo-much.png" alt="MUCH">
       <img src="logo-sata.png" alt="SATA">
     </div>
 
     <div class="portada-card">
-      <img src="logo-much.png" alt="MUCH" class="portada-much-logo">
+      <img src="Logo-Ag-14.png" alt="Gobierno de Chiapas" class="portada-much-logo portada-agency-logo">
 
       <h1 class="portada-title">SPINOSAURUS<br>RUNNER</h1>
       <p class="portada-sub">Salta los cactus, acumula puntos y demuestra tu habilidad 🦖</p>
@@ -1084,9 +1583,9 @@
     <div class="stage">
       <div class="hud-controls">
         <div class="hud-logos" aria-hidden="true">
-          <img src="Logo-Ag-14.png" alt="Agencia Digital Chiapas">
-          <img src="logo-sata.png" alt="SATA">
           <img src="logo-much.png" alt="MUCH">
+          <img src="Logo-Ag-14.png" alt="Agencia Digital Chiapas" class="hud-logo-agency">
+          <img src="logo-sata.png" alt="SATA" class="hud-logo-sata">
         </div>
 
         <button id="btnExitToMap" class="exit-map-btn" type="button" aria-label="Salir al mapa" title="Salir al mapa de estaciones">
@@ -1109,9 +1608,9 @@
   <div id="quizOverlay" class="quiz-overlay" aria-hidden="true">
     <div class="quiz-card" role="dialog" aria-modal="true">
       <div class="quiz-top-logos" aria-hidden="true">
-        <img src="Logo-Ag-14.png" alt="Gobierno de Chiapas">
-        <img src="logo-sata.png" alt="SATA">
         <img src="logo-much.png" alt="MUCH">
+        <img src="Logo-Ag-14.png" alt="Gobierno de Chiapas" class="quiz-logo-agency">
+        <img src="logo-sata.png" alt="SATA" class="quiz-logo-sata">
       </div>
       <h3 id="quizTitle" class="quiz-title"></h3>
       <p id="quizSub" class="quiz-sub"></p>
