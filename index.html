@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MISIÓN MUSEO — El Juego</title>
+  <meta name="description"
+    content="MISIÓN MUSEO: Un emocionante juego de preguntas sobre diversidad, dinosaurios, animales, ciencia y tecnología." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    /* ────────────────────────────────────────────────
+       MISIÓN MUSEO — STYLES (TODO EN UNO)
+    ────────────────────────────────────────────────── */
+    :root {
+      --msf-red: #F23F3A;
+      --msf-pink: #FF76B4;
+      --msf-yellow: #FFC549;
+      --msf-green: #00B487;
+      --msf-blue: #6DD0F0;
+      --msf-purple: #775AFF;
+      --primary: var(--msf-pink);
+      --secondary: var(--msf-blue);
+      --tertiary: var(--msf-yellow);
+      --quaternary: var(--msf-green);
+      --accent: var(--msf-purple);
+      --danger: var(--msf-red);
+      --bg-deep: #1A1C2C;
+      --bg-soft: #F4F4F9;
+      --white: #ffffff;
+      --text-main: #1A1C2C;
+      --text-light: #ffffff;
+      --sidebar-w: 300px;
+      --radius: 24px;
+      --transition: 0.25s cubic-bezier(.17, .67, .83, .67);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: 'Outfit', 'Inter', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-main);
+      overflow: hidden;
+    }
+
+    .bg-particles {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: var(--bg-deep);
+      pointer-events: none;
+    }
+
+    .bg-particles::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle 2px at 10% 20%, var(--msf-red) 0%, transparent 0%),
+        radial-gradient(circle 3px at 25% 65%, var(--msf-pink) 0%, transparent 0%),
+        radial-gradient(circle 4px at 50% 15%, var(--msf-yellow) 0%, transparent 0%),
+        radial-gradient(circle 2px at 70% 80%, var(--msf-green) 0%, transparent 0%),echo "# MISIONMUSEO" >> README.md
+        radial-gradient(circle 3px at 85% 40%, var(--msf-blue) 0%, transparent 0%),
+        radial-gradient(circle 2px at 40% 50%, var(--msf-purple) 0%, transparent 0%);
+      animation: floatParticles 15s linear infinite;
+    }
+
+    @keyframes floatParticles {
+      0% {
+        transform: translateY(0);
+      }
+
+      100% {
+        transform: translateY(-100px);
+      }
+    }
+
+    @keyframes twinkle {
+      0% {
+        opacity: .4;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    /* LAYOUT */
+    .view-section {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      display: none;
+      flex-direction: row;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      background: var(--bg-deep);
+    }
+
+    .view-section.active {
+      display: flex;
+    }
+
+    .main-area {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .hero {
+      text-align: center;
+      animation: fadeUp .9s ease both;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-icon {
+      font-size: 8rem;
+      margin-bottom: 1.5rem;
+      filter: drop-shadow(0 10px 20px rgba(255, 118, 180, 0.4));
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-20px) rotate(5deg);
+      }
+    }
+
+    .hero-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      text-shadow: 4px 4px 0px var(--msf-red), 8px 8px 0px var(--msf-purple);
+    }
+
+    .hero-title span {
+      background: linear-gradient(to right, var(--msf-yellow), var(--msf-green), var(--msf-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+    }
+
+    .hero-subtitle {
+      margin-top: 1.5rem;
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    .badge {
+      background: var(--white);
+      border: 4px solid var(--bg-deep);
+      color: var(--bg-deep);
+      padding: .6rem 1.4rem;
+      border-radius: 20px;
+      font-size: 1rem;
+      font-weight: 800;
+      box-shadow: 0 6px 0px var(--bg-deep);
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .badge:nth-child(1) {
+      background: var(--msf-red);
+      color: white;
+    }
+
+    .badge:nth-child(2) {
+      background: var(--msf-pink);
+      color: white;
+    }
+
+    .badge:nth-child(3) {
+      background: var(--msf-yellow);
+      color: var(--bg-deep);
+    }
+
+    .badge:nth-child(4) {
+      background: var(--msf-green);
+      color: white;
+    }
+
+    .badge:nth-child(5) {
+      background: var(--msf-blue);
+      color: var(--bg-deep);
+    }
+
+    .badge:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 9px 0px var(--bg-deep);
+    }
+
+    .badge:active {
+      transform: translateY(3px);
+      box-shadow: 0 3px 0px var(--bg-deep);
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: white;
+      border-left: 8px solid var(--msf-purple);
+      display: flex;
+      flex-direction: column;
+      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+      position: relative;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+
+    .sidebar-inner {
+      padding: 3rem 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    .brand-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      font-weight: 900;
+      line-height: 1.1;
+      color: var(--msf-pink);
+      text-shadow: 2px 2px 0px var(--msf-blue);
+      text-align: center;
+    }
+
+    .brand-divider {
+      margin: 1.2rem auto 2rem;
+      width: 70%;
+      height: 4px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--msf-red), var(--msf-yellow), var(--msf-blue));
+    }
+
+    .nav-list {
+      list-style: none;
+      gap: .4rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: .85rem 1.2rem;
+      border-radius: var(--radius);
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 600;
+      transition: all var(--transition);
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: var(--bg-soft);
+      color: var(--msf-purple);
+      transform: translateX(8px);
+    }
+
+    .nav-item.active {
+      border: 4px solid var(--msf-purple);
+      box-shadow: 4px 4px 0px var(--msf-blue);
+      background: white;
+    }
+
+    .sidebar-spacer {
+      flex: 1;
+    }
+
+    .btn-play {
+      background: linear-gradient(135deg, var(--msf-pink), var(--msf-red));
+      border: 5px solid var(--bg-deep);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      color: white;
+      font-weight: 900;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 8px 0px var(--bg-deep);
+      transition: all 0.1s;
+    }
+
+    .btn-play:hover {
+      transform: translateY(2px);
+      box-shadow: 0 6px 0px var(--bg-deep);
+      filter: brightness(1.1);
+    }
+
+    .btn-play:active {
+      transform: translateY(8px);
+      box-shadow: 0 0px 0px var(--bg-deep);
+    }
+
+    /* MODAL */
+    .avatar-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(5, 8, 20, 0.85);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      transition: opacity .3s;
+    }
+
+    .avatar-overlay.open {
+      display: flex;
+      opacity: 1;
+    }
+
+    .avatar-modal {
+      background: var(--white);
+      border: 8px solid var(--msf-blue);
+      border-radius: 40px;
+      width: min(860px, 96vw);
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 0px var(--bg-deep);
+      transform: translateY(30px);
+      transition: transform .4s cubic-bezier(.34, 1.56, .64, 1);
+      overflow: hidden;
+    }
+
+    .avatar-overlay.open .avatar-modal {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      text-align: center;
+      padding: 2rem 2rem .5rem;
+    }
+
+    .modal-title {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--msf-pink);
+      text-shadow: 3px 3px 0px var(--msf-blue);
+    }
+
+    .avatar-tabs {
+      display: flex;
+      gap: .5rem;
+      justify-content: center;
+      padding: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .av-tab {
+      background: white;
+      border: 4px solid var(--msf-blue);
+      padding: .6rem 1.4rem;
+      border-radius: 999px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 0px var(--msf-blue);
+      transition: all .2s;
+    }
+
+    .av-tab.active {
+      background: var(--bg-deep);
+      color: white;
+      border-color: var(--bg-deep);
+    }
+
+    .avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 1rem;
+      padding: 1rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .av-card {
+      background: var(--bg-soft);
+      border: 5px solid var(--bg-soft);
+      border-radius: 32px;
+      padding: 1rem .5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all .25s;
+      position: relative;
+    }
+
+    .av-card:hover {
+      border-color: var(--msf-yellow);
+      transform: translateY(-5px);
+    }
+
+    .av-card.selected {
+      border-color: var(--msf-pink);
+      box-shadow: 0 8px 0px var(--msf-pink);
+      transform: translateY(-8px);
+      background: white;
+    }
+
+    .av-img-wrap {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto .5rem;
+      border-radius: 20px;
+      overflow: hidden;
+      background: white;
+    }
+
+    .av-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .av-name {
+      font-weight: 800;
+      font-size: .9rem;
+    }
+
+    .av-check {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--msf-pink);
+      color: white;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid var(--bg-deep);
+    }
+
+    .av-card.selected .av-check {
+      display: flex;
+    }
+
+    .modal-footer {
+      padding: 1.5rem 2rem;
+      border-top: 2px solid var(--bg-soft);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-confirm {
+      background: linear-gradient(135deg, var(--msf-green), var(--msf-blue));
+      border: 5px solid var(--bg-deep);
+      border-radius: var(--radius);
+      padding: .8rem 2rem;
+      color: white;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 6px 0px var(--bg-deep);
+    }
+
+    .btn-confirm:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    /* PREP VIEW (RULES & MAP) */
+    .intro-container {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      align-items: center;
+      width: 100%;
+    }
+
+    .card {
+      background: white;
+      border: 6px solid var(--bg-deep);
+      border-radius: 40px;
+      padding: 2rem;
+      box-shadow: 0 15px 0px rgba(0, 0, 0, 0.3);
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 900;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .rules-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .rules-list li {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      font-weight: 600;
+    }
+
+    .rule-icon {
+      font-size: 1.8rem;
+      background: var(--bg-soft);
+      width: 55px;
+      height: 55px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 18px;
+      border: 3px solid var(--msf-blue);
+      flex-shrink: 0;
+    }
+
+    .avatar-preview-box {
+      margin-top: 2rem;
+      background: var(--msf-pink);
+      border: 4px solid var(--bg-deep);
+      border-radius: 30px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: white;
+      box-shadow: 0 6px 0px var(--bg-deep);
+    }
+
+    .museum-map {
+      background: #E8EDF3;
+      border-radius: 30px;
+      height: 400px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 2rem;
+      border: 4px inset rgba(0, 0, 0, 0.1);
+    }
+
+    .map-room {
+      width: 70px;
+      height: 70px;
+      background: white;
+      border: 6px solid var(--bg-deep);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.5rem;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 6px 0px var(--bg-deep);
+      transition: all .3s;
+    }
+
+    .map-room::after {
+      content: attr(data-name);
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: .75rem;
+      font-weight: 800;
+      margin-top: 8px;
+      color: white;
+      text-shadow: 2px 2px 0px var(--bg-deep);
+      white-space: nowrap;
+    }
+
+    .map-room.active {
+      background: var(--msf-yellow);
+      border-color: var(--msf-red);
+      animation: roomBounce 1s infinite alternate;
+    }
+
+    @keyframes roomBounce {
+      from {
+        transform: scale(1);
+      }
+
+      to {
+        transform: scale(1.1) translateY(-5px);
+      }
+    }
+
+    .map-path {
+      position: absolute;
+      height: 8px;
+      background: repeating-linear-gradient(90deg, var(--bg-deep), var(--bg-deep) 10px, transparent 10px, transparent 20px);
+      z-index: 1;
+    }
+
+    .path-1-2 {
+      width: 15%;
+      left: 20%;
+      top: 50%;
+    }
+
+    .path-2-3 {
+      width: 15%;
+      left: 42%;
+      top: 50%;
+    }
+
+    .path-3-4 {
+      width: 15%;
+      left: 65%;
+      top: 50%;
+    }
+
+    .btn-play.large {
+      width: auto;
+      padding: 1.5rem 3rem;
+      font-size: 1.8rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 1024px) {
+      .sidebar {
+        width: 260px;
+      }
+
+      .hero-title {
+        font-size: 5rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .view-section {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        position: fixed;
+        right: 0;
+        top: 0;
+        height: 100vh;
+        width: 280px;
+        transform: translateX(100%);
+        z-index: 1000;
+        transition: transform 0.3s cubic-bezier(.34, 1.56, .64, 1);
+        border-left: 10px solid var(--msf-purple);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-area {
+        padding: 1rem;
+        padding-top: 6rem;
+        width: 100%;
+        height: 100vh;
+      }
+
+      .hero-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+      }
+
+      .hero-title {
+        font-size: 3.2rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1rem;
+        padding: 0 1rem;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+
+      .intro-container {
+        grid-template-columns: 1fr;
+        padding: 6rem 1rem 2rem;
+        width: 100%;
+      }
+
+      .map-path {
+        display: none;
+      }
+
+      .museum-map {
+        height: auto;
+        min-height: 400px;
+        flex-direction: column;
+        gap: 2rem;
+        padding: 3rem 1rem;
+      }
+
+      .avatar-modal {
+        width: 95vw;
+        max-height: 85vh;
+        border-width: 4px;
+        border-radius: 20px;
+      }
+
+      .avatar-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: .8rem;
+        padding: 1rem;
+      }
+
+      .modal-title {
+        font-size: 1.8rem;
+      }
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 110;
+      background: var(--msf-purple);
+      border: 4px solid var(--bg-deep);
+      padding: .8rem;
+      border-radius: 15px;
+      cursor: pointer;
+      box-shadow: 0 4px 0px var(--bg-deep);
+    }
+
+    .hamburger span {
+      display: block;
+      width: 25px;
+      height: 4px;
+      background: white;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- FONDO ANIMADO -->
+  <div class="bg-particles" id="bgParticles"></div>
+
+  <!-- BOTÓN HAMBURGER (Móvil) -->
+  <div class="hamburger" id="hamburgerBtn">
+    <span></span><span></span><span></span>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       VISTA 1: INICIO / LANDING
+  ══════════════════════════════════════════════ -->
+  <section class="view-section active" id="viewLanding">
+    <main class="main-area">
+      <div class="hero">
+        <div class="hero-icon">🏛️</div>
+        <h1 class="hero-title">MISIÓN<br /><span>MUSEO</span></h1>
+        <p class="hero-subtitle">Descubre dinosaurios, animales y tecnología<br />¡Demuestra cuánto sabes!</p>
+        <div class="hero-badges">
+          <span class="badge">🦕 Dinosaurios</span>
+          <span class="badge">🐾 Animales</span>
+          <span class="badge">🔬 Ciencia</span>
+          <span class="badge">💻 Tecnología</span>
+          <span class="badge">🌈 Diversidad</span>
+        </div>
+      </div>
+    </main>
+
+    <aside class="sidebar">
+      <div class="sidebar-inner">
+        <div class="sidebar-brand">
+          <h2 class="brand-title">MISIÓN<br />MUSEO</h2>
+          <div class="brand-divider"></div>
+        </div>
+        <ul class="nav-list">
+          <li><a href="#" class="nav-item active">🏠 Inicio</a></li>
+          <li><a href="#" class="nav-item">🏆 Puntajes</a></li>
+          <li><a href="#" class="nav-item">📖 Cómo jugar</a></li>
+        </ul>
+        <div class="sidebar-spacer"></div>
+        <div class="play-section">
+          <button class="btn-play" id="btnJugar">▶ JUGAR</button>
+          <p style="font-size: .8rem; margin-top: .5rem; color: #666; font-style: italic;">¡Prepárate!</p>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       VISTA 2: PREPARACIÓN (REGLAS Y MAPA)
+  ══════════════════════════════════════════════ -->
+  <section class="view-section" id="viewPrep" style="background: var(--bg-deep); flex-direction: column;">
+    <div class="intro-container">
+      <div class="rules-col">
+        <div class="card">
+          <h2 class="section-title"> Reglas</h2>
+          <ul class="rules-list">
+            <li><span class="rule-icon">🕒</span> 15 seg por pregunta</li>
+            <li><span class="rule-icon">💎</span> Gana puntos al acertar</li>
+            <li><span class="rule-icon">❌</span> 3 errores y pierdes</li>
+          </ul>
+        </div>
+        <div class="avatar-preview-box" id="avatarPreviewBox">
+          <div id="prepAvatarImg"
+            style="width: 70px; height: 70px; background: white; border-radius: 15px; overflow: hidden; padding: 5px;">
+          </div>
+          <div>
+            <p style="font-size: .8rem; opacity: .8;">Tu Avatar:</p>
+            <p id="prepAvatarName" style="font-weight: 900; font-size: 1.2rem;">---</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-col">
+        <div class="card" style="height: 100%; display: flex; flex-direction: column;">
+          <h2 class="section-title">🗺️ Tu Mapa</h2>
+          <div class="museum-map">
+            <div class="map-room active" data-name="Entrada">1</div>
+            <div class="map-path path-1-2"></div>
+            <div class="map-room" data-name="Dino">2</div>
+            <div class="map-path path-2-3"></div>
+            <div class="map-room" data-name="Espacio">3</div>
+            <div class="map-path path-3-4"></div>
+            <div class="map-room" style="background: var(--msf-red); color: white;" data-name="Meta">🏆</div>
+          </div>
+          <div style="text-align: center;">
+            <button class="btn-play large" id="btnComenzar">🚀 ¡COMENZAR!</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       MODAL SELECCIÓN AVATAR
+  ══════════════════════════════════════════════ -->
+  <div class="avatar-overlay" id="avatarOverlay">
+    <div class="avatar-modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Elige tu Avatar</h2>
+        <p>Selecciona tu personaje favorito</p>
+      </div>
+      <div class="avatar-tabs">
+        <button class="av-tab active" data-filter="all">Todos</button>
+        <button class="av-tab" data-filter="human">Humanos</button>
+        <button class="av-tab" data-filter="dino">Dinos</button>
+        <button class="av-tab" data-filter="space">Espacio</button>
+      </div>
+      <div class="avatar-grid" id="avatarGrid">
+        <!-- Generado dinámicamente -->
+      </div>
+      <div class="modal-footer">
+        <p id="previewName" style="font-weight: 800; color: var(--msf-pink);">Ninguno</p>
+        <button class="btn-confirm" id="btnConfirmar" disabled>Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ────────────────────────────────────────────────
+       MISIÓN MUSEO — LOGIC (TODO EN UNO)
+    ────────────────────────────────────────────────── */
+    const avatars = [
+      { id: 'humano1', name: 'Explorador', cat: 'human' },
+      { id: 'humana2', name: 'Curadora', cat: 'human' },
+      { id: 'dino1', name: 'T-Rex', cat: 'dino' },
+      { id: 'dino2', name: 'Triceratops', cat: 'dino' },
+      { id: 'dino3', name: 'Estegosaurio', cat: 'dino' },
+      { id: 'astronauta_m', name: 'Astronauta', cat: 'space' },
+      { id: 'astronauta_f', name: 'Cosmonauta', cat: 'space', isSvg: true }
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Partículas
+      const bg = document.getElementById('bgParticles');
+      for (let i = 0; i < 25; i++) {
+        const star = document.createElement('div');
+        const size = Math.random() * 3 + 1;
+        star.style.cssText = `position: absolute; width: ${size}px; height: ${size}px; border-radius: 50%; background: white; opacity: ${Math.random()}; left: ${Math.random() * 100}%; top: ${Math.random() * 100}%; animation: twinkle ${2 + Math.random() * 3}s infinite alternate;`;
+        bg.appendChild(star);
+      }
+
+      // 2. Render Avatares
+      const grid = document.getElementById('avatarGrid');
+      function renderAvatars(filter = 'all') {
+        grid.innerHTML = '';
+        avatars.forEach(av => {
+          if (filter !== 'all' && av.cat !== filter) return;
+          const card = document.createElement('div');
+          card.className = 'av-card';
+          card.innerHTML = `
+            <div class="av-img-wrap">${av.isSvg ? '<svg viewBox="0 0 120 140" class="av-img"><circle cx="60" cy="58" r="30" fill="#f59e0b"/><ellipse cx="60" cy="105" rx="30" ry="28" fill="#e8ecf0"/></svg>' : `<img src="avatars/${av.id}.png" class="av-img">`}</div>
+            <p class="av-name">${av.name}</p>
+            <div class="av-check">✓</div>
+          `;
+          card.onclick = () => {
+            document.querySelectorAll('.av-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedAvatar = av;
+            document.getElementById('previewName').innerText = av.name;
+            document.getElementById('btnConfirmar').disabled = false;
+          };
+          grid.appendChild(card);
+        });
+      }
+      renderAvatars();
+
+      // 3. Modal & Filtros
+      let selectedAvatar = null;
+      const overlay = document.getElementById('avatarOverlay');
+      document.getElementById('btnJugar').onclick = () => overlay.classList.add('open');
+      overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('open'); };
+
+      document.querySelectorAll('.av-tab').forEach(tab => {
+        tab.onclick = () => {
+          document.querySelectorAll('.av-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          renderAvatars(tab.dataset.filter);
+        };
+      });
+
+      // 4. Confirmar y Cambiar de Vista
+      document.getElementById('btnConfirmar').onclick = () => {
+        if (!selectedAvatar) return;
+        overlay.classList.remove('open');
+
+        // Cargar datos en la vista de preparación
+        document.getElementById('prepAvatarName').innerText = selectedAvatar.name;
+        const imgCont = document.getElementById('prepAvatarImg');
+        imgCont.innerHTML = selectedAvatar.isSvg ? '<svg viewBox="0 0 120 140" class="av-img"><circle cx="60" cy="58" r="30" fill="#f59e0b"/><ellipse cx="60" cy="105" rx="30" ry="28" fill="#e8ecf0"/></svg>' : `<img src="avatars/${selectedAvatar.id}.png" class="av-img">`;
+
+        // Switch de vista
+        document.getElementById('viewLanding').classList.remove('active');
+        document.getElementById('viewPrep').classList.add('active');
+      };
+
+      document.getElementById('btnComenzar').onclick = () => {
+        alert('¡Iniciando la misión! Prepárate para las preguntas.');
+      };
+
+      // 5. Hamburguesa Móvil
+      const hamburger = document.getElementById('hamburgerBtn');
+      const sidebar = document.querySelector('.sidebar');
+      if (hamburger && sidebar) {
+        hamburger.onclick = (e) => {
+          e.stopPropagation();
+          sidebar.classList.toggle('open');
+        };
+        document.onclick = (e) => {
+          if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
+            sidebar.classList.remove('open');
+          }
+        };
+      }
+    });
+  </script>
+</body>
+
+</html>
