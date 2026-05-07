@@ -72,7 +72,7 @@
         radial-gradient(circle 2px at 10% 20%, var(--msf-red) 0%, transparent 0%),
         radial-gradient(circle 3px at 25% 65%, var(--msf-pink) 0%, transparent 0%),
         radial-gradient(circle 4px at 50% 15%, var(--msf-yellow) 0%, transparent 0%),
-        radial-gradient(circle 2px at 70% 80%, var(--msf-green) 0%, transparent 0%),echo "# MISIONMUSEO" >> README.md
+        radial-gradient(circle 2px at 70% 80%, var(--msf-green) 0%, transparent 0%),
         radial-gradient(circle 3px at 85% 40%, var(--msf-blue) 0%, transparent 0%),
         radial-gradient(circle 2px at 40% 50%, var(--msf-purple) 0%, transparent 0%);
       animation: floatParticles 15s linear infinite;
@@ -915,11 +915,16 @@
     const avatars = [
       { id: 'humano1', name: 'Explorador', cat: 'human' },
       { id: 'humana2', name: 'Curadora', cat: 'human' },
+      { id: 'humano3', name: 'Aventurero', cat: 'human' },
+      { id: 'cientifico1', name: 'Científico', cat: 'human' },
       { id: 'dino1', name: 'T-Rex', cat: 'dino' },
       { id: 'dino2', name: 'Triceratops', cat: 'dino' },
       { id: 'dino3', name: 'Estegosaurio', cat: 'dino' },
+      { id: 'dino4', name: 'Pterodáctilo', cat: 'dino' },
       { id: 'astronauta_m', name: 'Astronauta', cat: 'space' },
-      { id: 'astronauta_f', name: 'Cosmonauta', cat: 'space', isSvg: true }
+      { id: 'astronauta_f', name: 'Cosmonauta', cat: 'space' },
+      { id: 'alien1', name: 'Alien', cat: 'space' },
+      { id: 'robot1', name: 'Robot', cat: 'space' }
     ];
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -941,7 +946,7 @@
           const card = document.createElement('div');
           card.className = 'av-card';
           card.innerHTML = `
-            <div class="av-img-wrap">${av.isSvg ? '<svg viewBox="0 0 120 140" class="av-img"><circle cx="60" cy="58" r="30" fill="#f59e0b"/><ellipse cx="60" cy="105" rx="30" ry="28" fill="#e8ecf0"/></svg>' : `<img src="avatars/${av.id}.png" class="av-img">`}</div>
+            <div class="av-img-wrap"><img src="avatars/${av.id}.png" class="av-img"></div>
             <p class="av-name">${av.name}</p>
             <div class="av-check">✓</div>
           `;
@@ -979,7 +984,7 @@
         // Cargar datos en la vista de preparación
         document.getElementById('prepAvatarName').innerText = selectedAvatar.name;
         const imgCont = document.getElementById('prepAvatarImg');
-        imgCont.innerHTML = selectedAvatar.isSvg ? '<svg viewBox="0 0 120 140" class="av-img"><circle cx="60" cy="58" r="30" fill="#f59e0b"/><ellipse cx="60" cy="105" rx="30" ry="28" fill="#e8ecf0"/></svg>' : `<img src="avatars/${selectedAvatar.id}.png" class="av-img">`;
+        imgCont.innerHTML = `<img src="avatars/${selectedAvatar.id}.png" class="av-img">`;
 
         // Switch de vista
         document.getElementById('viewLanding').classList.remove('active');
