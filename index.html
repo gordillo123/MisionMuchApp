@@ -583,92 +583,113 @@
     .museum-map {
       background: #E8EDF3;
       border-radius: 30px;
-      height: 400px;
+      width: min(85vw, 760px);
+      max-width: 760px;
+      margin: 0 auto;
+      aspect-ratio: 16 / 9;
       position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      padding: 2rem;
-      border: 4px inset rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      border: 6px solid var(--bg-deep);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
     }
 
-    .map-room {
-      width: 70px;
-      height: 70px;
+    .map-bg {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      background: #f0f4f8;
+    }
+
+    .map-overlay-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .animated-path {
+      fill: none;
+      stroke: rgba(255, 197, 73, 0.9);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-dasharray: 12, 18;
+      animation: dashMove 2.5s linear infinite;
+      filter: drop-shadow(0 0 12px rgba(255, 197, 73, 0.45));
+      opacity: 0.85;
+    }
+
+    @keyframes dashMove {
+      from {
+        stroke-dashoffset: 0;
+      }
+      to {
+        stroke-dashoffset: 30;
+      }
+    }
+
+    .map-marker {
+      position: absolute;
+      width: 40px;
+      height: 40px;
       background: white;
-      border: 6px solid var(--bg-deep);
-      border-radius: 20px;
+      border: 4px solid var(--bg-deep);
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 900;
-      font-size: 1.5rem;
-      position: relative;
-      z-index: 2;
-      box-shadow: 0 6px 0px var(--bg-deep);
-      transition: all .3s;
+      font-size: 1.2rem;
+      color: var(--bg-deep);
+      z-index: 10;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(.34, 1.56, .64, 1);
     }
 
-    .map-room::after {
-      content: attr(data-name);
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: .75rem;
-      font-weight: 800;
-      margin-top: 8px;
-      color: white;
-      text-shadow: 2px 2px 0px var(--bg-deep);
-      white-space: nowrap;
-    }
-
-    .map-room.active {
+    .map-marker:hover {
+      transform: translate(-50%, -50%) scale(1.2);
       background: var(--msf-yellow);
-      border-color: var(--msf-red);
-      animation: roomBounce 1s infinite alternate;
     }
 
-    @keyframes roomBounce {
-      from {
-        transform: scale(1);
-      }
-
-      to {
-        transform: scale(1.1) translateY(-5px);
-      }
+    .map-marker.active {
+      background: var(--msf-pink);
+      color: white;
+      border-color: white;
+      box-shadow: 0 0 20px var(--msf-pink);
     }
 
-    .map-path {
+    .map-avatar {
       position: absolute;
-      height: 8px;
-      background: repeating-linear-gradient(90deg, var(--bg-deep), var(--bg-deep) 10px, transparent 10px, transparent 20px);
-      z-index: 1;
+      width: 80px;
+      height: 80px;
+      z-index: 20;
+      transform: translate(-50%, -85%);
+      transition: all 1s cubic-bezier(.34, 1.56, .64, 1);
+      pointer-events: none;
+      filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.5));
     }
 
-    .path-1-2 {
-      width: 15%;
-      left: 20%;
-      top: 50%;
+    .map-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      animation: avatarBounce 2s ease-in-out infinite;
     }
 
-    .path-2-3 {
-      width: 15%;
-      left: 42%;
-      top: 50%;
-    }
-
-    .path-3-4 {
-      width: 15%;
-      left: 65%;
-      top: 50%;
+    @keyframes avatarBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
     }
 
     .btn-play.large {
       width: auto;
       padding: 1.5rem 3rem;
       font-size: 1.8rem;
-      margin-top: 2rem;
+      margin-top: 1.5rem;
     }
 
     @media (max-width: 1024px) {
@@ -866,9 +887,22 @@
       <div class="map-col">
         <div class="card" style="height: 100%; display: flex; flex-direction: column;">
           <h2 class="section-title">🗺️ Tu Mapa</h2>
-          <div class="museum-map" style="padding: 0; overflow: hidden; background: none; border: none;">
-            <img src="mapa.png" alt="Mapa del Museo"
-              style="width: 100%; height: 100%; object-fit: contain; border-radius: 26px;" />
+          <div class="museum-map" id="museumMap">
+            <img src="mapa 12.png" alt="Mapa del Museo" class="map-bg" />
+            <svg class="map-overlay-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <path id="mapPath" class="animated-path" d="M 83 15 L 21 24 L 10 44 L 30 43 L 56 42 L 42 66" />
+            </svg>
+            
+            <div class="map-marker" style="left: 83%; top: 15%;" data-station="1">1</div>
+            <div class="map-marker" style="left: 21%; top: 24%;" data-station="2">2</div>
+            <div class="map-marker" style="left: 10%; top: 44%;" data-station="3">3</div>
+            <div class="map-marker" style="left: 30%; top: 43%;" data-station="4">4</div>
+            <div class="map-marker" style="left: 56%; top: 42%;" data-station="5">5</div>
+            <div class="map-marker" style="left: 42%; top: 66%;" data-station="6">6</div>
+
+            <div class="map-avatar" id="mapAvatar">
+              <!-- Imagen del avatar se inyectará aquí -->
+            </div>
           </div>
           <div style="text-align: center;">
             <button class="btn-play large" id="btnComenzar">🚀 ¡COMENZAR!</button>
@@ -988,16 +1022,56 @@
         const imgCont = document.getElementById('prepAvatarImg');
         imgCont.innerHTML = `<img src="avatars/${selectedAvatar.id}.png" class="av-img">`;
 
+        // Cargar avatar en el mapa
+        const mapAvatar = document.getElementById('mapAvatar');
+        mapAvatar.innerHTML = `<img src="avatars/${selectedAvatar.id}.png" alt="Avatar">`;
+
         // Switch de vista
         document.getElementById('viewLanding').classList.remove('active');
         document.getElementById('viewPrep').classList.add('active');
+
+        // Posición inicial del avatar (Estación 3 - Inicio)
+        setTimeout(() => {
+          moveToStation(3);
+        }, 500);
       };
+
+      // 5. Lógica de Movimiento en el Mapa
+      const stations = {
+        '1': { x: 83, y: 15 },
+        '2': { x: 21, y: 24 },
+        '3': { x: 10, y: 44 },
+        '4': { x: 30, y: 43 },
+        '5': { x: 56, y: 42 },
+        '6': { x: 42, y: 66 }
+      };
+
+      function moveToStation(stationId) {
+        const pos = stations[stationId];
+        const avatar = document.getElementById('mapAvatar');
+        if (pos && avatar) {
+          avatar.style.left = `${pos.x}%`;
+          avatar.style.top = `${pos.y}%`;
+
+          // Activar marcador
+          document.querySelectorAll('.map-marker').forEach(m => {
+            m.classList.toggle('active', m.dataset.station === String(stationId));
+          });
+        }
+      }
+
+      // Permitir click en marcadores para probar movimiento
+      document.querySelectorAll('.map-marker').forEach(marker => {
+        marker.onclick = () => {
+          moveToStation(marker.dataset.station);
+        };
+      });
 
       document.getElementById('btnComenzar').onclick = () => {
         alert('¡Iniciando la misión! Prepárate para las preguntas.');
       };
 
-      // 5. Hamburguesa Móvil
+      // 6. Hamburguesa Móvil
       const hamburger = document.getElementById('hamburgerBtn');
       const sidebar = document.querySelector('.sidebar');
       if (hamburger && sidebar) {
