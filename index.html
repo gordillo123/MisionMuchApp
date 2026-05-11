@@ -53,7 +53,7 @@
       font-family: 'Outfit', 'Inter', sans-serif;
       background: var(--bg-deep);
       color: var(--text-main);
-      overflow: hidden;
+      overflow-x: hidden;
     }
 
     .bg-particles {
@@ -107,7 +107,8 @@
       flex-direction: row;
       height: 100vh;
       width: 100vw;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
       background: var(--bg-deep);
     }
 
@@ -122,11 +123,14 @@
       justify-content: center;
       padding: 2rem;
       position: relative;
+      min-width: 0;
     }
 
     .hero {
       text-align: center;
       animation: fadeUp .9s ease both;
+      max-width: 960px;
+      width: 100%;
     }
 
     @keyframes fadeUp {
@@ -183,6 +187,7 @@
       font-size: clamp(1.1rem, 2.5vw, 1.4rem);
       color: rgba(255, 255, 255, 0.9);
       font-weight: 500;
+      line-height: 1.45;
     }
 
     .hero-badges {
@@ -330,6 +335,7 @@
       cursor: pointer;
       box-shadow: 0 8px 0px var(--bg-deep);
       transition: all 0.1s;
+      width: 100%;
     }
 
     .btn-play:hover {
@@ -379,6 +385,117 @@
 
     .avatar-overlay.open .avatar-modal {
       transform: translateY(0);
+    }
+
+    .login-modal {
+      width: min(520px, 94vw);
+      border-color: var(--msf-yellow);
+      box-shadow: 0 18px 0px var(--bg-deep);
+    }
+
+    .login-badge {
+      width: 86px;
+      height: 86px;
+      margin: 0 auto 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-soft);
+      border: 5px solid var(--bg-deep);
+      border-radius: 28px;
+      font-size: 2.7rem;
+      box-shadow: 0 7px 0px var(--msf-blue);
+    }
+
+    .login-copy {
+      max-width: 360px;
+      margin: .6rem auto 0;
+      color: #4f5364;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+
+    .google-login-area {
+      padding: 1rem 2rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn-google {
+      width: min(100%, 360px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .9rem;
+      background: var(--white);
+      border: 5px solid var(--bg-deep);
+      border-radius: var(--radius);
+      padding: .9rem 1.1rem;
+      color: var(--bg-deep);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 7px 0px var(--bg-deep);
+      transition: all .12s;
+    }
+
+    .btn-google:hover {
+      transform: translateY(2px);
+      box-shadow: 0 5px 0px var(--bg-deep);
+      background: #fdfdfd;
+    }
+
+    .btn-google:active {
+      transform: translateY(7px);
+      box-shadow: 0 0 0 var(--bg-deep);
+    }
+
+    .google-g {
+      width: 28px;
+      height: 28px;
+      flex: 0 0 28px;
+    }
+
+    .login-note {
+      min-height: 1.2rem;
+      color: var(--msf-purple);
+      font-size: .9rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .user-chip {
+      display: none;
+      align-items: center;
+      gap: .55rem;
+      margin: 0 auto 1rem;
+      width: fit-content;
+      max-width: 100%;
+      background: var(--bg-soft);
+      border: 3px solid var(--msf-green);
+      border-radius: 999px;
+      padding: .45rem .8rem;
+      font-weight: 800;
+      color: var(--bg-deep);
+    }
+
+    .user-chip.visible {
+      display: flex;
+    }
+
+    .user-chip-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--msf-green);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .85rem;
     }
 
     .modal-header {
@@ -516,13 +633,14 @@
     /* PREP VIEW (RULES & MAP) */
     .intro-container {
       display: grid;
-      grid-template-columns: 1fr 1.5fr;
+      grid-template-columns: minmax(260px, 1fr) minmax(0, 1.5fr);
       gap: 2rem;
       max-width: 1200px;
       margin: 0 auto;
       padding: 3rem 2rem;
       align-items: center;
       width: 100%;
+      min-height: 100vh;
     }
 
     .card {
@@ -531,6 +649,12 @@
       border-radius: 40px;
       padding: 2rem;
       box-shadow: 0 15px 0px rgba(0, 0, 0, 0.3);
+      min-width: 0;
+    }
+
+    .rules-col,
+    .map-col {
+      min-width: 0;
     }
 
     .section-title {
@@ -583,8 +707,8 @@
     .museum-map {
       background: #E8EDF3;
       border-radius: 30px;
-      width: min(85vw, 760px);
-      max-width: 760px;
+      width: 100%;
+      max-width: 100%;
       margin: 0 auto;
       aspect-ratio: 16 / 9;
       position: relative;
@@ -700,11 +824,22 @@
       .hero-title {
         font-size: 5rem;
       }
+
+      .intro-container {
+        max-width: 960px;
+        gap: 1.5rem;
+      }
+
+      .museum-map {
+        width: 100%;
+      }
     }
 
     @media (max-width: 768px) {
       .view-section {
         flex-direction: column;
+        height: 100dvh;
+        min-height: 100dvh;
       }
 
       .sidebar {
@@ -727,7 +862,8 @@
         padding: 1rem;
         padding-top: 6rem;
         width: 100%;
-        height: 100vh;
+        min-height: 100dvh;
+        height: auto;
       }
 
       .hero-icon {
@@ -744,6 +880,17 @@
         padding: 0 1rem;
       }
 
+      .hero-badges {
+        gap: .5rem;
+      }
+
+      .badge {
+        padding: .5rem .85rem;
+        border-width: 3px;
+        font-size: .9rem;
+        box-shadow: 0 4px 0px var(--bg-deep);
+      }
+
       .hamburger {
         display: flex;
       }
@@ -752,6 +899,21 @@
         grid-template-columns: 1fr;
         padding: 6rem 1rem 2rem;
         width: 100%;
+        min-height: 100dvh;
+        align-items: start;
+        gap: 1.25rem;
+      }
+
+      .card {
+        border-width: 4px;
+        border-radius: 26px;
+        padding: 1.25rem;
+        box-shadow: 0 8px 0px rgba(0, 0, 0, 0.3);
+      }
+
+      .section-title {
+        font-size: 1.55rem;
+        margin-bottom: 1rem;
       }
 
       .map-path {
@@ -759,11 +921,30 @@
       }
 
       .museum-map {
-        height: auto;
-        min-height: 400px;
-        flex-direction: column;
-        gap: 2rem;
-        padding: 3rem 1rem;
+        width: 100%;
+        min-height: 0;
+        aspect-ratio: 4 / 3;
+        border-width: 4px;
+        border-radius: 22px;
+      }
+
+      .map-avatar {
+        width: 58px;
+        height: 58px;
+      }
+
+      .map-marker {
+        width: 32px;
+        height: 32px;
+        border-width: 3px;
+        font-size: .9rem;
+      }
+
+      .btn-play.large {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        font-size: 1.25rem;
+        margin-top: 1.25rem;
       }
 
       .avatar-modal {
@@ -771,6 +952,14 @@
         max-height: 85vh;
         border-width: 4px;
         border-radius: 20px;
+      }
+
+      .login-modal {
+        width: 94vw;
+      }
+
+      .google-login-area {
+        padding: 1rem 1rem 1.5rem;
       }
 
       .avatar-grid {
@@ -781,6 +970,15 @@
 
       .modal-title {
         font-size: 1.8rem;
+      }
+
+      .modal-header {
+        padding: 1.25rem 1rem .25rem;
+      }
+
+      .modal-footer {
+        padding: 1rem;
+        gap: 1rem;
       }
     }
 
@@ -807,7 +1005,100 @@
       background: white;
       border-radius: 2px;
     }
+
+    @media (max-width: 768px) {
+      .hamburger {
+        display: flex;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-area {
+        padding: 5.5rem 1rem 2rem;
+      }
+
+      .hero-icon {
+        font-size: 4rem;
+      }
+
+      .hero-title {
+        font-size: clamp(2.45rem, 17vw, 3.2rem);
+        text-shadow: 3px 3px 0px var(--msf-red), 6px 6px 0px var(--msf-purple);
+      }
+
+      .hero-subtitle br {
+        display: none;
+      }
+
+      .hero-badges {
+        justify-content: stretch;
+      }
+
+      .badge {
+        flex: 1 1 140px;
+        justify-content: center;
+      }
+
+      .sidebar {
+        width: min(86vw, 300px);
+      }
+
+      .sidebar-inner {
+        padding: 5rem 1rem 1.5rem;
+      }
+
+      .avatar-preview-box,
+      .rules-list li {
+        align-items: flex-start;
+      }
+
+      .rule-icon {
+        width: 46px;
+        height: 46px;
+        font-size: 1.35rem;
+      }
+
+      .museum-map {
+        aspect-ratio: 1 / 1;
+      }
+
+      .map-avatar {
+        width: 48px;
+        height: 48px;
+      }
+
+      .map-marker {
+        width: 28px;
+        height: 28px;
+        font-size: .8rem;
+      }
+
+      .avatar-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .av-img-wrap {
+        width: 66px;
+        height: 66px;
+      }
+
+      .av-card {
+        border-radius: 22px;
+        padding: .75rem .35rem;
+      }
+
+      .modal-footer {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+      }
+
+      .btn-confirm {
+        width: 100%;
+      }
+    }
   </style>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
 <body>
@@ -915,11 +1206,38 @@
   <!-- ══════════════════════════════════════════════
        MODAL SELECCIÓN AVATAR
   ══════════════════════════════════════════════ -->
+  <div class="avatar-overlay" id="loginOverlay">
+    <div class="avatar-modal login-modal">
+      <div class="modal-header">
+        <div class="login-badge">🔐</div>
+        <h2 class="modal-title">Entra con Google</h2>
+        <p class="login-copy">Para guardar tu avance en la misión, inicia sesión con tu cuenta de Google.</p>
+      </div>
+      <div class="google-login-area">
+        <div id="googleSignInButton"></div>
+        <button class="btn-google" id="btnGoogleFallback" type="button">
+          <svg class="google-g" viewBox="0 0 48 48" aria-hidden="true">
+            <path fill="#EA4335" d="M24 9.5c3.5 0 6.5 1.2 8.9 3.5l6.6-6.6C35.5 2.7 30.3.5 24 .5 14.8.5 6.9 5.8 3.1 13.6l7.7 6C12.6 13.7 17.9 9.5 24 9.5z" />
+            <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.5 2.8-2.2 5.2-4.7 6.8l7.3 5.7c4.3-4 7.2-9.9 7.2-16.5z" />
+            <path fill="#FBBC05" d="M10.8 28.4c-.5-1.4-.8-2.9-.8-4.4s.3-3 .8-4.4l-7.7-6C1.5 16.7.5 20.2.5 24s1 7.3 2.6 10.4l7.7-6z" />
+            <path fill="#34A853" d="M24 47.5c6.3 0 11.6-2.1 15.4-5.7l-7.3-5.7c-2 1.3-4.6 2.1-8.1 2.1-6.1 0-11.4-4.1-13.2-9.8l-7.7 6C6.9 42.2 14.8 47.5 24 47.5z" />
+          </svg>
+          Continuar con Google
+        </button>
+        <p class="login-note" id="loginNote">Usa Google para comenzar tu aventura.</p>
+      </div>
+    </div>
+  </div>
+
   <div class="avatar-overlay" id="avatarOverlay">
     <div class="avatar-modal">
       <div class="modal-header">
         <h2 class="modal-title">Elige tu Avatar</h2>
         <p>Selecciona tu personaje favorito</p>
+        <div class="user-chip" id="userChip">
+          <span class="user-chip-avatar" id="userChipAvatar">G</span>
+          <span id="userChipName">Cuenta Google</span>
+        </div>
       </div>
       <div class="avatar-tabs">
         <button class="av-tab active" data-filter="all">Todos</button>
@@ -998,10 +1316,85 @@
       }
       renderAvatars();
 
-      // 3. Modal & Filtros
+      // 3. Login, Modal & Filtros
       let selectedAvatar = null;
+      let googleUser = null;
+      const GOOGLE_CLIENT_ID = 'TU_CLIENT_ID_DE_GOOGLE.apps.googleusercontent.com';
+      const loginOverlay = document.getElementById('loginOverlay');
       const overlay = document.getElementById('avatarOverlay');
-      document.getElementById('btnJugar').onclick = () => overlay.classList.add('open');
+      const loginNote = document.getElementById('loginNote');
+      const btnGoogleFallback = document.getElementById('btnGoogleFallback');
+
+      function openAvatarSelection() {
+        loginOverlay.classList.remove('open');
+        overlay.classList.add('open');
+        if (googleUser) {
+          const displayName = googleUser.name || googleUser.email || 'Cuenta Google';
+          const userChip = document.getElementById('userChip');
+          document.getElementById('userChipName').innerText = displayName;
+          document.getElementById('userChipAvatar').innerText = displayName.charAt(0).toUpperCase();
+          userChip.classList.add('visible');
+        }
+      }
+
+      function completeGoogleLogin(profile) {
+        googleUser = profile || { name: 'Invitado Google', email: 'google@demo.local' };
+        loginNote.innerText = 'Cuenta conectada. Elige tu avatar.';
+        openAvatarSelection();
+      }
+
+      function decodeJwt(token) {
+        const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(decodeURIComponent(atob(payload).split('').map((char) => {
+          return '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2);
+        }).join('')));
+      }
+
+      function initGoogleLogin(attempt = 0) {
+        const hasRealClientId = GOOGLE_CLIENT_ID && !GOOGLE_CLIENT_ID.startsWith('TU_CLIENT_ID');
+        if (hasRealClientId && !window.google?.accounts?.id && attempt < 20) {
+          loginNote.innerText = 'Preparando acceso con Google...';
+          setTimeout(() => initGoogleLogin(attempt + 1), 250);
+          return;
+        }
+
+        if (hasRealClientId && window.google?.accounts?.id) {
+          btnGoogleFallback.style.display = 'none';
+          loginNote.innerText = 'Elige tu cuenta de Google para continuar.';
+          window.google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: (response) => {
+              const profile = decodeJwt(response.credential);
+              completeGoogleLogin({
+                name: profile.name,
+                email: profile.email,
+                picture: profile.picture
+              });
+            }
+          });
+          window.google.accounts.id.renderButton(
+            document.getElementById('googleSignInButton'),
+            { theme: 'outline', size: 'large', width: 320, shape: 'pill', text: 'continue_with' }
+          );
+          return;
+        }
+
+        btnGoogleFallback.onclick = () => {
+          loginNote.innerText = 'Modo prueba: agrega tu Client ID para activar Google real.';
+          setTimeout(() => completeGoogleLogin({ name: 'Cuenta Google', email: 'demo@google.local' }), 450);
+        };
+      }
+
+      initGoogleLogin();
+
+      document.getElementById('btnJugar').onclick = () => {
+        if (googleUser) {
+          openAvatarSelection();
+          return;
+        }
+        loginOverlay.classList.add('open');
+      };
+      loginOverlay.onclick = (e) => { if (e.target === loginOverlay) loginOverlay.classList.remove('open'); };
       overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('open'); };
 
       document.querySelectorAll('.av-tab').forEach(tab => {
