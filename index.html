@@ -1883,6 +1883,18 @@
       { id: 'robot2', name: 'Cyborg', cat: 'space' }
     ];
 
+    const SUPABASE_URL = 'https://qwgaeorsymfispmtsbut.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3Z2Flb3JzeW1maXNwbXRzYnV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzODcyODUsImV4cCI6MjA3Nzk2MzI4NX0.FThZIIpz3daC9u8QaKyRTpxUeW0v4QHs5sHX2s1U1eo';
+    let supabaseClient = null;
+    let currentStation = '3';
+
+    async function initSupabase() {
+      if (supabaseClient) return supabaseClient;
+      const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+      supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      return supabaseClient;
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       // 1. Partículas
       const bg = document.getElementById('bgParticles');
@@ -1918,7 +1930,131 @@
       }
       renderAvatars();
 
-      // 3. Login, Modal & Filtros
+      // 3. Puntajes
+      const scoresOverlay = document.getElementById('scoresOverlay');
+      const btnPuntajes = document.getElementById('btnPuntajes');
+      const btnCerrarPuntajes = document.getElementById('btnCerrarPuntajes');
+      const scoresListContainer = document.getElementById('scoresListContainer');
+      const myRankCard = document.querySelector('.my-rank-card');
+      if (myRankCard) myRankCard.style.display = 'none';
+
+      function formatScore(value) {
+        return Number(value || 0).toLocaleString('es-MX');
+      }
+
+      function getPlayerName(row, fallback) {
+        return row.nombre || row.participante_nombre || row.usuario || row.correo || row.email || fallback;
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, (char) => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[char]));
+      }
+
+      function normalizeScoreRows(quizzes = [], intentos = []) {
+        const quizRows = quizzes.map((row, index) => ({
+          name: getPlayerName(row, `Explorador ${index + 1}`),
+          score: Number(row.puntaje_total ?? row.puntaje ?? 0),
+          avatar: avatars[index % avatars.length].id,
+          date: row.finished_at || row.started_at || ''
+        }));
+
+        const intentoRows = intentos.map((row, index) => ({
+          name: getPlayerName(row, `Spinosaurio ${index + 1}`),
+          score: Number(row.puntaje ?? 0),
+          avatar: avatars[(index + 5) % avatars.length].id,
+          date: row.created_at || ''
+        }));
+
+        return [...quizRows, ...intentoRows]
+          .filter(row => Number.isFinite(row.score))
+          .sort((a, b) => b.score - a.score || String(b.date).localeCompare(String(a.date)))
+          .slice(0, 10);
+      }
+
+      function renderPodium(rows) {
+        const podiumItems = document.querySelectorAll('.podium-item');
+        const podiumOrder = [1, 0, 2];
+        podiumItems.forEach((item, itemIndex) => {
+          const row = rows[podiumOrder[itemIndex]];
+          item.style.visibility = row ? 'visible' : 'hidden';
+          if (!row) return;
+          item.querySelector('.podium-avatar').src = `avatars/${row.avatar}.png`;
+          item.querySelector('.podium-name').innerText = row.name;
+          item.querySelector('.podium-score').innerText = formatScore(row.score);
+        });
+      }
+
+      function renderScoreList(rows) {
+        scoresListContainer.innerHTML = '';
+        const rest = rows.slice(3);
+
+        if (!rows.length) {
+          scoresListContainer.innerHTML = '<div class="score-row"><div class="score-info"><div class="score-name">Todavia no hay puntajes registrados.</div></div></div>';
+          return;
+        }
+
+        rest.forEach((row, index) => {
+          const rank = index + 4;
+          const item = document.createElement('div');
+          item.className = 'score-row';
+          item.innerHTML = `
+            <div class="score-rank">#${rank}</div>
+            <img src="avatars/${row.avatar}.png" class="score-av" alt="">
+            <div class="score-info">
+              <div class="score-name">${escapeHtml(row.name)}</div>
+            </div>
+            <div class="score-pts">${formatScore(row.score)} pts</div>
+          `;
+          scoresListContainer.appendChild(item);
+        });
+      }
+
+      async function loadScores() {
+        scoresListContainer.innerHTML = '<div class="score-row"><div class="score-info"><div class="score-name">Cargando puntajes...</div></div></div>';
+
+        try {
+          const sb = await initSupabase();
+          const [{ data: quizzes, error: quizError }, { data: intentos, error: intentosError }] = await Promise.all([
+            sb.from('quizzes').select('id,puntaje_total,estatus,participante_id,ubicacion,started_at,finished_at').order('puntaje_total', { ascending: false }).limit(20),
+            sb.from('intentos_juego').select('id,puntaje,ubicacion,created_at,estatus,participante_id').order('puntaje', { ascending: false }).limit(20)
+          ]);
+
+          if (quizError) console.warn('No se pudieron cargar quizzes:', quizError.message);
+          if (intentosError) console.warn('No se pudieron cargar intentos_juego:', intentosError.message);
+
+          const rows = normalizeScoreRows(quizzes || [], intentos || []);
+          renderPodium(rows);
+          renderScoreList(rows);
+        } catch (error) {
+          console.error('Error cargando puntajes:', error);
+          renderPodium([]);
+          scoresListContainer.innerHTML = '<div class="score-row"><div class="score-info"><div class="score-name">No se pudieron cargar los puntajes. Revisa la conexion o los permisos de Supabase.</div></div></div>';
+        }
+      }
+
+      if (btnPuntajes) {
+        btnPuntajes.onclick = (e) => {
+          e.preventDefault();
+          scoresOverlay.classList.add('open');
+          loadScores();
+          if (window.innerWidth <= 768) {
+            document.querySelector('.sidebar').classList.remove('open');
+          }
+        };
+      }
+
+      if (btnCerrarPuntajes) {
+        btnCerrarPuntajes.onclick = () => scoresOverlay.classList.remove('open');
+      }
+      scoresOverlay.onclick = (e) => { if (e.target === scoresOverlay) scoresOverlay.classList.remove('open'); };
+
+      // 4. Login, Modal & Filtros
       let selectedAvatar = null;
       let googleUser = null;
       const GOOGLE_CLIENT_ID = 'TU_CLIENT_ID_DE_GOOGLE.apps.googleusercontent.com';
@@ -2092,7 +2228,7 @@
           return;
         }
 
-        alert('Coloca tu avatar en la estación 2 para entrar al juego del Espinosaurio.');
+        alert('Coloca tu avatar en la estación 1 para entrar al juego del Espinosaurio.');
       };
 
       // 6. Hamburguesa Móvil
@@ -2103,7 +2239,7 @@
           e.stopPropagation();
           sidebar.classList.toggle('open');
         };
-        document.onclick = (e) => {
+        document.onclick = (e) => { 
           if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
             sidebar.classList.remove('open');
           }
