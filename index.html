@@ -1177,7 +1177,7 @@
 
       <div class="map-col">
         <div class="card" style="height: 100%; display: flex; flex-direction: column;">
-          <h2 class="section-title">🗺️ Tu Mapa</h2>
+          <h2 class="section-title">¿En qué estación estás?</h2>
           <div class="museum-map" id="museumMap">
             <img src="mapa 12.png" alt="Mapa del Museo" class="map-bg" />
             <svg class="map-overlay-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -1430,6 +1430,7 @@
       };
 
       // 5. Lógica de Movimiento en el Mapa
+      let currentStation = '3';
       const stations = {
         '1': { x: 80, y: 18 },
         '2': { x: 56, y: 42 },
@@ -1443,6 +1444,7 @@
         const pos = stations[stationId];
         const avatar = document.getElementById('mapAvatar');
         if (pos && avatar) {
+          currentStation = String(stationId);
           avatar.style.left = `${pos.x}%`;
           avatar.style.top = `${pos.y}%`;
 
@@ -1461,7 +1463,12 @@
       });
 
       document.getElementById('btnComenzar').onclick = () => {
-        alert('¡Iniciando la misión! Prepárate para las preguntas.');
+        if (currentStation === '2') {
+          window.location.href = 'Juego_Spinosaurio/index.html';
+          return;
+        }
+
+        alert('Coloca tu avatar en la estación 2 para entrar al juego del Espinosaurio.');
       };
 
       // 6. Hamburguesa Móvil
