@@ -1496,11 +1496,6 @@
       z-index: 900;
     }
 
-    .mobile-nav-backdrop.visible {
-      opacity: 1;
-      visibility: visible;
-    }
-
     @media (max-width: 768px) {
       .hamburger {
         display: flex;
@@ -2015,6 +2010,112 @@
     .back-button-prep:active {
       transform: translateY(-1px) scale(0.98);
     }
+
+    /* 👤 PERFIL MODAL */
+    .profile-card {
+      background: rgba(26, 28, 44, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 30px;
+      width: 400px;
+      max-width: 90vw;
+      padding: 2.5rem;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+      animation: modalFadeIn 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .profile-header {
+      margin-bottom: 2rem;
+    }
+
+    .profile-avatar-wrap {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 1.5rem;
+      position: relative;
+    }
+
+    .profile-avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 4px solid var(--msf-yellow);
+      background: var(--bg-soft);
+      padding: 5px;
+      object-fit: cover;
+      box-shadow: 0 0 20px rgba(226, 194, 136, 0.3);
+    }
+
+    .profile-name {
+      font-size: 1.8rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 0.5rem;
+    }
+
+    .profile-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-value {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--msf-yellow);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: #A0A4B8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .profile-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .btn-profile-action {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      padding: 1rem;
+      border-radius: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-profile-action:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-profile-primary {
+      background: linear-gradient(135deg, var(--msf-purple), var(--msf-blue));
+      color: white;
+      font-weight: 700;
+    }
+
+    .btn-profile-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(119, 90, 255, 0.4);
+    }
   </style>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -2059,9 +2160,12 @@
             <span class="nav-icon">❔</span>
             <span class="nav-label">Ayuda</span>
           </a>
-          <div class="nav-avatar">
-            <img src="avatars/dino1.png" alt="Avatar">
-          </div>
+          <a href="#" class="nav-btn" id="btnPerfil">
+            <div class="nav-avatar">
+              <img src="avatars/dino1.png" alt="Avatar" id="navAvatarImg">
+            </div>
+            <span class="nav-label">Perfil</span>
+          </a>
         </div>
       </div>
     </nav>
@@ -2202,7 +2306,7 @@
             <div class="map-marker" style="left: 42%; top: 66%;" data-station="6">6</div>
 
             <div class="map-avatar" id="mapAvatar">
-              <!-- Imagen del avatar se inyectará aquí -->
+              <div id="mapAvatarImgCont" style="width: 100%; height: 100%;"></div>
             </div>
           </div>
           <div style="text-align: center;">
@@ -2216,6 +2320,35 @@
   <!-- ══════════════════════════════════════════════
        MODAL SELECCIÓN AVATAR
   ══════════════════════════════════════════════ -->
+  <!-- PERFIL OVERLAY -->
+  <div class="avatar-overlay" id="profileOverlay">
+    <div class="profile-card">
+      <button class="modal-close" id="btnCerrarPerfil">×</button>
+      <div class="profile-header">
+        <div class="profile-avatar-wrap">
+          <img src="avatars/dino1.png" class="profile-avatar-img" id="profAvatarImg">
+        </div>
+        <h2 class="profile-name" id="profName">Explorador</h2>
+        <p style="color: #A0A4B8;" id="profEmail">invitado@misionmuseo.com</p>
+      </div>
+
+      <div class="profile-stats">
+        <div class="stat-box">
+          <span class="stat-value" id="profScore">0</span>
+          <span class="stat-label">Puntaje Total</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" id="profRank">--</span>
+          <span class="stat-label">Rango</span>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <button class="btn-profile-action btn-profile-primary" id="btnCambiarAvatar">Cambiar Avatar</button>
+        <button class="btn-profile-action" onclick="location.reload()">Cerrar Sesión</button>
+      </div>
+    </div>
+  </div>
   <div class="avatar-overlay" id="loginOverlay">
     <div class="avatar-modal login-modal">
       <div class="modal-header">
@@ -2483,7 +2616,86 @@
       }
       renderAvatars();
 
-      // 3. Puntajes
+      // 3. Perfil y Puntajes
+      const profileOverlay = document.getElementById('profileOverlay');
+      const btnPerfil = document.getElementById('btnPerfil');
+      const btnCerrarPerfil = document.getElementById('btnCerrarPerfil');
+      const profAvatarImg = document.getElementById('profAvatarImg');
+      const profName = document.getElementById('profName');
+      const profEmail = document.getElementById('profEmail');
+      const profScore = document.getElementById('profScore');
+      const navAvatarImg = document.getElementById('navAvatarImg');
+
+      function updateNavAvatar(id) {
+        if (navAvatarImg) navAvatarImg.src = `avatars/${id}.png`;
+      }
+
+      function openProfile() {
+        if (!googleUser && !selectedAvatar) {
+          startGameFlow();
+          return;
+        }
+
+        profName.innerText = (googleUser ? googleUser.name : selectedAvatar.name) || 'Explorador';
+        profEmail.innerText = googleUser ? googleUser.email : 'Modo Invitado';
+        profAvatarImg.src = `avatars/${selectedAvatar ? selectedAvatar.id : 'dino1'}.png`;
+        
+        // Simular carga de puntaje (aquí se podría sumar de Supabase)
+        profScore.innerText = 'Cargando...';
+        loadTotalScore();
+
+        profileOverlay.classList.add('open');
+      }
+
+      async function loadTotalScore() {
+        try {
+          const sb = await initSupabase();
+          let total = 0;
+          const userId = googleUser ? googleUser.email : null;
+
+          if (userId) {
+            const [qRes, iRes] = await Promise.all([
+              sb.from('quizzes').select('puntaje_total').eq('participante_id', userId),
+              sb.from('intentos_juego').select('puntaje').eq('participante_id', userId)
+            ]);
+
+            const qSum = (qRes.data || []).reduce((acc, curr) => acc + (Number(curr.puntaje_total) || 0), 0);
+            const iSum = (iRes.data || []).reduce((acc, curr) => acc + (Number(curr.puntaje) || 0), 0);
+            total = qSum + iSum;
+          }
+
+          profScore.innerText = formatScore(total);
+          
+          // Lógica de Rango
+          let rank = 'Novato';
+          if (total >= 5000) rank = 'Leyenda';
+          else if (total >= 3000) rank = 'Experto';
+          else if (total >= 1500) rank = 'Explorador';
+          else if (total >= 500) rank = 'Iniciado';
+          
+          const profRank = document.getElementById('profRank');
+          if (profRank) profRank.innerText = rank;
+
+        } catch (e) {
+          console.error('Error cargando puntaje total:', e);
+          profScore.innerText = '0';
+        }
+      }
+
+      if (btnPerfil) {
+        btnPerfil.onclick = (e) => {
+          e.preventDefault();
+          openProfile();
+        };
+      }
+      if (btnCerrarPerfil) btnCerrarPerfil.onclick = () => profileOverlay.classList.remove('open');
+      profileOverlay.onclick = (e) => { if (e.target === profileOverlay) profileOverlay.classList.remove('open'); };
+      
+      document.getElementById('btnCambiarAvatar').onclick = () => {
+        profileOverlay.classList.remove('open');
+        overlay.classList.add('open');
+      };
+
       const scoresOverlay = document.getElementById('scoresOverlay');
       const btnPuntajes = document.getElementById('btnPuntajes');
       const btnCerrarPuntajes = document.getElementById('btnCerrarPuntajes');
@@ -2632,6 +2844,7 @@
 
       function completeGoogleLogin(profile) {
         googleUser = profile || { name: 'Invitado Google', email: 'google@demo.local' };
+        localStorage.setItem('much_google_user', JSON.stringify(googleUser));
         loginNote.innerText = 'Cuenta conectada. Elige tu avatar.';
         openAvatarSelection();
       }
@@ -2694,11 +2907,18 @@
       }
 
       window.startGameFlow = () => {
+        if (selectedAvatar) {
+          document.getElementById('viewLanding').classList.remove('active');
+          document.getElementById('viewPrep').classList.add('active');
+          setTimeout(() => moveToStation(currentStation || 3), 500);
+          return;
+        }
         if (googleUser) {
           openAvatarSelection();
           return;
         }
-        loginOverlay.classList.add('open');
+        const lOverlay = document.getElementById('loginOverlay');
+        if (lOverlay) lOverlay.classList.add('open');
       };
       loginOverlay.onclick = (e) => { if (e.target === loginOverlay) loginOverlay.classList.remove('open'); };
       overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('open'); };
@@ -2747,8 +2967,8 @@
         imgCont.innerHTML = `<img src="avatars/${selectedAvatar.id}.png" class="av-img">`;
 
         // Cargar avatar en el mapa
-        const mapAvatar = document.getElementById('mapAvatar');
-        mapAvatar.innerHTML = `<img src="avatars/${selectedAvatar.id}.png" alt="Avatar">`;
+        const mapAvatarCont = document.getElementById('mapAvatarImgCont');
+        if (mapAvatarCont) mapAvatarCont.innerHTML = `<img src="avatars/${selectedAvatar.id}.png" alt="Avatar">`;
 
         // Switch de vista
         document.getElementById('viewLanding').classList.remove('active');
@@ -2758,6 +2978,9 @@
         setTimeout(() => {
           moveToStation(3);
         }, 500);
+
+        // Actualizar nav
+        updateNavAvatar(selectedAvatar.id);
 
         // Guardar avatar seleccionado en localStorage
         localStorage.setItem('much_selected_avatar', JSON.stringify(selectedAvatar));
@@ -2780,8 +3003,8 @@
             imgCont.innerHTML = `<img src="avatars/${selectedAvatar.id}.png" class="av-img">`;
 
             // Cargar avatar en el mapa
-            const mapAvatar = document.getElementById('mapAvatar');
-            mapAvatar.innerHTML = `<img src="avatars/${selectedAvatar.id}.png" alt="Avatar">`;
+            const mapAvatarCont = document.getElementById('mapAvatarImgCont');
+            if (mapAvatarCont) mapAvatarCont.innerHTML = `<img src="avatars/${selectedAvatar.id}.png" alt="Avatar">`;
 
             // Switch de vista
             document.getElementById('viewLanding').classList.remove('active');
@@ -2789,6 +3012,8 @@
 
             // Restaurar estación
             if (savedStation) currentStation = savedStation;
+            
+            updateNavAvatar(selectedAvatar.id);
 
             // Posición inicial del avatar
             setTimeout(() => {
@@ -2815,6 +3040,7 @@
       function moveToStation(stationId) {
         const pos = stations[stationId];
         const avatar = document.getElementById('mapAvatar');
+
         if (pos && avatar) {
           currentStation = String(stationId);
           localStorage.setItem('much_current_station', currentStation);

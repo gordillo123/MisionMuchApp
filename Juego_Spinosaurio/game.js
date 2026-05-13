@@ -433,23 +433,20 @@ async function registrarIntentoInicial() {
     const ID_SALA_SPINO = '0b4f04b0-5196-473d-8689-55d5f315df55';
 
     console.log("📝 Entró a registrarIntentoInicial");
-    console.log("📝 Datos a insertar:", {
+    const savedUser = JSON.parse(localStorage.getItem('much_google_user') || '{}');
+    const ID_PARTICIPANTE = savedUser.email || null;
+
+    const payload = {
       sala_id: ID_SALA_SPINO,
+      participante_id: ID_PARTICIPANTE,
       puntaje: 0,
       ubicacion: LUGAR_QR,
       estatus: 'activo',
       created_at: getMexicoTime()
-    });
-
+    };
     const { data, error } = await window.supabase
       .from("intentos_juego")
-      .insert({
-        sala_id: ID_SALA_SPINO,
-        puntaje: 0,
-        ubicacion: LUGAR_QR,
-        estatus: 'activo',
-        created_at: getMexicoTime()
-      })
+      .insert(payload)
       .select("id")
       .single();
 
@@ -528,13 +525,17 @@ async function registrarQuizEnSupabase(puntajeFinal, ganadorId = null) {
       return;
     }
 
-    if (intentoId && !Number.isNaN(intentoIdNum)) {
-      const payload = {
-        puntaje: puntaje,
-        estatus: 'finalizado'
-      };
+      const savedUser = JSON.parse(localStorage.getItem('much_google_user') || '{}');
+      const ID_PARTICIPANTE = savedUser.email || null;
 
-      if (ganadorId) payload.participante_id = ganadorId;
+      if (intentoId && !Number.isNaN(intentoIdNum)) {
+        const payload = {
+          puntaje: puntaje,
+          estatus: 'finalizado'
+        };
+
+        if (ID_PARTICIPANTE) payload.participante_id = ID_PARTICIPANTE;
+        else if (ganadorId) payload.participante_id = ganadorId;
 
       const { data, error } = await window.supabase
         .from("intentos_juego")

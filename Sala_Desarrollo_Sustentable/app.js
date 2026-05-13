@@ -206,13 +206,9 @@ async function startQuizInDB() {
   quizIniciando = true;
 
   try {
-    await initSupabase();
-
-    sessionStorage.removeItem('much_current_quiz_id');
-    sessionStorage.removeItem('much_quiz_final_data');
-
-    // 🌟 SE ESTABLECE EL ID MANUALMENTE
-    const ID_JUGADOR = 365;
+    // 🌟 SE OBTIENE EL ID DEL USUARIO DESDE EL LOCALSTORAGE
+    const savedUser = JSON.parse(localStorage.getItem('much_google_user') || '{}');
+    const ID_JUGADOR = savedUser.email || 365;
 
     // Insertar nuevo intento
     const payload = {
