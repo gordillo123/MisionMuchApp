@@ -2239,6 +2239,7 @@
     ];
 
     let currentStation = '3';
+    let selectedAvatar = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       // 1. Partículas
@@ -2550,7 +2551,49 @@
         setTimeout(() => {
           moveToStation(3);
         }, 500);
+
+        // Guardar avatar seleccionado en localStorage
+        localStorage.setItem('much_selected_avatar', JSON.stringify(selectedAvatar));
       };
+
+      // NUEVO: Lógica para manejar el regreso desde las estaciones
+      function checkReturnFromStation() {
+        const params = new URLSearchParams(window.location.search);
+        const view = params.get('view');
+        const savedAvatar = localStorage.getItem('much_selected_avatar');
+        const savedStation = localStorage.getItem('much_current_station');
+
+        if (view === 'prep' && savedAvatar) {
+          try {
+            selectedAvatar = JSON.parse(savedAvatar);
+            
+            // Cargar datos en la vista de preparación
+            document.getElementById('prepAvatarName').innerText = selectedAvatar.name;
+            const imgCont = document.getElementById('prepAvatarImg');
+            imgCont.innerHTML = `<img src="avatars/${selectedAvatar.id}.png" class="av-img">`;
+
+            // Cargar avatar en el mapa
+            const mapAvatar = document.getElementById('mapAvatar');
+            mapAvatar.innerHTML = `<img src="avatars/${selectedAvatar.id}.png" alt="Avatar">`;
+
+            // Switch de vista
+            document.getElementById('viewLanding').classList.remove('active');
+            document.getElementById('viewPrep').classList.add('active');
+
+            // Restaurar estación
+            if (savedStation) currentStation = savedStation;
+
+            // Posición inicial del avatar
+            setTimeout(() => {
+              moveToStation(currentStation || 3);
+            }, 500);
+          } catch (e) {
+            console.error('Error al restaurar avatar:', e);
+          }
+        }
+      }
+
+      checkReturnFromStation();
 
       // 5. Lógica de Movimiento en el Mapa
       const stations = {
@@ -2567,6 +2610,7 @@
         const avatar = document.getElementById('mapAvatar');
         if (pos && avatar) {
           currentStation = String(stationId);
+          localStorage.setItem('much_current_station', currentStation);
           avatar.style.left = `${pos.x}%`;
           avatar.style.top = `${pos.y}%`;
 

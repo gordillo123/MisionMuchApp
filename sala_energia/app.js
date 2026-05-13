@@ -359,6 +359,7 @@ class UIManager {
 
   bind() {
     this.e.nextBtn.addEventListener('click', () => this.next());
+    this.e.returnBtn.addEventListener('click', () => this.redirectToRegistration());
     this.e.openTicketBtn.addEventListener('click', () => this.redirectToRegistration());
     this.e.playAgainBtn1.addEventListener('click', () => location.reload());
     this.e.playAgainBtn2.addEventListener('click', () => location.reload());
@@ -373,8 +374,10 @@ class UIManager {
   }
 
   redirectToRegistration() {
-    // Redirigir al mapa principal
-    window.location.href = '../index.html' + window.location.search;
+    // Redirigir al mapa principal en la vista de preparación
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set('view', 'prep');
+    window.location.href = '../index.html?' + searchParams.toString();
   }
 
   async render() {
@@ -524,6 +527,7 @@ const elements = {
   giftRow: document.getElementById('giftRow'),
   retryRow: document.getElementById('retryRow'),
   openTicketBtn: document.getElementById('openTicketBtn'),
+  returnBtn: document.getElementById('returnBtn'),
   playAgainBtn1: document.getElementById('playAgainBtn1'),
   playAgainBtn2: document.getElementById('playAgainBtn2'),
   soundToggle: document.getElementById('soundToggle'),

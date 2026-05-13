@@ -428,6 +428,7 @@ class UIManager {
 
   bind() {
     this.e.nextBtn.addEventListener('click', () => this.next());
+    this.e.returnBtn.addEventListener('click', () => this.redirectToRegistration());
     this.e.openTicketBtn.addEventListener('click', () => this.redirectToRegistration());
     this.e.playAgainBtn1.addEventListener('click', () => location.reload());
     this.e.playAgainBtn2.addEventListener('click', () => location.reload());
@@ -442,19 +443,10 @@ class UIManager {
   }
 
   redirectToRegistration() {
-    if (!this.currentPrize) return;
-    const prizeData = {
-      title: this.currentPrize.title,
-      label: this.currentPrize.label,
-      lugar: this.currentPrize.lugar,
-      folio: buildPrizeFolio(this.currentPrize.label),
-      date: new Intl.DateTimeFormat('es-MX', { dateStyle: 'long' }).format(new Date()),
-      emoji: this.currentPrize.emoji
-    };
-    localStorage.setItem('much_quiz_prize', JSON.stringify(prizeData));
-
-    // Pasamos el parámetro a registro
-    window.location.href = '../index.html' + window.location.search;
+    // Redirigir al mapa principal en la vista de preparación
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set('view', 'prep');
+    window.location.href = '../index.html?' + searchParams.toString();
   }
 
   async render() {
@@ -606,6 +598,7 @@ const elements = {
   giftRow: document.getElementById('giftRow'),
   retryRow: document.getElementById('retryRow'),
   openTicketBtn: document.getElementById('openTicketBtn'),
+  returnBtn: document.getElementById('returnBtn'),
   playAgainBtn1: document.getElementById('playAgainBtn1'),
   playAgainBtn2: document.getElementById('playAgainBtn2'),
   soundToggle: document.getElementById('soundToggle'),
