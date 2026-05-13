@@ -99,9 +99,18 @@ function getMexicoTime() {
 // ------------------------------------------------------------
 async function loadPreguntas() {
   try {
-    const resp = await fetch('preguntas.json', { cache: 'no-store' });
-    if (!resp.ok) throw new Error('No se pudo cargar preguntas.json: ' + resp.status);
-    let bank = await resp.json();
+    let bank;
+    
+    // Intentar cargar desde la variable global primero (preguntas-local.js)
+    if (window.MUCH_PREGUNTAS_BIODIVERSIDAD) {
+      bank = window.MUCH_PREGUNTAS_BIODIVERSIDAD;
+      console.log('[loadPreguntas] Usando preguntas desde variable global');
+    } else {
+      // Fallback a fetch si no está disponible la variable global
+      const resp = await fetch('preguntas.json', { cache: 'no-store' });
+      if (!resp.ok) throw new Error('No se pudo cargar preguntas.json: ' + resp.status);
+      bank = await resp.json();
+    }
 
     if (!Array.isArray(bank)) {
       const keys = Object.keys(bank || {});
