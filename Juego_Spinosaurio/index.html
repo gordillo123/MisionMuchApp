@@ -101,6 +101,38 @@
       font-size: clamp(14px, 2.8vw, 18px);
     }
 
+    /* Botón Regresar al Mapa (Circular Púrpura como el Mapa) */
+    .btn-regresar-mapa {
+      position: absolute;
+      top: 1.5rem;
+      left: 1.5rem;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #775AFF;
+      border: 4px solid white;
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      transition: all 0.2s ease;
+      z-index: 200000;
+      text-decoration: none;
+    }
+
+    .btn-regresar-mapa:hover {
+      transform: translateY(-3px) scale(1.1);
+      box-shadow: 0 8px 20px rgba(119, 90, 255, 0.4);
+      background: #6DD0F0;
+    }
+
+    .btn-regresar-mapa:active {
+      transform: translateY(-1px) scale(0.98);
+    }
+
     /* ====== NUEVOS ESTILOS DE LA PORTADA INTEGRADA ====== */
     .portada-overlay {
       position: fixed;
@@ -340,6 +372,9 @@
 </head>
 
 <body>
+  <a href="../index.html" class="btn-regresar-mapa" id="btnReturnToMap" title="Volver al Mapa">
+    ←
+  </a>
 
   <div id="portadaOverlay" class="portada-overlay show">
 
@@ -417,6 +452,14 @@
       lastTouchEnd = now;
     }, { passive: false });
     document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
+
+    // Lógica para el botón de regresar que mantenga los parámetros de la URL
+    document.getElementById('btnReturnToMap').addEventListener('click', function(e) {
+      e.preventDefault();
+      const searchParams = new URLSearchParams(window.location.search);
+      searchParams.set('view', 'prep');
+      window.location.href = '../index.html?' + searchParams.toString();
+    });
 
   </script>
 </body>
