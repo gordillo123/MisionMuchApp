@@ -1,0 +1,430 @@
+:root {
+  --primary: #3b82f6;
+  /* Blue like the button/progress */
+  --primary-light: #eff6ff;
+  --text-dark: #1e293b;
+  --text-gray: #64748b;
+  --bg-gradient-start: #6366f1;
+  /* Indigo */
+  --bg-gradient-end: #d946ef;
+  /* Fuchsia */
+
+  --card-br: 24px;
+  --btn-br: 12px;
+
+  --font-main: system-ui, -apple-system, sans-serif;
+}
+
+/* ====== Prevent horizontal overflow globally ====== */
+html,
+body {
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-main);
+  min-height: 100vh;
+  background: linear-gradient(135deg, #6366f1 0%, #c026d3 50%, #db2777 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dark);
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ====== Header section ====== */
+.header-section {
+  overflow: hidden;
+  width: 100%;
+}
+
+/* ====== Logos del header ====== */
+.logo-header {
+  height: 48px !important;
+  max-height: 48px !important;
+  width: auto !important;
+  max-width: 45% !important;
+  object-fit: contain;
+  display: block;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* ====== Contenedor del QUIZ ====== */
+#quizShell {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+/* Tarjeta del quiz */
+.quiz-card {
+  width: 100%;
+  max-width: 720px;
+  background: #fff;
+  border-radius: var(--card-br);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  padding: 40px;
+  position: relative;
+  border: none;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.quiz-card::before {
+  display: none;
+}
+
+/* ====== Título y subtítulo ====== */
+.app-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 0.15rem;
+}
+
+.app-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-gray);
+  font-weight: 400;
+}
+
+/* ====== Controls row pills ====== */
+.sala-pill {
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: 999px;
+  padding: 6px 16px;
+  border: none;
+}
+
+.timer-text {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  white-space: nowrap;
+}
+
+.points-pill {
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: 999px;
+  padding: 6px 16px;
+  display: inline-block;
+}
+
+.tiny {
+  font-size: 0.85rem;
+  color: var(--text-gray);
+}
+
+/* ====== Progress Bar ====== */
+.progress {
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-bar {
+  background: #3b82f6;
+  box-shadow: none;
+}
+
+/* ====== Question Section ====== */
+.question-container {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.badge-question {
+  background-color: #eff6ff;
+  color: #3b82f6;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+#qText {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+  line-height: 1.3;
+}
+
+#qDesc {
+  font-size: 1rem;
+  color: var(--text-gray);
+  margin-bottom: 2rem;
+}
+
+/* ====== Opciones as Grid ====== */
+#options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.col-12.col-md-6 {
+  width: 100%;
+  padding: 0;
+}
+
+.option-btn {
+  border: 1px solid transparent;
+  text-align: left;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: #fff;
+  color: var(--text-dark);
+  font-weight: 500;
+  font-size: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+  width: 100%;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+}
+
+.option-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  background: #fff;
+}
+
+.option-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
+  border-color: var(--primary);
+}
+
+.option-btn--correct {
+  border-color: #22c55e !important;
+  background: #f0fdf4 !important;
+  color: #15803d;
+}
+
+.option-btn--incorrect {
+  border-color: #ef4444 !important;
+  background: #fef2f2 !important;
+  color: #b91c1c;
+}
+
+.option-btn:disabled {
+  opacity: 0.8;
+  cursor: default;
+  transform: none;
+}
+
+.emoji {
+  font-size: 1.2rem;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 12px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  color: #3b82f6;
+}
+
+/* ====== Botón Siguiente ====== */
+.btn-action {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  color: #fff;
+  border: none;
+  font-size: 1.05rem;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.btn-action:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+.btn-action:active {
+  transform: translateY(0);
+}
+
+/* ====== Status message ====== */
+.status-msg {
+  font-size: 1rem;
+}
+
+/* ====== Confeti canvas ====== */
+.confetti-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* =========================================
+   MEDIA QUERIES FOR MOBILE RESPONSIVENESS
+   ========================================= */
+@media (max-width: 768px) {
+
+  /* Global Layout */
+  body {
+    align-items: flex-start;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  #quizShell {
+    padding: 10px;
+    align-items: flex-start;
+    height: auto;
+    min-height: 100%;
+  }
+
+  .quiz-card {
+    padding: 20px 16px;
+    border-radius: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+  }
+
+  /* Header logos */
+  .logo-header {
+    height: 36px !important;
+    max-height: 36px !important;
+    max-width: 40% !important;
+  }
+
+  /* Título */
+  .app-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .app-subtitle {
+    font-size: 0.8rem;
+  }
+
+  .tiny {
+    font-size: 0.75rem;
+  }
+
+  /* Controls row */
+  .controls-row {
+    flex-wrap: wrap;
+    gap: 8px !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .sala-pill {
+    font-size: 0.78rem;
+    padding: 4px 12px;
+  }
+
+  .timer-text {
+    font-size: 0.82rem;
+  }
+
+  /* Question Section */
+  #qText {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .badge-question {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+  }
+
+  /* Options Grid -> Stack */
+  #options {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .option-btn {
+    padding: 12px 14px;
+    min-height: 52px;
+    font-size: 0.9rem;
+  }
+
+  .emoji {
+    width: 24px;
+    height: 24px;
+    font-size: 0.9rem;
+    margin-right: 10px;
+  }
+
+  /* Botón Siguiente */
+  #nextBtn {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+
+  /* Footer info */
+  .footer-info {
+    margin-top: 1rem !important;
+  }
+
+  .points-pill {
+    font-size: 0.82rem;
+    padding: 5px 14px;
+  }
+
+  #hint {
+    font-size: 0.75rem;
+    display: block;
+    margin-bottom: 0;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 380px) {
+  #qText {
+    font-size: 1.15rem;
+  }
+
+  .quiz-card {
+    padding: 14px;
+  }
+
+  .logo-header {
+    height: 28px !important;
+    max-height: 28px !important;
+    max-width: 38% !important;
+  }
+
+  .app-title {
+    font-size: 1rem;
+  }
+}

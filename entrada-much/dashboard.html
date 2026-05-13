@@ -1,0 +1,1098 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <title>MUCH • Sistema de Inteligencia</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-body: #020617;
+      --bg-sidebar: #0f172a;
+      --bg-card: #1e293b;
+      --bg-input: #0f172a;
+      --border: rgba(255, 255, 255, 0.06);
+      --accent: #06b6d4;
+      --accent-soft: rgba(6, 182, 212, 0.1);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --sidebar-width: 280px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: var(--bg-body);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, sans-serif;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    main {
+      margin-left: 280px;
+      flex: 1;
+      padding: 40px;
+      height: 100vh;
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+    }
+
+    .sidebar-img-container {
+      padding: 0 24px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .sidebar-img-container img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      object-fit: contain;
+    }
+
+    .img-bottom {
+      margin-top: auto;
+      margin-bottom: 0;
+      padding: 24px;
+    }
+
+    .brand {
+      padding: 0 24px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      background: var(--accent-soft);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-txt h1 {
+      font-size: 20px;
+      margin: 0;
+      font-weight: 800;
+      color: white;
+    }
+
+    .brand-txt p {
+      font-size: 11px;
+      margin: 0;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .nav-label {
+      padding: 0 24px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      opacity: 0.5;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 24px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-left: 3px solid transparent;
+      cursor: pointer;
+    }
+
+    .nav-link.active {
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-left-color: var(--accent);
+    }
+
+    .nav-link:hover:not(.active) {
+      color: white;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .main-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 40px;
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+
+    .header-title h2 {
+      font-size: 32px;
+      margin: 0;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .header-title p {
+      color: var(--text-muted);
+      margin: 8px 0 0;
+      font-size: 15px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .badge-live {
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--success);
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .badge-live::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--success);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--success);
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.95);
+        opacity: 0.5;
+      }
+
+      70% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(0.95);
+        opacity: 0.5;
+      }
+    }
+
+    /* Stats Grid */
+    .top-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: transform 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
+    .card-info .label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .card-info .value {
+      font-size: 40px;
+      font-weight: 800;
+      color: white;
+      line-height: 1;
+    }
+
+    .card-icon {
+      width: 56px;
+      height: 56px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    /* Filters Bar */
+    .filters-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 40px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .filter-group label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .filter-group select,
+    .filter-group input {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: white;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .filter-group select:focus,
+    .filter-group input:focus {
+      border-color: var(--accent);
+    }
+
+    .btn-update {
+      background: var(--accent);
+      color: #000;
+      border: 0;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.3s;
+    }
+
+    .btn-update:hover {
+      opacity: 0.9;
+      transform: scale(1.02);
+    }
+
+    /* Views Handling */
+    .view-content {
+      display: none;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    .view-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Table System */
+    .table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      padding: 18px 24px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    td {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .status-pill {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .st-active {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+
+    .st-redeemed {
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--success);
+    }
+
+    .st-none {
+      background: rgba(148, 163, 184, 0.12);
+      color: var(--text-muted);
+    }
+
+    /* Charts Section */
+    .charts-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px;
+      width: 100%;
+      max-width: 600px;
+      /* Tamaño controlado */
+      margin: 0 auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .chart-header {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .chart-header h4 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .chart-header p {
+      margin: 4px 0 0;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .chart-canvas-wrapper {
+      position: relative;
+      height: 400px;
+      /* Altura fija para evitar saltos */
+      width: 100%;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-body);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--bg-card);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+
+    .btn-delete {
+      background: transparent;
+      border: 0;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      transition: 0.2s;
+      font-size: 16px;
+    }
+
+    .btn-delete:hover {
+      color: var(--danger);
+      background: rgba(239, 68, 68, 0.1);
+    }
+  </style>
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div style="padding: 32px 24px;">
+      <div
+        style="background: var(--accent-soft); padding: 16px; border-radius: 20px; text-align: center; margin-bottom: 24px;">
+        <img src="logo-much.png" alt="Logo MUCH"
+          style="max-width: 100%; height: auto; display: block; margin: 0 auto; filter: drop-shadow(0 4px 10px rgba(6,182,214,0.3))">
+      </div>
+
+
+      <div class="nav-label">General</div>
+      <a href="#" class="nav-link active" data-view="dashboard"><span>📊</span> Dashboard</a>
+      <a href="#" class="nav-link" data-view="charts"><span>📈</span> Gráficas</a>
+
+      <div class="sidebar-footer"
+        style="margin-top:auto; padding:20px 24px; border-top:1px solid var(--border); display:flex; align-items:center; gap:12px;">
+        <div class="user-avatar"
+          style="width:36px; height:36px; background:#334155; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px;">
+          AC</div>
+        <div class="user-info">
+          <div class="name" style="font-size:13px; font-weight:600; color:white;">Admin Chiapas</div>
+          <div class="email" style="font-size:11px; color:var(--text-muted);">admin@much.mx</div>
+        </div>
+      </div>
+  </aside>
+
+  <main class="main">
+    <div class="main-scroll">
+      <header class="header-row">
+        <div class="header-title">
+          <h2 id="view-title">Dashboard</h2>
+          <p id="view-subtitle">Monitoreo de actividad en tiempo real.</p>
+        </div>
+        <div class="header-actions">
+          <div class="badge-live">SISTEMA LIVE</div>
+          <div id="update-time" style="font-family:monospace; color:var(--accent); font-weight:700">--:--:--</div>
+          <button id="btn-refresh" class="btn-update"><span>↻</span> Sincronizar</button>
+        </div>
+      </header>
+
+      <!-- Common Stats (Always Visible) -->
+      <section class="top-stats">
+        <article class="card">
+          <div class="card-info">
+            <span class="label">Total Partidas</span>
+            <div id="stat-quizzes" class="value">0</div>
+          </div>
+          <div class="card-icon">🎮</div>
+        </article>
+        <article class="card">
+          <div class="card-info" style="border-left: 4px solid var(--success); padding-left: 15px;">
+            <span class="label">Canjes Exitosos</span>
+            <div id="stat-canjeados" class="value" style="color:var(--success)">0</div>
+          </div>
+          <div class="card-icon">✅</div>
+        </article>
+        <article class="card">
+          <div class="card-info">
+            <span class="label">Boletos Emitidos</span>
+            <div id="stat-total-boletos" class="value">0</div>
+          </div>
+          <div class="card-icon">🎟️</div>
+        </article>
+      </section>
+
+      <!-- Filters (Always Visible) -->
+      <section class="filters-bar">
+        <div class="filter-group" id="group-sala">
+          <label for="f-sala">📍 Sala / Actividad</label>
+          <select id="f-sala">
+            <option value="">Todas las salas</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="f-ubicacion">📍 Ubicación (POI)</label>
+          <select id="f-ubicacion">
+            <option value="">Cargando ubicaciones...</option>
+          </select>
+        </div>
+        <div class="filter-group" id="group-estatus">
+          <label for="f-estatus">Estatus</label>
+          <select id="f-estatus">
+            <option value="">Cualquiera</option>
+            <option value="activo">⏳ Activo</option>
+            <option value="canjeado">✅ Canjeado</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="f-fecha">Fecha</label>
+          <input type="date" id="f-fecha">
+        </div>
+        <button id="btn-clear"
+          style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:12px 20px; border-radius:12px; cursor:pointer">Limpiar</button>
+      </section>
+
+      <!-- VIEW: Dashboard (Table) -->
+      <section id="view-dashboard" class="view-content active">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha / Hora</th>
+                <th>Sala</th>
+                <th>Ubicación (POI)</th>
+                <th>Puntaje</th>
+                <th>Estatus</th>
+                <th>ID</th>
+                <th style="width:50px"></th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+          <div
+            style="padding:20px; text-align:right; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border)">
+            <span id="row-count">0 registros encontrados</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: Charts (Graphs) -->
+      <section id="view-charts" class="view-content">
+        <div class="charts-container">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h4>Top 5 Procedencia (POIs)</h4>
+              <p>Impacto basado en la ubicación de escaneo del QR.</p>
+            </div>
+            <div class="chart-canvas-wrapper">
+              <canvas id="chart-pois"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    const SUPABASE_URL = 'https://qwgaeorsymfispmtsbut.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3Z2Flb3JzeW1maXNwbXRzYnV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzODcyODUsImV4cCI6MjA3Nzk2MzI4NX0.FThZIIpz3daC9u8QaKyRTpxUeW0v4QHs5sHX2s1U1eo';
+
+    const ROOM_MAP = {
+      '08a6cc96-5323-42e0-89df-77a8c36e9705': 'Sala Energía',
+      '0b4f04b0-5196-473d-8689-55d5f315df55': '🦖 Spinosaurio',
+      '17fd001d-f6c5-4f98-ab25-d81624227bc2': 'Sala Desarrollo Sustentable',
+      '4bdffb5f-1a55-4952-be0c-9d487550fb0c': 'Sala Biodiversidad y Conocimiento',
+      '6d66b495-cf43-42c1-b7f8-627ceb6fe33d': 'Entrada MUCH'
+    };
+
+    /**
+     * DataManager: Handles all Supabase communication and data processing.
+     */
+    class DataManager {
+      constructor() {
+        this.client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        this.records = [];
+        this.rooms = [];
+      }
+
+      async deleteRecord(id, salaNombre) {
+        const table = salaNombre.includes('Spinosaurio') ? 'intentos_juego' : 'quizzes';
+        const { error } = await this.client.from(table).delete().eq('id', id);
+        if (error) throw error;
+        return true;
+      }
+
+      async fetchInitialData() {
+        const { data: rooms } = await this.client.from('salas').select('*');
+        this.rooms = rooms || [];
+        return this.rooms;
+      }
+
+      async getTicketMetrics() {
+        const { count: total } = await this.client.from('Ganadores').select('*', { count: 'exact', head: true });
+        const { count: canjeados } = await this.client
+          .from('Ganadores')
+          .select('*', { count: 'exact', head: true })
+          .eq('estatus', 'canjeado');
+
+        return {
+          total: total || 0,
+          canjeados: canjeados || 0
+        };
+      }
+
+      async fetchWinnerStatusMap() {
+        const { data, error } = await this.client.from('Ganadores').select('id, estatus');
+        if (error) {
+          console.error("❌ Error al leer Ganadores:", error.message);
+          return new Map();
+        }
+
+        return new Map(
+          (data || []).map(row => [
+            String(row.id),
+            (row.estatus || 'activo').toLowerCase()
+          ])
+        );
+      }
+
+      async fetchUbicaciones(fecha = null) {
+        let iQuery = this.client.from('intentos_juego').select('ubicacion');
+        let qQuery = this.client.from('quizzes').select('ubicacion');
+
+        if (fecha) {
+          iQuery = iQuery.gte('created_at', `${fecha}T00:00:00Z`).lte('created_at', `${fecha}T23:59:59Z`);
+          qQuery = qQuery.gte('started_at', `${fecha}T00:00:00Z`).lte('started_at', `${fecha}T23:59:59Z`);
+        } else {
+          // Si no hay fecha, traemos los más recientes para asegurar que las nuevas ubicaciones aparezcan
+          iQuery = iQuery.order('created_at', { ascending: false }).limit(1000);
+          qQuery = qQuery.order('started_at', { ascending: false }).limit(1000);
+        }
+
+        const { data: intentos } = await iQuery;
+        const { data: quizzes } = await qQuery;
+
+        const all = [...(intentos || []), ...(quizzes || [])];
+        const unique = [...new Set(
+          all.map(r => {
+            let u = (r.ubicacion || '').trim().toLowerCase();
+            // 💡 NORMALIZACIÓN AGRESIVA: Quitamos todos los números y guiones bajos para agrupar mejor
+            u = u.replace(/\d+/g, '').replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
+            return u;
+          }).filter(u => u && u !== 'sin especificar')
+        )];
+
+        const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
+        return unique.sort().map(capitalize);
+      }
+
+      async fetchUnifiedData(filters = {}) {
+        try {
+          const winnerStatusMap = await this.fetchWinnerStatusMap();
+          // 1. Traer datos de Quizzes (Salas normales)
+          let qQuery = this.client.from('quizzes').select('*, salas(nombre)').order('started_at', { ascending: false });
+          if (filters.fecha) qQuery = qQuery.gte('started_at', `${filters.fecha}T00:00:00Z`).lte('started_at', `${filters.fecha}T23:59:59Z`);
+          const { data: quizzes } = await qQuery;
+
+          // 2. Traer datos de Intentos (Juego Espinosaurio)
+          let iQuery = this.client.from('intentos_juego').select('*').order('created_at', { ascending: false });
+          if (filters.fecha) {
+            iQuery = iQuery.gte('created_at', `${filters.fecha}T00:00:00Z`).lte('created_at', `${filters.fecha}T23:59:59Z`);
+          } else {
+            iQuery = iQuery.limit(1000); // Evitar saturación pero traer suficientes
+          }
+          const { data: intentos, error: iError } = await iQuery;
+
+          console.log(`📊 Unified Sync: ${quizzes?.length || 0} Quizzes, ${intentos?.length || 0} Intentos`);
+
+          if (iError) console.error("❌ Error al leer intentos_juego:", iError.message);
+
+          // DIAGNÓSTICO: Loguear los últimos 3 intentos crudos para verificar formato
+          if (intentos && intentos.length > 0) {
+            console.log("🦖 Muestra de intentos_juego (DB):", intentos.slice(0, 3));
+          }
+
+          // 3. Unificar con BLINDAJE para el Dino
+          const unified = [
+            ...(quizzes || []).map(q => {
+              const winnerStatus = q.participante_id != null
+                ? winnerStatusMap.get(String(q.participante_id))
+                : null;
+
+              return {
+                id: q.id, fecha: q.started_at,
+                sala_id: q.sala_id,
+                sala_nombre: q.salas ? q.salas.nombre : (ROOM_MAP[q.sala_id] || 'Sala Desconocida'),
+                ubicacion: q.ubicacion || 'Sin Especificar',
+                puntaje: q.puntaje_total ?? q.puntaje ?? 0,
+                estatus: winnerStatus || 'sin_boleto'
+              };
+            }),
+            ...(intentos || []).map(i => ({
+              id: i.id, fecha: i.created_at,
+              sala_id: '0b4f04b0-5196-473d-8689-55d5f315df55',
+              sala_nombre: '🦖 Spinosaurio',
+              ubicacion: (i.ubicacion || 'Sin Especificar').trim(),
+              puntaje: i.puntaje ?? 0,
+              estatus: 'sin_boleto'
+            }))
+          ];
+
+          // Ordenar por fecha (más reciente arriba) - Blindaje para formatos de fecha mixtos
+          this.records = unified.sort((a, b) => {
+            const da = new Date(a.fecha).getTime() || 0;
+            const db = new Date(b.fecha).getTime() || 0;
+            return db - da;
+          });
+
+          // 4. Aplicar filtros locales
+          let filtered = this.records;
+          if (filters.sala) {
+            filtered = filtered.filter(r => r.sala_id === filters.sala || r.sala_nombre === filters.sala);
+          }
+          if (filters.ubicacion) {
+            const f = filters.ubicacion.trim().toLowerCase();
+            filtered = filtered.filter(r => {
+              const ubi = (r.ubicacion || '').trim().toLowerCase();
+              // Normalización básica para que "parque" coincida con "Parque la Marimba"
+              return ubi.includes(f) || f.includes(ubi);
+            });
+          }
+          if (filters.estatus) filtered = filtered.filter(r => r.estatus === filters.estatus);
+
+          return filtered;
+        } catch (e) {
+          console.error("DataManager Error:", e);
+          return [];
+        }
+      }
+      /**
+       * ChartEngine: Manages the visualization components.
+       */
+    }
+    class ChartEngine {
+      constructor(canvasId) {
+        this.ctx = document.getElementById(canvasId).getContext('2d');
+        this.chart = null;
+      }
+
+      renderTopPOIs(data) {
+        const counts = {};
+
+        // Contamos por ubicación para el Top 5
+        data.forEach(r => {
+          const key = r.ubicacion;
+          counts[key] = (counts[key] || 0) + 1;
+        });
+
+        const sorted = Object.entries(counts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5);
+
+        const labels = sorted.map(i => i[0]);
+        const values = sorted.map(i => i[1]);
+
+        const canvasContainer = this.ctx.canvas.parentElement;
+
+        if (values.length === 0) {
+          if (this.chart) { this.chart.destroy(); this.chart = null; }
+          canvasContainer.innerHTML = '<div style="height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:14px; flex-direction:column; gap:12px;"><span>📉</span> Sin datos registrados</div>';
+          return;
+        }
+
+        if (!document.getElementById('chart-pois')) {
+          canvasContainer.innerHTML = '<canvas id="chart-pois"></canvas>';
+          this.ctx = document.getElementById('chart-pois').getContext('2d');
+        }
+
+        if (this.chart) {
+          this.chart.data.labels = labels;
+          this.chart.data.datasets[0].data = values;
+          this.chart.update();
+        } else {
+          this.chart = new Chart(this.ctx, {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Escaneos',
+                data: values,
+                backgroundColor: '#06b6d4',
+                borderColor: '#06b6d4',
+                borderWidth: 1,
+                borderRadius: 8
+              }]
+            },
+            options: {
+              indexAxis: 'y',
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  backgroundColor: '#1e293b',
+                  titleColor: '#06b6d4',
+                  bodyColor: '#fff'
+                }
+              },
+              scales: {
+                x: {
+                  grid: { color: 'rgba(255,255,255,0.05)' },
+                  ticks: { color: '#94a3b8' }
+                },
+                y: {
+                  grid: { display: false },
+                  ticks: { color: '#f8fafc', font: { weight: 'bold' } }
+                }
+              }
+            }
+          });
+        }
+      }
+    }
+
+    /**
+     * UIController: Orchestrates the interface and user interaction.
+     */
+    class UIController {
+      constructor(dataManager, chartEngine) {
+        this.dm = dataManager;
+        this.ce = chartEngine;
+        this.currentView = 'dashboard';
+
+        this.els = {
+          tbody: document.getElementById('tbody'),
+          rowCount: document.getElementById('row-count'),
+          updateTime: document.getElementById('update-time'),
+          statQuizzes: document.getElementById('stat-quizzes'),
+          statCanjeados: document.getElementById('stat-canjeados'),
+          statTotalBoletos: document.getElementById('stat-total-boletos'),
+          filtersBar: document.querySelector('.filters-bar'),
+          selSala: document.getElementById('f-sala'),
+          selUbicacion: document.getElementById('f-ubicacion'),
+          selEstatus: document.getElementById('f-estatus'),
+          selFecha: document.getElementById('f-fecha'),
+          btnRefresh: document.getElementById('btn-refresh'),
+          btnClear: document.getElementById('btn-clear'),
+          navLinks: document.querySelectorAll('.nav-link'),
+          viewTitle: document.getElementById('view-title'),
+          viewSubtitle: document.getElementById('view-subtitle'),
+          views: {
+            dashboard: document.getElementById('view-dashboard'),
+            charts: document.getElementById('view-charts')
+          }
+        };
+
+        this.init();
+      }
+
+      async init() {
+        this.bindEvents();
+        const rooms = await this.dm.fetchInitialData();
+        this.populateRooms(rooms);
+        const ubicaciones = await this.dm.fetchUbicaciones();
+        this.populatePOIs(ubicaciones);
+        this.refresh();
+        setInterval(() => this.refresh(), 60000);
+      }
+
+      bindEvents() {
+        this.els.navLinks.forEach(link => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.switchView(link.dataset.view);
+          });
+        });
+
+        this.els.btnRefresh.addEventListener('click', () => this.refresh());
+        this.els.btnClear.addEventListener('click', () => {
+          this.els.selSala.value = "";
+          this.els.selUbicacion.value = "";
+          this.els.selEstatus.value = "";
+          this.els.selFecha.value = "";
+          this.refresh();
+        });
+
+        [this.els.selSala, this.els.selUbicacion, this.els.selEstatus, this.els.selFecha].forEach(el => {
+          el.addEventListener('change', () => this.refresh());
+        });
+      }
+
+      switchView(viewId) {
+        this.currentView = viewId;
+        this.els.navLinks.forEach(l => l.classList.toggle('active', l.dataset.view === viewId));
+        Object.keys(this.els.views).forEach(key => {
+          this.els.views[key].classList.toggle('active', key === viewId);
+        });
+
+        if (viewId === 'dashboard') {
+          this.els.viewTitle.textContent = "Dashboard";
+          this.els.viewSubtitle.textContent = "Monitoreo de actividad en tiempo real.";
+          this.els.filtersBar.style.display = 'flex';
+        } else {
+          this.els.viewTitle.textContent = "Impacto Visual";
+          this.els.viewSubtitle.textContent = "Análisis de puntos de interés y procedencia.";
+          this.els.filtersBar.style.display = 'none';
+          this.ce.renderTopPOIs(this.dm.records);
+        }
+      }
+
+      populateRooms(rooms) {
+        this.els.selSala.innerHTML = '<option value="">Todas las salas</option>';
+
+        // Usar datos de DB si existen
+        if (rooms && rooms.length > 0) {
+          rooms.forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r.id; opt.textContent = r.nombre;
+            this.els.selSala.appendChild(opt);
+          });
+        } else {
+          // Fallback al mapa estático si la tabla salas está vacía/bloqueada
+          Object.entries(ROOM_MAP).forEach(([id, name]) => {
+            const opt = document.createElement('option');
+            opt.value = id; opt.textContent = name;
+            this.els.selSala.appendChild(opt);
+          });
+        }
+      }
+
+      populatePOIs(ubicaciones) {
+        const current = this.els.selUbicacion.value;
+        this.els.selUbicacion.innerHTML = '<option value="">Todas las ubicaciones</option>';
+        ubicaciones.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p; opt.textContent = p;
+          this.els.selUbicacion.appendChild(opt);
+        });
+        this.els.selUbicacion.value = current;
+      }
+
+      async refresh() {
+        const filters = {
+          sala: this.els.selSala.value,
+          ubicacion: this.els.selUbicacion.value,
+          estatus: this.els.selEstatus.value,
+          fecha: this.els.selFecha.value
+        };
+
+        const data = await this.dm.fetchUnifiedData(filters);
+        const ticketMetrics = await this.dm.getTicketMetrics();
+
+        const ubicaciones = await this.dm.fetchUbicaciones(filters.fecha);
+        this.populatePOIs(ubicaciones);
+        this.renderTable(data);
+        this.updateStats(data, ticketMetrics);
+
+        if (this.currentView === 'charts') {
+          this.ce.renderTopPOIs(this.dm.records);
+        }
+
+        this.els.updateTime.textContent = new Date().toLocaleTimeString();
+      }
+
+      renderTable(data) {
+        this.els.tbody.innerHTML = '';
+        data.forEach(r => {
+          const tr = document.createElement('tr');
+          const statusMeta = r.estatus === 'canjeado'
+            ? { className: 'st-redeemed', label: 'CANJEADO' }
+            : r.estatus === 'activo'
+              ? { className: 'st-active', label: 'ACTIVO' }
+              : { className: 'st-none', label: 'SIN BOLETO' };
+          const safeId = String(r.id).slice(0, 8);
+          tr.innerHTML = `
+            <td>${new Date(r.fecha).toLocaleString()}</td>
+            <td><span style="color:var(--accent); font-weight:600">${r.sala_nombre}</span></td>
+            <td>${r.ubicacion}</td>
+            <td style="font-weight:800; color:white">${r.puntaje} pts</td>
+            <td><span class="status-pill ${statusMeta.className}">${statusMeta.label}</span></td>
+            <td style="font-family:monospace; font-size:11px; color:var(--text-muted)">${safeId}...</td>
+            <td>
+              <button class="btn-delete" data-id="${r.id}" data-sala="${r.sala_nombre}" title="Eliminar registro">🗑️</button>
+            </td>
+          `;
+          this.els.tbody.appendChild(tr);
+        });
+
+        // Bind delete buttons
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const { id, sala } = btn.dataset;
+            if (confirm(`¿Estás seguro de que deseas eliminar este registro (${sala})?`)) {
+              try {
+                await this.dm.deleteRecord(id, sala);
+                this.refresh();
+              } catch (e) {
+                alert("Error al eliminar: " + e.message);
+              }
+            }
+          });
+        });
+        this.els.rowCount.textContent = `${data.length} registros encontrados`;
+      }
+
+      updateStats(data, ticketMetrics) {
+        this.els.statQuizzes.textContent = data.length;
+        this.els.statCanjeados.textContent = ticketMetrics.canjeados;
+        this.els.statTotalBoletos.textContent = ticketMetrics.total;
+      }
+    }
+
+    // Launch!
+    const dm = new DataManager();
+    const ce = new ChartEngine('chart-pois');
+    new UIController(dm, ce);
+  </script>
+</body>
+
+</html>

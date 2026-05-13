@@ -1,0 +1,273 @@
+/* ====== VARIABLES & THEME (SALA BIODIVERSIDAD) ====== */
+:root {
+  /* Biodiversity Theme (Original Colors) */
+  --verde-500: #10b981; 
+  --verde-600: #059669;
+  --verde-700: #047857;
+
+  --azul-500: #3b82f6;
+  --azul-600: #2563eb;
+
+  --primary: var(--verde-500);
+  --primary-dark: var(--verde-600);
+
+  /* Original Vibrant Background Gradient */
+  --bg-gradient: linear-gradient(135deg, #0ea5b9, #ec4899, #38bdf8, #f472b6);
+
+  /* UI Colors */
+  --card-bg: #ffffff;
+  --text-main: #1f2937;
+  --text-sub: #6b7280;
+  --surface-light: #f3f4f6;
+
+  --radius-card: 32px;
+  --radius-btn: 16px;
+
+  --shadow-card: 0 20px 40px -5px rgba(0, 0, 0, 0.1);
+  --shadow-btn: 0 10px 20px -5px rgba(16, 185, 129, 0.3); /* Green shadow matching primary */
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  background-size: 300% 300%;
+  animation: gradientMove 15s ease infinite;
+  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* === QUIZ SHELL === */
+#quizShell {
+  width: 100%;
+  max-width: 480px;
+  margin: auto;
+}
+
+.quiz-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Top Decoration */
+.quiz-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--verde-500), var(--azul-500));
+}
+
+/* === HEADER === */
+.logo-header {
+  height: 48px;
+  object-fit: contain;
+}
+
+.logo-left {
+  height: 42px;
+}
+
+.logo-right {
+  height: 32px;
+}
+
+.app-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-top: 0.5rem;
+  color: #111;
+  letter-spacing: -0.02em;
+}
+
+.app-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-sub);
+}
+
+/* === CONTROLS === */
+.controls-row {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.sala-pill {
+  background: #eff6ff;
+  color: var(--azul-600);
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 1rem;
+  border-radius: 99px;
+  font-weight: 700;
+}
+
+.timer-text {
+  color: #ef4444;
+  font-variant-numeric: tabular-nums;
+}
+
+/* === QUESTION BADGE === */
+.badge-question {
+  background: #eff6ff;
+  color: var(--azul-600);
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* === QUESTION TEXT === */
+.question-text {
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #111;
+}
+
+/* === OPTIONS LIST === */
+.option-btn {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  width: 100%;
+}
+
+.option-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--azul-500);
+  background: #f8fafc;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+.option-btn:disabled {
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+/* Selected States */
+.option-btn--correct {
+  background: #ecfdf5 !important;
+  border-color: #10b981 !important;
+  color: #047857 !important;
+}
+
+.option-btn--incorrect {
+  background: #fef2f2 !important;
+  border-color: #ef4444 !important;
+  color: #b91c1c !important;
+}
+
+/* The diamond marker / emoji container */
+.emoji {
+  font-size: 0.8rem;
+  color: var(--azul-500);
+  background: #eff6ff;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Centering the text inside option buttons */
+.option-btn span:not(.emoji) {
+  text-align: center;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+/* === ACTION BUTTON === */
+.btn-action {
+  background: var(--azul-500);
+  color: white;
+  border: none;
+  font-size: 1.1rem;
+  transition: transform 0.15s;
+  box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
+}
+
+.btn-action:hover {
+  background: var(--azul-600);
+  transform: scale(1.02);
+}
+
+.btn-action:active {
+  transform: scale(0.98);
+}
+
+/* === FOOTER === */
+.footer-info {
+  border-top: 1px solid #f3f4f6;
+  padding-top: 1.5rem;
+}
+
+.points-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: #ca8a04;
+  background: #fefce8;
+  padding: 0.5rem 1rem;
+  border-radius: 99px;
+}
+
+.tiny {
+  font-size: 0.85rem;
+}
+
+/* Confetti */
+.confetti-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Progress Bar Overrides */
+.progress {
+  height: 6px;
+  background: #eff6ff;
+  border-radius: 999px;
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, var(--verde-500), var(--azul-500));
+}

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta name="theme-color" content="#0f6c81">
+  <title>MUCH · Portada</title>
+  <style>
+    :root{
+      --ink:#0f3f4c; --paper:#ffffff; --paper-2:#f4fbfa;
+      --bg1:#0f6c81; --bg2:#e8f6a4; --white:#ffffff;
+
+      /* Colores del MUCH */
+      --turquesa:#10b7cf;
+      --verde:#4fd97a;
+      --ambar:#ffb649;
+      --fucsia:#d946ef;
+
+      --turquesa-700:#0f6c81;
+      --verde-700:#148a4a;
+      --ambar-700:#c77408;
+      --fucsia-700:#9a2398;
+
+      --card-bg:#16a87a;
+      --card-bg1:#16a87a;
+      --card-bg2:#16a87a;
+      --card-br:24px;
+      --shadow-soft:0 22px 60px rgba(7, 48, 60, .24);
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      min-height:100svh;
+      display:grid; place-items:center;
+      background:
+        radial-gradient(900px 480px at 12% 10%, rgba(16, 183, 207, .42), transparent 62%),
+        radial-gradient(760px 420px at 88% 28%, rgba(79, 217, 122, .32), transparent 58%),
+        linear-gradient(180deg, #0e667b 0%, #55b8bb 52%, #eef6a2 100%);
+      padding:
+        max(12px, env(safe-area-inset-top))
+        max(12px, env(safe-area-inset-right))
+        max(16px, env(safe-area-inset-bottom))
+        max(12px, env(safe-area-inset-left));
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+.card{
+      width:min(920px, 94vw);
+      border-radius:var(--card-br);
+      background:linear-gradient(180deg, var(--card-bg1), var(--card-bg2));
+      border:1px solid rgba(15,108,129,.16);
+      box-shadow:0 30px 80px rgba(7,48,60,.22), inset 0 1px 0 rgba(255,255,255,.9);
+      padding:clamp(16px, 5vw, 32px);
+      text-align:center; color:#12323d;
+      backdrop-filter: blur(6px);
+      position:relative;
+      overflow:visible;
+      margin-top:78px; /* 👈 espacio extra para los logos */
+    }
+
+    /* Estilos base para todos los logos de esquina */
+    .logo-esquina{
+      position:absolute;
+      top:-65px;
+      width:auto;
+      border-radius:12px;
+      background:#fff;
+      padding:6px 10px;
+      box-shadow:0 6px 14px rgba(0,0,0,.25);
+    }
+
+    /* Tamaño individual de cada logo */
+    .logo-izq-abs{ 
+      left:20px; 
+      height:43px;
+    }
+    .logo-der-abs{ 
+      right:20px; 
+      height:44px;
+      background:#f6f6f6;
+    }
+    /* Logo MUCH */
+    .logo-much{
+      display:block;
+      margin:0 auto clamp(16px, 4vw, 24px);
+      height:100px;
+      width:auto;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,.25));
+    }
+
+    h1{
+      font-size: clamp(25px, 7vw, 50px);
+      line-height:1.05; font-weight:900; letter-spacing:.6px;
+      color:#0e5063;
+      text-shadow:0 2px 10px rgba(16,183,207,.12);
+      margin: 6px 0 10px;
+    }
+    p.sub{
+      font-size:clamp(14px, 3.8vw, 20px);
+      color:#35515e;
+      opacity:.98;
+      margin-bottom:clamp(12px, 4vw, 18px)
+    }
+
+    .btn{
+      appearance:none; border:0; cursor:pointer; display:inline-block; text-decoration:none;
+      padding:clamp(12px, 3.8vw, 16px) clamp(18px, 6vw, 22px);
+      border-radius:16px; font-weight:900;
+      font-size:clamp(16px, 4vw, 20px); color:#fff;
+      background:linear-gradient(135deg, #12b3c7 0%, #2cd779 100%);
+      box-shadow:0 18px 44px rgba(16,183,207,.26),0 6px 16px rgba(12,40,52,.18);
+      min-width:200px; min-height:48px;
+      transition: transform .06s, box-shadow .2s;
+    }
+    .btn:active{ transform: translateY(1px); }
+
+    .tip{margin-top:clamp(10px, 3vw, 14px); font-size:clamp(12px, 3.4vw, 14px); color:#58707a; opacity:.98}
+
+  </style>
+</head>
+<body>
+  <main class="card">
+    <img src="Logo-Ag-14.png" alt="Logo Aditech" class="logo-esquina logo-izq-abs">
+    <img src="logo-sata.png" alt="Logo SATA" class="logo-esquina logo-der-abs">
+
+    <img src="logo-much.png" alt="Logo MUCH" class="logo-much">
+
+    <h1>MUCH</h1>
+    <p class="sub">Aprende y gana premios!! 🌋</p>
+
+    <a class="btn" href="index.html?from=portada" id="startLink">Jugar ahora 🦕</a>
+    <p class="tip">Tip: Lee cuidasosamente las preguntas 🦉</p>
+  </main>
+  <script>
+    (function() {
+      const qs = new URLSearchParams(window.location.search);
+      const startLink = document.getElementById('startLink');
+      if (startLink && qs.toString()) {
+        const base = startLink.getAttribute('href');
+        // Unimos los parámetros actuales con los que ya tiene el link
+        const separator = base.includes('?') ? '&' : '?';
+        startLink.setAttribute('href', base + separator + qs.toString());
+      }
+    })();
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
