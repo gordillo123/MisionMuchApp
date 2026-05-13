@@ -52,9 +52,15 @@ function getMexicoTime() {
 // ------------------------------------------------------------
 async function loadPreguntas() {
   try {
-    const resp = await fetch('preguntas.json', { cache: 'no-store' });
-    if (!resp.ok) throw new Error('No se pudo cargar preguntas.json: ' + resp.status);
-    let bank = await resp.json();
+    let bank;
+    try {
+      const resp = await fetch('preguntas.json', { cache: 'no-store' });
+      if (!resp.ok) throw new Error('No se pudo cargar preguntas.json: ' + resp.status);
+      bank = await resp.json();
+    } catch (fetchErr) {
+      console.warn('No se pudo cargar preguntas.json con fetch. Usando respaldo local.', fetchErr);
+      bank = window.MUCH_PREGUNTAS_ENERGIA;
+    }
 
     if (!Array.isArray(bank)) {
       const keys = Object.keys(bank || {});

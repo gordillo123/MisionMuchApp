@@ -208,6 +208,9 @@
 
     /* GLASSMORPHISM TITLE CONTAINER */
     .hero-glass {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       background: rgba(255, 255, 255, 0.06);
       backdrop-filter: blur(18px) saturate(1.4);
       -webkit-backdrop-filter: blur(18px) saturate(1.4);
@@ -286,7 +289,8 @@
       flex-wrap: wrap;
       gap: .6rem;
       justify-content: center;
-      margin-top: 2rem;
+      margin-top: 1.8rem;
+      width: 100%;
     }
 
     @keyframes badgeAppear {
@@ -523,6 +527,10 @@
       flex: 1;
     }
 
+    .play-section {
+      display: none;
+    }
+
     .btn-play {
       background: linear-gradient(135deg, var(--msf-pink), var(--msf-red));
       border: 5px solid var(--bg-deep);
@@ -535,6 +543,28 @@
       box-shadow: 0 8px 0px var(--bg-deep);
       transition: all 0.1s;
       width: 100%;
+    }
+
+    .hero-play-mobile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .6rem;
+      margin-top: 2rem;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .hero-play-mobile .btn-play-mobile {
+      width: 100%;
+      max-width: 100%;
+      min-width: 260px;
+    }
+
+    .mobile-play-note {
+      font-size: .85rem;
+      color: rgba(255,255,255,.8);
+      font-style: italic;
     }
 
     .btn-play:hover {
@@ -1046,15 +1076,47 @@
         right: 0;
         top: 0;
         height: 100vh;
-        width: 280px;
+        width: min(86vw, 320px);
         transform: translateX(100%);
         z-index: 1000;
         transition: transform 0.3s cubic-bezier(.34, 1.56, .64, 1);
-        border-left: 10px solid var(--msf-purple);
+        border-left: 0;
+        border-right: 10px solid var(--msf-purple);
+        background: white;
       }
 
       .sidebar.open {
         transform: translateX(0);
+      }
+
+      .sidebar-inner {
+        padding: 5rem 1rem 1.5rem;
+      }
+
+      .nav-item {
+        padding: .95rem 1.2rem;
+        border-radius: 18px;
+      }
+
+      .nav-list {
+        gap: .75rem;
+      }
+
+      .play-section {
+      display: none;
+      }
+
+      .btn-play {
+        font-size: 1.15rem;
+        padding: 1.2rem 1rem;
+      }
+
+      .hero-play-mobile {
+        display: flex;
+      }
+
+      .play-section {
+        display: none;
       }
 
       .main-area {
@@ -1205,6 +1267,21 @@
       border-radius: 2px;
     }
 
+    .mobile-nav-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .25s ease, visibility .25s ease;
+      z-index: 900;
+    }
+
+    .mobile-nav-backdrop.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
     @media (max-width: 768px) {
       .hamburger {
         display: flex;
@@ -1245,6 +1322,16 @@
       .badge {
         flex: 1 1 140px;
         justify-content: center;
+      }
+
+      .nav-item {
+        width: 100%;
+      }
+
+      .play-section {
+        display: flex;
+        flex-direction: column;
+        gap: .8rem;
       }
 
       .sidebar {
@@ -1593,6 +1680,7 @@
   <div class="hamburger" id="hamburgerBtn">
     <span></span><span></span><span></span>
   </div>
+  <div class="mobile-nav-backdrop" id="mobileNavBackdrop"></div>
 
   <!-- ══════════════════════════════════════════════
        VISTA 1: INICIO / LANDING
@@ -1606,6 +1694,10 @@
         <div class="hero-glass">
           <h1 class="hero-title">MISIÓN<br /><span>MUSEO</span></h1>
           <p class="hero-subtitle">Descubre dinosaurios, animales y tecnología<br />¡Demuestra cuánto sabes!</p>
+          <div class="hero-play-mobile">
+            <button class="btn-play btn-play-mobile" id="btnJugarMobile">▶ JUGAR</button>
+            <p class="mobile-play-note">¡Prepárate!</p>
+          </div>
         </div>
         <div class="hero-badges">
           <span class="badge"
@@ -1857,6 +1949,7 @@
     </div>
   </div>
 
+  <script type="module" src="./supabase-utils.js"></script>
   <script>
     /* ────────────────────────────────────────────────
        MISIÓN MUSEO — LOGIC (TODO EN UNO)
@@ -1883,17 +1976,7 @@
       { id: 'robot2', name: 'Cyborg', cat: 'space' }
     ];
 
-    const SUPABASE_URL = 'https://qwgaeorsymfispmtsbut.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3Z2Flb3JzeW1maXNwbXRzYnV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzODcyODUsImV4cCI6MjA3Nzk2MzI4NX0.FThZIIpz3daC9u8QaKyRTpxUeW0v4QHs5sHX2s1U1eo';
-    let supabaseClient = null;
     let currentStation = '3';
-
-    async function initSupabase() {
-      if (supabaseClient) return supabaseClient;
-      const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
-      supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      return supabaseClient;
-    }
 
     document.addEventListener('DOMContentLoaded', () => {
       // 1. Partículas
@@ -2226,23 +2309,49 @@
         if (currentStation === '2') {
           window.location.href = 'Juego_Spinosaurio/index.html';
           return;
+        } else if (currentStation === '3') {
+          window.location.href = 'SALA-Biodiversidad-y-Conocimiento/index.html';
+          return;
         }
 
-        alert('Coloca tu avatar en la estación 1 para entrar al juego del Espinosaurio.');
+        alert('Coloca tu avatar en la estación correspondiente para entrar al juego.');
       };
 
       // 6. Hamburguesa Móvil
       const hamburger = document.getElementById('hamburgerBtn');
       const sidebar = document.querySelector('.sidebar');
-      if (hamburger && sidebar) {
+      const mobileBackdrop = document.getElementById('mobileNavBackdrop');
+      if (hamburger && sidebar && mobileBackdrop) {
         hamburger.onclick = (e) => {
           e.stopPropagation();
           sidebar.classList.toggle('open');
+          mobileBackdrop.classList.toggle('visible', sidebar.classList.contains('open'));
         };
-        document.onclick = (e) => { 
+        document.addEventListener('click', (e) => {
           if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
             sidebar.classList.remove('open');
+            mobileBackdrop.classList.remove('visible');
           }
+        });
+        mobileBackdrop.onclick = () => {
+          sidebar.classList.remove('open');
+          mobileBackdrop.classList.remove('visible');
+        };
+      }
+
+      document.querySelectorAll('.nav-item').forEach(link => {
+        link.onclick = () => {
+          if (window.innerWidth <= 768) {
+            sidebar.classList.remove('open');
+            mobileBackdrop.classList.remove('visible');
+          }
+        };
+      });
+
+      const btnJugarMobile = document.getElementById('btnJugarMobile');
+      if (btnJugarMobile) {
+        btnJugarMobile.onclick = () => {
+          document.getElementById('btnJugar').click();
         };
       }
     });
