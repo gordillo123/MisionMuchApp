@@ -405,8 +405,35 @@
       width: 140px;
       height: auto;
       filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.5));
-      animation: float 4s ease-in-out infinite;
+      animation: floatDino 4s ease-in-out infinite;
       z-index: 3;
+      transform-origin: bottom center;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+    }
+
+    .logo-dino-img:hover {
+      animation: jumpDino 0.8s ease-out;
+      filter: drop-shadow(0px 15px 25px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 30px rgba(226, 194, 136, 0.9));
+    }
+
+    @keyframes floatDino {
+      0%, 100% {
+        transform: translateY(0);
+        filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.5));
+      }
+      50% {
+        transform: translateY(-15px);
+        filter: drop-shadow(0px 25px 20px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 20px rgba(226, 194, 136, 0.3));
+      }
+    }
+
+    @keyframes jumpDino {
+      0% { transform: translateY(0) scale(1); }
+      30% { transform: translateY(-35px) scale(1.15) rotate(8deg); }
+      50% { transform: translateY(-35px) scale(1.15) rotate(-8deg); }
+      70% { transform: translateY(-35px) scale(1.15) rotate(8deg); }
+      100% { transform: translateY(0) scale(1) rotate(0deg); }
     }
 
     .pedestal {
@@ -450,13 +477,52 @@
       font-family: 'Cinzel', serif;
       font-size: clamp(3.5rem, 8vw, 5.5rem);
       font-weight: 900;
-      line-height: 0.95;
+      line-height: 1.1;
       letter-spacing: -0.02em;
-      background: linear-gradient(to bottom, #FFF1C5 0%, #D8A55D 100%);
+      
+      background: linear-gradient(
+        45deg,
+        #FF512F,
+        #F09819,
+        #E2C288,
+        #4facfe,
+        #00f2fe,
+        #FF512F
+      );
+      background-size: 300% 300%;
+      animation: rainbowText 6s ease infinite;
+      
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
       margin-bottom: 1rem;
+      position: relative;
+    }
+
+    @keyframes rainbowText {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .animal-deco {
+      display: inline-block;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      -webkit-text-fill-color: initial;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
+      animation: animalBounce 2.5s ease-in-out infinite alternate;
+      margin: 0 10px;
+      vertical-align: middle;
+    }
+
+    .animal-left { animation-delay: 0s; }
+    .animal-right { animation-delay: 0.3s; }
+    .animal-left2 { animation-delay: 0.6s; }
+    .animal-right2 { animation-delay: 0.9s; }
+
+    @keyframes animalBounce {
+      0% { transform: translateY(0px) rotate(-10deg) scale(1); }
+      100% { transform: translateY(-12px) rotate(10deg) scale(1.1); }
     }
 
     .hero-subtitle {
@@ -1817,7 +1883,10 @@
             </div>
           </div>
 
-          <h1 class="hero-title">MISIÓN<br/>MUSEO</h1>
+          <h1 class="hero-title">
+            <span class="animal-deco animal-left">🦋</span> MISIÓN <span class="animal-deco animal-right">🦖</span><br/>
+            <span class="animal-deco animal-left2">🐙</span> MUSEO <span class="animal-deco animal-right2">🦜</span>
+          </h1>
           <p class="hero-subtitle">Descubre dinosaurios, animales y tecnología<br/>¡Demuestra cuánto sabes!</p>
           <div class="hero-play-mobile">
             <button class="btn-play btn-play-mobile" onclick="startGameFlow()">
