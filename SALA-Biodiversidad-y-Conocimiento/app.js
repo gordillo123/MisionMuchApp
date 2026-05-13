@@ -11,7 +11,7 @@ if (LUGAR_EN_URL) {
 }
 const LUGAR_QR = LUGAR_EN_URL || 'Sin Especificar';
 
-const NUM_QUESTIONS = 6;
+const NUM_QUESTIONS = 10;
 // Función para mezclar arrays
 const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
 
@@ -422,19 +422,8 @@ class UIManager {
   }
 
   redirectToRegistration() {
-    if (!this.currentPrize) return;
-    const prizeData = {
-      title: this.currentPrize.title,
-      label: this.currentPrize.label,
-      lugar: this.currentPrize.lugar,
-      folio: buildPrizeFolio(this.currentPrize.label),
-      date: new Intl.DateTimeFormat('es-MX', { dateStyle: 'long' }).format(new Date()),
-      emoji: this.currentPrize.emoji
-    };
-    localStorage.setItem('much_quiz_prize', JSON.stringify(prizeData));
-
-    // Pasamos el parámetro a registro
-    window.location.href = 'registro.html' + window.location.search;
+    // Redirigir al mapa principal
+    window.location.href = '../index.html' + window.location.search;
   }
 
   async render() {
@@ -494,10 +483,8 @@ class UIManager {
           this.currentPrize = prize;
 
           e.finalTitle.textContent = '¡Felicidades!';
-          e.finalMsg.textContent = '¡Has ganado un boleto!';
+          e.finalMsg.textContent = '¡Has completado esta estación!';
           e.giftRow.classList.remove('d-none');
-
-          setTimeout(() => this.redirectToRegistration(), 500);
         }
         return;
       } else {

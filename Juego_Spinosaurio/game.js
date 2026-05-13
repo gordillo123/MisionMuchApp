@@ -26,7 +26,7 @@ var tiempoHastaObstaculo = 2, tiempoObstaculoMin = 0.7, tiempoObstaculoMax = 1.8
 var tiempoHastaNube = 0.5, tiempoNubeMin = 0.7, tiempoNubeMax = 2.7, nubes = [], velNube = 0.5;
 
 var contenedor, dino, textoScore, suelo, gameOver;
-var WIN_SCORE = 15;
+var WIN_SCORE = 10;
 
 var jumpSound;
 var quizData = null;
@@ -268,7 +268,7 @@ function MoverObstaculos() {
       obstaculos.splice(i, 1); GanarPuntos();
     } else {
       obstaculos[i].posX -= velEscenario * deltaTime * gameVel;
-      obstaculos[i].style.left = obstaculos[i].posX + "px";
+      obstaculos[i].style.left =  obstaculos[i].posX + "px";
     }
   }
 }
@@ -370,6 +370,11 @@ async function validarQuiz() {
   var sel = document.querySelector('input[name="q1"]:checked');
   var btnOk = document.getElementById("btnQuizOk");
 
+  if (btnOk.textContent === "Continuar") {
+    window.location.href = "../index.html";
+    return;
+  }
+
   if (btnOk.textContent === "Volver a jugar") {
     location.reload();
     return;
@@ -380,15 +385,20 @@ async function validarQuiz() {
   }
 
   if (Number(sel.value) === quizAnswerIndex) {
-    msg.textContent = "¡Correcto! Registrando..."; msg.className = "quiz-msg ok";
+    msg.textContent = "¡Correcto! Has completado esta estación. Puedes continuar explorando las demás. 🦕"; 
+    msg.className = "quiz-msg ok";
 
-    navigatingToRegistro = true; quizVisible = false;
-    document.getElementById("quizOverlay").classList.remove("show");
+    navigatingToRegistro = true; 
+    quizVisible = false;
+
+    // Deshabilitar radio buttons para evitar cambios
+    var inputs = document.querySelectorAll('input[name="q1"]');
+    inputs.forEach(inp => inp.disabled = true);
 
     const ganadorId = await crearParticipanteGanador();
     await registrarQuizEnSupabase(Number(score), ganadorId);
 
-    setTimeout(function () { window.location.href = "registro.html"; }, 400);
+    btnOk.textContent = "Continuar";
   } else {
     msg.textContent = "Incorrecto. ¡Vuelve a jugar!"; msg.className = "quiz-msg err";
 

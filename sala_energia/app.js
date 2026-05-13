@@ -10,7 +10,7 @@ if (LUGAR_EN_URL && LUGAR_EN_URL.trim() !== "") {
 // Lo saca de la memoria (si no hay nada, pone Sin Especificar)
 const LUGAR_QR = localStorage.getItem('much_lugar_seguro') || 'Sin Especificar';
 
-const NUM_QUESTIONS = 6;
+const NUM_QUESTIONS = 10;
 // Función para mezclar arrays
 const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
 
@@ -373,19 +373,8 @@ class UIManager {
   }
 
   redirectToRegistration() {
-    if (!this.currentPrize) return;
-    const prizeData = {
-      title: this.currentPrize.title,
-      label: this.currentPrize.label,
-      lugar: this.currentPrize.lugar,
-      folio: 'MUCH-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
-      date: new Intl.DateTimeFormat('es-MX', { dateStyle: 'long' }).format(new Date()),
-      emoji: this.currentPrize.emoji
-    };
-    localStorage.setItem('much_quiz_prize', JSON.stringify(prizeData));
-
-    // Pasamos el parámetro a registro
-    window.location.href = 'registro.html' + window.location.search;
+    // Redirigir al mapa principal
+    window.location.href = '../index.html' + window.location.search;
   }
 
   async render() {
@@ -445,10 +434,8 @@ class UIManager {
           this.currentPrize = prize;
 
           e.finalTitle.textContent = '¡Felicidades!';
-          e.finalMsg.textContent = '¡Has ganado un boleto!';
+          e.finalMsg.textContent = '¡Has completado esta estación!';
           e.giftRow.classList.remove('d-none');
-
-          setTimeout(() => this.redirectToRegistration(), 500);
         }
         return;
       } else {

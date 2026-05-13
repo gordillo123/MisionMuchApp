@@ -11,7 +11,7 @@ if (LUGAR_EN_URL) {
 }
 const LUGAR_QR = LUGAR_EN_URL || 'Sin Especificar';
 
-const NUM_QUESTIONS = 6;
+const NUM_QUESTIONS = 10;
 // Función para mezclar arrays
 const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
 
@@ -163,8 +163,37 @@ async function loadPreguntas() {
     return QUESTIONS;
   } catch (err) {
     console.error(err);
-    alert('Error al cargar preguntas.json.\n' + err.message);
-    throw err;
+    console.warn('Error en fetch:', err);
+    const bankLocal = window.MUCH_PREGUNTAS_SUSTENTABLE || [];
+    if (!bankLocal.length) throw err;
+    const normalizeFallback = (it) => {
+      const text = it.text ?? it.pregunta ?? it.enunciado ?? 'Pregunta sin texto';
+      const desc = it.desc ?? it.descripcion ?? '';
+      let options = it.options ?? it.opciones ?? it.respuestas ?? [];
+      let correctIndex = it.correctIndex ?? it.correcta_index;
+      if (Array.isArray(options) && typeof options[0] === 'object') {
+        const idx = options.findIndex(o => o.correcta === true || o.esCorrecta === true);
+        if (correctIndex == null && idx >= 0) correctIndex = idx;
+        options = options.map(o => o.text ?? o.texto ?? o.label ?? String(o));
+      }
+      if (correctIndex == null && typeof it.correcta === 'string') {
+        const idx2 = options.findIndex(o => String(o).trim() === String(it.correcta).trim());
+        if (idx2 >= 0) correctIndex = idx2;
+      }
+      if (correctIndex == null && (it.respuesta || it.respuesta_correcta)) {
+        const num = (it.respuesta ?? it.respuesta_correcta) - 1;
+        if (!Number.isNaN(num)) correctIndex = num;
+      }
+      const points = it.points ?? it.puntos ?? 10;
+      if (!Array.isArray(options) || options.length === 0) { options = ['(sin opciones)']; correctIndex = 0; }
+      if (correctIndex == null || correctIndex < 0 || correctIndex >= options.length) { correctIndex = 0; }
+      return { text, options, correctIndex, points, desc };
+    };
+    const poolFallback = bankLocal;
+    const normalizedFallback = poolFallback.map(normalizeFallback);
+    QUESTIONS = shuffle(normalizedFallback).slice(0, NUM_QUESTIONS);
+    console.log('[loadPreguntas] Fallback local cargado. Total:', QUESTIONS.length);
+    return QUESTIONS;
   }
 }
 
@@ -425,7 +454,7 @@ class UIManager {
     localStorage.setItem('much_quiz_prize', JSON.stringify(prizeData));
 
     // Pasamos el parámetro a registro
-    window.location.href = 'registro.html' + window.location.search;
+    window.location.href = '../index.html' + window.location.search;
   }
 
   async render() {
@@ -485,10 +514,10 @@ class UIManager {
           this.currentPrize = prize;
 
           e.finalTitle.textContent = '¡Felicidades!';
-          e.finalMsg.textContent = '¡Has ganado un boleto!';
+          e.finalMsg.textContent = '¡Has completado esta estación!';
           e.giftRow.classList.remove('d-none');
 
-          setTimeout(() => this.redirectToRegistration(), 500);
+
         }
         return;
       } else {

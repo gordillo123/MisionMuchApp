@@ -34,7 +34,7 @@
       --white: #ffffff;
       --text-main: #1A1C2C;
       --text-light: #ffffff;
-      --sidebar-w: 300px;
+
       --radius: 24px;
       --transition: 0.25s cubic-bezier(.17, .67, .83, .67);
     }
@@ -62,17 +62,25 @@
       z-index: 0;
       pointer-events: none;
       background:
-        radial-gradient(ellipse 120% 80% at 20% 80%, rgba(119,90,255,0.12) 0%, transparent 60%),
-        radial-gradient(ellipse 100% 70% at 80% 20%, rgba(242,63,58,0.10) 0%, transparent 55%),
-        radial-gradient(ellipse 90% 90% at 50% 50%, rgba(109,208,240,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse 120% 80% at 20% 80%, rgba(119, 90, 255, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 100% 70% at 80% 20%, rgba(242, 63, 58, 0.10) 0%, transparent 55%),
+        radial-gradient(ellipse 90% 90% at 50% 50%, rgba(109, 208, 240, 0.06) 0%, transparent 50%),
         var(--bg-deep);
       animation: bgShift 20s ease-in-out infinite alternate;
     }
 
     @keyframes bgShift {
-      0%   { background-position: 0% 0%, 100% 0%, 50% 50%; }
-      50%  { background-position: 30% 20%, 70% 80%, 40% 60%; }
-      100% { background-position: 60% 40%, 40% 60%, 60% 40%; }
+      0% {
+        background-position: 0% 0%, 100% 0%, 50% 50%;
+      }
+
+      50% {
+        background-position: 30% 20%, 70% 80%, 40% 60%;
+      }
+
+      100% {
+        background-position: 60% 40%, 40% 60%, 60% 40%;
+      }
     }
 
     /* Patrón geométrico hexagonal sutil */
@@ -81,12 +89,12 @@
       position: absolute;
       inset: 0;
       background-image:
-        linear-gradient(30deg, rgba(255,255,255,0.018) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,0.018) 87.5%),
-        linear-gradient(150deg, rgba(255,255,255,0.018) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,0.018) 87.5%),
-        linear-gradient(30deg, rgba(255,255,255,0.018) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,0.018) 87.5%),
-        linear-gradient(150deg, rgba(255,255,255,0.018) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,0.018) 87.5%),
-        linear-gradient(60deg, rgba(255,255,255,0.025) 25%, transparent 25.5%, transparent 75%, rgba(255,255,255,0.025) 75%),
-        linear-gradient(60deg, rgba(255,255,255,0.025) 25%, transparent 25.5%, transparent 75%, rgba(255,255,255,0.025) 75%);
+        linear-gradient(30deg, rgba(255, 255, 255, 0.018) 12%, transparent 12.5%, transparent 87%, rgba(255, 255, 255, 0.018) 87.5%),
+        linear-gradient(150deg, rgba(255, 255, 255, 0.018) 12%, transparent 12.5%, transparent 87%, rgba(255, 255, 255, 0.018) 87.5%),
+        linear-gradient(30deg, rgba(255, 255, 255, 0.018) 12%, transparent 12.5%, transparent 87%, rgba(255, 255, 255, 0.018) 87.5%),
+        linear-gradient(150deg, rgba(255, 255, 255, 0.018) 12%, transparent 12.5%, transparent 87%, rgba(255, 255, 255, 0.018) 87.5%),
+        linear-gradient(60deg, rgba(255, 255, 255, 0.025) 25%, transparent 25.5%, transparent 75%, rgba(255, 255, 255, 0.025) 75%),
+        linear-gradient(60deg, rgba(255, 255, 255, 0.025) 25%, transparent 25.5%, transparent 75%, rgba(255, 255, 255, 0.025) 75%);
       background-size: 80px 140px;
       background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
       animation: patternDrift 40s linear infinite;
@@ -98,28 +106,49 @@
       position: absolute;
       inset: -50%;
       background:
-        radial-gradient(circle 300px at 15% 25%, rgba(255,118,180,0.08) 0%, transparent 70%),
-        radial-gradient(circle 250px at 75% 65%, rgba(109,208,240,0.07) 0%, transparent 70%),
-        radial-gradient(circle 200px at 55% 15%, rgba(255,197,73,0.06) 0%, transparent 70%),
-        radial-gradient(circle 280px at 35% 80%, rgba(0,180,135,0.06) 0%, transparent 70%);
+        radial-gradient(circle 300px at 15% 25%, rgba(255, 118, 180, 0.08) 0%, transparent 70%),
+        radial-gradient(circle 250px at 75% 65%, rgba(109, 208, 240, 0.07) 0%, transparent 70%),
+        radial-gradient(circle 200px at 55% 15%, rgba(255, 197, 73, 0.06) 0%, transparent 70%),
+        radial-gradient(circle 280px at 35% 80%, rgba(0, 180, 135, 0.06) 0%, transparent 70%);
       animation: orbFloat 25s ease-in-out infinite alternate;
     }
 
     @keyframes patternDrift {
-      0%   { transform: translate(0, 0); }
-      100% { transform: translate(80px, 140px); }
+      0% {
+        transform: translate(0, 0);
+      }
+
+      100% {
+        transform: translate(80px, 140px);
+      }
     }
 
     @keyframes orbFloat {
-      0%   { transform: translate(0, 0) scale(1); }
-      33%  { transform: translate(60px, -40px) scale(1.05); }
-      66%  { transform: translate(-30px, 50px) scale(0.97); }
-      100% { transform: translate(40px, -20px) scale(1.02); }
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      33% {
+        transform: translate(60px, -40px) scale(1.05);
+      }
+
+      66% {
+        transform: translate(-30px, 50px) scale(0.97);
+      }
+
+      100% {
+        transform: translate(40px, -20px) scale(1.02);
+      }
     }
 
     @keyframes twinkle {
-      0% { opacity: .4; }
-      100% { opacity: 1; }
+      0% {
+        opacity: .4;
+      }
+
+      100% {
+        opacity: 1;
+      }
     }
 
     /* LAYOUT */
@@ -128,7 +157,7 @@
       inset: 0;
       z-index: 1;
       display: none;
-      flex-direction: row;
+      flex-direction: column;
       height: 100vh;
       width: 100vw;
       overflow-x: hidden;
@@ -145,7 +174,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 2rem;
+      padding: 6rem 2rem 2rem; /* Espacio para el navbar fijo */
       position: relative;
       min-width: 0;
     }
@@ -186,21 +215,22 @@
       object-fit: contain;
       object-position: bottom;
       filter:
-        drop-shadow(0px 8px 0px rgba(0,0,0,0.35))
-        drop-shadow(0px -2px 12px rgba(255,118,180,0.25));
+        drop-shadow(0px 8px 0px rgba(0, 0, 0, 0.35)) drop-shadow(0px -2px 12px rgba(255, 118, 180, 0.25));
       transition: filter 0.3s ease;
     }
 
     .logo-dino-img:hover {
       filter:
-        drop-shadow(0px 12px 0px rgba(0,0,0,0.4))
-        drop-shadow(0px -2px 20px rgba(255,196,73,0.45));
+        drop-shadow(0px 12px 0px rgba(0, 0, 0, 0.4)) drop-shadow(0px -2px 20px rgba(255, 196, 73, 0.45));
     }
 
     @keyframes float {
-      0%, 100% {
+
+      0%,
+      100% {
         transform: translateY(0);
       }
+
       50% {
         transform: translateY(-20px);
       }
@@ -234,21 +264,24 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: linear-gradient(
-        105deg,
-        transparent 40%,
-        rgba(255, 255, 255, 0.04) 45%,
-        rgba(255, 255, 255, 0.08) 50%,
-        rgba(255, 255, 255, 0.04) 55%,
-        transparent 60%
-      );
+      background: linear-gradient(105deg,
+          transparent 40%,
+          rgba(255, 255, 255, 0.04) 45%,
+          rgba(255, 255, 255, 0.08) 50%,
+          rgba(255, 255, 255, 0.04) 55%,
+          transparent 60%);
       animation: shimmer 6s ease-in-out infinite;
       pointer-events: none;
     }
 
     @keyframes shimmer {
-      0%   { transform: translateX(-100%) rotate(15deg); }
-      100% { transform: translateX(100%) rotate(15deg); }
+      0% {
+        transform: translateX(-100%) rotate(15deg);
+      }
+
+      100% {
+        transform: translateX(100%) rotate(15deg);
+      }
     }
 
     .hero-title {
@@ -259,11 +292,11 @@
       letter-spacing: -0.02em;
       color: var(--white);
       text-shadow:
-        0 2px 0px rgba(242,63,58,0.9),
-        0 4px 0px rgba(119,90,255,0.8),
-        0 6px 0px rgba(26,28,44,0.6),
-        0 8px 0px rgba(26,28,44,0.4),
-        0 12px 24px rgba(0,0,0,0.5);
+        0 2px 0px rgba(242, 63, 58, 0.9),
+        0 4px 0px rgba(119, 90, 255, 0.8),
+        0 6px 0px rgba(26, 28, 44, 0.6),
+        0 8px 0px rgba(26, 28, 44, 0.4),
+        0 12px 24px rgba(0, 0, 0, 0.5);
     }
 
     .hero-title span {
@@ -272,7 +305,7 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
       text-shadow: none;
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
     }
 
     .hero-subtitle {
@@ -281,7 +314,7 @@
       color: rgba(255, 255, 255, 0.92);
       font-weight: 500;
       line-height: 1.45;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
     .hero-badges {
@@ -298,6 +331,7 @@
         opacity: 0;
         transform: translateY(20px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -323,11 +357,35 @@
       cursor: pointer;
     }
 
-    .badge:nth-child(1) { animation-delay: 0.1s; background: var(--msf-red); color: white; }
-    .badge:nth-child(2) { animation-delay: 0.2s; background: var(--msf-pink); color: white; }
-    .badge:nth-child(3) { animation-delay: 0.3s; background: var(--msf-yellow); color: var(--bg-deep); }
-    .badge:nth-child(4) { animation-delay: 0.4s; background: var(--msf-green); color: white; }
-    .badge:nth-child(5) { animation-delay: 0.5s; background: var(--msf-blue); color: var(--bg-deep); }
+    .badge:nth-child(1) {
+      animation-delay: 0.1s;
+      background: var(--msf-red);
+      color: white;
+    }
+
+    .badge:nth-child(2) {
+      animation-delay: 0.2s;
+      background: var(--msf-pink);
+      color: white;
+    }
+
+    .badge:nth-child(3) {
+      animation-delay: 0.3s;
+      background: var(--msf-yellow);
+      color: var(--bg-deep);
+    }
+
+    .badge:nth-child(4) {
+      animation-delay: 0.4s;
+      background: var(--msf-green);
+      color: white;
+    }
+
+    .badge:nth-child(5) {
+      animation-delay: 0.5s;
+      background: var(--msf-blue);
+      color: var(--bg-deep);
+    }
 
     .badge:hover {
       transform: translateY(-4px);
@@ -360,8 +418,8 @@
       opacity: 0;
       transition: opacity 0.25s ease, transform 0.25s ease;
       z-index: 50;
-      border: 2px solid rgba(255,255,255,0.12);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
 
     .badge::after {
@@ -394,141 +452,137 @@
       white-space: pre-line;
     }
 
-    /* SIDEBAR */
-    .sidebar {
-      width: var(--sidebar-w);
-      height: 100vh;
-      background: white;
-      border-left: 8px solid var(--msf-purple);
+    /* NEW TOP NAV */
+    .top-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(26, 28, 44, 0.7);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0.8rem 2rem;
       display: flex;
-      flex-direction: column;
-      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
-      position: relative;
-      z-index: 10;
-      flex-shrink: 0;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .sidebar-inner {
-      padding: 3rem 1.5rem 2rem;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      overflow-y: auto;
-    }
-
-    .brand-title {
-      font-family: 'Cinzel', serif;
-      font-size: 1.8rem;
-      font-weight: 900;
-      line-height: 1.1;
-      color: var(--msf-pink);
-      text-shadow: 2px 2px 0px var(--msf-blue);
-      text-align: center;
-    }
-
-    .brand-divider {
-      margin: 1.2rem auto 2rem;
-      width: 70%;
-      height: 4px;
-      border-radius: 2px;
-      background: linear-gradient(90deg, var(--msf-red), var(--msf-yellow), var(--msf-blue));
-    }
-
-    .nav-list {
-      list-style: none;
-      gap: .4rem;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .nav-item {
+    .nav-brand {
       display: flex;
       align-items: center;
       gap: 1rem;
-      padding: .85rem 1.2rem .85rem 1.6rem;
-      border-radius: 16px;
       text-decoration: none;
-      color: var(--text-main);
+      transition: transform 0.3s ease;
+    }
+
+    .nav-brand:hover {
+      transform: scale(1.02);
+    }
+
+    .nav-brand-text {
+      font-family: 'Cinzel', serif;
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--msf-pink);
+      text-shadow: 2px 2px 0px var(--msf-blue);
+      letter-spacing: 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
       font-weight: 600;
-      transition: all 0.3s cubic-bezier(.25,.8,.25,1);
-      position: relative;
-      overflow: hidden;
-      background: transparent;
-      box-shadow: none;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    /* Indicator bar (left edge) */
-    .nav-item::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%) scaleY(0);
-      width: 4px;
-      height: 60%;
-      border-radius: 0 4px 4px 0;
-      background: linear-gradient(180deg, var(--msf-pink), var(--msf-purple));
-      transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s ease;
-      box-shadow: none;
+    .nav-link:hover {
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
     }
 
-    /* Subtle background shimmer */
-    .nav-item::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      background: linear-gradient(135deg, rgba(119,90,255,0.06), rgba(255,118,180,0.04));
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
+    .nav-link.active {
+      color: var(--white);
+      background: linear-gradient(135deg, rgba(255, 118, 180, 0.2), rgba(119, 90, 255, 0.2));
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
 
-    .nav-item:hover {
-      color: var(--msf-purple);
-      transform: translateX(4px);
-      background: rgba(119, 90, 255, 0.06);
-    }
-
-    .nav-item:hover::before {
-      transform: translateY(-50%) scaleY(1);
-    }
-
-    .nav-item:hover::after {
-      opacity: 1;
-    }
-
-    .nav-item.active {
-      color: var(--msf-purple);
-      background: linear-gradient(135deg, rgba(119,90,255,0.10), rgba(109,208,240,0.08));
+    .nav-btn-play {
+      background: linear-gradient(135deg, var(--msf-pink), var(--msf-red));
+      color: white;
+      padding: 0.7rem 1.8rem;
+      border-radius: 50px;
       font-weight: 800;
-      transform: translateX(4px);
+      text-decoration: none;
+      box-shadow: 0 4px 15px rgba(242, 63, 58, 0.3);
+      transition: all 0.3s ease;
+      border: 2px solid rgba(255, 255, 255, 0.2);
     }
 
-    .nav-item.active::before {
-      transform: translateY(-50%) scaleY(1);
-      width: 5px;
-      box-shadow:
-        0 0 8px rgba(119,90,255,0.5),
-        0 0 20px rgba(255,118,180,0.3);
-      animation: glowPulse 2s ease-in-out infinite alternate;
+    .nav-btn-play:hover {
+      transform: scale(1.05) translateY(-2px);
+      box-shadow: 0 8px 25px rgba(242, 63, 58, 0.4);
     }
 
-    .nav-item.active::after {
-      opacity: 1;
+    @media (max-width: 768px) {
+      .top-nav {
+        padding: 1rem;
+      }
+      .nav-links {
+        display: none;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: rgba(26, 28, 44, 0.98);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        gap: 2rem;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+      .nav-links.open {
+        display: flex;
+        animation: fadeIn 0.3s ease both;
+      }
+      .nav-brand-text {
+        font-size: 1.2rem;
+      }
+      .nav-link {
+        font-size: 1.5rem;
+      }
+      .nav-btn-play {
+        font-size: 1.5rem;
+        padding: 1rem 3rem;
+      }
     }
 
-    @keyframes glowPulse {
-      0%   { box-shadow: 0 0 6px rgba(119,90,255,0.4), 0 0 14px rgba(255,118,180,0.2); }
-      100% { box-shadow: 0 0 12px rgba(119,90,255,0.7), 0 0 28px rgba(255,118,180,0.4); }
-    }
-
-    .sidebar-spacer {
-      flex: 1;
-    }
-
-    .play-section {
-      display: none;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .btn-play {
@@ -563,7 +617,7 @@
 
     .mobile-play-note {
       font-size: .85rem;
-      color: rgba(255,255,255,.8);
+      color: rgba(255, 255, 255, .8);
       font-style: italic;
     }
 
@@ -978,6 +1032,7 @@
       from {
         stroke-dashoffset: 0;
       }
+
       to {
         stroke-dashoffset: 30;
       }
@@ -1034,8 +1089,15 @@
     }
 
     @keyframes avatarBounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-15px);
+      }
     }
 
     .btn-play.large {
@@ -1046,9 +1108,7 @@
     }
 
     @media (max-width: 1024px) {
-      .sidebar {
-        width: 260px;
-      }
+
 
       .hero-title {
         font-size: 5rem;
@@ -1071,40 +1131,7 @@
         min-height: 100dvh;
       }
 
-      .sidebar {
-        position: fixed;
-        right: 0;
-        top: 0;
-        height: 100vh;
-        width: min(86vw, 320px);
-        transform: translateX(100%);
-        z-index: 1000;
-        transition: transform 0.3s cubic-bezier(.34, 1.56, .64, 1);
-        border-left: 0;
-        border-right: 10px solid var(--msf-purple);
-        background: white;
-      }
 
-      .sidebar.open {
-        transform: translateX(0);
-      }
-
-      .sidebar-inner {
-        padding: 5rem 1rem 1.5rem;
-      }
-
-      .nav-item {
-        padding: .95rem 1.2rem;
-        border-radius: 18px;
-      }
-
-      .nav-list {
-        gap: .75rem;
-      }
-
-      .play-section {
-      display: none;
-      }
 
       .btn-play {
         font-size: 1.15rem;
@@ -1261,10 +1288,24 @@
 
     .hamburger span {
       display: block;
-      width: 25px;
-      height: 4px;
-      background: white;
-      border-radius: 2px;
+      width: 28px;
+      height: 3px;
+      background: var(--white);
+      border-radius: 4px;
+      transition: all 0.3s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    .hamburger.active span:nth-child(1) {
+      transform: translateY(9px) rotate(45deg);
+    }
+
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+      transform: translateX(10px);
+    }
+
+    .hamburger.active span:nth-child(3) {
+      transform: translateY(-9px) rotate(-45deg);
     }
 
     .mobile-nav-backdrop {
@@ -1305,10 +1346,10 @@
       .hero-title {
         font-size: clamp(2.45rem, 17vw, 3.2rem);
         text-shadow:
-          0 1px 0px rgba(242,63,58,0.9),
-          0 2px 0px rgba(119,90,255,0.8),
-          0 3px 0px rgba(26,28,44,0.6),
-          0 6px 16px rgba(0,0,0,0.5);
+          0 1px 0px rgba(242, 63, 58, 0.9),
+          0 2px 0px rgba(119, 90, 255, 0.8),
+          0 3px 0px rgba(26, 28, 44, 0.6),
+          0 6px 16px rgba(0, 0, 0, 0.5);
       }
 
       .hero-subtitle br {
@@ -1324,23 +1365,7 @@
         justify-content: center;
       }
 
-      .nav-item {
-        width: 100%;
-      }
 
-      .play-section {
-        display: flex;
-        flex-direction: column;
-        gap: .8rem;
-      }
-
-      .sidebar {
-        width: min(86vw, 300px);
-      }
-
-      .sidebar-inner {
-        padding: 5rem 1rem 1.5rem;
-      }
 
       .avatar-preview-box,
       .rules-list li {
@@ -1397,6 +1422,7 @@
     .scores-modal {
       width: min(700px, 95vw);
     }
+
     .scores-content {
       padding: 1.5rem;
       display: flex;
@@ -1405,6 +1431,7 @@
       max-height: 70vh;
       overflow-y: auto;
     }
+
     /* Podio */
     .podium {
       display: flex;
@@ -1412,23 +1439,26 @@
       align-items: flex-end;
       gap: 0.5rem;
       padding: 1rem 0 2rem;
-      border-bottom: 2px dashed rgba(0,0,0,0.1);
+      border-bottom: 2px dashed rgba(0, 0, 0, 0.1);
     }
+
     .podium-item {
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
     }
+
     .podium-avatar {
       width: 60px;
       height: 60px;
       border-radius: 50%;
       border: 4px solid white;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       background: white;
       margin-bottom: 10px;
     }
+
     .podium-rank {
       width: 24px;
       height: 24px;
@@ -1441,35 +1471,89 @@
       position: absolute;
       top: 45px;
       color: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
-    .podium-1 { order: 2; }
-    .podium-1 .podium-avatar { width: 85px; height: 85px; border-color: #FFD700; }
-    .podium-1 .podium-rank { background: #FFD700; top: 70px; width: 30px; height: 30px; font-size: 1rem; }
-    .podium-1 .podium-box { height: 100px; background: linear-gradient(to top, #FFD700, #FFF0A0); }
-    
-    .podium-2 { order: 1; }
-    .podium-2 .podium-avatar { border-color: #C0C0C0; }
-    .podium-2 .podium-rank { background: #C0C0C0; }
-    .podium-2 .podium-box { height: 70px; background: linear-gradient(to top, #C0C0C0, #E8E8E8); }
-    
-    .podium-3 { order: 3; }
-    .podium-3 .podium-avatar { border-color: #CD7F32; }
-    .podium-3 .podium-rank { background: #CD7F32; }
-    .podium-3 .podium-box { height: 50px; background: linear-gradient(to top, #CD7F32, #E0AC69); }
-    
+
+    .podium-1 {
+      order: 2;
+    }
+
+    .podium-1 .podium-avatar {
+      width: 85px;
+      height: 85px;
+      border-color: #FFD700;
+    }
+
+    .podium-1 .podium-rank {
+      background: #FFD700;
+      top: 70px;
+      width: 30px;
+      height: 30px;
+      font-size: 1rem;
+    }
+
+    .podium-1 .podium-box {
+      height: 100px;
+      background: linear-gradient(to top, #FFD700, #FFF0A0);
+    }
+
+    .podium-2 {
+      order: 1;
+    }
+
+    .podium-2 .podium-avatar {
+      border-color: #C0C0C0;
+    }
+
+    .podium-2 .podium-rank {
+      background: #C0C0C0;
+    }
+
+    .podium-2 .podium-box {
+      height: 70px;
+      background: linear-gradient(to top, #C0C0C0, #E8E8E8);
+    }
+
+    .podium-3 {
+      order: 3;
+    }
+
+    .podium-3 .podium-avatar {
+      border-color: #CD7F32;
+    }
+
+    .podium-3 .podium-rank {
+      background: #CD7F32;
+    }
+
+    .podium-3 .podium-box {
+      height: 50px;
+      background: linear-gradient(to top, #CD7F32, #E0AC69);
+    }
+
     .podium-box {
       width: 80px;
       border-radius: 12px 12px 0 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: rgba(0,0,0,0.5);
+      color: rgba(0, 0, 0, 0.5);
       font-weight: 900;
       font-size: 1.5rem;
     }
-    .podium-name { font-weight: 800; font-size: 0.9rem; margin-top: 8px; color: var(--text-main); }
-    .podium-score { font-weight: 900; color: var(--msf-purple); font-size: 1.1rem; }
+
+    .podium-name {
+      font-weight: 800;
+      font-size: 0.9rem;
+      margin-top: 8px;
+      color: var(--text-main);
+    }
+
+    .podium-score {
+      font-weight: 900;
+      color: var(--msf-purple);
+      font-size: 1.1rem;
+    }
 
     /* Lista */
     .scores-list {
@@ -1477,6 +1561,7 @@
       flex-direction: column;
       gap: 0.5rem;
     }
+
     .score-row {
       display: flex;
       align-items: center;
@@ -1486,12 +1571,42 @@
       gap: 1rem;
       transition: transform 0.2s;
     }
-    .score-row:hover { transform: scale(1.02); background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .score-rank { width: 30px; font-weight: 900; color: #888; font-size: 1.1rem; }
-    .score-av { width: 40px; height: 40px; border-radius: 10px; background: white; padding: 3px; }
-    .score-info { flex: 1; }
-    .score-name { font-weight: 700; color: var(--text-main); }
-    .score-pts { font-weight: 900; color: var(--msf-pink); font-size: 1.1rem; }
+
+    .score-row:hover {
+      transform: scale(1.02);
+      background: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .score-rank {
+      width: 30px;
+      font-weight: 900;
+      color: #888;
+      font-size: 1.1rem;
+    }
+
+    .score-av {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: white;
+      padding: 3px;
+    }
+
+    .score-info {
+      flex: 1;
+    }
+
+    .score-name {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .score-pts {
+      font-weight: 900;
+      color: var(--msf-pink);
+      font-size: 1.1rem;
+    }
 
     /* My Rank Card */
     .my-rank-card {
@@ -1504,8 +1619,24 @@
       justify-content: space-between;
       box-shadow: 0 8px 20px rgba(119, 90, 255, 0.3);
     }
-    .my-rank-info { display: flex; align-items: center; gap: 1rem; }
-    .my-rank-num { font-size: 1.5rem; font-weight: 900; background: rgba(255,255,255,0.2); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+    .my-rank-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .my-rank-num {
+      font-size: 1.5rem;
+      font-weight: 900;
+      background: rgba(255, 255, 255, 0.2);
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
     /* ════ ESTILOS MEJORADOS PARA MODAL DE REGLAS ════ */
     .rules-modal {
@@ -1553,25 +1684,64 @@
       animation: slideUp 0.5s ease both;
     }
 
-    .rule-item:nth-child(1) { animation-delay: 0.05s; }
-    .rule-item:nth-child(2) { animation-delay: 0.1s; }
-    .rule-item:nth-child(3) { animation-delay: 0.15s; }
-    .rule-item:nth-child(4) { animation-delay: 0.2s; }
-    .rule-item:nth-child(5) { animation-delay: 0.25s; }
-    .rule-item:nth-child(6) { animation-delay: 0.3s; }
-    .rule-item:nth-child(7) { animation-delay: 0.35s; }
-    .rule-item:nth-child(8) { animation-delay: 0.4s; }
-    .rule-item:nth-child(9) { animation-delay: 0.45s; }
-    .rule-item:nth-child(10) { animation-delay: 0.5s; }
-    .rule-item:nth-child(11) { animation-delay: 0.55s; }
-    .rule-item:nth-child(12) { animation-delay: 0.6s; }
-    .rule-item:nth-child(n+13) { animation-delay: 0.65s; }
+    .rule-item:nth-child(1) {
+      animation-delay: 0.05s;
+    }
+
+    .rule-item:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+
+    .rule-item:nth-child(3) {
+      animation-delay: 0.15s;
+    }
+
+    .rule-item:nth-child(4) {
+      animation-delay: 0.2s;
+    }
+
+    .rule-item:nth-child(5) {
+      animation-delay: 0.25s;
+    }
+
+    .rule-item:nth-child(6) {
+      animation-delay: 0.3s;
+    }
+
+    .rule-item:nth-child(7) {
+      animation-delay: 0.35s;
+    }
+
+    .rule-item:nth-child(8) {
+      animation-delay: 0.4s;
+    }
+
+    .rule-item:nth-child(9) {
+      animation-delay: 0.45s;
+    }
+
+    .rule-item:nth-child(10) {
+      animation-delay: 0.5s;
+    }
+
+    .rule-item:nth-child(11) {
+      animation-delay: 0.55s;
+    }
+
+    .rule-item:nth-child(12) {
+      animation-delay: 0.6s;
+    }
+
+    .rule-item:nth-child(n+13) {
+      animation-delay: 0.65s;
+    }
 
     @keyframes slideUp {
       from {
         opacity: 0;
         transform: translateY(30px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -1686,6 +1856,19 @@
        VISTA 1: INICIO / LANDING
   ══════════════════════════════════════════════ -->
   <section class="view-section active" id="viewLanding">
+    <nav class="top-nav">
+      <div class="nav-container">
+        <a href="#" class="nav-brand">
+          <span class="nav-brand-text">MISIÓN MUSEO</span>
+        </a>
+        <ul class="nav-links">
+          <li><a href="#" class="nav-link active" id="btnInicio">🏠 Inicio</a></li>
+          <li><a href="#" class="nav-link" id="btnPuntajes">🏆 Puntajes</a></li>
+          <li><a href="#" class="nav-link" id="btnComoJugar">📖 Cómo jugar</a></li>
+        </ul>
+      </div>
+    </nav>
+
     <main class="main-area">
       <div class="hero">
         <div class="hero-logo-badge">
@@ -1695,43 +1878,30 @@
           <h1 class="hero-title">MISIÓN<br /><span>MUSEO</span></h1>
           <p class="hero-subtitle">Descubre dinosaurios, animales y tecnología<br />¡Demuestra cuánto sabes!</p>
           <div class="hero-play-mobile">
-            <button class="btn-play btn-play-mobile" id="btnJugarMobile">▶ JUGAR</button>
+            <button class="btn-play btn-play-mobile" onclick="startGameFlow()">▶ JUGAR</button>
             <p class="mobile-play-note">¡Prepárate!</p>
           </div>
         </div>
+
         <div class="hero-badges">
           <span class="badge"
-            data-fact="El T-Rex tenía una mordida 3 veces más fuerte que la de un cocodrilo moderno, con una fuerza de hasta 57,000 Newtons.">🦕 Dinosaurios</span>
+            data-fact="El T-Rex tenía una mordida 3 veces más fuerte que la de un cocodrilo moderno, con una fuerza de hasta 57,000 Newtons.">🦕
+            Dinosaurios</span>
           <span class="badge"
-            data-fact="El pulpo tiene 3 corazones, 9 cerebros y su sangre es de color azul gracias al cobre.">🐾 Animales</span>
+            data-fact="El pulpo tiene 3 corazones, 9 cerebros y su sangre es de color azul gracias al cobre.">🐾
+            Animales</span>
           <span class="badge"
-            data-fact="Un rayo cae en la Tierra unas 100 veces por segundo. ¡Eso son 8 millones de rayos al día!">🔬 Ciencia</span>
+            data-fact="Un rayo cae en la Tierra unas 100 veces por segundo. ¡Eso son 8 millones de rayos al día!">🔬
+            Ciencia</span>
           <span class="badge"
-            data-fact="El primer mensaje de texto de la historia fue enviado el 3 de diciembre de 1992 y decía: 'Merry Christmas'.">💻 Tecnología</span>
+            data-fact="El primer mensaje de texto de la historia fue enviado el 3 de diciembre de 1992 y decía: 'Merry Christmas'.">💻
+            Tecnología</span>
           <span class="badge"
-            data-fact="Existen más de 7,000 idiomas en el mundo. El 40% está en peligro de desaparecer.">🌈 Diversidad</span>
+            data-fact="Existen más de 7,000 idiomas en el mundo. El 40% está en peligro de desaparecer.">🌈
+            Diversidad</span>
         </div>
       </div>
     </main>
-
-    <aside class="sidebar">
-      <div class="sidebar-inner">
-        <div class="sidebar-brand">
-          <h2 class="brand-title">MISIÓN<br />MUSEO</h2>
-          <div class="brand-divider"></div>
-        </div>
-        <ul class="nav-list">
-          <li><a href="#" class="nav-item active">🏠 Inicio</a></li>
-          <li><a href="#" class="nav-item" id="btnPuntajes">🏆 Puntajes</a></li>
-          <li><a href="#" class="nav-item" id="btnComoJugar">📖 Cómo jugar</a></li>
-        </ul>
-        <div class="sidebar-spacer"></div>
-        <div class="play-section">
-          <button class="btn-play" id="btnJugar">▶ JUGAR</button>
-          <p style="font-size: .8rem; margin-top: .5rem; color: #666; font-style: italic;">¡Prepárate!</p>
-        </div>
-      </div>
-    </aside>
   </section>
 
   <!-- ══════════════════════════════════════════════
@@ -1744,23 +1914,57 @@
         <div class="card">
           <h2 class="section-title"> Reglas</h2>
           <ul class="rules-list" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
-            <li><span class="rule-icon">📱</span> <div>Gira el celular en posición horizontal.</div></li>
-            <li><span class="rule-icon">📷</span> <div>Escanea el código QR de cualquier estación del museo.</div></li>
-            <li><span class="rule-icon">👤</span> <div>Inicia sesión con tu cuenta de Google.</div></li>
-            <li><span class="rule-icon">📍</span> <div>Acepta el permiso de ubicación para ver dónde estás.</div></li>
-            <li><span class="rule-icon">🧑‍🚀</span> <div>Selecciona tu avatar.</div></li>
-            <li><span class="rule-icon">🗺️</span> <div>Revisa el mapa interactivo para ver tus estaciones.</div></li>
-            <li><span class="rule-icon">🔍</span> <div>Escanea el QR de la estación donde te encuentres.</div></li>
-            <li><span class="rule-icon">📖</span> <div>Lee o revisa el contenido educativo de la estación.</div></li>
-            <li><span class="rule-icon">🧠</span> <div>Responde las 10 preguntas de la trivia.</div></li>
-            <li><span class="rule-icon">🦖</span> <div>En el Espinosaurio, completa el reto de 15 saltos.</div></li>
-            <li><span class="rule-icon">💖</span> <div>Tienes máximo 3 intentos por estación.</div></li>
-            <li><span class="rule-icon">💀</span> <div>Si fallas los 3 intentos, el juego se reinicia.</div></li>
-            <li><span class="rule-icon">💾</span> <div>Si sales, usa “Seguir jugando” para continuar.</div></li>
-            <li><span class="rule-icon">🏁</span> <div>Completa todas las estaciones para terminar.</div></li>
-            <li><span class="rule-icon">🏆</span> <div>Al finalizar, revisa tu resultado final.</div></li>
-            <li><span class="rule-icon">🎟️</span> <div>Si cumples, podrás recibir un boleto digital.</div></li>
-            <li><span class="rule-icon">⚠️</span> <div>Solo se puede obtener un boleto por día.</div></li>
+            <li><span class="rule-icon">📱</span>
+              <div>Gira el celular en posición horizontal.</div>
+            </li>
+            <li><span class="rule-icon">📷</span>
+              <div>Escanea el código QR de cualquier estación del museo.</div>
+            </li>
+            <li><span class="rule-icon">👤</span>
+              <div>Inicia sesión con tu cuenta de Google.</div>
+            </li>
+            <li><span class="rule-icon">📍</span>
+              <div>Acepta el permiso de ubicación para ver dónde estás.</div>
+            </li>
+            <li><span class="rule-icon">🧑‍🚀</span>
+              <div>Selecciona tu avatar.</div>
+            </li>
+            <li><span class="rule-icon">🗺️</span>
+              <div>Revisa el mapa interactivo para ver tus estaciones.</div>
+            </li>
+            <li><span class="rule-icon">🔍</span>
+              <div>Escanea el QR de la estación donde te encuentres.</div>
+            </li>
+            <li><span class="rule-icon">📖</span>
+              <div>Lee o revisa el contenido educativo de la estación.</div>
+            </li>
+            <li><span class="rule-icon">🧠</span>
+              <div>Responde las 10 preguntas de la trivia.</div>
+            </li>
+            <li><span class="rule-icon">🦖</span>
+              <div>En el Espinosaurio, completa el reto de 15 saltos.</div>
+            </li>
+            <li><span class="rule-icon">💖</span>
+              <div>Tienes máximo 3 intentos por estación.</div>
+            </li>
+            <li><span class="rule-icon">💀</span>
+              <div>Si fallas los 3 intentos, el juego se reinicia.</div>
+            </li>
+            <li><span class="rule-icon">💾</span>
+              <div>Si sales, usa “Seguir jugando” para continuar.</div>
+            </li>
+            <li><span class="rule-icon">🏁</span>
+              <div>Completa todas las estaciones para terminar.</div>
+            </li>
+            <li><span class="rule-icon">🏆</span>
+              <div>Al finalizar, revisa tu resultado final.</div>
+            </li>
+            <li><span class="rule-icon">🎟️</span>
+              <div>Si cumples, podrás recibir un boleto digital.</div>
+            </li>
+            <li><span class="rule-icon">⚠️</span>
+              <div>Solo se puede obtener un boleto por día.</div>
+            </li>
           </ul>
         </div>
         <div class="avatar-preview-box" id="avatarPreviewBox">
@@ -1782,7 +1986,7 @@
             <svg class="map-overlay-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
               <path id="mapPath" class="animated-path" d="M 80 18 L 56 42 L 21 24 L 10 44 L 30 43 L 42 66" />
             </svg>
-            
+
             <div class="map-marker" style="left: 80%; top: 18%;" data-station="1">1</div>
             <div class="map-marker" style="left: 56%; top: 42%;" data-station="2">2</div>
             <div class="map-marker" style="left: 21%; top: 24%;" data-station="3">3</div>
@@ -1816,10 +2020,14 @@
         <div id="googleSignInButton"></div>
         <button class="btn-google" id="btnGoogleFallback" type="button">
           <svg class="google-g" viewBox="0 0 48 48" aria-hidden="true">
-            <path fill="#EA4335" d="M24 9.5c3.5 0 6.5 1.2 8.9 3.5l6.6-6.6C35.5 2.7 30.3.5 24 .5 14.8.5 6.9 5.8 3.1 13.6l7.7 6C12.6 13.7 17.9 9.5 24 9.5z" />
-            <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.5 2.8-2.2 5.2-4.7 6.8l7.3 5.7c4.3-4 7.2-9.9 7.2-16.5z" />
-            <path fill="#FBBC05" d="M10.8 28.4c-.5-1.4-.8-2.9-.8-4.4s.3-3 .8-4.4l-7.7-6C1.5 16.7.5 20.2.5 24s1 7.3 2.6 10.4l7.7-6z" />
-            <path fill="#34A853" d="M24 47.5c6.3 0 11.6-2.1 15.4-5.7l-7.3-5.7c-2 1.3-4.6 2.1-8.1 2.1-6.1 0-11.4-4.1-13.2-9.8l-7.7 6C6.9 42.2 14.8 47.5 24 47.5z" />
+            <path fill="#EA4335"
+              d="M24 9.5c3.5 0 6.5 1.2 8.9 3.5l6.6-6.6C35.5 2.7 30.3.5 24 .5 14.8.5 6.9 5.8 3.1 13.6l7.7 6C12.6 13.7 17.9 9.5 24 9.5z" />
+            <path fill="#4285F4"
+              d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.5 2.8-2.2 5.2-4.7 6.8l7.3 5.7c4.3-4 7.2-9.9 7.2-16.5z" />
+            <path fill="#FBBC05"
+              d="M10.8 28.4c-.5-1.4-.8-2.9-.8-4.4s.3-3 .8-4.4l-7.7-6C1.5 16.7.5 20.2.5 24s1 7.3 2.6 10.4l7.7-6z" />
+            <path fill="#34A853"
+              d="M24 47.5c6.3 0 11.6-2.1 15.4-5.7l-7.3-5.7c-2 1.3-4.6 2.1-8.1 2.1-6.1 0-11.4-4.1-13.2-9.8l-7.7 6C6.9 42.2 14.8 47.5 24 47.5z" />
           </svg>
           Continuar con Google
         </button>
@@ -1925,26 +2133,80 @@
         <p>Sigue estos pasos para completar tu misión con éxito</p>
       </div>
       <div class="rules-content">
-        <div class="rule-item"><div class="rule-icon-pro">📱</div><div class="rule-text">Gira el celular en posición horizontal.</div></div>
-        <div class="rule-item"><div class="rule-icon-pro">📷</div><div class="rule-text">Escanea el código QR de cualquier estación del museo.</div></div>
-        <div class="rule-item"><div class="rule-icon-pro">👤</div><div class="rule-text">Inicia sesión con tu cuenta de Google.</div></div>
-        <div class="rule-item"><div class="rule-icon-pro">📍</div><div class="rule-text">Acepta el permiso de ubicación para mostrar dónde estás dentro del recorrido.</div></div>
-        <div class="rule-item"><div class="rule-icon-pro">🧑‍🚀</div><div class="rule-text">Selecciona tu avatar.</div></div>
-        <div class="rule-item"><div class="rule-icon-pro">🗺️</div><div class="rule-text">Revisa el mapa interactivo para ver tu ubicación, estaciones pendientes y estaciones completadas.</div></div>
-        <div class="rule-item"><div class="rule-icon-pro">🔍</div><div class="rule-text">Escanea el QR de la estación donde te encuentres.</div></div>
-        <div class="rule-item"><div class="rule-icon-pro">📖</div><div class="rule-text">Lee o revisa el contenido educativo de la estación.</div></div>
-        <div class="rule-item"><div class="rule-icon-pro">🧠</div><div class="rule-text">Responde las 10 preguntas de la trivia.</div></div>
-        <div class="rule-item"><div class="rule-icon-pro">🦖</div><div class="rule-text">Si estás en la estación del Espinosaurio, completa el reto de 15 saltos.</div></div>
-        <div class="rule-item"><div class="rule-icon-pro">💖</div><div class="rule-text">Tienes máximo 3 intentos por estación.</div></div>
-        <div class="rule-item"><div class="rule-icon-pro">💀</div><div class="rule-text">Si fallas los 3 intentos, el juego se reinicia desde cero.</div></div>
-        <div class="rule-item"><div class="rule-icon-pro">💾</div><div class="rule-text">Si sales del juego, presiona “Seguir jugando” para continuar desde tu progreso guardado.</div></div>
-        <div class="rule-item"><div class="rule-icon-pro">🏁</div><div class="rule-text">Completa todas las estaciones para terminar la misión.</div></div>
-        <div class="rule-item"><div class="rule-icon-pro">🏆</div><div class="rule-text">Al finalizar, revisa tu resultado final.</div></div>
-        <div class="rule-item"><div class="rule-icon-pro">🎟️</div><div class="rule-text">Si cumples las condiciones del juego, podrás recibir un boleto digital.</div></div>
-        <div class="rule-item"><div class="rule-icon-pro">⚠️</div><div class="rule-text">Solo se puede obtener un boleto por día por usuario.</div></div>
+        <div class="rule-item">
+          <div class="rule-icon-pro">📱</div>
+          <div class="rule-text">Gira el celular en posición horizontal.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon-pro">📷</div>
+          <div class="rule-text">Escanea el código QR de cualquier estación del museo.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon-pro">👤</div>
+          <div class="rule-text">Inicia sesión con tu cuenta de Google.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon-pro">📍</div>
+          <div class="rule-text">Acepta el permiso de ubicación para mostrar dónde estás dentro del recorrido.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon-pro">🧑‍🚀</div>
+          <div class="rule-text">Selecciona tu avatar.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon-pro">🗺️</div>
+          <div class="rule-text">Revisa el mapa interactivo para ver tu ubicación, estaciones pendientes y estaciones
+            completadas.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon-pro">🔍</div>
+          <div class="rule-text">Escanea el QR de la estación donde te encuentres.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon-pro">📖</div>
+          <div class="rule-text">Lee o revisa el contenido educativo de la estación.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon-pro">🧠</div>
+          <div class="rule-text">Responde las 10 preguntas de la trivia.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon-pro">🦖</div>
+          <div class="rule-text">Si estás en la estación del Espinosaurio, completa el reto de 10 saltos.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon-pro">💖</div>
+          <div class="rule-text">Tienes máximo 3 intentos por estación.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon-pro">💀</div>
+          <div class="rule-text">Si fallas los 3 intentos, el juego se reinicia desde cero.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon-pro">💾</div>
+          <div class="rule-text">Si sales del juego, presiona “Seguir jugando” para continuar desde tu progreso
+            guardado.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon-pro">🏁</div>
+          <div class="rule-text">Completa todas las estaciones para terminar la misión.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon-pro">🏆</div>
+          <div class="rule-text">Al finalizar, revisa tu resultado final.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon-pro">🎟️</div>
+          <div class="rule-text">Si cumples las condiciones del juego, podrás recibir un boleto digital.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon-pro">⚠️</div>
+          <div class="rule-text">Solo se puede obtener un boleto por día por usuario.</div>
+        </div>
       </div>
       <div class="modal-footer" style="justify-content: center;">
-        <button class="btn-confirm" id="btnCerrarReglas" style="background: linear-gradient(135deg, var(--msf-purple), var(--msf-blue));">¡Entendido!</button>
+        <button class="btn-confirm" id="btnCerrarReglas"
+          style="background: linear-gradient(135deg, var(--msf-purple), var(--msf-blue));">¡Entendido!</button>
       </div>
     </div>
   </div>
@@ -2122,14 +2384,16 @@
       }
 
       if (btnPuntajes) {
-        btnPuntajes.onclick = (e) => {
+        btnPuntajes.addEventListener('click', (e) => {
           e.preventDefault();
           scoresOverlay.classList.add('open');
           loadScores();
-          if (window.innerWidth <= 768) {
-            document.querySelector('.sidebar').classList.remove('open');
+          if (window.innerWidth <= 768 && navLinks) {
+            navLinks.classList.remove('open');
+            hamburger.classList.remove('active');
+            if (mobileBackdrop) mobileBackdrop.classList.remove('visible');
           }
-        };
+        });
       }
 
       if (btnCerrarPuntajes) {
@@ -2208,7 +2472,20 @@
 
       initGoogleLogin();
 
-      document.getElementById('btnJugar').onclick = () => {
+      const btnInicio = document.getElementById('btnInicio');
+      if (btnInicio) {
+        btnInicio.addEventListener('click', (e) => {
+          e.preventDefault();
+          document.getElementById('viewPrep').classList.remove('active');
+          document.getElementById('viewLanding').classList.add('active');
+          if (window.innerWidth <= 768 && navLinks) {
+            navLinks.classList.remove('open');
+            hamburger.classList.remove('active');
+          }
+        });
+      }
+
+      window.startGameFlow = () => {
         if (googleUser) {
           openAvatarSelection();
           return;
@@ -2217,17 +2494,19 @@
       };
       loginOverlay.onclick = (e) => { if (e.target === loginOverlay) loginOverlay.classList.remove('open'); };
       overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('open'); };
-      
+
       const rulesOverlay = document.getElementById('rulesOverlay');
       const btnComoJugar = document.getElementById('btnComoJugar');
       if (btnComoJugar) {
-        btnComoJugar.onclick = (e) => {
+        btnComoJugar.addEventListener('click', (e) => {
           e.preventDefault();
           rulesOverlay.classList.add('open');
-          if (window.innerWidth <= 768) {
-            document.querySelector('.sidebar').classList.remove('open');
+          if (window.innerWidth <= 768 && navLinks) {
+            navLinks.classList.remove('open');
+            hamburger.classList.remove('active');
+            if (mobileBackdrop) mobileBackdrop.classList.remove('visible');
           }
-        };
+        });
       }
       document.getElementById('btnCerrarReglas').onclick = () => rulesOverlay.classList.remove('open');
       rulesOverlay.onclick = (e) => { if (e.target === rulesOverlay) rulesOverlay.classList.remove('open'); };
@@ -2325,39 +2604,38 @@
 
       // 6. Hamburguesa Móvil
       const hamburger = document.getElementById('hamburgerBtn');
-      const sidebar = document.querySelector('.sidebar');
+      const navLinks = document.querySelector('.nav-links');
       const mobileBackdrop = document.getElementById('mobileNavBackdrop');
-      if (hamburger && sidebar && mobileBackdrop) {
+
+      if (hamburger && navLinks) {
         hamburger.onclick = (e) => {
           e.stopPropagation();
-          sidebar.classList.toggle('open');
-          mobileBackdrop.classList.toggle('visible', sidebar.classList.contains('open'));
+          navLinks.classList.toggle('open');
+          hamburger.classList.toggle('active');
+          if (mobileBackdrop) mobileBackdrop.classList.toggle('visible', navLinks.classList.contains('open'));
         };
+
         document.addEventListener('click', (e) => {
-          if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
-            sidebar.classList.remove('open');
-            mobileBackdrop.classList.remove('visible');
+          if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
+            navLinks.classList.remove('open');
+            hamburger.classList.remove('active');
+            if (mobileBackdrop) mobileBackdrop.classList.remove('visible');
           }
         });
-        mobileBackdrop.onclick = () => {
-          sidebar.classList.remove('open');
-          mobileBackdrop.classList.remove('visible');
-        };
-      }
 
-      document.querySelectorAll('.nav-item').forEach(link => {
-        link.onclick = () => {
-          if (window.innerWidth <= 768) {
-            sidebar.classList.remove('open');
-            mobileBackdrop.classList.remove('visible');
-          }
-        };
-      });
+        navLinks.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+            navLinks.classList.remove('open');
+            hamburger.classList.remove('active');
+            if (mobileBackdrop) mobileBackdrop.classList.remove('visible');
+          });
+        });
+      }
 
       const btnJugarMobile = document.getElementById('btnJugarMobile');
       if (btnJugarMobile) {
         btnJugarMobile.onclick = () => {
-          document.getElementById('btnJugar').click();
+          startGameFlow();
         };
       }
     });
