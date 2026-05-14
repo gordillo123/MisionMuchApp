@@ -32,7 +32,7 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Fredoka', system-ui, -apple-system, sans-serif;
   /* Modern font match */
   min-height: 100vh;
   background: linear-gradient(135deg, #4ade80, #3b82f6, #a855f7);
@@ -105,11 +105,14 @@ body {
 }
 
 .app-title {
-  font-size: 1.15rem;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.5rem;
   font-weight: 800;
   margin-top: 0.5rem;
-  color: #111;
-  letter-spacing: -0.02em;
+  background: linear-gradient(to right, #22c55e, #3b82f6, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.01em;
 }
 
 .app-subtitle {
@@ -155,10 +158,11 @@ body {
 
 /* === QUESTION TEXT === */
 .question-text {
-  font-size: 1.35rem;
-  font-weight: 800;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
   line-height: 1.35;
-  color: #111;
+  color: #1a365d;
 }
 
 .question-text .emoji-icon {
