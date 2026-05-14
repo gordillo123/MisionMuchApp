@@ -168,6 +168,37 @@ header h1 {
     transform: translateY(2px);
 }
 
+.timer-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 140px;
+    margin-right: 1rem;
+    padding: 0.85rem 1rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 999px;
+    font-weight: 700;
+    color: #F8FAFC;
+    letter-spacing: 0.7px;
+    font-size: 1rem;
+}
+
+.timer-box span {
+    margin-left: 0.45rem;
+    color: var(--msf-yellow);
+}
+
+.timer-box.time-end {
+    background: rgba(242, 63, 58, 0.15);
+    border-color: rgba(242, 63, 58, 0.35);
+    color: #FEE2E2;
+}
+
+.timer-box.time-end span {
+    color: var(--msf-red);
+}
+
 /* Modal de éxito */
 .modal {
     display: none;

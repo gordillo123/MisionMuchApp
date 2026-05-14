@@ -6,13 +6,22 @@
 document.addEventListener('DOMContentLoaded', () => {
     const puzzleBoard = document.getElementById('puzzle-board');
     const resetBtn = document.getElementById('reset-btn');
+    const countdownEl = document.getElementById('countdown');
+    const timerBox = document.getElementById('timer-box');
     const successModal = document.getElementById('success-modal');
     const closeModalBtn = document.getElementById('close-modal');
     const backBtn = document.getElementById('btn-back');
 
     const size = 3; // 3x3
+    const TIME_LIMIT_SECONDS = 120;
+    const COMPLETED_STATIONS_KEY = 'much_completed_stations';
+    const STATION_ID = '6';
+
     let pieces = [];
     let draggedPiece = null;
+    let timeRemaining = TIME_LIMIT_SECONDS;
+    let timerInterval = null;
+    let solvedOnTime = false;
 
     /**
      * Inicializa el juego
@@ -21,6 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
         createPieces();
         shufflePieces();
         renderBoard();
+        resetTimer();
+        startTimer();
     }
 
     /**
@@ -174,7 +185,22 @@ document.addEventListener('DOMContentLoaded', () => {
         return pieces.every(piece => piece.currentPos === piece.correctPos);
     }
 
+    function markStationCompleted() {
+        try {
+            const completed = JSON.parse(localStorage.getItem(COMPLETED_STATIONS_KEY) || '{}');
+            completed[STATION_ID] = true;
+            localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
+        } catch (e) {
+            console.warn('No se pudo marcar estación completa:', e);
+        }
+    }
+
     function showSuccess() {
+        stopTimer();
+        if (timeRemaining > 0) {
+            solvedOnTime = true;
+            markStationCompleted();
+        }
         successModal.classList.add('show');
     }
 
@@ -183,17 +209,70 @@ document.addEventListener('DOMContentLoaded', () => {
     resetBtn.addEventListener('click', () => {
         shufflePieces();
         renderBoard();
+        resetTimer();
+        startTimer();
     });
 
     closeModalBtn.addEventListener('click', () => {
         successModal.classList.remove('show');
         shufflePieces();
         renderBoard();
+        resetTimer();
+        startTimer();
     });
 
     backBtn.addEventListener('click', () => {
         window.location.href = '../index.html?view=prep';
     });
+
+    function formatTime(seconds) {
+        const min = String(Math.floor(seconds / 60)).padStart(2, '0');
+        const sec = String(seconds % 60).padStart(2, '0');
+        return `${min}:${sec}`;
+    }
+
+    function updateTimerDisplay() {
+        countdownEl.textContent = formatTime(timeRemaining);
+        timerBox.classList.toggle('time-end', timeRemaining <= 10);
+    }
+
+    function resetTimer() {
+        stopTimer();
+        timeRemaining = TIME_LIMIT_SECONDS;
+        solvedOnTime = false;
+        updateTimerDisplay();
+    }
+
+    function startTimer() {
+        stopTimer();
+        timerInterval = setInterval(() => {
+            timeRemaining -= 1;
+            updateTimerDisplay();
+
+            if (timeRemaining <= 0) {
+                stopTimer();
+                timerBox.classList.add('time-end');
+                setTimeout(() => {
+                    alert('Se terminó el tiempo. El rompecabezas se reinicia para intentarlo de nuevo.');
+                    resetGame();
+                }, 100);
+            }
+        }, 1000);
+    }
+
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+    }
+
+    function resetGame() {
+        shufflePieces();
+        renderBoard();
+        resetTimer();
+        startTimer();
+    }
 
     // Iniciar
     initGame();

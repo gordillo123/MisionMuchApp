@@ -26,13 +26,25 @@ var tiempoHastaObstaculo = 2, tiempoObstaculoMin = 0.7, tiempoObstaculoMax = 1.8
 var tiempoHastaNube = 0.5, tiempoNubeMin = 0.7, tiempoNubeMax = 2.7, nubes = [], velNube = 0.5;
 
 var contenedor, dino, textoScore, suelo, gameOver;
-var WIN_SCORE = 10;
+var WIN_SCORE = 15;
+const STATION_ID = '2';
+const COMPLETED_STATIONS_KEY = 'much_completed_stations';
 
 var jumpSound;
 var quizData = null;
 var quizAnswerIndex = null;
 var quizVisible = false;
 var navigatingToRegistro = false;
+
+function markStationCompleted() {
+  try {
+    const completed = JSON.parse(localStorage.getItem(COMPLETED_STATIONS_KEY) || '{}');
+    completed[STATION_ID] = true;
+    localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
+  } catch (e) {
+    console.warn('No se pudo marcar estación completa:', e);
+  }
+}
 
 // 🛑 Variables de la cuenta regresiva y estado del juego
 var countdownActive = false;
@@ -291,7 +303,7 @@ function GanarPuntos() {
   if (score == 5) { contenedor.classList.add("mediodia"); }
   else if (score == 10) { contenedor.classList.add("tarde"); }
 
-  if (score == WIN_SCORE) {
+  if (score >= WIN_SCORE) {
     contenedor.classList.add("noche"); parado = true;
     dino.classList.remove("dino-corriendo"); mostrarQuiz(); return;
   }
@@ -394,6 +406,10 @@ async function validarQuiz() {
     // Deshabilitar radio buttons para evitar cambios
     var inputs = document.querySelectorAll('input[name="q1"]');
     inputs.forEach(inp => inp.disabled = true);
+
+    if (score >= WIN_SCORE) {
+      markStationCompleted();
+    }
 
     await registrarQuizEnSupabase(Number(score));
 
