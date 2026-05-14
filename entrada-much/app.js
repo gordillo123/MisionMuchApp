@@ -437,7 +437,7 @@ class UIManager {
     localStorage.setItem('much_quiz_prize', JSON.stringify(prizeData));
 
     // Pasamos el parámetro a registro
-    window.location.href = 'registro.html' + window.location.search;
+    window.location.href = '../Boleto_Digital/registro.html' + window.location.search;
   }
 
   async render() {

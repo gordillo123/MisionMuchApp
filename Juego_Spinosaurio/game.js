@@ -385,7 +385,7 @@ async function validarQuiz() {
   }
 
   if (Number(sel.value) === quizAnswerIndex) {
-    msg.textContent = "¡Correcto! Has completado esta estación. Puedes continuar explorando las demás. 🦕"; 
+    msg.textContent = "¡Correcto! Has completado esta estación. Puedes continuar explorando las demás. 🦖"; 
     msg.className = "quiz-msg ok";
 
     navigatingToRegistro = true; 
@@ -395,8 +395,7 @@ async function validarQuiz() {
     var inputs = document.querySelectorAll('input[name="q1"]');
     inputs.forEach(inp => inp.disabled = true);
 
-    const ganadorId = await crearParticipanteGanador();
-    await registrarQuizEnSupabase(Number(score), ganadorId);
+    await registrarQuizEnSupabase(Number(score));
 
     btnOk.textContent = "Continuar";
   } else {
@@ -472,41 +471,7 @@ async function registrarIntentoInicial() {
   }
 }
 
-async function crearParticipanteGanador() {
-  const sb = window.supabase;
-  if (!sb) return null;
-
-  const existingId = sessionStorage.getItem("usuario_id");
-  if (existingId) return existingId;
-
-  const randomSuffix = Math.floor(Math.random() * 999999);
-  try {
-    const { data, error } = await sb
-      .from('Ganadores')
-      .insert([
-        {
-          nombre: 'Visitante Spinosaurio (Ganador)',
-          correo: `ganador.${randomSuffix}@much.mx`,
-          telefono: '0000000000',
-          folio: 'G-' + randomSuffix,
-          valido_desde: getMexicoTime(),
-          ubicacion: LUGAR_QR
-        }
-      ])
-      .select('id')
-      .single();
-
-    if (error) {
-      console.error("❌ Error al crear Ganador:", error.message);
-      return null;
-    }
-    console.log("✅ Ganador creado con ID:", data.id);
-    sessionStorage.setItem("usuario_id", data.id);
-    return data.id;
-  } catch (e) { return null; }
-}
-
-async function registrarQuizEnSupabase(puntajeFinal, ganadorId = null) {
+async function registrarQuizEnSupabase(puntajeFinal) {
   if (!window.supabase) {
     console.error("❌ Supabase no está disponible");
     return;
@@ -535,7 +500,6 @@ async function registrarQuizEnSupabase(puntajeFinal, ganadorId = null) {
         };
 
         if (ID_PARTICIPANTE) payload.participante_id = ID_PARTICIPANTE;
-        else if (ganadorId) payload.participante_id = ganadorId;
 
       const { data, error } = await window.supabase
         .from("intentos_juego")
@@ -561,7 +525,7 @@ async function registrarQuizEnSupabase(puntajeFinal, ganadorId = null) {
         created_at: getMexicoTime()
       };
 
-      if (ganadorId) payload.participante_id = ganadorId;
+      // No ganadorId fallback here
 
       const { data, error } = await window.supabase
         .from("intentos_juego")

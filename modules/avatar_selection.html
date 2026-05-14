@@ -1,0 +1,23 @@
+<div class="avatar-modal">
+  <div class="modal-header">
+    <h2 class="modal-title">Elige tu Avatar</h2>
+    <p>Selecciona tu personaje favorito</p>
+    <div class="user-chip" id="userChip">
+      <span class="user-chip-avatar" id="userChipAvatar">G</span>
+      <span id="userChipName">Cuenta Google</span>
+    </div>
+  </div>
+  <div class="avatar-tabs">
+    <button class="av-tab active" data-filter="all">Todos</button>
+    <button class="av-tab" data-filter="human">Humanos</button>
+    <button class="av-tab" data-filter="dino">Dinos</button>
+    <button class="av-tab" data-filter="space">Espacio</button>
+  </div>
+  <div class="avatar-grid" id="avatarGrid">
+    <!-- Generado dinámicamente -->
+  </div>
+  <div class="modal-footer">
+    <p id="previewName" style="font-weight: 800; color: var(--msf-pink);">Ninguno</p>
+    <button class="btn-confirm" id="btnConfirmar" disabled>Confirmar</button>
+  </div>
+</div>

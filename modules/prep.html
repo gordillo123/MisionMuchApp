@@ -1,0 +1,90 @@
+<button class="back-button-prep" id="btnBackPrep" title="Volver">←</button>
+<div class="intro-container">
+  <div class="rules-col">
+    <div class="card">
+      <h2 class="section-title"> Reglas</h2>
+      <ul class="rules-list" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+        <li><span class="rule-icon">📱</span>
+          <div>Gira el celular en posición horizontal.</div>
+        </li>
+        <li><span class="rule-icon">📷</span>
+          <div>Escanea el código QR de cualquier estación del museo.</div>
+        </li>
+        <li><span class="rule-icon">👤</span>
+          <div>Inicia sesión con tu cuenta de Google.</div>
+        </li>
+        <li><span class="rule-icon">📍</span>
+          <div>Acepta el permiso de ubicación para ver dónde estás.</div>
+        </li>
+        <li><span class="rule-icon">🧑‍🚀</span>
+          <div>Selecciona tu avatar.</div>
+        </li>
+        <li><span class="rule-icon">🗺️</span>
+          <div>Revisa el mapa interactivo para ver tus estaciones.</div>
+        </li>
+        <li><span class="rule-icon">🔍</span>
+          <div>Escanea el QR de la estación donde te encuentres.</div>
+        </li>
+        <li><span class="rule-icon">📖</span>
+          <div>Lee o revisa el contenido educativo de la estación.</div>
+        </li>
+        <li><span class="rule-icon">🧠</span>
+          <div>Responde las 10 preguntas de la trivia.</div>
+        </li>
+        <li><span class="rule-icon">🦖</span>
+          <div>En el Espinosaurio, completa el reto de 15 saltos.</div>
+        </li>
+        <li><span class="rule-icon">💖</span>
+          <div>Tienes máximo 3 intentos por estación.</div>
+        </li>
+        <li><span class="rule-icon">💀</span>
+          <div>Si fallas los 3 intentos, el juego se reinicia.</div>
+        </li>
+        <li><span class="rule-icon">💾</span>
+          <div>Si sales, usa “Seguir jugando” para continuar.</div>
+        </li>
+        <li><span class="rule-icon">🏁</span>
+          <div>Completa todas las estaciones para terminar.</div>
+        </li>
+        <li><span class="rule-icon">🏆</span>
+          <div>Al finalizar, revisa tu resultado final.</div>
+        </li>
+      </ul>
+    </div>
+    <div class="avatar-preview-box" id="avatarPreviewBox">
+      <div id="prepAvatarImg"
+        style="width: 70px; height: 70px; background: white; border-radius: 15px; overflow: hidden; padding: 5px;">
+      </div>
+      <div>
+        <p style="font-size: .8rem; opacity: .8;">Tu Avatar:</p>
+        <p id="prepAvatarName" style="font-weight: 900; font-size: 1.2rem;">---</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="map-col">
+    <div class="card" style="height: 100%; display: flex; flex-direction: column;">
+      <h2 class="section-title">¿En qué estación estás?</h2>
+      <div class="museum-map" id="museumMap">
+        <img src="mapa 12.png" alt="Mapa del Museo" class="map-bg" />
+        <svg class="map-overlay-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <path id="mapPath" class="animated-path" d="M 80 18 L 56 42 L 21 24 L 10 44 L 30 43 L 42 66" />
+        </svg>
+
+        <div class="map-marker" style="left: 80%; top: 18%;" data-station="1">1</div>
+        <div class="map-marker" style="left: 56%; top: 42%;" data-station="2">2</div>
+        <div class="map-marker" style="left: 21%; top: 24%;" data-station="3">3</div>
+        <div class="map-marker" style="left: 10%; top: 44%;" data-station="4">4</div>
+        <div class="map-marker" style="left: 30%; top: 43%;" data-station="5">5</div>
+        <div class="map-marker" style="left: 42%; top: 66%;" data-station="6">6</div>
+
+        <div class="map-avatar" id="mapAvatar">
+          <div id="mapAvatarImgCont" style="width: 100%; height: 100%;"></div>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: center; margin-top: 1.5rem;">
+        <button class="btn-play large" id="btnComenzar" style="width: max-content; min-width: 280px;">🚀 ¡COMENZAR!</button>
+      </div>
+    </div>
+  </div>
+</div>

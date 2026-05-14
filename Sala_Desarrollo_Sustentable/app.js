@@ -20,6 +20,12 @@ let QUESTIONS = [];
 // 🔒 BANDERA DE SEGURIDAD (Evita dobles registros al dar clic rápido)
 let quizIniciando = false;
 
+// 🎁 Clase dummy para mantener compatibilidad con el constructor de UIManager
+class PrizeManager {
+  constructor() {}
+}
+
+
 /* ================================================================= */
 /* ==== SUPABASE: CONEXIÓN Y LÓGICA DE BASE DE DATOS =========== */
 /* ================================================================= */
@@ -64,19 +70,6 @@ function normalizeOffset(offsetValue) {
 function getMexicoDateKey(date = new Date()) {
   const parts = getMexicoDateParts(date);
   return `${parts.year}-${parts.month}-${parts.day}`;
-}
-
-function buildPrizeFolio(prizeLabel = '') {
-  const text = String(prizeLabel || '').toLowerCase();
-  let prefix = 'MUCH';
-
-  if (text.includes('planetario')) {
-    prefix = 'PLAN';
-  } else if (text.includes('visita general') || text.includes('museo + planetario')) {
-    prefix = 'VGMP';
-  }
-
-  return `${prefix}-` + Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
 // Inicializa la librería
@@ -162,11 +155,14 @@ async function loadPreguntas() {
     console.log('[loadPreguntas] JSON Cargado. Total preguntas:', QUESTIONS.length);
     return QUESTIONS;
   } catch (err) {
-    console.error(err);
-    console.warn('Error en fetch:', err);
+    console.warn('[loadPreguntas] Error en fetch, usando banco local:', err);
     const bankLocal = window.MUCH_PREGUNTAS_SUSTENTABLE || [];
-    if (!bankLocal.length) throw err;
-    const normalizeFallback = (it) => {
+    if (!bankLocal.length) {
+      console.error('No hay preguntas locales disponibles.');
+      throw err;
+    }
+
+    const normalize = (it) => {
       const text = it.text ?? it.pregunta ?? it.enunciado ?? 'Pregunta sin texto';
       const desc = it.desc ?? it.descripcion ?? '';
       let options = it.options ?? it.opciones ?? it.respuestas ?? [];
@@ -176,22 +172,13 @@ async function loadPreguntas() {
         if (correctIndex == null && idx >= 0) correctIndex = idx;
         options = options.map(o => o.text ?? o.texto ?? o.label ?? String(o));
       }
-      if (correctIndex == null && typeof it.correcta === 'string') {
-        const idx2 = options.findIndex(o => String(o).trim() === String(it.correcta).trim());
-        if (idx2 >= 0) correctIndex = idx2;
-      }
-      if (correctIndex == null && (it.respuesta || it.respuesta_correcta)) {
-        const num = (it.respuesta ?? it.respuesta_correcta) - 1;
-        if (!Number.isNaN(num)) correctIndex = num;
-      }
       const points = it.points ?? it.puntos ?? 10;
       if (!Array.isArray(options) || options.length === 0) { options = ['(sin opciones)']; correctIndex = 0; }
       if (correctIndex == null || correctIndex < 0 || correctIndex >= options.length) { correctIndex = 0; }
       return { text, options, correctIndex, points, desc };
     };
-    const poolFallback = bankLocal;
-    const normalizedFallback = poolFallback.map(normalizeFallback);
-    QUESTIONS = shuffle(normalizedFallback).slice(0, NUM_QUESTIONS);
+
+    QUESTIONS = shuffle(bankLocal.map(normalize)).slice(0, NUM_QUESTIONS);
     console.log('[loadPreguntas] Fallback local cargado. Total:', QUESTIONS.length);
     return QUESTIONS;
   }
@@ -276,42 +263,6 @@ async function endQuizInDB({ puntaje_total, num_correctas, num_preguntas }) {
   } catch (e) { console.warn('Error endQuizInDB:', e); }
 }
 
-// ------------------------------------------------------------
-// 🌟 NUEVO: FUNCIÓN PARA COMPROBAR LÍMITE DE BOLETOS DIARIOS
-// ------------------------------------------------------------
-async function checkLimiteBoletos() {
-  try {
-    await initSupabase();
-
-    const parts = getMexicoDateParts();
-    const fechaHoyStr = getMexicoDateKey();
-    const offset = normalizeOffset(parts.timeZoneName);
-
-    const inicioDia = `${fechaHoyStr}T00:00:00.000${offset}`;
-    const finDia = `${fechaHoyStr}T23:59:59.999${offset}`;
-
-    const { count, error } = await supabase
-      .from('quizzes')
-      .select('*', { count: 'exact', head: true })
-      .eq('sala_id', SALA_ENTRADA_ID)
-      .gte('finished_at', inicioDia)
-      .lte('finished_at', finDia)
-      .eq('num_correctas', NUM_QUESTIONS);
-
-    if (error) {
-      console.error("Error al checar límite de boletos:", error);
-      return false;
-    }
-
-    console.log(`Boletos entregados hoy en esta sala: ${count}`);
-    return count >= 3;
-
-  } catch (e) {
-    console.error("Excepción en checkLimiteBoletos:", e);
-    return false;
-  }
-}
-
 // Fallback Functions
 function startQuizLocal() {
   if (sessionStorage.getItem('much_quiz_start')) return;
@@ -373,17 +324,6 @@ class Confetti {
   }
 }
 
-class PrizeManager {
-  constructor() {
-    this.PRIZES = [
-      { key: 'museo', title: 'MUCH · Museo', label: 'Entrada al Museo MUCH', lugar: 'Museo Chiapas (MUCH)', emoji: '🏛️' },
-      { key: 'planetario', title: 'MUCH · Planetario', label: 'Entrada al Planetario MUCH', lugar: 'Planetario MUCH', emoji: '🔭' },
-      { key: 'general', title: 'MUCH · Visita General', label: 'Visita General (Museo + Planetario)', lugar: 'Museo y Planetario', emoji: '🌟' },
-    ];
-  }
-  random() { return this.PRIZES[Math.floor(Math.random() * this.PRIZES.length)]; }
-}
-
 class UIManager {
   constructor({ elements, sound, confetti, prizeMgr }) {
     this.e = elements; this.sound = sound; this.confetti = confetti; this.prizeMgr = prizeMgr;
@@ -441,7 +381,7 @@ class UIManager {
   redirectToRegistration() {
     // Redirigir al mapa principal en la vista de preparación
     const searchParams = new URLSearchParams(window.location.search);
-    searchParams.set('view', 'prep');
+
     window.location.href = '../index.html?' + searchParams.toString();
   }
 
@@ -491,29 +431,15 @@ class UIManager {
       e.finalTotal.textContent = QUESTIONS.length.toString();
 
       if (allCorrect) {
-        const limiteAlcanzado = await checkLimiteBoletos();
-
-        if (limiteAlcanzado) {
-          e.finalTitle.textContent = '¡Felicidades, eres un experto! 🧠';
-          e.finalMsg.innerHTML = '<span style="color: #e6007a; font-weight: bold;">Lo sentimos, los boletos para esta sala se han agotado por hoy.</span><br>¡Vuelve a intentarlo mañana!';
-          e.retryRow.classList.remove('d-none');
-        } else {
-          const prize = this.prizeMgr.random();
-          this.currentPrize = prize;
-
-          e.finalTitle.textContent = '¡Felicidades!';
-          e.finalMsg.textContent = '¡Has completado esta estación!';
-          e.giftRow.classList.remove('d-none');
-
-
-        }
-        return;
+        e.finalTitle.textContent = '¡Felicidades!';
+        e.finalMsg.textContent = '¡Has completado esta estación con éxito!';
+        e.giftRow.classList.remove('d-none');
       } else {
         e.finalTitle.textContent = 'Buen intento 👀';
         e.finalMsg.textContent = 'Sigue explorando el museo.';
         e.retryRow.classList.remove('d-none');
-        return;
       }
+      return;
     }
 
     const q = QUESTIONS[s.idx];

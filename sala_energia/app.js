@@ -19,6 +19,11 @@ let QUESTIONS = [];
 // 🔒 BANDERA DE SEGURIDAD (Evita dobles registros al dar clic rápido)
 let quizIniciando = false;
 
+class PrizeManager {
+  constructor() {}
+}
+
+
 /* ================================================================= */
 /* ==== SUPABASE: CONEXIÓN Y LÓGICA DE BASE DE DATOS =========== */
 /* ================================================================= */
@@ -121,9 +126,32 @@ async function loadPreguntas() {
     console.log('[loadPreguntas] JSON Cargado. Total preguntas:', QUESTIONS.length);
     return QUESTIONS;
   } catch (err) {
-    console.error(err);
-    alert('Error al cargar preguntas.json.\n' + err.message);
-    throw err;
+    console.warn('[loadPreguntas] Error en fetch, usando banco local:', err);
+    const bankLocal = window.MUCH_PREGUNTAS_ENERGIA || [];
+    if (!bankLocal.length) {
+      console.error('No hay preguntas locales disponibles.');
+      throw err;
+    }
+
+    const normalize = (it) => {
+      const text = it.text ?? it.pregunta ?? it.enunciado ?? 'Pregunta sin texto';
+      const desc = it.desc ?? it.descripcion ?? '';
+      let options = it.options ?? it.opciones ?? it.respuestas ?? [];
+      let correctIndex = it.correctIndex ?? it.correcta_index;
+      if (Array.isArray(options) && typeof options[0] === 'object') {
+        const idx = options.findIndex(o => o.correcta === true || o.esCorrecta === true);
+        if (correctIndex == null && idx >= 0) correctIndex = idx;
+        options = options.map(o => o.text ?? o.texto ?? o.label ?? String(o));
+      }
+      const points = it.points ?? it.puntos ?? 10;
+      if (!Array.isArray(options) || options.length === 0) { options = ['(sin opciones)']; correctIndex = 0; }
+      if (correctIndex == null || correctIndex < 0 || correctIndex >= options.length) { correctIndex = 0; }
+      return { text, options, correctIndex, points, desc };
+    };
+
+    QUESTIONS = shuffle(bankLocal.map(normalize)).slice(0, NUM_QUESTIONS);
+    console.log('[loadPreguntas] Fallback local cargado. Total:', QUESTIONS.length);
+    return QUESTIONS;
   }
 }
 
@@ -208,43 +236,6 @@ async function endQuizInDB({ puntaje_total, num_correctas, num_preguntas }) {
   } catch (e) { console.warn('Error endQuizInDB:', e); }
 }
 
-// ------------------------------------------------------------
-// 🌟 NUEVO: FUNCIÓN PARA COMPROBAR LÍMITE DE BOLETOS DIARIOS
-// ------------------------------------------------------------
-async function checkLimiteBoletos() {
-  try {
-    await initSupabase();
-
-    const hoy = new Date();
-    const offsetMexico = hoy.getTimezoneOffset() * 60000;
-    const localTime = new Date(hoy.getTime() - offsetMexico);
-    const fechaHoyStr = localTime.toISOString().split('T')[0];
-
-    const inicioDia = `${fechaHoyStr}T00:00:00.000Z`;
-    const finDia = `${fechaHoyStr}T23:59:59.999Z`;
-
-    const { count, error } = await supabase
-      .from('quizzes')
-      .select('*', { count: 'exact', head: true })
-      .eq('sala_id', SALA_ENTRADA_ID)
-      .gte('finished_at', inicioDia)
-      .lte('finished_at', finDia)
-      .eq('num_correctas', NUM_QUESTIONS);
-
-    if (error) {
-      console.error("Error al checar límite de boletos:", error);
-      return false;
-    }
-
-    console.log(`Boletos entregados hoy en esta sala: ${count}`);
-    return count >= 3;
-
-  } catch (e) {
-    console.error("Excepción en checkLimiteBoletos:", e);
-    return false;
-  }
-}
-
 // Fallback Functions
 function startQuizLocal() {
   if (sessionStorage.getItem('much_quiz_start')) return;
@@ -306,20 +297,9 @@ class Confetti {
   }
 }
 
-class PrizeManager {
-  constructor() {
-    this.PRIZES = [
-      { key: 'museo', title: 'MUCH · Museo', label: 'Entrada al Museo MUCH', lugar: 'Museo Chiapas (MUCH)', emoji: '🏛️' },
-      { key: 'planetario', title: 'MUCH · Planetario', label: 'Entrada al Planetario MUCH', lugar: 'Planetario MUCH', emoji: '🔭' },
-      { key: 'general', title: 'MUCH · Visita General', label: 'Visita General(Museo+ much)', lugar: 'Museo y Planetario', emoji: '🌟' },
-    ];
-  }
-  random() { return this.PRIZES[Math.floor(Math.random() * this.PRIZES.length)]; }
-}
-
 class UIManager {
-  constructor({ elements, sound, confetti, prizeMgr }) {
-    this.e = elements; this.sound = sound; this.confetti = confetti; this.prizeMgr = prizeMgr;
+  constructor({ elements, sound, confetti }) {
+    this.e = elements; this.sound = sound; this.confetti = confetti;
     this.state = { idx: 0, selected: null, points: 0, correct: 0, locked: false, answers: [] };
     this.currentPrize = null;
     this.cheatingDetected = false;
@@ -374,7 +354,7 @@ class UIManager {
   redirectToRegistration() {
     // Redirigir al mapa principal en la vista de preparación
     const searchParams = new URLSearchParams(window.location.search);
-    searchParams.set('view', 'prep');
+
     window.location.href = '../index.html?' + searchParams.toString();
   }
 
@@ -424,27 +404,15 @@ class UIManager {
       e.finalTotal.textContent = QUESTIONS.length.toString();
 
       if (allCorrect) {
-        const limiteAlcanzado = await checkLimiteBoletos();
-
-        if (limiteAlcanzado) {
-          e.finalTitle.textContent = '¡Felicidades, eres un experto! 🧠';
-          e.finalMsg.innerHTML = '<span style="color: #e6007a; font-weight: bold;">Lo sentimos, los boletos para esta sala se han agotado por hoy.</span><br>¡Vuelve a intentarlo mañana!';
-          e.retryRow.classList.remove('d-none');
-        } else {
-          const prize = this.prizeMgr.random();
-          this.currentPrize = prize;
-
-          e.finalTitle.textContent = '¡Felicidades!';
-          e.finalMsg.textContent = '¡Has completado esta estación!';
-          e.giftRow.classList.remove('d-none');
-        }
-        return;
+        e.finalTitle.textContent = '¡Felicidades!';
+        e.finalMsg.textContent = '¡Has completado esta estación con éxito!';
+        e.giftRow.classList.remove('d-none');
       } else {
         e.finalTitle.textContent = 'Buen intento 👀';
         e.finalMsg.textContent = 'Sigue explorando el museo.';
         e.retryRow.classList.remove('d-none');
-        return;
       }
+      return;
     }
 
     const q = QUESTIONS[s.idx];
@@ -547,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
       startQuizInDB();
       if (welcome) welcome.classList.add('hidden');
       if (quizShell) quizShell.classList.remove('hidden');
-      new UIManager({ elements, sound, confetti, prizeMgr });
+      new UIManager({ elements, sound, confetti });
     } catch (err) {
       console.error('No se pudo iniciar el quiz:', err);
     }

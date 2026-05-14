@@ -1,6 +1,7 @@
 /* =================== Datos de Configuración =================== */
 const params = new URLSearchParams(location.search);
-const SALA = params.get('sala') || 'desarrollo-sustentable';
+const SALA = params.get('sala') || 'biodiversidad';
+
 
 // 🛡️ BLINDAJE NIVEL DIOS: Guardar en memoria PERMANENTE
 const LUGAR_EN_URL = (params.get('lugar') || '').trim();
@@ -19,6 +20,11 @@ const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).
 let QUESTIONS = [];
 // 🔒 BANDERA DE SEGURIDAD (Evita dobles registros al dar clic rápido)
 let quizIniciando = false;
+
+class PrizeManager {
+  constructor() {}
+}
+
 
 /* ================================================================= */
 /* ==== SUPABASE: CONEXIÓN Y LÓGICA DE BASE DE DATOS =========== */
@@ -66,19 +72,6 @@ function getMexicoDateKey(date = new Date()) {
   return `${parts.year}-${parts.month}-${parts.day}`;
 }
 
-function buildPrizeFolio(prizeLabel = '') {
-  const text = String(prizeLabel || '').toLowerCase();
-  let prefix = 'MUCH';
-
-  if (text.includes('planetario')) {
-    prefix = 'PLAN';
-  } else if (text.includes('visita general') || text.includes('museo + planetario')) {
-    prefix = 'VGMP';
-  }
-
-  return `${prefix}-` + Math.random().toString(36).substring(2, 8).toUpperCase();
-}
-
 // Inicializa la librería
 async function initSupabase() {
   if (supabase) return supabase;
@@ -98,35 +91,34 @@ function getMexicoTime() {
 // 1. CARGAR PREGUNTAS DESDE ARCHIVO JSON
 // ------------------------------------------------------------
 async function loadPreguntas() {
+  console.log('[loadPreguntas] Iniciando carga...');
   try {
-    let bank;
+    let bank = [];
     
-    // Intentar cargar desde la variable global primero (preguntas-local.js)
-    if (window.MUCH_PREGUNTAS_BIODIVERSIDAD) {
+    // 1. Intentar Banco Local (preguntas-local.js) primero
+    if (window.MUCH_PREGUNTAS_BIODIVERSIDAD && Array.isArray(window.MUCH_PREGUNTAS_BIODIVERSIDAD)) {
       bank = window.MUCH_PREGUNTAS_BIODIVERSIDAD;
-      console.log('[loadPreguntas] Usando preguntas desde variable global');
+      console.log('[loadPreguntas] Usando banco local (preguntas-local.js). Total:', bank.length);
     } else {
-      // Fallback a fetch si no está disponible la variable global
-      const resp = await fetch('preguntas.json', { cache: 'no-store' });
-      if (!resp.ok) throw new Error('No se pudo cargar preguntas.json: ' + resp.status);
-      bank = await resp.json();
-    }
-
-    if (!Array.isArray(bank)) {
-      const keys = Object.keys(bank || {});
-      if (keys.length && bank[SALA]) {
-        bank = bank[SALA];
-      } else if (keys.length) {
-        const firstKey = keys.find(k => Array.isArray(bank[k]));
-        if (firstKey) bank = bank[firstKey];
+      console.log('[loadPreguntas] Banco local no detectado, intentando fetch...');
+      try {
+        const resp = await fetch('preguntas.json', { cache: 'no-store' });
+        if (resp.ok) {
+          bank = await resp.json();
+          console.log('[loadPreguntas] Fetch exitoso. Total:', bank.length);
+        }
+      } catch (fErr) {
+        console.warn('[loadPreguntas] Fetch falló (CORS o Red):', fErr);
       }
     }
 
-    if (!Array.isArray(bank) || bank.length === 0)
-      throw new Error('preguntas.json no contiene un array de preguntas');
+    if (!Array.isArray(bank) || bank.length === 0) {
+      console.error('[loadPreguntas] No se encontraron preguntas en ninguna fuente.');
+      throw new Error('Sin preguntas disponibles');
+    }
 
     const normalize = (it) => {
-      const text = it.text ?? it.pregunta ?? it.enunciado ?? 'Pregunta sin texto';
+      const text = it.text ?? it.pregunta ?? it.enunciado ?? '¿...?';
       const desc = it.desc ?? it.descripcion ?? '';
       let options = it.options ?? it.opciones ?? it.respuestas ?? [];
       let correctIndex = it.correctIndex ?? it.correcta_index;
@@ -142,38 +134,28 @@ async function loadPreguntas() {
         if (idx2 >= 0) correctIndex = idx2;
       }
 
-      if (correctIndex == null && (it.respuesta || it.respuesta_correcta)) {
-        const num = (it.respuesta ?? it.respuesta_correcta) - 1;
-        if (!Number.isNaN(num)) correctIndex = num;
-      }
-
       const points = it.points ?? it.puntos ?? 10;
-
-      if (!Array.isArray(options) || options.length === 0) {
-        options = ['(sin opciones)'];
-        correctIndex = 0;
-      }
-      if (correctIndex == null || correctIndex < 0 || correctIndex >= options.length) {
-        correctIndex = 0;
-      }
+      if (!Array.isArray(options) || options.length === 0) { options = ['(sin opciones)']; correctIndex = 0; }
+      if (correctIndex == null || correctIndex < 0 || correctIndex >= options.length) { correctIndex = 0; }
+      
       return { text, options, correctIndex, points, desc };
     };
 
-    const bySala = bank.filter(q =>
-      !q?.sala && !q?.sala_codigo ? true :
-        (q.sala === SALA || q.sala_codigo === SALA)
+    // Filtrar por sala si aplica
+    const filtered = bank.filter(q => 
+      !q?.sala && !q?.sala_codigo ? true : (q.sala === SALA || q.sala_codigo === SALA)
     );
 
-    const pool = bySala.length ? bySala : bank;
-    const normalized = pool.map(normalize);
-
-    QUESTIONS = shuffle(normalized).slice(0, NUM_QUESTIONS);
-    console.log('[loadPreguntas] JSON Cargado. Total preguntas:', QUESTIONS.length);
+    const pool = filtered.length ? filtered : bank;
+    QUESTIONS = shuffle(pool.map(normalize)).slice(0, NUM_QUESTIONS);
+    
+    console.log('[loadPreguntas] Finalizado. Preguntas seleccionadas:', QUESTIONS.length);
     return QUESTIONS;
   } catch (err) {
-    console.error(err);
-    alert('Error al cargar preguntas.json.\n' + err.message);
-    throw err;
+    console.error('[loadPreguntas] ERROR FATAL:', err);
+    // Banco de emergencia último recurso
+    QUESTIONS = [{ text: 'Error al cargar preguntas. Revisa la consola.', options: ['Reintentar'], correctIndex: 0, points: 0, desc: '' }];
+    return QUESTIONS;
   }
 }
 
@@ -261,42 +243,6 @@ async function endQuizInDB({ puntaje_total, num_correctas, num_preguntas }) {
   } catch (e) { console.warn('Error endQuizInDB:', e); }
 }
 
-// ------------------------------------------------------------
-// 🌟 NUEVO: FUNCIÓN PARA COMPROBAR LÍMITE DE BOLETOS DIARIOS
-// ------------------------------------------------------------
-async function checkLimiteBoletos() {
-  try {
-    await initSupabase();
-
-    const parts = getMexicoDateParts();
-    const fechaHoyStr = getMexicoDateKey();
-    const offset = normalizeOffset(parts.timeZoneName);
-
-    const inicioDia = `${fechaHoyStr}T00:00:00.000${offset}`;
-    const finDia = `${fechaHoyStr}T23:59:59.999${offset}`;
-
-    const { count, error } = await supabase
-      .from('quizzes')
-      .select('*', { count: 'exact', head: true })
-      .eq('sala_id', SALA_ENTRADA_ID)
-      .gte('finished_at', inicioDia)
-      .lte('finished_at', finDia)
-      .eq('num_correctas', NUM_QUESTIONS);
-
-    if (error) {
-      console.error("Error al checar límite de boletos:", error);
-      return false;
-    }
-
-    console.log(`Boletos entregados hoy en esta sala: ${count}`);
-    return count >= 3;
-
-  } catch (e) {
-    console.error("Excepción en checkLimiteBoletos:", e);
-    return false;
-  }
-}
-
 // Fallback Functions
 function startQuizLocal() {
   if (sessionStorage.getItem('much_quiz_start')) return;
@@ -358,17 +304,6 @@ class Confetti {
   }
 }
 
-class PrizeManager {
-  constructor() {
-    this.PRIZES = [
-      { key: 'museo', title: 'MUCH · Museo', label: 'Entrada al Museo MUCH', lugar: 'Museo Chiapas (MUCH)', emoji: '🏛️' },
-      { key: 'planetario', title: 'MUCH · Planetario', label: 'Entrada al Planetario MUCH', lugar: 'Planetario MUCH', emoji: '🔭' },
-      { key: 'general', title: 'MUCH · Visita General', label: 'Visita General (Museo + Planetario)', lugar: 'Museo y Planetario', emoji: '🌟' },
-    ];
-  }
-  random() { return this.PRIZES[Math.floor(Math.random() * this.PRIZES.length)]; }
-}
-
 class UIManager {
   constructor({ elements, sound, confetti, prizeMgr }) {
     this.e = elements; this.sound = sound; this.confetti = confetti; this.prizeMgr = prizeMgr;
@@ -426,7 +361,7 @@ class UIManager {
   redirectToRegistration() {
     // Redirigir al mapa principal en la vista de preparación
     const searchParams = new URLSearchParams(window.location.search);
-    searchParams.set('view', 'prep');
+
     window.location.href = '../index.html?' + searchParams.toString();
   }
 
@@ -476,27 +411,15 @@ class UIManager {
       e.finalTotal.textContent = QUESTIONS.length.toString();
 
       if (allCorrect) {
-        const limiteAlcanzado = await checkLimiteBoletos();
-
-        if (limiteAlcanzado) {
-          e.finalTitle.textContent = '¡Felicidades, eres un experto! 🧠';
-          e.finalMsg.innerHTML = '<span style="color: #e6007a; font-weight: bold;">Lo sentimos, los boletos para esta sala se han agotado por hoy.</span><br>¡Vuelve a intentarlo mañana!';
-          e.retryRow.classList.remove('d-none');
-        } else {
-          const prize = this.prizeMgr.random();
-          this.currentPrize = prize;
-
-          e.finalTitle.textContent = '¡Felicidades!';
-          e.finalMsg.textContent = '¡Has completado esta estación!';
-          e.giftRow.classList.remove('d-none');
-        }
-        return;
+        e.finalTitle.textContent = '¡Felicidades!';
+        e.finalMsg.textContent = '¡Has completado esta estación con éxito!';
+        e.giftRow.classList.remove('d-none');
       } else {
         e.finalTitle.textContent = 'Buen intento 👀';
         e.finalMsg.textContent = 'Sigue explorando el museo.';
         e.retryRow.classList.remove('d-none');
-        return;
       }
+      return;
     }
 
     const q = QUESTIONS[s.idx];

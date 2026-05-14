@@ -387,7 +387,7 @@
       <img src="logo-much.png" alt="MUCH" class="portada-much-logo">
 
       <h1 class="portada-title">SPINOSAURUS<br>RUNNER</h1>
-      <p class="portada-sub">Salta los cactus, acumula puntos y ¡reclama tu premio! 🦕</p>
+      <p class="portada-sub">Salta los cactus, acumula puntos y demuestra tu habilidad 🦖</p>
 
       <button id="btnJugarPortada" class="btn-play-portada">Jugar ahora 🦕</button>
 
@@ -457,7 +457,7 @@
     document.getElementById('btnReturnToMap').addEventListener('click', function(e) {
       e.preventDefault();
       const searchParams = new URLSearchParams(window.location.search);
-      searchParams.set('view', 'prep');
+
       window.location.href = '../index.html?' + searchParams.toString();
     });
 

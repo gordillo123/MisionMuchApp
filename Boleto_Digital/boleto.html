@@ -338,7 +338,7 @@
     <div class="actions">
       <button id="btnShareImage" class="btn btn-whatsapp">📤 Compartir Boleto (Imagen)</button>
       <button class="btn btn-print" onclick="window.print()">🖨️ Imprimir</button>
-      <a class="btn btn-link" href="index.html">🏠 Inicio</a>
+      <a class="btn btn-link" href="../index.html">🏠 Inicio</a>
     </div>
   </div>
 
@@ -377,10 +377,10 @@
         // Detectamos si es local o producción para crear el link correcto
         const isLocal = window.location.href.includes('localhost') || window.location.href.includes('127.0.0.1');
 
-        // AJUSTA '/entrada-much' si tu carpeta local tiene otro nombre
+        // AJUSTA '/Boleto_Digital'
         const baseUrl = isLocal
-          ? window.location.origin + '/entrada-much'
-          : 'https://glesantonio4.github.io/entrada-much';
+          ? window.location.origin + '/Boleto_Digital'
+          : 'https://gordillo123.github.io/MisionMuchApp/Boleto_Digital';
 
         // Link final que leerá el guardia
         const validationUrl = `${baseUrl}/validar.html?folio=${folio}`;
