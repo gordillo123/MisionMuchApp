@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sbeel Dinosaurios - Rompecabezas</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts para una tipografía moderna y amigable -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <button id="btn-back" class="btn-back-map" title="Volver al Mapa">← Volver</button>
+        <header>
+            <h1>Sbeel Dinosaurios</h1>
+            <p class="intro">Ordena las piezas para completar la imagen jurásica.</p>
+        </header>
+
+        <main>
+            <!-- Contenedor del rompecabezas -->
+            <div id="puzzle-board" class="puzzle-board">
+                <!-- Las piezas se generarán dinámicamente con JavaScript -->
+            </div>
+
+            <div class="controls">
+                <button id="reset-btn" class="btn">Mezclar piezas</button>
+            </div>
+        </main>
+
+        <!-- Mensaje de éxito (oculto por defecto) -->
+        <div id="success-modal" class="modal">
+            <div class="modal-content">
+                <h2>¡Increíble!</h2>
+                <p>Has completado el rompecabezas con éxito. ¡Eres un experto paleontólogo!</p>
+                <button id="close-modal" class="btn">Jugar de nuevo</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
