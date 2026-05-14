@@ -20,6 +20,27 @@ const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).
 let QUESTIONS = [];
 // 🔒 BANDERA DE SEGURIDAD (Evita dobles registros al dar clic rápido)
 let quizIniciando = false;
+const PASS_THRESHOLD = 7;
+const STATION_ID = '3';
+
+function getStationStatus() {
+  try {
+    return JSON.parse(localStorage.getItem('much_station_status') || '{}');
+  } catch (e) {
+    return {};
+  }
+}
+
+function setStationCompleted(stationId) {
+  const status = getStationStatus();
+  status[stationId] = true;
+  localStorage.setItem('much_station_status', JSON.stringify(status));
+}
+
+function isStationCompleted(stationId) {
+  const status = getStationStatus();
+  return Boolean(status[stationId]);
+}
 
 class PrizeManager {
   constructor() {}
@@ -391,7 +412,7 @@ class UIManager {
       e.giftRow.classList.add('d-none');
       e.retryRow.classList.add('d-none');
 
-      const allCorrect = s.correct === QUESTIONS.length;
+      const passed = s.correct >= PASS_THRESHOLD;
       const puntajeFinal = s.correct * 10;
 
       saveQuizResultLocal({
@@ -410,14 +431,20 @@ class UIManager {
       e.finalCorrect.textContent = s.correct.toString();
       e.finalTotal.textContent = QUESTIONS.length.toString();
 
-      if (allCorrect) {
-        e.finalTitle.textContent = '¡Felicidades!';
-        e.finalMsg.textContent = '¡Has completado esta estación con éxito!';
+      if (passed) {
+        setStationCompleted(STATION_ID);
+        e.finalTitle.textContent = '¡Estación completada!';
+        e.finalMsg.textContent = `¡Has completado esta estación con ${s.correct} respuestas correctas! ✅`;
         e.giftRow.classList.remove('d-none');
+        e.retryRow.classList.add('d-none');
       } else {
-        e.finalTitle.textContent = 'Buen intento 👀';
-        e.finalMsg.textContent = 'Sigue explorando el museo.';
+        e.finalTitle.textContent = 'No alcanzaste la meta';
+        e.finalMsg.textContent = 'Tienes menos de 7 respuestas correctas. El juego se reiniciará.';
+        e.giftRow.classList.add('d-none');
         e.retryRow.classList.remove('d-none');
+        setTimeout(() => {
+          location.reload();
+        }, 2500);
       }
       return;
     }

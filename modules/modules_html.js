@@ -164,8 +164,9 @@ window.APP_MODULES = {
           <div id="mapAvatarImgCont" style="width: 100%; height: 100%;"></div>
         </div>
       </div>
-      <div style="display: flex; justify-content: center; margin-top: 1.5rem;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem; margin-top: 1.5rem;">
         <button class="btn-play large" id="btnComenzar" style="width: max-content; min-width: 280px;">🚀 ¡COMENZAR!</button>
+        <button class="btn-reset btn-reset-dynamic" id="btnResetStations" type="button">🔄 Reiniciar juego y estaciones</button>
       </div>
     </div>
   </div>

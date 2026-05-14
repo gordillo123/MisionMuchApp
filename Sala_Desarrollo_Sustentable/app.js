@@ -12,6 +12,8 @@ if (LUGAR_EN_URL) {
 const LUGAR_QR = LUGAR_EN_URL || 'Sin Especificar';
 
 const NUM_QUESTIONS = 10;
+const PASS_THRESHOLD = 7;
+const STATION_ID = '5';
 // Función para mezclar arrays
 const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
 
@@ -19,6 +21,20 @@ const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).
 let QUESTIONS = [];
 // 🔒 BANDERA DE SEGURIDAD (Evita dobles registros al dar clic rápido)
 let quizIniciando = false;
+
+function getStationStatus() {
+  try {
+    return JSON.parse(localStorage.getItem('much_station_status') || '{}');
+  } catch (e) {
+    return {};
+  }
+}
+
+function setStationCompleted(stationId) {
+  const status = getStationStatus();
+  status[stationId] = true;
+  localStorage.setItem('much_station_status', JSON.stringify(status));
+}
 
 // 🎁 Clase dummy para mantener compatibilidad con el constructor de UIManager
 class PrizeManager {
@@ -430,14 +446,20 @@ class UIManager {
       e.finalCorrect.textContent = s.correct.toString();
       e.finalTotal.textContent = QUESTIONS.length.toString();
 
-      if (allCorrect) {
-        e.finalTitle.textContent = '¡Felicidades!';
-        e.finalMsg.textContent = '¡Has completado esta estación con éxito!';
+      const passed = s.correct >= PASS_THRESHOLD;
+      if (passed) {
+        setStationCompleted(STATION_ID);
+        e.finalTitle.textContent = '¡Estación completada!';
+        e.finalMsg.textContent = `¡Has completado esta estación con ${s.correct} respuestas correctas! ✅`;
         e.giftRow.classList.remove('d-none');
       } else {
-        e.finalTitle.textContent = 'Buen intento 👀';
-        e.finalMsg.textContent = 'Sigue explorando el museo.';
+        e.finalTitle.textContent = 'No alcanzaste la meta';
+        e.finalMsg.textContent = 'Tienes menos de 7 respuestas correctas. El juego se reiniciará.';
+        e.giftRow.classList.add('d-none');
         e.retryRow.classList.remove('d-none');
+        setTimeout(() => {
+          location.reload();
+        }, 2500);
       }
       return;
     }

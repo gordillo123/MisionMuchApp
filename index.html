@@ -579,6 +579,70 @@
         inset 0 2px 0px rgba(255,255,255,0.5);
     }
 
+    .btn-reset {
+      background: linear-gradient(135deg, #2dd4bf 0%, #38bdf8 100%);
+      border: none;
+      border-radius: 999px;
+      padding: 0.95rem 1.35rem;
+      color: white;
+      font-weight: 800;
+      font-size: 0.98rem;
+      cursor: pointer;
+      box-shadow:
+        0 10px 25px rgba(14, 165, 233, 0.22),
+        inset 0 1px 0 rgba(255,255,255,0.25);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      width: 100%;
+      max-width: 280px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-reset::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.35), transparent 35%);
+      opacity: 0.7;
+      transform: scale(0.8);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .btn-reset:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 14px 28px rgba(14, 165, 233, 0.28),
+        inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+
+    .btn-reset:hover::after {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+
+    .btn-reset:active {
+      transform: translateY(2px);
+      box-shadow:
+        0 6px 10px rgba(14, 165, 233, 0.20),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    .btn-reset-dynamic {
+      animation: btnPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes btnPulse {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
     .mobile-play-note {
       font-size: 0.85rem;
       color: #94a3b8;
@@ -1271,6 +1335,14 @@
       color: white;
       border-color: white;
       box-shadow: 0 0 20px var(--msf-pink);
+    }
+
+    .map-marker.completed {
+      background: var(--msf-green);
+      color: white;
+      border-color: var(--msf-green);
+      pointer-events: none;
+      box-shadow: 0 0 18px rgba(34, 197, 94, 0.7);
     }
 
     .map-avatar {
@@ -2676,7 +2748,38 @@
         }
       }
 
+      function getStationStatus() {
+        try {
+          return JSON.parse(localStorage.getItem('much_station_status') || '{}');
+        } catch (e) {
+          return {};
+        }
+      }
+
+      function isStationCompleted(stationId) {
+        const status = getStationStatus();
+        return Boolean(status[stationId]);
+      }
+
+      function setStationCompleted(stationId) {
+        const status = getStationStatus();
+        status[stationId] = true;
+        localStorage.setItem('much_station_status', JSON.stringify(status));
+        applyStationStatus();
+      }
+
+      function applyStationStatus() {
+        const status = getStationStatus();
+        document.querySelectorAll('.map-marker').forEach(marker => {
+          const id = marker.dataset.station;
+          const completed = Boolean(status[id]);
+          marker.classList.toggle('completed', completed);
+          marker.textContent = completed ? '✓' : id;
+        });
+      }
+
       checkStatePersistence();
+      applyStationStatus();
 
       // 5. Lógica de Movimiento en el Mapa
       const stations = {
@@ -2708,11 +2811,29 @@
       // Permitir click en marcadores para probar movimiento
       document.querySelectorAll('.map-marker').forEach(marker => {
         marker.onclick = () => {
+          if (marker.classList.contains('completed')) return;
           moveToStation(marker.dataset.station);
         };
       });
 
+      const resetBtn = document.getElementById('btnResetStations');
+      if (resetBtn) {
+        resetBtn.onclick = () => {
+          localStorage.removeItem('much_station_status');
+          currentStation = '3';
+          localStorage.setItem('much_current_station', currentStation);
+          moveToStation(currentStation);
+          applyStationStatus();
+          alert('Juego reiniciado. Todas las estaciones están habilitadas de nuevo.');
+        };
+      }
+
       document.getElementById('btnComenzar').onclick = () => {
+        if (isStationCompleted(currentStation)) {
+          alert('Esta estación ya fue completada. Elige otra estación.');
+          return;
+        }
+
         if (currentStation === '2') {
           window.location.href = 'Juego_Spinosaurio/index.html';
           return;
@@ -2724,6 +2845,9 @@
           return;
         } else if (currentStation === '5') {
           window.location.href = 'Sala_Desarrollo_Sustentable/index.html?from=portada&sala=desarrollo-sustentable';
+          return;
+        } else if (currentStation === '6') {
+          window.location.href = 'Sala_T-Rex/index.html?from=portada&sala=trex';
           return;
         }
 
