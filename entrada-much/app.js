@@ -597,11 +597,48 @@ const elements = {
 const sound = new SoundFX(elements.soundToggle || null);
 const confetti = new Confetti(document.getElementById('confetti'));
 
+// === INICIALIZAR MINI-MAPA ===
+function initMiniMap() {
+  const miniMapAvatar = document.getElementById('miniMapAvatar');
+  const miniMapAvatarImg = document.getElementById('miniMapAvatarImg');
+  if (!miniMapAvatar || !miniMapAvatarImg) return;
+
+  // 1. Obtener Avatar
+  const savedAvatar = JSON.parse(localStorage.getItem('much_selected_avatar') || '{}');
+  if (savedAvatar && savedAvatar.id) {
+    miniMapAvatarImg.src = `../avatars/${savedAvatar.id}.png`;
+  } else {
+    miniMapAvatarImg.src = `../avatars/dino1.png`; // Fallback
+  }
+
+  // 2. Obtener Estación Actual
+  const stations = {
+    '1': { x: 80, y: 18 },
+    '2': { x: 56, y: 42 },
+    '3': { x: 21, y: 24 },
+    '4': { x: 10, y: 44 },
+    '5': { x: 30, y: 43 },
+    '6': { x: 42, y: 66 }
+  };
+
+  // Identificar sala actual para forzar la posición correcta
+  let currentStationId = '1'; // Entrada es Estación 1
+  
+  const pos = stations[currentStationId];
+  if (pos) {
+    miniMapAvatar.style.left = `${pos.x}%`;
+    miniMapAvatar.style.top = `${pos.y}%`;
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const welcome = document.getElementById('welcome');
   const quizShell = document.getElementById('quizShell');
   const startBtn = document.getElementById('startBtn');
   const prizeMgr = new PrizeManager();
+
+  // Inicializar Mini-Mapa
+  initMiniMap();
 
   const start = async () => {
     try {

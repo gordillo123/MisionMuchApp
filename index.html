@@ -2456,7 +2456,7 @@
       scoresOverlay.onclick = (e) => { if (e.target === scoresOverlay) scoresOverlay.classList.remove('open'); };
 
       // 4. Login, Modal & Filtros
-      let selectedAvatar = null;
+      selectedAvatar = null;
       let googleUser = null;
       const GOOGLE_CLIENT_ID = 'TU_CLIENT_ID_DE_GOOGLE.apps.googleusercontent.com';
       const loginOverlay = document.getElementById('loginOverlay');
@@ -2559,12 +2559,8 @@
           setTimeout(() => moveToStation(currentStation || 3), 500);
           return;
         }
-        if (googleUser) {
-          openAvatarSelection();
-          return;
-        }
-        const lOverlay = document.getElementById('loginOverlay');
-        if (lOverlay) lOverlay.classList.add('open');
+        // Si no hay avatar seleccionado, mostramos la selección de avatares directamente
+        openAvatarSelection();
       };
       loginOverlay.onclick = (e) => { if (e.target === loginOverlay) loginOverlay.classList.remove('open'); };
       overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('open'); };
