@@ -2270,6 +2270,11 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      // Limpiar sesión temporal para que pida login al refrescar (Modo Prueba)
+      localStorage.removeItem('much_google_user');
+      localStorage.removeItem('much_selected_avatar');
+      localStorage.removeItem('much_current_view');
+
       includeHTML();
 
       // 1. Partículas
@@ -2513,7 +2518,7 @@
 
       // 4. Login, Modal & Filtros
       selectedAvatar = null;
-      let googleUser = null;
+      let googleUser = null; 
       const GOOGLE_CLIENT_ID = 'TU_CLIENT_ID_DE_GOOGLE.apps.googleusercontent.com';
       const loginOverlay = document.getElementById('loginOverlay');
       const overlay = document.getElementById('avatarOverlay');
@@ -2583,6 +2588,41 @@
 
       initGoogleLogin();
 
+      // Lógica para alternar entre login y registro (solo visual para la prueba)
+      let isRegisterMode = false;
+      function toggleLoginMode(e) {
+        if (e) e.preventDefault();
+        isRegisterMode = !isRegisterMode;
+        
+        const title = document.getElementById('loginTitle');
+        const copy = document.getElementById('loginCopy');
+        const btnText = document.getElementById('btnGoogleText');
+        const toggleText = document.getElementById('loginToggleText');
+        const toggleLink = document.getElementById('btnToggleLogin');
+
+        if (isRegisterMode) {
+          title.innerText = 'Regístrate con Google';
+          copy.innerText = 'Crea tu cuenta de explorador en segundos usando Google.';
+          btnText.innerText = 'Registrarse con Google';
+          toggleText.innerText = '¿Ya tienes cuenta?';
+          toggleLink.innerText = 'Inicia sesión aquí';
+        } else {
+          title.innerText = 'Entra con Google';
+          copy.innerText = 'Para guardar tu avance en la misión, inicia sesión con tu cuenta de Google.';
+          btnText.innerText = 'Continuar con Google';
+          toggleText.innerText = '¿No tienes cuenta?';
+          toggleLink.innerText = 'Registrarse aquí';
+        }
+      }
+
+      // El botón de toggle puede no estar cargado aún si includeHTML es asíncrono
+      // pero en este caso includeHTML se llama justo antes de registrar eventos
+      // y asumiendo que los módulos ya están cargados en APP_MODULES.
+      setTimeout(() => {
+        const toggleBtn = document.getElementById('btnToggleLogin');
+        if (toggleBtn) toggleBtn.onclick = toggleLoginMode;
+      }, 500);
+
       function showView(viewId) {
         document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
         const target = document.getElementById(viewId);
@@ -2610,14 +2650,23 @@
       }
 
       window.startGameFlow = () => {
-        if (selectedAvatar) {
-          showView('viewPrep');
-          setTimeout(() => moveToStation(currentStation || 3), 500);
+        // 1. Si no hay sesión de Google, pedir login (Prioridad máxima)
+        if (!googleUser) {
+          loginOverlay.classList.add('open');
           return;
         }
-        // Si no hay avatar seleccionado, mostramos la selección de avatares directamente
-        openAvatarSelection();
+
+        // 2. Si ya hay Google pero no hay avatar, pedir avatar
+        if (!selectedAvatar) {
+          openAvatarSelection();
+          return;
+        }
+
+        // 3. Si ya hay ambos, ir al mapa directamente
+        showView('viewPrep');
+        setTimeout(() => moveToStation(currentStation || 3), 500);
       };
+
       loginOverlay.onclick = (e) => { if (e.target === loginOverlay) loginOverlay.classList.remove('open'); };
       overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('open'); };
 
