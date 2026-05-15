@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MISIÓN MUSEO — El Juego</title>
+  <title>MISIÓN MUCH — El Juego</title>
   <meta name="description"
-    content="MISIÓN MUSEO: Un emocionante juego de preguntas sobre diversidad, dinosaurios, animales, ciencia y tecnología." />
+    content="MISIÓN MUCH: Un emocionante juego de preguntas sobre diversidad, dinosaurios, animales, ciencia y tecnología." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -14,7 +14,7 @@
     rel="stylesheet" />
   <style>
     /* ────────────────────────────────────────────────
-       MISIÓN MUSEO — STYLES (TODO EN UNO)
+       MISIÓN MUCH — STYLES (TODO EN UNO)
     ────────────────────────────────────────────────── */
     :root {
       --msf-red: #F23F3A;
@@ -630,6 +630,62 @@
       color: #E2C288;
       box-shadow: 0 0 20px rgba(226, 194, 136, 0.2);
     }
+
+    /* THEMATIC CATEGORY COLORS (NEON GLOW PERMANENT) */
+    .badge.node-1 { 
+      border-color: var(--msf-green); 
+      color: #00ffbf; 
+      box-shadow: 0 0 15px rgba(0, 180, 135, 0.3);
+    }
+    .badge.node-1.active { 
+      background: rgba(0, 180, 135, 0.2);
+      box-shadow: 0 0 25px rgba(0, 180, 135, 0.6); 
+    }
+    .badge.node-1:hover { background: rgba(0, 180, 135, 0.1); box-shadow: 0 0 20px rgba(0, 180, 135, 0.5); }
+
+    .badge.node-2 { 
+      border-color: var(--msf-pink); 
+      color: #ff9ecb; 
+      box-shadow: 0 0 15px rgba(255, 118, 180, 0.3);
+    }
+    .badge.node-2.active { 
+      background: rgba(255, 118, 180, 0.2);
+      box-shadow: 0 0 25px rgba(255, 118, 180, 0.6); 
+    }
+    .badge.node-2:hover { background: rgba(255, 118, 180, 0.1); box-shadow: 0 0 20px rgba(255, 118, 180, 0.5); }
+
+    .badge.node-3 { 
+      border-color: var(--msf-purple); 
+      color: #a08eff; 
+      box-shadow: 0 0 15px rgba(119, 90, 255, 0.3);
+    }
+    .badge.node-3.active { 
+      background: rgba(119, 90, 255, 0.2);
+      box-shadow: 0 0 25px rgba(119, 90, 255, 0.6); 
+    }
+    .badge.node-3:hover { background: rgba(119, 90, 255, 0.1); box-shadow: 0 0 20px rgba(119, 90, 255, 0.5); }
+
+    .badge.node-4 { 
+      border-color: var(--msf-blue); 
+      color: #9de4ff; 
+      box-shadow: 0 0 15px rgba(109, 208, 240, 0.3);
+    }
+    .badge.node-4.active { 
+      background: rgba(109, 208, 240, 0.2);
+      box-shadow: 0 0 25px rgba(109, 208, 240, 0.6); 
+    }
+    .badge.node-4:hover { background: rgba(109, 208, 240, 0.1); box-shadow: 0 0 20px rgba(109, 208, 240, 0.5); }
+
+    .badge.node-5 { 
+      border-color: var(--msf-yellow); 
+      color: #ffe0a3; 
+      box-shadow: 0 0 15px rgba(255, 197, 73, 0.3);
+    }
+    .badge.node-5.active { 
+      background: rgba(255, 197, 73, 0.2);
+      box-shadow: 0 0 25px rgba(255, 197, 73, 0.6); 
+    }
+    .badge.node-5:hover { background: rgba(255, 197, 73, 0.1); box-shadow: 0 0 20px rgba(255, 197, 73, 0.5); }
 
     @media (max-width: 768px) {
       .hero-badges {
@@ -2173,7 +2229,7 @@
   <script type="module" src="./supabase-utils.js"></script>
   <script>
     /* ────────────────────────────────────────────────
-       MISIÓN MUSEO — LOGIC (TODO EN UNO)
+       MISIÓN MUCH — LOGIC (TODO EN UNO)
     ────────────────────────────────────────────────── */
     const avatars = [
       { id: 'humano1', name: 'Explorador', cat: 'human' },

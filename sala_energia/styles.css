@@ -126,6 +126,66 @@ body {
   font-weight: 600;
 }
 
+/* Premium Back Button Styles */
+.btn-back-premium {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #ffffff;
+  border: 1.5px solid #e5e7eb;
+  padding: 5px 16px;
+  border-radius: 99px;
+  color: #4b5563;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  outline: none;
+  height: 38px;
+  white-space: nowrap;
+}
+
+.btn-back-premium:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  color: #1f2937;
+}
+
+.back-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid #e5e7eb;
+  position: relative;
+  flex-shrink: 0;
+  color: #6b7280;
+}
+
+.back-icon-wrapper svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  margin-top: -4px;
+}
+
+.back-icon-label {
+  position: absolute;
+  font-size: 6px;
+  font-weight: 900;
+  text-transform: uppercase;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  letter-spacing: 0.2px;
+}
+
 .sala-pill {
   background: #eff6ff;
   color: var(--azul-600);

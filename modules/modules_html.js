@@ -1,5 +1,5 @@
 /**
- * MISIÓN MUSEO - HTML Modules Library
+ * MISIÓN MUCH - HTML Modules Library
  * This file contains all the HTML components as strings to bypass CORS issues 
  * when viewing the project directly via file:// protocol.
  */
@@ -9,7 +9,7 @@ window.APP_MODULES = {
 <nav class="top-nav">
   <div class="nav-container">
     <a href="#" class="nav-brand">
-      <span class="nav-brand-text">MISIÓN MUSEO</span>
+      <span class="nav-brand-text">MISIÓN MUCH</span>
     </a>
     <div class="nav-links">
       <a href="#" class="nav-btn active" id="btnInicio">
@@ -39,7 +39,7 @@ window.APP_MODULES = {
     
     <div class="hero-glass">
       <div class="hero-logo-badge">
-        <img src="avatars/dino1.png" alt="Dinosaurio Misión Museo" class="logo-dino-img" />
+        <img src="avatars/dino1.png" alt="Dinosaurio Misión MUCH" class="logo-dino-img" />
         <div class="pedestal">
           <div class="pedestal-glow"></div>
         </div>
@@ -47,7 +47,7 @@ window.APP_MODULES = {
 
       <h1 class="hero-title">
         <span class="animal-deco animal-left">🦋</span> MISIÓN <span class="animal-deco animal-right">🦖</span><br/>
-        <span class="animal-deco animal-left2">🐙</span> MUSEO <span class="animal-deco animal-right2">🦜</span>
+        <span class="animal-deco animal-left2">🐙</span> MUCH <span class="animal-deco animal-right2">🦜</span>
       </h1>
       <p class="hero-subtitle">Descubre dinosaurios, animales y tecnología<br/>¡Demuestra cuánto sabes!</p>
       <div class="hero-play-mobile">
@@ -180,7 +180,7 @@ window.APP_MODULES = {
       <img src="avatars/dino1.png" class="profile-avatar-img" id="profAvatarImg">
     </div>
     <h2 class="profile-name" id="profName">Explorador</h2>
-    <p style="color: #A0A4B8;" id="profEmail">invitado@misionmuseo.com</p>
+    <p style="color: #A0A4B8;" id="profEmail">invitado@misionmuch.com</p>
   </div>
 
   <div class="profile-stats">
