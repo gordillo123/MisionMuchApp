@@ -347,16 +347,16 @@
         display: none;
         position: fixed;
         top: 0.85rem;
-        left: 1.5rem;
         right: 4.8rem;
+        width: 220px;
         height: 42px;
         background: rgba(26, 28, 44, 0.96);
         border: 2px solid rgba(255, 255, 255, 0.12);
         border-radius: 12px;
         flex-direction: row;
         align-items: center;
-        justify-content: space-around;
-        padding: 0 0.5rem;
+        justify-content: space-evenly;
+        padding: 0 0.25rem;
         z-index: 1000;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
       }
@@ -378,26 +378,29 @@
       }
       
       .nav-btn {
+        display: flex;
         flex-direction: row;
         align-items: center;
-        gap: 0.35rem;
-        background: none;
-        border: none;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         color: #a0a4b8;
-        font-size: 0.85rem;
-        font-weight: 700;
-        padding: 0.2rem 0.4rem;
+        width: 32px;
+        height: 32px;
         border-radius: 8px;
         transition: all 0.2s;
+        padding: 0;
       }
       
       .nav-btn .nav-icon {
-        font-size: 1.05rem;
+        font-size: 1.15rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
       
       .nav-btn .nav-label {
-        font-size: 0.8rem;
-        font-weight: 700;
+        display: none !important;
       }
       
       .nav-links .nav-avatar {
