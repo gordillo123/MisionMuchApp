@@ -214,12 +214,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     closeModalBtn.addEventListener('click', () => {
-        successModal.classList.remove('show');
-        shufflePieces();
-        renderBoard();
-        resetTimer();
-        startTimer();
+        window.location.href = '../index.html?view=prep';
     });
+
+    const retryModalBtn = document.getElementById('retry-modal-btn');
+    if (retryModalBtn) {
+        retryModalBtn.addEventListener('click', () => {
+            successModal.classList.remove('show');
+            shufflePieces();
+            renderBoard();
+            resetTimer();
+            startTimer();
+        });
+    }
 
     backBtn.addEventListener('click', () => {
         window.location.href = '../index.html?view=prep';

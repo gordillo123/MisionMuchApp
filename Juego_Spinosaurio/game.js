@@ -397,7 +397,7 @@ async function validarQuiz() {
   }
 
   if (Number(sel.value) === quizAnswerIndex) {
-    msg.textContent = "¡Correcto! Has completado esta estación. Puedes continuar explorando las demás. 🦖"; 
+    msg.textContent = "¡Felicidades! ¡Correcto! Has completado esta estación con éxito y tu avatar avanzó a la siguiente estación. 🦖"; 
     msg.className = "quiz-msg ok";
 
     navigatingToRegistro = true; 
@@ -407,9 +407,9 @@ async function validarQuiz() {
     var inputs = document.querySelectorAll('input[name="q1"]');
     inputs.forEach(inp => inp.disabled = true);
 
-    if (score >= WIN_SCORE) {
-      markStationCompleted();
-    }
+    // Marcar completado y avanzar avatar
+    markStationCompleted();
+    localStorage.setItem('much_current_station', '3');
 
     await registrarQuizEnSupabase(Number(score));
 

@@ -38,12 +38,6 @@ window.APP_MODULES = {
   <div class="hero">
     
     <div class="hero-glass">
-      <div class="hero-logo-badge">
-        <img src="avatars/dino1.png" alt="Dinosaurio Misión MUCH" class="logo-dino-img" />
-        <div class="pedestal">
-          <div class="pedestal-glow"></div>
-        </div>
-      </div>
 
       <h1 class="hero-title">
         <span class="animal-deco animal-left">🦋</span> MISIÓN <span class="animal-deco animal-right">🦖</span><br/>
@@ -164,8 +158,11 @@ window.APP_MODULES = {
           <div id="mapAvatarImgCont" style="width: 100%; height: 100%;"></div>
         </div>
       </div>
-      <div style="display: flex; justify-content: center; margin-top: 1.5rem;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem; margin-top: 1.5rem;">
         <button class="btn-play large" id="btnComenzar" style="width: max-content; min-width: 280px;">🚀 ¡COMENZAR!</button>
+        <button id="btnResetProgress" style="background: transparent; border: 2px dashed rgba(255,255,255,0.25); color: #A0A4B8; padding: 6px 16px; border-radius: 20px; font-family: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 5px;">
+          <span>🔄</span> Reiniciar Estaciones
+        </button>
       </div>
     </div>
   </div>
@@ -196,7 +193,7 @@ window.APP_MODULES = {
 
   <div class="profile-actions">
     <button class="btn-profile-action btn-profile-primary" id="btnCambiarAvatar">Cambiar Avatar</button>
-    <button class="btn-profile-action" onclick="location.reload()">Cerrar Sesión</button>
+    <button class="btn-profile-action" onclick="localStorage.clear(); location.reload();">Cerrar Sesión</button>
   </div>
 </div>
   `,

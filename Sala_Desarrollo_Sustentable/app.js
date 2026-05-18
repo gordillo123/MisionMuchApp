@@ -331,6 +331,7 @@ class UIManager {
     this.currentPrize = null;
     this.cheatingDetected = false;
 
+    if (this.e.nextBtn) this.e.nextBtn.classList.add('d-none');
     if (this.e.pillSala) this.e.pillSala.textContent = `Sala: ${SALA}`;
     if (this.e.qTotal) this.e.qTotal.textContent = QUESTIONS.length.toString();
     this.bind();
@@ -359,6 +360,7 @@ class UIManager {
     this.e.nextBtn.textContent = '❌ Reintentar';
     this.e.nextBtn.classList.remove('btn-primary');
     this.e.nextBtn.classList.add('btn-danger');
+    if (this.e.nextBtn) this.e.nextBtn.classList.remove('d-none');
     this.sound.wrong();
   }
 
@@ -411,7 +413,7 @@ class UIManager {
       e.giftRow.classList.add('d-none');
       e.retryRow.classList.add('d-none');
 
-      const allCorrect = s.correct === QUESTIONS.length;
+      const isPassed = s.correct >= 7; // 70% or more
       const puntajeFinal = s.correct * 10;
 
       saveQuizResultLocal({
@@ -430,13 +432,21 @@ class UIManager {
       e.finalCorrect.textContent = s.correct.toString();
       e.finalTotal.textContent = QUESTIONS.length.toString();
 
-      if (allCorrect) {
-        e.finalTitle.textContent = '¡Felicidades!';
-        e.finalMsg.textContent = '¡Has completado esta estación con éxito!';
+      if (isPassed) {
+        e.finalTitle.textContent = '¡Felicidades! 🎉';
+        e.finalMsg.textContent = `¡Estación completada con éxito! Lograste un ${Math.round(s.correct / QUESTIONS.length * 100)}% de respuestas correctas. Tu avatar ha avanzado a la siguiente estación.`;
         e.giftRow.classList.remove('d-none');
+        e.retryRow.classList.add('d-none');
+
+        // Avanzar avatar en el mapa
+        localStorage.setItem('much_current_station', '6');
+        let completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
+        completed['5'] = true;
+        localStorage.setItem('much_completed_stations', JSON.stringify(completed));
       } else {
         e.finalTitle.textContent = 'Buen intento 👀';
-        e.finalMsg.textContent = 'Sigue explorando el museo.';
+        e.finalMsg.textContent = `Lograste un ${Math.round(s.correct / QUESTIONS.length * 100)}%. Necesitas al menos 70% de aciertos para completar la estación y avanzar.`;
+        e.giftRow.classList.add('d-none');
         e.retryRow.classList.remove('d-none');
       }
       return;
@@ -485,6 +495,14 @@ class UIManager {
       this.sound.wrong();
     }
     s.answers.push({ qIndex: s.idx, question: q.text, choice: q.options[i], correct: i === correctIdx });
+
+    // Auto-advance after 3 seconds (3000ms)
+    setTimeout(() => {
+      if (!this.cheatingDetected) {
+        s.idx += 1;
+        this.render();
+      }
+    }, 3000);
   }
 
   next() {

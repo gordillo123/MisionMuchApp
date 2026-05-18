@@ -33,9 +33,10 @@ body {
 }
 
 #quizShell {
-  width: 100%;
-  max-width: 500px;
+  width: 95%;
+  max-width: 1400px;
   padding: 1rem;
+  margin: auto;
 }
 
 .quiz-card {
@@ -389,6 +390,84 @@ body {
   .mini-map-avatar {
     width: 22px;
     height: 22px;
+  }
+}
+
+/* === HORIZONTAL MOBILE RESPONSIVENESS (LANDSCAPE) === */
+@media (max-width: 480px) {
+  .controls-row {
+    flex-wrap: wrap;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+  .sala-pill {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    font-size: 0.8rem;
+  }
+  .btn-back-premium {
+    font-size: 0.8rem;
+    padding: 5px 12px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  body {
+    padding: 0.5rem;
+  }
+  .quiz-card {
+    padding: 1rem;
+    border-radius: 20px;
+  }
+  .header-section {
+    margin-bottom: 0.5rem !important;
+  }
+  .app-title {
+    font-size: 1.1rem;
+  }
+  .app-subtitle {
+    font-size: 0.75rem;
+  }
+  .controls-row {
+    margin-bottom: 0.5rem !important;
+    gap: 8px !important;
+  }
+  .progress {
+    margin-bottom: 0.5rem !important;
+  }
+  .question-text {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem !important;
+  }
+  .badge-question {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.5rem;
+  }
+  .options-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 0.5rem !important;
+  }
+  .option-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  .btn-action {
+    padding: 0.5rem !important;
+    font-size: 0.95rem;
+  }
+  .footer-info {
+    padding-top: 0.5rem;
+    margin-top: 0.5rem !important;
+  }
+  .points-pill {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  .mini-map-container {
+    display: none !important;
   }
 }
 

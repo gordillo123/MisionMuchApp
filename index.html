@@ -57,26 +57,7 @@
     }
 
     #orientationOverlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(26, 28, 44, 0.98);
-      backdrop-filter: blur(10px);
-      z-index: 99999;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: white;
-    }
-
-    @media (max-width: 850px) and (orientation: portrait) {
-      #orientationOverlay {
-        display: flex;
-      }
-      .view-section, .hamburger, .mobile-nav-backdrop {
-        display: none !important;
-      }
+      display: none !important;
     }
 
     .bg-particles {
@@ -378,7 +359,7 @@
     .hero-glass {
       background: #252836;
       border-radius: 32px;
-      padding: 7rem 3rem 3rem;
+      padding: 3.5rem 3rem 3.5rem;
       margin: 0 auto;
       max-width: 650px;
       position: relative;
@@ -699,7 +680,7 @@
     }
 
     /* 📱 OPTIMIZACIÓN COMPLETA PARA ANDROID / MÓVIL EN HORIZONTAL (LANDSCAPE) */
-    @media (max-height: 500px) and (orientation: landscape) {
+    @media (max-height: 520px) and (orientation: landscape) {
       .main-area {
         padding: 4.5rem 1rem 1rem;
         min-height: auto;
@@ -1326,6 +1307,24 @@
       border-color: white;
       box-shadow: 0 0 20px var(--msf-pink);
     }
+    .map-marker.completed {
+      background: var(--msf-green) !important;
+      border-color: #ffffff !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 15px rgba(0, 180, 135, 0.8) !important;
+      animation: completePulse 2s infinite alternate;
+    }
+
+    @keyframes completePulse {
+      0% {
+        box-shadow: 0 0 10px rgba(0, 180, 135, 0.6);
+        transform: translate(-50%, -50%) scale(1);
+      }
+      100% {
+        box-shadow: 0 0 22px rgba(0, 180, 135, 1);
+        transform: translate(-50%, -50%) scale(1.12);
+      }
+    }
 
     .map-avatar {
       position: absolute;
@@ -1362,144 +1361,6 @@
       padding: 1.5rem 3rem;
       font-size: 1.8rem;
       margin-top: 1.5rem;
-    }
-
-    @media (max-width: 1024px) {
-
-
-      .hero-title {
-        font-size: 5rem;
-      }
-
-      .intro-container {
-        max-width: 960px;
-        gap: 1.5rem;
-      }
-
-      .museum-map {
-        width: 100%;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .view-section {
-        flex-direction: column;
-        height: 100dvh;
-        min-height: 100dvh;
-      }
-
-
-
-      .btn-play {
-        font-size: 1.15rem;
-        padding: 1.2rem 1rem;
-      }
-
-      .hero-play-mobile {
-        display: flex;
-      }
-
-      .play-section {
-        display: none;
-      }
-
-      .main-area {
-        padding: 1rem;
-        padding-top: 8rem;
-        width: 100%;
-        min-height: 100dvh;
-        height: auto;
-      }
-
-      .hamburger {
-        display: flex;
-      }
-
-      .intro-container {
-        grid-template-columns: 1fr;
-        padding: 6rem 1rem 2rem;
-        width: 100%;
-        min-height: 100dvh;
-        align-items: start;
-        gap: 1.25rem;
-      }
-
-      .card {
-        border-width: 4px;
-        border-radius: 26px;
-        padding: 1.25rem;
-        box-shadow: 0 8px 0px rgba(0, 0, 0, 0.3);
-      }
-
-      .section-title {
-        font-size: 1.55rem;
-        margin-bottom: 1rem;
-      }
-
-      .map-path {
-        display: none;
-      }
-
-      .museum-map {
-        width: 100%;
-        min-height: 0;
-        aspect-ratio: 4 / 3;
-        border-width: 4px;
-        border-radius: 22px;
-      }
-
-      .map-avatar {
-        width: 58px;
-        height: 58px;
-      }
-
-      .map-marker {
-        width: 32px;
-        height: 32px;
-        border-width: 3px;
-        font-size: .9rem;
-      }
-
-      .btn-play.large {
-        width: 100%;
-        padding: 1rem 1.25rem;
-        font-size: 1.25rem;
-        margin-top: 1.25rem;
-      }
-
-      .avatar-modal {
-        width: 95vw;
-        max-height: 85vh;
-        border-width: 4px;
-        border-radius: 20px;
-      }
-
-      .login-modal {
-        width: 94vw;
-      }
-
-      .google-login-area {
-        padding: 1rem 1rem 1.5rem;
-      }
-
-      .avatar-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: .8rem;
-        padding: 1rem;
-      }
-
-      .modal-title {
-        font-size: 1.8rem;
-      }
-
-      .modal-header {
-        padding: 1.25rem 1rem .25rem;
-      }
-
-      .modal-footer {
-        padding: 1rem;
-        gap: 1rem;
-      }
     }
 
     .hamburger {
@@ -1540,6 +1401,229 @@
       transform: translateY(-9px) rotate(-45deg);
     }
 
+    @media (max-width: 1024px) {
+
+
+      .hero-title {
+        font-size: 5rem;
+      }
+
+      .intro-container {
+        max-width: 960px;
+        gap: 1.5rem;
+      }
+
+      .museum-map {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .view-section {
+        flex-direction: column;
+        height: 100dvh;
+        min-height: 100dvh;
+      }
+
+      .btn-play {
+        font-size: 1.2rem;
+        padding: 1rem 2rem;
+      }
+
+      .hero-play-mobile {
+        display: flex;
+      }
+
+      .play-section {
+        display: none;
+      }
+
+      .main-area {
+        padding: 1rem;
+        padding-top: 7rem;
+        width: 100%;
+        min-height: 100dvh;
+        height: auto;
+      }
+
+      .hamburger {
+        display: flex;
+        position: fixed;
+        top: 0.85rem;
+        right: 1.5rem;
+        height: 42px;
+        width: 42px;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        box-shadow: none;
+        padding: 0;
+        z-index: 1010;
+        gap: 5px;
+      }
+      
+      .hamburger span {
+        width: 20px;
+        height: 2px;
+      }
+
+      .hamburger.active span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+      }
+
+      .hamburger.active span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+      }
+
+      .hero-logo-badge {
+        top: -85px;
+        width: 140px;
+        height: 140px;
+      }
+
+      .logo-dino-img {
+        width: 95px;
+      }
+
+      .pedestal {
+        width: 95px;
+        height: 24px;
+        margin-top: -12px;
+      }
+
+      .hero-glass {
+        padding: 2.2rem 1.5rem 2.2rem;
+        border-radius: 24px;
+        max-width: 92vw;
+      }
+
+      .hero-title {
+        font-size: clamp(2rem, 7vw, 2.8rem);
+        margin-bottom: 0.8rem;
+      }
+
+      .animal-deco {
+        font-size: clamp(1.2rem, 4vw, 1.8rem);
+        margin: 0 4px;
+      }
+
+      .hero-subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .intro-container {
+        display: flex;
+        flex-direction: column;
+        padding: 5rem 1rem 2rem;
+        width: 100%;
+        min-height: 100dvh;
+        align-items: stretch;
+        gap: 1.25rem;
+      }
+
+      .map-col {
+        order: 1;
+        width: 100%;
+      }
+
+      .rules-col {
+        order: 2;
+        width: 100%;
+      }
+
+      .card {
+        border-width: 4px;
+        border-radius: 26px;
+        padding: 1.25rem;
+        box-shadow: 0 8px 0px rgba(0, 0, 0, 0.3);
+      }
+
+      .section-title {
+        font-size: 1.55rem;
+        margin-bottom: 1rem;
+      }
+
+      .map-path {
+        display: none;
+      }
+
+      .museum-map {
+        width: 100%;
+        min-height: 0;
+        aspect-ratio: 16 / 9;
+        border-width: 4px;
+        border-radius: 22px;
+      }
+
+      .map-avatar {
+        width: 58px;
+        height: 58px;
+      }
+
+      .map-marker {
+        width: 32px;
+        height: 32px;
+        border-width: 3px;
+        font-size: .9rem;
+      }
+
+      .btn-play.large {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        font-size: 1.25rem;
+        margin-top: 1.25rem;
+      }
+
+      .avatar-modal {
+        width: 95vw;
+        max-height: 92vh;
+        border-width: 4px;
+        border-radius: 20px;
+      }
+
+      .login-modal {
+        width: 94vw;
+      }
+
+      .google-login-area {
+        padding: 1rem 1rem 1.5rem;
+      }
+
+      .avatar-tabs {
+        padding: 0.5rem;
+        gap: 0.4rem;
+      }
+
+      .av-tab {
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+        border-width: 3px;
+        box-shadow: 0 3px 0px var(--msf-blue);
+      }
+
+      .avatar-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: .8rem;
+        padding: 1rem;
+      }
+
+      .modal-title {
+        font-size: 1.8rem;
+      }
+
+      .modal-header {
+        padding: 1.25rem 1rem .25rem;
+      }
+
+      .modal-footer {
+        padding: 1rem;
+        gap: 1rem;
+      }
+    }
+
     .mobile-nav-backdrop {
       position: fixed;
       inset: 0;
@@ -1550,33 +1634,47 @@
       z-index: 900;
     }
 
-    @media (max-width: 768px) {
-      .hamburger {
-        display: flex;
-      }
-    }
-
     @media (max-width: 480px) {
       .main-area {
-        padding: 5.5rem 1rem 2rem;
+        padding: 5rem 1rem 2rem;
       }
 
       .hero-icon {
         font-size: 4rem;
       }
 
+      .hero-logo-badge {
+        top: -65px;
+        width: 110px;
+        height: 110px;
+      }
+
+      .logo-dino-img {
+        width: 75px;
+      }
+
+      .pedestal {
+        width: 75px;
+        height: 18px;
+        margin-top: -10px;
+      }
+
       .hero-glass {
-        padding: 1.5rem 1.25rem 1.25rem;
-        border-radius: 22px;
+        padding: 2rem 1.25rem 1.8rem;
+        border-radius: 20px;
       }
 
       .hero-title {
-        font-size: clamp(2.45rem, 17vw, 3.2rem);
+        font-size: clamp(1.5rem, 8vw, 2.1rem);
         text-shadow:
           0 1px 0px rgba(242, 63, 58, 0.9),
           0 2px 0px rgba(119, 90, 255, 0.8),
           0 3px 0px rgba(26, 28, 44, 0.6),
           0 6px 16px rgba(0, 0, 0, 0.5);
+      }
+
+      .animal-deco {
+        font-size: clamp(1.1rem, 4vw, 1.4rem);
       }
 
       .hero-subtitle br {
@@ -1606,7 +1704,7 @@
       }
 
       .museum-map {
-        aspect-ratio: 1 / 1;
+        aspect-ratio: 16 / 9;
       }
 
       .map-avatar {
@@ -1620,24 +1718,61 @@
         font-size: .8rem;
       }
 
+      .avatar-modal {
+        max-height: 95vh;
+      }
+
+      .modal-header {
+        padding: 0.8rem 0.8rem 0.2rem;
+      }
+
+      .modal-title {
+        font-size: 1.45rem;
+      }
+
+      .modal-header p {
+        font-size: 0.8rem;
+        margin-bottom: 0.2rem;
+      }
+
+      .user-chip {
+        margin-bottom: 0.3rem !important;
+        padding: 0.3rem 0.6rem !important;
+      }
+
+      .avatar-tabs {
+        padding: 0.25rem;
+        gap: 0.25rem;
+      }
+
+      .av-tab {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.75rem;
+        border-width: 2px;
+        box-shadow: 0 2px 0px var(--msf-blue);
+      }
+
       .avatar-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding: 0.5rem;
+        gap: 0.6rem;
       }
 
       .av-img-wrap {
-        width: 66px;
-        height: 66px;
+        width: 58px;
+        height: 58px;
       }
 
       .av-card {
-        border-radius: 22px;
-        padding: .75rem .35rem;
+        border-radius: 18px;
+        padding: .5rem .25rem;
       }
 
       .modal-footer {
         flex-direction: column;
         align-items: stretch;
         text-align: center;
+        padding: 0.6rem 1rem;
       }
 
       .btn-confirm {
@@ -2170,6 +2305,214 @@
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(119, 90, 255, 0.4);
     }
+
+    /* 📱 MÓDULOS Y DIÁLOGOS COMPACTOS PARA MÓVIL EN HORIZONTAL (LANDSCAPE) */
+    @media (max-height: 520px) {
+      .avatar-modal {
+        max-height: 96vh;
+        width: min(720px, 96vw);
+        border-width: 4px;
+        border-radius: 20px;
+        box-shadow: 0 10px 0px var(--bg-deep);
+      }
+
+      .modal-header {
+        padding: 0.5rem 1rem 0.2rem;
+      }
+
+      .modal-title {
+        font-size: 1.4rem;
+        text-shadow: 1.5px 1.5px 0px var(--msf-blue);
+      }
+
+      .modal-header p {
+        font-size: 0.8rem;
+        margin: 0;
+      }
+
+      .user-chip {
+        margin: 0.2rem auto 0 !important;
+        padding: 0.2rem 0.6rem !important;
+        font-size: 0.8rem;
+      }
+
+      .avatar-tabs {
+        padding: 0.3rem;
+        gap: 0.3rem;
+      }
+
+      .av-tab {
+        padding: 0.3rem 1rem;
+        font-size: 0.8rem;
+        border-width: 2px;
+        box-shadow: 0 2px 0px var(--msf-blue);
+      }
+
+      .avatar-grid {
+        padding: 0.5rem 1rem;
+        gap: 0.6rem;
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      }
+
+      .av-card {
+        padding: 0.4rem;
+        border-radius: 16px;
+        border-width: 3px;
+      }
+
+      .av-img-wrap {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 0.2rem;
+      }
+
+      .av-name {
+        font-size: 0.75rem;
+      }
+
+      .modal-footer {
+        padding: 0.5rem 1rem;
+      }
+
+      .btn-confirm {
+        padding: 0.5rem 1.5rem;
+        font-size: 0.9rem;
+        border-width: 3px;
+        box-shadow: 0 3px 0px var(--bg-deep);
+      }
+
+      /* Login overlay compact */
+      .login-modal {
+        width: min(460px, 94vw);
+      }
+
+      .login-badge {
+        width: 52px;
+        height: 52px;
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+        border-width: 3px;
+        box-shadow: 0 4px 0px var(--msf-blue);
+      }
+
+      .login-copy {
+        font-size: 0.85rem;
+        margin-top: 0.2rem;
+      }
+
+      .google-login-area {
+        padding: 0.5rem 1rem 1rem;
+        gap: 0.5rem;
+      }
+
+      .btn-google {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+        border-width: 3px;
+        box-shadow: 0 4px 0px var(--bg-deep);
+      }
+
+      .google-g {
+        width: 20px;
+        height: 20px;
+        flex: 0 0 20px;
+      }
+
+      .login-note {
+        font-size: 0.8rem;
+      }
+
+      /* Leaderboard overlay compact */
+      .scores-content {
+        padding: 0.6rem 1rem;
+        gap: 0.6rem;
+      }
+
+      .podium {
+        padding: 0.2rem 0 0.5rem;
+        gap: 0.4rem;
+      }
+
+      .podium-avatar {
+        width: 42px;
+        height: 42px;
+        border-width: 2px;
+        margin-bottom: 4px;
+      }
+
+      .podium-1 .podium-avatar {
+        width: 54px;
+        height: 54px;
+      }
+
+      .podium-rank {
+        width: 18px;
+        height: 18px;
+        font-size: 0.65rem;
+        top: 30px;
+      }
+
+      .podium-1 .podium-rank {
+        top: 42px;
+        width: 22px;
+        height: 22px;
+        font-size: 0.8rem;
+      }
+
+      .podium-box {
+        width: 60px;
+        height: 35px !important;
+        font-size: 1.1rem;
+      }
+
+      .podium-1 .podium-box {
+        height: 55px !important;
+      }
+
+      .podium-2 .podium-box {
+        height: 42px !important;
+      }
+
+      .podium-3 .podium-box {
+        height: 30px !important;
+      }
+
+      .podium-name {
+        font-size: 0.75rem;
+        margin-top: 4px;
+      }
+
+      .podium-score {
+        font-size: 0.85rem;
+      }
+
+      .scores-list {
+        gap: 0.3rem;
+      }
+
+      .score-row {
+        padding: 0.4rem 0.8rem;
+        gap: 0.6rem;
+        border-radius: 10px;
+      }
+
+      .score-rank {
+        font-size: 0.8rem;
+      }
+
+      .score-av {
+        width: 24px;
+        height: 24px;
+      }
+
+      .score-name {
+        font-size: 0.8rem;
+      }
+
+      .score-pts {
+        font-size: 0.8rem;
+      }
+    }
   </style>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -2270,11 +2613,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Limpiar sesión temporal para que pida login al refrescar (Modo Prueba)
-      localStorage.removeItem('much_google_user');
-      localStorage.removeItem('much_selected_avatar');
-      localStorage.removeItem('much_current_view');
-
       includeHTML();
 
       // 1. Partículas
@@ -2719,9 +3057,9 @@
         // Switch de vista
         showView('viewPrep');
 
-        // Posición inicial del avatar (Estación 3 - Inicio)
+        // Posición inicial del avatar (Estación 1 - Entrada)
         setTimeout(() => {
-          moveToStation(3);
+          moveToStation(1);
         }, 500);
 
         // Actualizar nav
@@ -2733,20 +3071,14 @@
 
       // NUEVO: Lógica para manejar el regreso desde las estaciones y persistencia
       function checkStatePersistence() {
-        const params = new URLSearchParams(window.location.search);
-        const viewParam = params.get('view');
-        const savedView = localStorage.getItem('much_current_view');
         const savedAvatar = localStorage.getItem('much_selected_avatar');
         const savedStation = localStorage.getItem('much_current_station');
-
-        // Si hay un parámetro en la URL mandamos a esa vista, si no a la guardada
-        const targetView = viewParam || (savedView === 'viewPrep' ? 'prep' : 'landing');
 
         if (savedAvatar) {
           try {
             selectedAvatar = JSON.parse(savedAvatar);
             
-            // Cargar datos en la vista de preparación (por si se activa luego)
+            // Cargar datos en la vista de preparación
             const prepName = document.getElementById('prepAvatarName');
             if (prepName) prepName.innerText = selectedAvatar.name;
             
@@ -2758,20 +3090,18 @@
 
             updateNavAvatar(selectedAvatar.id);
 
-            // Si la vista objetivo es preparación, la activamos
-            if (targetView === 'prep' || targetView === 'viewPrep') {
-              showView('viewPrep'); // Esto ya limpia la URL
-              if (savedStation) currentStation = savedStation;
-              setTimeout(() => {
-                moveToStation(currentStation || 3);
-              }, 500);
-            } else {
-              // Si es landing, nos aseguramos de que la URL esté limpia
-              showView('viewLanding');
-            }
+            // Redirigir SIEMPRE al mapa interactivo de estaciones si hay una sesión activa
+            showView('viewPrep');
+            currentStation = savedStation ? String(savedStation) : '1';
+            setTimeout(() => {
+              moveToStation(currentStation);
+            }, 500);
           } catch (e) {
             console.error('Error al restaurar estado:', e);
+            showView('viewLanding');
           }
+        } else {
+          showView('viewLanding');
         }
       }
 
@@ -2787,6 +3117,24 @@
         '6': { x: 42, y: 66 }
       };
 
+      function updateCompletedStationsOnMap() {
+        try {
+          const completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
+          document.querySelectorAll('.map-marker').forEach(marker => {
+            const stationId = marker.dataset.station;
+            if (completed[stationId]) {
+              marker.classList.add('completed');
+              marker.innerHTML = '✓';
+            } else {
+              marker.classList.remove('completed');
+              marker.innerHTML = stationId;
+            }
+          });
+        } catch (e) {
+          console.warn('Error rendering completed stations on map:', e);
+        }
+      }
+
       function moveToStation(stationId) {
         const pos = stations[stationId];
         const avatar = document.getElementById('mapAvatar');
@@ -2801,7 +3149,38 @@
           document.querySelectorAll('.map-marker').forEach(m => {
             m.classList.toggle('active', m.dataset.station === String(stationId));
           });
+
+          updateCompletedStationsOnMap();
+
+          // Bloquear el botón de comenzar si la estación ya está completada
+          const completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
+          const btnComenzar = document.getElementById('btnComenzar');
+          if (btnComenzar) {
+            if (completed[String(stationId)]) {
+              btnComenzar.innerHTML = '🔒 ESTACIÓN COMPLETADA';
+              btnComenzar.style.background = '#00B487';
+              btnComenzar.style.opacity = '0.7';
+              btnComenzar.style.pointerEvents = 'none';
+            } else {
+              btnComenzar.innerHTML = '🚀 ¡COMENZAR!';
+              btnComenzar.style.background = '';
+              btnComenzar.style.opacity = '';
+              btnComenzar.style.pointerEvents = '';
+            }
+          }
         }
+      }
+
+      const btnResetProgress = document.getElementById('btnResetProgress');
+      if (btnResetProgress) {
+        btnResetProgress.onclick = () => {
+          if (confirm('¿Estás seguro de que deseas reiniciar el progreso de todas las estaciones? Las palomitas verdes se desmarcarán.')) {
+            localStorage.setItem('much_completed_stations', '{}');
+            currentStation = '1';
+            localStorage.setItem('much_current_station', '1');
+            moveToStation(1);
+          }
+        };
       }
 
       // Permitir click en marcadores para probar movimiento
@@ -2812,6 +3191,12 @@
       });
 
       document.getElementById('btnComenzar').onclick = () => {
+        const completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
+        if (completed[currentStation]) {
+          alert('¡Esta estación ya ha sido completada! Por favor, continúa con la siguiente.');
+          return;
+        }
+
         if (currentStation === '2') {
           window.location.href = 'Juego_Spinosaurio/index.html';
           return;
