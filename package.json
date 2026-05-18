@@ -1,0 +1,17 @@
+{
+  "name": "mision-much-backend",
+  "version": "1.0.0",
+  "description": "Backend para Misión MUCH",
+  "main": "backend/server.js",
+  "scripts": {
+    "dev": "node backend/server.js",
+    "migrate": "node backend/migrate.js",
+    "seed": "node backend/seed.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "pg": "^8.11.5"
+  }
+}
