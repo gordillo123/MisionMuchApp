@@ -3070,10 +3070,10 @@
 
       window.startGameFlow = () => {
         // 1. Si no hay sesión de Google, pedir login (Prioridad máxima)
-        if (!googleUser) {
-          loginOverlay.classList.add('open');
-          return;
-        }
+        // if (!googleUser) {
+        //   loginOverlay.classList.add('open');
+        //   return;
+        // }
 
         // 2. Si ya hay Google pero no hay avatar, pedir avatar
         if (!selectedAvatar) {
