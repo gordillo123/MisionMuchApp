@@ -372,14 +372,13 @@
 </head>
 
 <body>
-  <button id="btnReturnToMap" class="btn-back-premium" title="Volver al Mapa">
+  <button id="btnReturnToMap" class="btn-back-premium" title="Volver al Mapa" aria-label="Volver al mapa">
     <div class="back-icon-wrapper">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 12h8" />
+        <path d="M13 6l6 6-6 6" />
       </svg>
-      <span class="back-icon-label">BACK</span>
     </div>
-    Regresar
   </button>
 
   <div id="portadaOverlay" class="portada-overlay show">
@@ -424,9 +423,11 @@
       <h3 id="quizTitle" class="quiz-title"></h3>
       <p id="quizSub" class="quiz-sub"></p>
       <p id="quizQuestion" class="quiz-q"></p>
+      <p id="quizTimer" class="quiz-timer" style="text-align:center;font-weight:900;margin:6px 0;color:#b91c1c;display:none;">10s</p>
       <div id="quizOptions" class="quiz-options"></div>
       <div class="quiz-actions">
         <button id="btnQuizOk" class="btn-primary">Confirmar</button>
+        <button id="btnQuizNext" class="btn-primary" style="display:none;">Siguiente</button>
         <button id="btnQuizCancel" class="btn-secondary">Cancelar</button>
       </div>
       <div id="quizMsg" class="quiz-msg" aria-live="polite"></div>

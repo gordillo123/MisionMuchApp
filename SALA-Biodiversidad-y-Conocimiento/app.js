@@ -13,6 +13,7 @@ if (LUGAR_EN_URL) {
 const LUGAR_QR = LUGAR_EN_URL || 'Sin Especificar';
 
 const NUM_QUESTIONS = 10;
+const QUESTION_SECONDS = 10;
 // Función para mezclar arrays
 const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
 
@@ -310,6 +311,8 @@ class UIManager {
     this.state = { idx: 0, selected: null, points: 0, correct: 0, locked: false, answers: [] };
     this.currentPrize = null;
     this.cheatingDetected = false;
+    this.questionTimer = null;
+    this.questionCountdown = QUESTION_SECONDS;
 
     if (this.e.nextBtn) this.e.nextBtn.classList.add('d-none');
     if (this.e.pillSala) this.e.pillSala.textContent = `Sala: ${SALA}`;
@@ -322,6 +325,71 @@ class UIManager {
 
   startFocusDetection() {
     window.addEventListener('blur', this.handleFocusLoss.bind(this));
+  }
+
+  updateQuestionTimerDisplay() {
+    if (!this.e.questionTimer) return;
+    this.e.questionTimer.textContent = `⏳ ${this.questionCountdown}s`;
+    this.e.questionTimer.classList.toggle('low', this.questionCountdown <= 5 && this.questionCountdown > 3);
+    this.e.questionTimer.classList.toggle('urgent', this.questionCountdown <= 3);
+  }
+
+  stopQuestionTimer() {
+    if (this.questionTimer) {
+      clearInterval(this.questionTimer);
+      this.questionTimer = null;
+    }
+  }
+
+  startQuestionTimer() {
+    this.stopQuestionTimer();
+    this.questionCountdown = QUESTION_SECONDS;
+    this.updateQuestionTimerDisplay();
+
+    this.questionTimer = setInterval(() => {
+      if (this.questionCountdown <= 0) {
+        this.handleQuestionTimeout();
+        return;
+      }
+      this.questionCountdown -= 1;
+      this.updateQuestionTimerDisplay();
+      if (this.questionCountdown <= 0) {
+        this.handleQuestionTimeout();
+      }
+    }, 1000);
+  }
+
+  handleQuestionTimeout() {
+    const s = this.state, { e } = this;
+    if (s.locked || this.cheatingDetected || s.idx >= QUESTIONS.length) return;
+    this.stopQuestionTimer();
+
+    s.locked = true;
+    s.selected = null;
+
+    if (e.status) e.status.textContent = '⏰ Se acabó el tiempo. Respuesta incorrecta.';
+    [...e.options.querySelectorAll('.option-btn')].forEach((btn, idx) => {
+      btn.disabled = true;
+      const correctIdx = QUESTIONS[s.idx].correctIndex;
+      if (idx === correctIdx) {
+        btn.classList.add('option-btn--correct');
+      } else {
+        btn.classList.add('option-btn--incorrect');
+      }
+    });
+
+    const q = QUESTIONS[s.idx];
+    s.answers.push({ qIndex: s.idx, question: q.text, choice: null, correct: false, timeout: true });
+
+    if (e.questionTimer) e.questionTimer.textContent = '⏳ 0s';
+    this.sound.wrong();
+
+    setTimeout(() => {
+      if (!this.cheatingDetected) {
+        s.idx += 1;
+        this.render();
+      }
+    }, 1400);
   }
 
   handleFocusLoss() {
@@ -373,6 +441,7 @@ class UIManager {
     e.bar.style.width = pct + '%';
 
     if (this.cheatingDetected) {
+      this.stopQuestionTimer();
       e.quizView.classList.add('d-none');
       e.finalView.classList.remove('d-none');
       e.finalTitle.textContent = '¡Ronda Invalidada!';
@@ -386,6 +455,7 @@ class UIManager {
     }
 
     if (s.idx >= QUESTIONS.length) {
+      this.stopQuestionTimer();
       e.quizView.classList.add('d-none');
       e.finalView.classList.remove('d-none');
       e.finalTitle.textContent = 'Verificando resultados...';
@@ -452,6 +522,7 @@ class UIManager {
     e.nextBtn.textContent = s.idx === QUESTIONS.length - 1 ? 'Finalizar 🎉' : 'Siguiente ➡️';
     if (e.pointsEl) e.pointsEl.textContent = s.points.toString();
     if (e.hint) e.hint.textContent = 'Tip: solo puedes elegir una respuesta';
+    this.startQuestionTimer();
   }
 
   choose(i) {
@@ -459,6 +530,7 @@ class UIManager {
     if (s.locked) return;
     if (this.cheatingDetected) return;
 
+    this.stopQuestionTimer();
     s.locked = true; s.selected = i;
     const q = QUESTIONS[s.idx], correctIdx = q.correctIndex;
     [...e.options.querySelectorAll('.option-btn')].forEach((btn, idx) => {
@@ -505,6 +577,7 @@ const elements = {
   qTotal: document.getElementById('qTotal'),
   qText: document.getElementById('qText'),
   qDesc: document.getElementById('qDesc'),
+  questionTimer: document.getElementById('questionTimer'),
   options: document.getElementById('options'),
   status: document.getElementById('status'),
   nextBtn: document.getElementById('nextBtn'),

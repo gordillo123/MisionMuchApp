@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 210" role="img" aria-labelledby="title desc">
+  <title id="title">SBEEL Dinosaurios</title>
+  <desc id="desc">Logo estilizado de SBEEL Dinosaurios para la barra superior.</desc>
+  <defs>
+    <linearGradient id="leafA" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#b7d64a"/>
+      <stop offset="1" stop-color="#71ad3d"/>
+    </linearGradient>
+    <linearGradient id="stone" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#c7c7c7"/>
+      <stop offset="0.55" stop-color="#8d8d8d"/>
+      <stop offset="1" stop-color="#5f5f5f"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#f7d51b"/>
+      <stop offset="1" stop-color="#e29a13"/>
+    </linearGradient>
+    <filter id="shadow" x="-12%" y="-24%" width="124%" height="150%">
+      <feDropShadow dx="0" dy="7" stdDeviation="0" flood-color="#3e2b12" flood-opacity="1"/>
+      <feDropShadow dx="0" dy="14" stdDeviation="0" flood-color="#2b1c0d" flood-opacity="0.78"/>
+    </filter>
+  </defs>
+  <rect width="620" height="210" rx="20" fill="#211a16"/>
+  <g opacity="0.95">
+    <path d="M158 92c-26-28-48-38-77-42 18 32 38 55 70 68 2-9 4-17 7-26z" fill="url(#leafA)"/>
+    <path d="M238 76c-4-34-20-55-42-76-19 29-29 62-17 96 17-10 36-16 59-20z" fill="url(#leafA)"/>
+    <path d="M385 77c6-34 22-54 45-76 16 33 23 65 10 96-16-11-34-17-55-20z" fill="url(#leafA)"/>
+    <path d="M465 116c27-26 56-33 88-30-22 29-47 47-85 50 0-7-1-14-3-20z" fill="url(#leafA)"/>
+  </g>
+  <g text-anchor="middle" font-family="Arial Black, Impact, sans-serif" filter="url(#shadow)">
+    <text x="310" y="92" font-size="58" fill="url(#stone)" stroke="#4b351c" stroke-width="8" paint-order="stroke">SBEEL</text>
+    <text x="310" y="165" font-size="86" fill="url(#gold)" stroke="#5b3b17" stroke-width="10" paint-order="stroke">Dinosaurios</text>
+  </g>
+  <g font-family="Arial Black, Impact, sans-serif" text-anchor="middle">
+    <text x="310" y="50" font-size="22" fill="#b94f70">MUCH</text>
+    <text x="310" y="69" font-size="14" fill="#f4f0e9">Museo Chiapas</text>
+    <text x="310" y="84" font-size="13" fill="#9bd6d4">de Ciencia y Tecnología</text>
+  </g>
+</svg>

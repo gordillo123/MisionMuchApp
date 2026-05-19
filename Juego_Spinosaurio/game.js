@@ -35,6 +35,10 @@ var quizData = null;
 var quizAnswerIndex = null;
 var quizVisible = false;
 var navigatingToRegistro = false;
+// Temporizador de pregunta especial
+var QUESTION_SECONDS = 10;
+var questionSecondsLeft = 0;
+var questionTimerInterval = null;
 
 function markStationCompleted() {
   try {
@@ -90,11 +94,44 @@ function Start() {
   document.getElementById("btnRetry").addEventListener("click", function () { location.reload(); });
   document.getElementById("btnQuizOk").addEventListener("click", validarQuiz);
 
+  // Nuevo: botón 'Siguiente' que aparece después de responder
+  try {
+    const btnNext = document.getElementById("btnQuizNext");
+    if (btnNext) {
+      btnNext.addEventListener("click", function () {
+        // Navegar a la siguiente estación basada en localStorage (misma lógica que index.html)
+        try {
+          const searchParams = new URLSearchParams(window.location.search);
+          // Valor esperado ya actualizado en validarQuiz() a '3' tras completar
+          let target = localStorage.getItem('much_current_station') || '3';
+
+          // Si por alguna razón target es la misma estación actual, avanzar 1
+          if (target === STATION_ID) {
+            target = String(Number(target) + 1);
+          }
+
+          let url = '../index.html?' + searchParams.toString();
+          if (target === '3') url = '../SALA-Biodiversidad-y-Conocimiento/index.html?from=portada&sala=biodiversidad';
+          else if (target === '4') url = '../sala_energia/index.html?from=portada&sala=energia';
+          else if (target === '5') url = '../Sala_Desarrollo_Sustentable/index.html?from=portada&sala=desarrollo-sustentable';
+          else if (target === '6') url = '../Sbeel_Dinosaurios/index.html';
+
+          window.location.href = url;
+        } catch (e) {
+          // Fallback: volver al mapa
+          const searchParams = new URLSearchParams(window.location.search);
+          window.location.href = '../index.html?' + searchParams.toString();
+        }
+      });
+    }
+  } catch (e) { /* noop */ }
+
   document.getElementById("btnQuizCancel").addEventListener("click", function () {
     navigatingToRegistro = true;
     quizVisible = false;
     try { document.getElementById("quizOverlay").classList.remove("show"); } catch (e) { }
     document.body.classList.remove("quiz-mode");
+    stopQuestionTimer();
     location.reload(); // Volvemos a mostrar la portada recargando
   });
 
@@ -344,6 +381,41 @@ function IsCollision(a, b, pt, pr, pb, pl) {
 }
 
 /* ===== QUIZ UI ===== */
+// Temporizador de pregunta: iniciar / detener / manejar timeout
+function startQuestionTimer(seconds) {
+  try {
+    stopQuestionTimer();
+    questionSecondsLeft = typeof seconds === 'number' ? seconds : QUESTION_SECONDS;
+    const timerEl = document.getElementById('quizTimer');
+    if (timerEl) { timerEl.style.display = 'block'; timerEl.textContent = questionSecondsLeft + 's'; }
+    questionTimerInterval = setInterval(() => {
+      questionSecondsLeft--;
+      if (timerEl) timerEl.textContent = questionSecondsLeft + 's';
+      if (questionSecondsLeft <= 0) {
+        stopQuestionTimer();
+        handleQuestionTimeout();
+      }
+    }, 1000);
+  } catch (e) { console.warn('Timer start error', e); }
+}
+
+function stopQuestionTimer() {
+  try {
+    if (questionTimerInterval) { clearInterval(questionTimerInterval); questionTimerInterval = null; }
+    const timerEl = document.getElementById('quizTimer'); if (timerEl) timerEl.style.display = 'none';
+  } catch (e) { }
+}
+
+function handleQuestionTimeout() {
+  try {
+    const msg = document.getElementById('quizMsg'); if (msg) { msg.textContent = 'Tiempo agotado. Incorrecto.'; msg.className = 'quiz-msg err'; }
+    var inputs = document.querySelectorAll('input[name="q1"]'); inputs.forEach(inp => inp.disabled = true);
+    try { document.getElementById('btnQuizNext').style.display = 'inline-block'; } catch (e) {}
+    try { document.getElementById('btnQuizOk').textContent = 'Volver a jugar'; } catch (e) {}
+    // Reiniciar juego Espinosaurio automáticamente después de una pequeña pausa
+    setTimeout(() => { location.reload(); }, 1400);
+  } catch (e) { console.warn('handleQuestionTimeout error', e); }
+}
 function mostrarQuiz() {
   document.body.classList.add("quiz-mode");
   try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) { }
@@ -373,14 +445,23 @@ function mostrarQuiz() {
 
   var o = document.getElementById("quizOverlay");
   var msg = document.getElementById("quizMsg"); msg.textContent = ""; msg.className = "quiz-msg";
+  // Preparar botones: ocultar 'Siguiente' y restaurar 'Confirmar'
+  try { document.getElementById('btnQuizNext').style.display = 'none'; } catch (e) {}
+  try { const b = document.getElementById('btnQuizOk'); if (b) { b.disabled = false; b.textContent = 'Confirmar'; } } catch (e) {}
+
   o.classList.add("show"); quizVisible = true;
   try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { }
+  // Iniciar temporizador de 10 segundos para la pregunta especial
+  startQuestionTimer(QUESTION_SECONDS);
 }
 
 async function validarQuiz() {
   var msg = document.getElementById("quizMsg");
   var sel = document.querySelector('input[name="q1"]:checked');
   var btnOk = document.getElementById("btnQuizOk");
+
+  // Detener temporizador al confirmar respuesta
+  try { stopQuestionTimer(); } catch (e) {}
 
   if (btnOk.textContent === "Continuar") {
     window.location.href = "../index.html";
@@ -413,6 +494,8 @@ async function validarQuiz() {
 
     await registrarQuizEnSupabase(Number(score));
 
+    // Mostrar botón Siguiente para que el usuario avance cuando quiera
+    try { document.getElementById('btnQuizNext').style.display = 'inline-block'; } catch (e) {}
     btnOk.textContent = "Continuar";
   } else {
     msg.textContent = "Incorrecto. ¡Vuelve a jugar!"; msg.className = "quiz-msg err";
@@ -420,6 +503,8 @@ async function validarQuiz() {
     var inputs = document.querySelectorAll('input[name="q1"]');
     inputs.forEach(inp => inp.disabled = true);
 
+    // Mostrar botón Siguiente incluso en incorrecto para permitir navegación/recarga
+    try { document.getElementById('btnQuizNext').style.display = 'inline-block'; } catch (e) {}
     btnOk.textContent = "Volver a jugar";
   }
 }
