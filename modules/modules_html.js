@@ -179,7 +179,7 @@ window.APP_MODULES = {
           </div>
           <button id="btnClaimReward" class="btn-claim-reward" type="button">🎟️ Reclamar mi premio</button>
         </div>
-        <button id="btnResetProgress" style="background: transparent; border: 2px dashed rgba(255,255,255,0.25); color: #A0A4B8; padding: 6px 16px; border-radius: 20px; font-family: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 5px;">
+        <button id="btnResetProgress" type="button" style="background: transparent; border: 2px dashed rgba(255,255,255,0.25); color: #A0A4B8; padding: 6px 16px; border-radius: 20px; font-family: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 5px;">
           <span>🔄</span> Reiniciar Estaciones
         </button>
       </div>

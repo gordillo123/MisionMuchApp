@@ -397,27 +397,35 @@
       }
       
       .nav-links {
-        display: none;
+        display: flex;
         position: fixed;
-        top: 4.15rem;
-        left: 0.75rem;
-        right: 0.75rem;
-        width: auto;
-        height: auto;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: min(82vw, 320px);
+        height: 100dvh;
         background: rgba(26, 28, 44, 0.96);
-        border: 2px solid rgba(255, 255, 255, 0.12);
-        border-radius: 14px;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        align-items: center;
-        gap: 0.35rem;
-        padding: 0.45rem;
+        border-left: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 22px 0 0 22px;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 0.75rem;
+        padding: 5rem 1rem 1.25rem;
         z-index: 1005;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        box-shadow: -18px 0 36px rgba(0, 0, 0, 0.42);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(105%);
+        transition: transform 0.28s cubic-bezier(0.165, 0.84, 0.44, 1),
+          opacity 0.22s ease,
+          visibility 0.22s ease;
       }
       
       .nav-links.open {
-        display: grid;
-        animation: slideInLeft 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(0);
       }
       
       @keyframes slideInLeft {
@@ -441,15 +449,15 @@
         color: #a0a4b8;
         width: 100%;
         min-width: 0;
-        height: 48px;
-        border-radius: 8px;
+        height: 58px;
+        border-radius: 14px;
         transition: all 0.2s;
-        padding: 0.25rem 0.15rem;
-        gap: 0.12rem;
+        padding: 0.55rem 0.75rem;
+        gap: 0.3rem;
       }
       
       .nav-btn .nav-icon {
-        font-size: 1rem;
+        font-size: 1.25rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -461,14 +469,15 @@
         max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
-        font-size: 0.64rem;
+        font-size: 0.8rem;
+        font-weight: 800;
         line-height: 1;
         white-space: nowrap;
       }
       
       .nav-links .nav-avatar {
-        width: 25px;
-        height: 25px;
+        width: 30px;
+        height: 30px;
         margin-left: 0;
         border-width: 1.5px;
       }
@@ -940,6 +949,10 @@
         max-width: 100%;
       }
 
+      .intro-container .rules-col {
+        display: none;
+      }
+
       .rules-col {
         flex: 1;
         display: flex;
@@ -1337,7 +1350,8 @@
     /* PREP VIEW (RULES & MAP) */
     .intro-container {
       display: grid;
-      grid-template-columns: minmax(260px, 1fr) minmax(0, 1.5fr);
+      grid-template-columns: minmax(280px, 820px);
+      justify-content: center;
       gap: 2rem;
       max-width: 1200px;
       margin: 0 auto;
@@ -1359,6 +1373,10 @@
     .rules-col,
     .map-col {
       min-width: 0;
+    }
+
+    .rules-col {
+      display: none;
     }
 
     .section-title {
@@ -1779,6 +1797,16 @@
         margin-top: 1.25rem;
       }
 
+      #btnResetProgress {
+        min-height: 44px;
+        justify-content: center;
+        padding: 0.65rem 1rem !important;
+        position: relative;
+        z-index: 2;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+
       .avatar-modal {
         width: 95vw;
         max-height: 92vh;
@@ -1836,6 +1864,11 @@
       z-index: 900;
     }
 
+    .mobile-nav-backdrop.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
     @media (max-width: 380px) {
       .nav-container {
         padding-left: 0.75rem;
@@ -1846,18 +1879,17 @@
       }
 
       .nav-links {
-        left: 0.5rem;
-        right: 0.5rem;
+        width: min(86vw, 300px);
         gap: 0.25rem;
-        padding: 0.35rem;
+        padding: 4.75rem 0.75rem 1rem;
       }
 
       .nav-btn {
-        height: 46px;
+        height: 54px;
       }
 
       .nav-btn .nav-label {
-        font-size: 0.58rem;
+        font-size: 0.74rem;
       }
     }
 
@@ -2361,6 +2393,32 @@
       color: var(--text-main);
       line-height: 1.35;
       letter-spacing: -0.3px;
+    }
+
+    .start-rules-mode .rules-modal {
+      width: min(620px, 94vw);
+    }
+
+    .start-rules-mode .rules-content {
+      grid-template-columns: 1fr;
+      max-height: min(58vh, 430px);
+      padding: 1rem 1.4rem;
+      gap: 0.75rem;
+    }
+
+    .start-rules-mode .rule-item {
+      flex-direction: row;
+      text-align: left;
+      align-items: center;
+      padding: 0.85rem 1rem;
+      border-radius: 18px;
+    }
+
+    .start-rules-mode .rule-icon-pro {
+      width: 42px;
+      min-width: 42px;
+      font-size: 1.7rem;
+      text-align: center;
     }
 
     .btn-back-regreso {
@@ -3437,10 +3495,35 @@
       overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('open'); };
 
       const rulesOverlay = document.getElementById('rulesOverlay');
+      const btnCerrarReglas = document.getElementById('btnCerrarReglas');
+      const rulesTitle = rulesOverlay ? rulesOverlay.querySelector('.modal-title') : null;
+      const rulesSubtitle = rulesOverlay ? rulesOverlay.querySelector('.modal-header p') : null;
+      let pendingStartAfterRules = false;
+
+      function setRulesModeForStart(isStartingGame) {
+        pendingStartAfterRules = isStartingGame;
+        if (rulesOverlay) rulesOverlay.classList.toggle('start-rules-mode', isStartingGame);
+        if (rulesTitle) rulesTitle.innerText = isStartingGame ? 'Antes de jugar' : 'Cómo Jugar';
+        if (rulesSubtitle) {
+          rulesSubtitle.innerText = isStartingGame
+            ? 'Lee estas reglas rápidas antes de entrar a la estación.'
+            : 'Sigue estos pasos para completar tu misión con éxito';
+        }
+        if (btnCerrarReglas) {
+          btnCerrarReglas.innerText = isStartingGame ? 'Enterado, jugar' : '¡Entendido!';
+        }
+      }
+
+      function closeRulesOverlay() {
+        if (rulesOverlay) rulesOverlay.classList.remove('open');
+        setRulesModeForStart(false);
+      }
+
       const btnComoJugar = document.getElementById('btnComoJugar');
       if (btnComoJugar) {
         btnComoJugar.addEventListener('click', (e) => {
           e.preventDefault();
+          setRulesModeForStart(false);
           rulesOverlay.classList.add('open');
           if (window.innerWidth <= 768 && navLinks) {
             navLinks.classList.remove('open');
@@ -3449,11 +3532,17 @@
           }
         });
       }
-      document.getElementById('btnCerrarReglas').onclick = () => rulesOverlay.classList.remove('open');
-      rulesOverlay.onclick = (e) => { if (e.target === rulesOverlay) rulesOverlay.classList.remove('open'); };
+      if (btnCerrarReglas) {
+        btnCerrarReglas.onclick = () => {
+          const shouldStart = pendingStartAfterRules;
+          closeRulesOverlay();
+          if (shouldStart) playCurrentStation();
+        };
+      }
+      rulesOverlay.onclick = (e) => { if (e.target === rulesOverlay) closeRulesOverlay(); };
 
       // Botón cerrar reglas con X
-      document.getElementById('btnBackRules').onclick = () => rulesOverlay.classList.remove('open');
+      document.getElementById('btnBackRules').onclick = closeRulesOverlay;
 
       // Botón regreso desde vista de preparación
       document.getElementById('btnBackPrep').onclick = () => {
@@ -3655,19 +3744,33 @@
         }
       }
 
+      let lastResetPromptAt = 0;
+      function resetStationProgress(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        const now = Date.now();
+        if (now - lastResetPromptAt < 800) return;
+        lastResetPromptAt = now;
+
+        if (confirm('¿Estás seguro de que deseas reiniciar el progreso de todas las estaciones? Las palomitas verdes se desmarcarán.')) {
+          localStorage.setItem('much_completed_stations', '{}');
+          localStorage.removeItem('much_quiz_prize');
+          localStorage.removeItem('much_mission_reward_claimed');
+          currentStation = '1';
+          localStorage.setItem('much_current_station', '1');
+          updateCompletedStationsOnMap();
+          updateRewardClaimUI({});
+          moveToStation('1');
+        }
+      }
+
       const btnResetProgress = document.getElementById('btnResetProgress');
       if (btnResetProgress) {
-        btnResetProgress.onclick = () => {
-          if (confirm('¿Estás seguro de que deseas reiniciar el progreso de todas las estaciones? Las palomitas verdes se desmarcarán.')) {
-            localStorage.setItem('much_completed_stations', '{}');
-            localStorage.removeItem('much_quiz_prize');
-            localStorage.removeItem('much_mission_reward_claimed');
-            currentStation = '1';
-            localStorage.setItem('much_current_station', '1');
-            updateRewardClaimUI({});
-            moveToStation(1);
-          }
-        };
+        btnResetProgress.addEventListener('click', resetStationProgress);
+        btnResetProgress.addEventListener('touchend', resetStationProgress, { passive: false });
       }
 
       const btnClaimReward = document.getElementById('btnClaimReward');
@@ -3683,6 +3786,25 @@
         };
       });
 
+      function getCurrentStationGameUrl() {
+        if (currentStation === '2') return 'Juego_Spinosaurio/index.html';
+        if (currentStation === '3') return 'SALA-Biodiversidad-y-Conocimiento/index.html?from=portada&sala=biodiversidad';
+        if (currentStation === '4') return 'sala_energia/index.html?from=portada&sala=energia';
+        if (currentStation === '5') return 'Sala_Desarrollo_Sustentable/index.html?from=portada&sala=desarrollo-sustentable';
+        if (currentStation === '6') return 'Sbeel_Dinosaurios/index.html';
+        return '';
+      }
+
+      function playCurrentStation() {
+        const url = getCurrentStationGameUrl();
+        if (url) {
+          window.location.href = url;
+          return;
+        }
+
+        alert('Coloca tu avatar en la estación correspondiente para entrar al juego.');
+      }
+
       document.getElementById('btnComenzar').onclick = () => {
         const completed = getCompletedStations();
         if (completed[currentStation]) {
@@ -3690,24 +3812,13 @@
           return;
         }
 
-        if (currentStation === '2') {
-          window.location.href = 'Juego_Spinosaurio/index.html';
-          return;
-        } else if (currentStation === '3') {
-          window.location.href = 'SALA-Biodiversidad-y-Conocimiento/index.html?from=portada&sala=biodiversidad';
-          return;
-        } else if (currentStation === '4') {
-          window.location.href = 'sala_energia/index.html?from=portada&sala=energia';
-          return;
-        } else if (currentStation === '5') {
-          window.location.href = 'Sala_Desarrollo_Sustentable/index.html?from=portada&sala=desarrollo-sustentable';
-          return;
-        } else if (currentStation === '6') {
-          window.location.href = 'Sbeel_Dinosaurios/index.html';
+        if (!getCurrentStationGameUrl()) {
+          playCurrentStation();
           return;
         }
 
-        alert('Coloca tu avatar en la estación correspondiente para entrar al juego.');
+        setRulesModeForStart(true);
+        rulesOverlay.classList.add('open');
       };
 
       // 6. Hamburguesa Móvil
