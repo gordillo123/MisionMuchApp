@@ -30,6 +30,10 @@ window.APP_MODULES = {
         <span class="nav-icon">❔</span>
         <span class="nav-label">Ayuda</span>
       </a>
+      <a href="./ADMINISTRADOR.html" class="nav-btn nav-btn-admin" id="btnAdmin" title="Administrador">
+        <span class="nav-icon">🛡️</span>
+        <span class="nav-label">Admin</span>
+      </a>
       <a href="#" class="nav-btn" id="btnPerfil">
         <div class="nav-avatar">
           <img src="avatars/dino1.png" alt="Avatar" id="navAvatarImg">
