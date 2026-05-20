@@ -54,6 +54,23 @@ function markStationCompleted() {
 var countdownActive = false;
 var gameStarted = false;
 var loopRequestId;
+var orientationBlocked = false;
+
+function isMobilePortrait() {
+  const isCoarsePointer = window.matchMedia && window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+  const isSmallScreen = Math.min(window.innerWidth, window.innerHeight) <= 900;
+  return isSmallScreen && isCoarsePointer && window.innerHeight > window.innerWidth;
+}
+
+function updateOrientationGate() {
+  orientationBlocked = isMobilePortrait();
+  document.body.classList.toggle("orientation-blocked", orientationBlocked);
+  return orientationBlocked;
+}
+
+function canStartLandscapeGame() {
+  return !updateOrientationGate();
+}
 
 /* ===== INICIALIZACIÓN ===== */
 if (document.readyState === "complete" || document.readyState === "interactive") {
@@ -63,6 +80,12 @@ if (document.readyState === "complete" || document.readyState === "interactive")
 }
 
 function Init() {
+  updateOrientationGate();
+  window.addEventListener("resize", updateOrientationGate, { passive: true });
+  window.addEventListener("orientationchange", function () {
+    setTimeout(updateOrientationGate, 120);
+  }, { passive: true });
+
   Start();
   ConfigurarPortada(); // Arranca escuchando el botón de la portada integrada
 }
@@ -152,6 +175,8 @@ function ConfigurarPortada() {
 
   if (btnJugar) {
     btnJugar.addEventListener("click", async () => {
+      if (!canStartLandscapeGame()) return;
+
       try {
         // 1. Pedimos Pantalla Completa
         if (document.documentElement.requestFullscreen) {
@@ -168,6 +193,8 @@ function ConfigurarPortada() {
         console.warn("No se pudo forzar rotación:", err);
       }
 
+      if (!canStartLandscapeGame()) return;
+
       // 3. Ocultar la portada
       if (portada) portada.classList.remove("show");
 
@@ -178,6 +205,7 @@ function ConfigurarPortada() {
 }
 
 async function runCountdown() {
+  if (!canStartLandscapeGame()) return;
   if (gameStarted || countdownActive) return;
   countdownActive = true;
 
@@ -229,6 +257,7 @@ async function cargarQuizJSON() {
 
 /* ===== CONTROLES ===== */
 function GlobalTap(e) {
+  if (orientationBlocked) return;
   if (parado || quizVisible || countdownActive || !gameStarted) return;
   var target = e.target;
   if (target.closest("#retryWrap") || target.closest("#quizOverlay")) return;
@@ -239,6 +268,7 @@ function GlobalTap(e) {
 }
 
 function HandleKeyDown(ev) {
+  if (orientationBlocked) return;
   if (quizVisible || countdownActive || !gameStarted) return;
   if (ev.code === "Space" || ev.keyCode === 32 || ev.code === "ArrowUp" || ev.keyCode === 38) {
     ev.preventDefault(); Saltar();
@@ -247,6 +277,7 @@ function HandleKeyDown(ev) {
 
 /* ===== UPDATE (Lógica de movimiento y colisiones) ===== */
 function Update() {
+  if (orientationBlocked) return;
   if (parado) return;
   MoverDinosaurio();
   MoverSuelo();

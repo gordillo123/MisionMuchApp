@@ -701,15 +701,15 @@ body {
 
   .options-list {
     display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem !important;
+    grid-template-columns: 1fr !important;
+    gap: 0.55rem !important;
     margin-bottom: 0.5rem !important;
   }
 
   .option-btn {
-    min-height: 58px;
+    min-height: 48px;
     border-radius: 14px;
-    padding: 0.55rem 0.45rem;
+    padding: 0.55rem 0.75rem;
     font-size: 0.9rem;
     line-height: 1.15;
     gap: 0.4rem;
@@ -952,15 +952,15 @@ body {
 
   #options.options-list {
     display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 0.42rem !important;
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
     margin-bottom: 0.4rem !important;
   }
 
   #options .option-btn {
-    min-height: 54px;
+    min-height: 46px;
     border-radius: 13px;
-    padding: 0.42rem 0.35rem;
+    padding: 0.48rem 0.7rem;
     font-size: clamp(0.72rem, 3.6vw, 0.88rem);
     line-height: 1.12;
     gap: 0.3rem;
