@@ -87,7 +87,7 @@ window.APP_MODULES = {
       <h2 class="section-title"> Reglas</h2>
       <ul class="rules-list" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
         <li><span class="rule-icon">📱</span>
-          <div>Gira el celular en posición horizontal.</div>
+          <div>Usa el celular en vertical para las preguntas. Solo el Espinosaurio se juega en horizontal.</div>
         </li>
         <li><span class="rule-icon">📷</span>
           <div>Escanea el código QR de cualquier estación del museo.</div>
@@ -337,7 +337,7 @@ window.APP_MODULES = {
   <div class="rules-content">
     <div class="rule-item">
       <div class="rule-icon-pro">📱</div>
-      <div class="rule-text">Gira el celular en posición horizontal.</div>
+      <div class="rule-text">Usa el celular en vertical para las preguntas. Solo el Espinosaurio se juega en horizontal.</div>
     </div>
     <div class="rule-item">
       <div class="rule-icon-pro">📷</div>

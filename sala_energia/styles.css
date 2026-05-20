@@ -47,6 +47,52 @@ body {
   padding: 1rem;
 }
 
+.portrait-lock {
+  display: none;
+}
+
+.portrait-lock-card {
+  width: min(88vw, 380px);
+  padding: 1.5rem;
+  border-radius: 26px;
+  background: #ffffff;
+  color: var(--text-main);
+  text-align: center;
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.22);
+  border: 1px solid rgba(59, 130, 246, 0.14);
+}
+
+.portrait-lock-icon {
+  font-size: 3rem;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+}
+
+.portrait-lock h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.65rem;
+  font-weight: 900;
+}
+
+.portrait-lock p {
+  margin: 0;
+  color: var(--text-sub);
+  font-weight: 700;
+}
+
+@media (orientation: landscape) and (max-height: 620px) and (pointer: coarse) {
+  .portrait-lock {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.96), rgba(59, 130, 246, 0.96));
+  }
+}
+
 @keyframes gradientMove {
   0% {
     background-position: 0% 50%;

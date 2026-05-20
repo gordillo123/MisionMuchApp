@@ -39,6 +39,52 @@ body {
     overflow-x: hidden;
 }
 
+.portrait-lock {
+    display: none;
+}
+
+.portrait-lock-card {
+    width: min(88vw, 380px);
+    padding: 1.5rem;
+    border-radius: 26px;
+    background: #252836;
+    color: var(--text-color);
+    text-align: center;
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.portrait-lock-icon {
+    font-size: 3rem;
+    line-height: 1;
+    margin-bottom: 0.75rem;
+}
+
+.portrait-lock h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.65rem;
+    font-weight: 900;
+}
+
+.portrait-lock p {
+    margin: 0;
+    color: #E2E8F0;
+    font-weight: 700;
+}
+
+@media (orientation: landscape) and (max-height: 620px) and (pointer: coarse) {
+    .portrait-lock {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background: linear-gradient(135deg, rgba(26, 28, 44, 0.96), rgba(119, 90, 255, 0.96));
+    }
+}
+
 .container {
     width: 100%;
     max-width: 700px;
