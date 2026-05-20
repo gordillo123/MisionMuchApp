@@ -72,7 +72,7 @@ window.APP_MODULES = {
         💻 Tecnología
       </div>
       <div class="badge node-5" data-fact="Existen más de 7,000 idiomas en el mundo. El 40% está en peligro de desaparecer.">
-        🌈 Diversidad
+        🧬 Diversidad
       </div>
     </div>
   </div>

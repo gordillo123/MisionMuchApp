@@ -310,10 +310,18 @@ class UIManager {
     if (this.e.nextBtn) this.e.nextBtn.classList.add('d-none');
     if (this.e.pillSala) this.e.pillSala.textContent = `Sala: ${SALA}`;
     if (this.e.qTotal) this.e.qTotal.textContent = QUESTIONS.length.toString();
+    if (this.e.correctTotal) this.e.correctTotal.textContent = QUESTIONS.length.toString();
     this.bind();
     this.render();
     this.clock();
     this.startFocusDetection();
+  }
+
+  updateScoreboard() {
+    const s = this.state;
+    if (this.e.pointsEl) this.e.pointsEl.textContent = s.points.toString();
+    if (this.e.correctCount) this.e.correctCount.textContent = s.correct.toString();
+    if (this.e.correctTotal) this.e.correctTotal.textContent = QUESTIONS.length.toString();
   }
 
   startFocusDetection() {
@@ -373,6 +381,7 @@ class UIManager {
 
     const q = QUESTIONS[s.idx];
     s.answers.push({ qIndex: s.idx, question: q.text, choice: null, correct: false, timeout: true });
+    this.updateScoreboard();
 
     if (e.questionTimer) e.questionTimer.textContent = '⏳ 0s';
     this.sound.wrong();
@@ -513,7 +522,7 @@ class UIManager {
     });
 
     e.nextBtn.textContent = s.idx === QUESTIONS.length - 1 ? 'Finalizar 🎉' : 'Siguiente ➡️';
-    if (e.pointsEl) e.pointsEl.textContent = s.points.toString();
+    this.updateScoreboard();
     if (e.hint) e.hint.textContent = 'Tip: solo puedes elegir una respuesta';
     this.startQuestionTimer();
   }
@@ -540,6 +549,7 @@ class UIManager {
       this.sound.wrong();
     }
     s.answers.push({ qIndex: s.idx, question: q.text, choice: q.options[i], correct: i === correctIdx });
+    this.updateScoreboard();
 
     // Auto-advance after 3 seconds (3000ms)
     setTimeout(() => {
@@ -575,6 +585,8 @@ const elements = {
   status: document.getElementById('status'),
   nextBtn: document.getElementById('nextBtn'),
   pointsEl: document.getElementById('points'),
+  correctCount: document.getElementById('correctCount'),
+  correctTotal: document.getElementById('correctTotal'),
   hint: document.getElementById('hint'),
   finalTitle: document.getElementById('finalTitle'),
   finalMsg: document.getElementById('finalMsg'),

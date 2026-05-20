@@ -237,6 +237,32 @@
       font-weight: 500;
     }
 
+    .exit-map-btn {
+      position: absolute;
+      top: calc(max(8px, env(safe-area-inset-top)) + clamp(150px, 30vh, 190px));
+      left: max(12px, env(safe-area-inset-left));
+      z-index: 2000000;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 7px 11px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      color: #1f2937;
+      font-weight: 900;
+      font-size: clamp(11px, 2.3vw, 13px);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+
+    .exit-map-btn:active {
+      transform: scale(0.97);
+    }
+
     /* ==================================================== */
 
     /* Comportamiento Vertical/Horizontal */
@@ -443,15 +469,6 @@
 </head>
 
 <body>
-  <button id="btnReturnToMap" class="btn-back-premium" title="Volver al Mapa" aria-label="Volver al mapa">
-    <div class="back-icon-wrapper">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 12h8" />
-        <path d="M13 6l6 6-6 6" />
-      </svg>
-    </div>
-  </button>
-
   <div id="orientationLock" class="orientation-lock" role="dialog" aria-modal="true" aria-live="polite">
     <div class="orientation-lock__card">
       <div class="orientation-lock__icon" aria-hidden="true"></div>
@@ -486,6 +503,10 @@
         <img src="logo-sata.png" alt="SATA">
         <img src="logo-much.png" alt="MUCH">
       </div>
+      <button id="btnExitToMap" class="exit-map-btn" type="button" aria-label="Salir al mapa">
+        <span aria-hidden="true">🚪</span>
+        <span>Salir</span>
+      </button>
       <div class="suelo"></div>
       <div class="dino dino-corriendo"></div>
       <div class="score">0</div>
@@ -539,11 +560,9 @@
     }, { passive: false });
     document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
 
-    // Lógica para el botón de regresar que mantenga los parámetros de la URL
-    document.getElementById('btnReturnToMap').addEventListener('click', function(e) {
+    document.getElementById('btnExitToMap').addEventListener('click', function(e) {
       e.preventDefault();
       const searchParams = new URLSearchParams(window.location.search);
-
       window.location.href = '../index.html?' + searchParams.toString();
     });
 
