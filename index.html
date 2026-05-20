@@ -2583,7 +2583,6 @@
       }
     }
   </style>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
 <body>
@@ -2926,11 +2925,17 @@
       // 4. Login, Modal & Filtros
       selectedAvatar = null;
       let googleUser = null; 
-      const GOOGLE_CLIENT_ID = '448151900472-1s6mhvs9ter7tiidtdp387iqu62ijvcj.apps.googleusercontent.com';
       const loginOverlay = document.getElementById('loginOverlay');
       const overlay = document.getElementById('avatarOverlay');
       const loginNote = document.getElementById('loginNote');
       const btnGoogleFallback = document.getElementById('btnGoogleFallback');
+
+      try {
+        googleUser = JSON.parse(localStorage.getItem('much_google_user') || 'null');
+      } catch (error) {
+        console.warn('No se pudo leer la sesion de Google guardada:', error);
+        googleUser = null;
+      }
 
       function openAvatarSelection() {
         loginOverlay.classList.remove('open');
@@ -2944,53 +2949,47 @@
         }
       }
 
-      function completeGoogleLogin(profile) {
-        googleUser = profile || { name: 'Invitado Google', email: 'google@demo.local' };
+      async function sincronizarUsuarioSupabase() {
+        const session = await window.obtenerSesionActual();
+        console.log('[Login] Sesion actual:', session);
+        if (!session?.user) return null;
+
+        const user = await window.obtenerUsuarioActual();
+        if (!user) return null;
+
+        googleUser = window.normalizarUsuarioSupabase(user);
+        console.log('[Login] Usuario autenticado:', googleUser);
         localStorage.setItem('much_google_user', JSON.stringify(googleUser));
+
+        try {
+          await window.verificarUsuarioEnTabla();
+        } catch (error) {
+          console.error('[Login] Error verificando public.usuarios:', error);
+        }
+
         loginNote.innerText = 'Cuenta conectada. Elige tu avatar.';
-        openAvatarSelection();
+        return googleUser;
       }
 
-      function decodeJwt(token) {
-        const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-        return JSON.parse(decodeURIComponent(atob(payload).split('').map((char) => {
-          return '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2);
-        }).join('')));
+      async function completeGoogleLogin() {
+        const user = await sincronizarUsuarioSupabase();
+        if (user) openAvatarSelection();
       }
 
-      function initGoogleLogin(attempt = 0) {
-        const hasRealClientId = GOOGLE_CLIENT_ID && !GOOGLE_CLIENT_ID.startsWith('TU_CLIENT_ID');
-        if (hasRealClientId && !window.google?.accounts?.id && attempt < 20) {
-          loginNote.innerText = 'Preparando acceso con Google...';
-          setTimeout(() => initGoogleLogin(attempt + 1), 250);
-          return;
-        }
-
-        if (hasRealClientId && window.google?.accounts?.id) {
-          btnGoogleFallback.style.display = 'none';
-          loginNote.innerText = 'Elige tu cuenta de Google para continuar.';
-          window.google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
-            callback: (response) => {
-              const profile = decodeJwt(response.credential);
-              completeGoogleLogin({
-                name: profile.name,
-                email: profile.email,
-                picture: profile.picture
-              });
-            }
-          });
-          window.google.accounts.id.renderButton(
-            document.getElementById('googleSignInButton'),
-            { theme: 'outline', size: 'large', width: 320, shape: 'pill', text: 'continue_with' }
-          );
-          return;
-        }
-
-        btnGoogleFallback.onclick = () => {
-          loginNote.innerText = 'Modo prueba: agrega tu Client ID para activar Google real.';
-          setTimeout(() => completeGoogleLogin({ name: 'Cuenta Google', email: 'demo@google.local' }), 450);
+      async function initGoogleLogin() {
+        loginNote.innerText = 'Usa Google para comenzar tu aventura.';
+        btnGoogleFallback.onclick = async () => {
+          try {
+            loginNote.innerText = 'Redirigiendo a Google...';
+            await window.iniciarSesionConGoogle();
+          } catch (error) {
+            console.error('[Login] Error iniciando sesion con Google:', error);
+            loginNote.innerText = 'No se pudo iniciar sesion con Google. Revisa Supabase.';
+          }
         };
+
+        const user = await sincronizarUsuarioSupabase();
+        if (user) openAvatarSelection();
       }
 
       initGoogleLogin();
@@ -3073,10 +3072,10 @@
 
       window.startGameFlow = () => {
         // 1. Si no hay sesión de Google, pedir login (Prioridad máxima)
-        // if (!googleUser) {
-        //   loginOverlay.classList.add('open');
-        //   return;
-        // }
+        if (!googleUser) {
+          loginOverlay.classList.add('open');
+          return;
+        }
 
         // 2. Si ya hay Google pero no hay avatar, pedir avatar
         if (!selectedAvatar) {
