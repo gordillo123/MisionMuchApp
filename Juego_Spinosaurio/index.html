@@ -263,6 +263,81 @@
       transform: scale(0.97);
     }
 
+    @media (orientation: landscape) and (max-height: 650px) {
+      .portada-overlay {
+        justify-content: stretch;
+        align-items: stretch;
+        padding: 0;
+        overflow: hidden;
+        background: linear-gradient(180deg, #6c9c93, #38bdf8);
+      }
+
+      .portada-top-logos {
+        top: max(8px, env(safe-area-inset-top));
+        left: max(10px, env(safe-area-inset-left));
+        right: max(10px, env(safe-area-inset-right));
+        width: auto;
+        max-width: none;
+        padding: 0;
+        z-index: 2;
+      }
+
+      .portada-top-logos img {
+        height: clamp(24px, 8vh, 40px);
+        border-radius: 10px;
+        padding: 4px 10px;
+      }
+
+      .portada-card {
+        width: 100%;
+        max-width: none;
+        min-height: 100svh;
+        height: 100svh;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+        padding: clamp(48px, 13vh, 74px) max(18px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+        box-shadow: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .portada-much-logo {
+        width: clamp(120px, 20vw, 180px);
+        max-height: 52px;
+        margin: 0 auto clamp(6px, 1.6vh, 12px);
+      }
+
+      .portada-title {
+        font-size: clamp(32px, 9.5vh, 64px);
+        line-height: 0.95;
+        margin: 0 0 clamp(8px, 2vh, 14px);
+        letter-spacing: 0.5px;
+      }
+
+      .portada-sub {
+        width: min(760px, 86vw);
+        margin: 0 auto clamp(12px, 3vh, 18px);
+        font-size: clamp(15px, 4.4vh, 26px);
+        line-height: 1.15;
+      }
+
+      .btn-play-portada {
+        width: min(320px, 42vw);
+        max-width: none;
+        padding: clamp(10px, 3vh, 15px) 18px;
+        margin: 0 auto clamp(8px, 2vh, 14px);
+        border-radius: 14px;
+        font-size: clamp(16px, 4.4vh, 24px);
+      }
+
+      .portada-tips {
+        font-size: clamp(11px, 2.8vh, 14px);
+        line-height: 1.1;
+      }
+    }
+
     /* ==================================================== */
 
     /* Comportamiento Vertical/Horizontal */
@@ -464,6 +539,90 @@
 
     .quiz-msg.err {
       color: #dc2626
+    }
+
+    @media (orientation: landscape) and (max-height: 650px) {
+      .quiz-overlay {
+        padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+        overflow: hidden !important;
+        place-items: center;
+      }
+
+      .quiz-card {
+        width: min(900px, 92vw);
+        max-height: calc(100svh - 16px);
+        margin: 0 auto;
+        padding: clamp(10px, 3vh, 16px);
+        border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .quiz-title {
+        font-size: clamp(15px, 3.8vh, 22px);
+        margin-bottom: 4px;
+      }
+
+      .quiz-sub {
+        font-size: clamp(12px, 3vh, 16px);
+        margin-bottom: 8px;
+      }
+
+      .quiz-q {
+        font-size: clamp(16px, 4.2vh, 24px);
+        line-height: 1.15;
+        margin-bottom: 6px;
+        text-align: center;
+      }
+
+      .quiz-timer {
+        margin: 4px 0 8px !important;
+        font-size: clamp(16px, 4.4vh, 24px);
+      }
+
+      .quiz-options {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin: 6px 0 8px;
+      }
+
+      .quiz-opt {
+        min-height: clamp(42px, 12vh, 62px);
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 13px;
+        font-size: clamp(13px, 3.5vh, 18px);
+        font-weight: 800;
+        background: #ffffff;
+      }
+
+      .quiz-opt input {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        flex: 0 0 auto;
+      }
+
+      .quiz-actions {
+        gap: 8px;
+        margin-top: 6px;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        min-width: 130px;
+        padding: 9px 14px;
+        border-radius: 11px;
+        font-size: clamp(13px, 3.2vh, 16px);
+      }
+
+      .quiz-msg {
+        min-height: 18px;
+        margin-top: 5px;
+        font-size: clamp(12px, 3vh, 15px);
+      }
     }
   </style>
 </head>

@@ -3133,6 +3133,34 @@
         if (navAvatarImg) navAvatarImg.src = `avatars/${id}.png`;
       }
 
+      function applyAvatarToUI(avatar) {
+        if (!avatar || !avatar.id) return false;
+
+        selectedAvatar = avatar;
+
+        const prepName = document.getElementById('prepAvatarName');
+        if (prepName) prepName.innerText = avatar.name || 'Explorador';
+
+        const imgCont = document.getElementById('prepAvatarImg');
+        if (imgCont) imgCont.innerHTML = `<img src="avatars/${avatar.id}.png" class="av-img">`;
+
+        const mapAvatarCont = document.getElementById('mapAvatarImgCont');
+        if (mapAvatarCont) mapAvatarCont.innerHTML = `<img src="avatars/${avatar.id}.png" alt="Avatar">`;
+
+        updateNavAvatar(avatar.id);
+        return true;
+      }
+
+      function restoreSavedAvatar() {
+        try {
+          const savedAvatar = JSON.parse(localStorage.getItem('much_selected_avatar') || 'null');
+          return applyAvatarToUI(savedAvatar);
+        } catch (error) {
+          console.error('Error al restaurar avatar:', error);
+          return false;
+        }
+      }
+
       function openProfile() {
         if (!googleUser && !selectedAvatar) {
           startGameFlow();
@@ -3375,7 +3403,7 @@
 
       async function completeGoogleLogin() {
         const user = await sincronizarUsuarioSupabase();
-        if (user) openAvatarSelection();
+        if (user && !restoreSavedAvatar()) openAvatarSelection();
       }
 
       async function initGoogleLogin() {
@@ -3391,7 +3419,7 @@
         };
 
         const user = await sincronizarUsuarioSupabase();
-        if (user) openAvatarSelection();
+        if (user && !restoreSavedAvatar()) openAvatarSelection();
       }
 
       initGoogleLogin();
@@ -3479,8 +3507,8 @@
           return;
         }
 
-        // 2. Si ya hay Google pero no hay avatar, pedir avatar
-        if (!selectedAvatar) {
+        // 2. Si ya hay Google pero no hay avatar guardado, pedir avatar
+        if (!selectedAvatar && !restoreSavedAvatar()) {
           openAvatarSelection();
           return;
         }
@@ -3561,16 +3589,8 @@
         if (!selectedAvatar) return;
         overlay.classList.remove('open');
 
-        // Cargar datos en la vista de preparación
-        document.getElementById('prepAvatarName').innerText = selectedAvatar.name;
-        const imgCont = document.getElementById('prepAvatarImg');
-        imgCont.innerHTML = `<img src="avatars/${selectedAvatar.id}.png" class="av-img">`;
-
-        // Cargar avatar en el mapa
-        const mapAvatarCont = document.getElementById('mapAvatarImgCont');
-        if (mapAvatarCont) mapAvatarCont.innerHTML = `<img src="avatars/${selectedAvatar.id}.png" alt="Avatar">`;
-
-        // Switch de vista
+        localStorage.setItem('much_selected_avatar', JSON.stringify(selectedAvatar));
+        applyAvatarToUI(selectedAvatar);
         showView('viewPrep');
 
         // Posición inicial del avatar (Estación 1 - Entrada)
@@ -3578,44 +3598,19 @@
           moveToStation(1);
         }, 500);
 
-        // Actualizar nav
-        updateNavAvatar(selectedAvatar.id);
-
-        // Guardar avatar seleccionado en localStorage
-        localStorage.setItem('much_selected_avatar', JSON.stringify(selectedAvatar));
       };
 
       // NUEVO: Lógica para manejar el regreso desde las estaciones y persistencia
       function checkStatePersistence() {
-        const savedAvatar = localStorage.getItem('much_selected_avatar');
         const savedStation = localStorage.getItem('much_current_station');
 
-        if (savedAvatar) {
-          try {
-            selectedAvatar = JSON.parse(savedAvatar);
-            
-            // Cargar datos en la vista de preparación
-            const prepName = document.getElementById('prepAvatarName');
-            if (prepName) prepName.innerText = selectedAvatar.name;
-            
-            const imgCont = document.getElementById('prepAvatarImg');
-            if (imgCont) imgCont.innerHTML = `<img src="avatars/${selectedAvatar.id}.png" class="av-img">`;
-
-            const mapAvatarCont = document.getElementById('mapAvatarImgCont');
-            if (mapAvatarCont) mapAvatarCont.innerHTML = `<img src="avatars/${selectedAvatar.id}.png" alt="Avatar">`;
-
-            updateNavAvatar(selectedAvatar.id);
-
-            // Redirigir SIEMPRE al mapa interactivo de estaciones si hay una sesión activa
-            showView('viewPrep');
-            currentStation = savedStation ? String(savedStation) : '1';
-            setTimeout(() => {
-              moveToStation(currentStation);
-            }, 500);
-          } catch (e) {
-            console.error('Error al restaurar estado:', e);
-            showView('viewLanding');
-          }
+        if (restoreSavedAvatar()) {
+          // Redirigir SIEMPRE al mapa interactivo de estaciones si hay una sesión activa
+          showView('viewPrep');
+          currentStation = savedStation ? String(savedStation) : '1';
+          setTimeout(() => {
+            moveToStation(currentStation);
+          }, 500);
         } else {
           showView('viewLanding');
         }
