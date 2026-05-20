@@ -260,6 +260,10 @@
 
     .nav-brand {
       text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      min-width: 0;
     }
 
     .nav-brand-text {
@@ -271,6 +275,48 @@
       -webkit-text-fill-color: transparent;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
       letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .nav-brand-logos {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding-left: 0.85rem;
+      border-left: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .nav-brand-logo {
+      display: block;
+      width: auto;
+      object-fit: contain;
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 6px;
+      padding: 3px 6px;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .nav-brand-logo-sata {
+      height: 30px;
+      max-width: 112px;
+    }
+
+    .nav-brand-logo-much {
+      height: 34px;
+      max-width: 88px;
+    }
+
+    .nav-brand-logo-sbeel {
+      height: 40px;
+      max-width: 128px;
+      background: transparent;
+      padding: 0;
+      border-radius: 5px;
+    }
+
+    .nav-brand-logo-agencia {
+      height: 34px;
+      max-width: 118px;
     }
 
     .nav-links {
@@ -331,39 +377,55 @@
     }
 
     @media (max-width: 768px) {
-      .top-nav { padding: 1rem; }
+      .top-nav {
+        padding: 0;
+      }
       
       .nav-container {
         position: relative;
+        min-height: 60px;
+        padding: 0.65rem 4.75rem 0.65rem 0.9rem;
+      }
+
+      .nav-brand-logos {
+        display: none;
       }
       
       .nav-container:has(.nav-links.open) .nav-brand {
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.25s ease, visibility 0.25s ease;
+        opacity: 1;
+        visibility: visible;
       }
       
       .nav-links {
-        display: none;
+        display: flex;
         position: fixed;
-        top: 0.85rem;
-        right: 4.8rem;
-        width: 220px;
-        height: 42px;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: min(82vw, 320px);
+        height: 100dvh;
         background: rgba(26, 28, 44, 0.96);
-        border: 2px solid rgba(255, 255, 255, 0.12);
-        border-radius: 12px;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-evenly;
-        padding: 0 0.25rem;
-        z-index: 1000;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        border-left: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 22px 0 0 22px;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 0.75rem;
+        padding: 5rem 1rem 1.25rem;
+        z-index: 1005;
+        box-shadow: -18px 0 36px rgba(0, 0, 0, 0.42);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(105%);
+        transition: transform 0.28s cubic-bezier(0.165, 0.84, 0.44, 1),
+          opacity 0.22s ease,
+          visibility 0.22s ease;
       }
       
       .nav-links.open {
-        display: flex;
-        animation: slideInLeft 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(0);
       }
       
       @keyframes slideInLeft {
@@ -379,33 +441,43 @@
       
       .nav-btn {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
         color: #a0a4b8;
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
+        width: 100%;
+        min-width: 0;
+        height: 58px;
+        border-radius: 14px;
         transition: all 0.2s;
-        padding: 0;
+        padding: 0.55rem 0.75rem;
+        gap: 0.3rem;
       }
       
       .nav-btn .nav-icon {
-        font-size: 1.15rem;
+        font-size: 1.25rem;
         display: flex;
         align-items: center;
         justify-content: center;
+        line-height: 1;
       }
       
       .nav-btn .nav-label {
-        display: none !important;
+        display: block !important;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 0.8rem;
+        font-weight: 800;
+        line-height: 1;
+        white-space: nowrap;
       }
       
       .nav-links .nav-avatar {
-        width: 26px;
-        height: 26px;
+        width: 30px;
+        height: 30px;
         margin-left: 0;
         border-width: 1.5px;
       }
@@ -764,6 +836,40 @@
         font-size: 1.1rem;
       }
 
+      .nav-brand {
+        gap: 0.55rem;
+      }
+
+      .nav-brand-logos {
+        gap: 0.35rem;
+        padding-left: 0.5rem;
+      }
+
+      .nav-brand-logo {
+        border-radius: 5px;
+        padding: 2px 4px;
+      }
+
+      .nav-brand-logo-sata {
+        height: 22px;
+        max-width: 78px;
+      }
+
+      .nav-brand-logo-much {
+        height: 24px;
+        max-width: 58px;
+      }
+
+      .nav-brand-logo-sbeel {
+        height: 27px;
+        max-width: 86px;
+      }
+
+      .nav-brand-logo-agencia {
+        height: 24px;
+        max-width: 78px;
+      }
+
       .nav-links {
         gap: 0.8rem;
         padding: 0.15rem 0.8rem;
@@ -841,6 +947,10 @@
         min-height: auto;
         height: 100vh;
         max-width: 100%;
+      }
+
+      .intro-container .rules-col {
+        display: none;
       }
 
       .rules-col {
@@ -933,6 +1043,26 @@
         border-width: 3px;
         z-index: 1020 !important;
         pointer-events: auto !important;
+      }
+
+      .prep-logo-strip {
+        gap: 0.35rem;
+        margin: -0.35rem auto 0.45rem;
+        padding: 0.28rem 0.4rem;
+        border-radius: 10px;
+      }
+
+      .prep-logo-strip img {
+        height: 21px;
+        max-width: 66px;
+        border-radius: 5px;
+        padding: 2px 4px;
+      }
+
+      .prep-logo-strip .prep-logo-sbeel {
+        height: 25px;
+        max-width: 78px;
+        padding: 0;
       }
     }
 
@@ -1220,7 +1350,8 @@
     /* PREP VIEW (RULES & MAP) */
     .intro-container {
       display: grid;
-      grid-template-columns: minmax(260px, 1fr) minmax(0, 1.5fr);
+      grid-template-columns: minmax(280px, 820px);
+      justify-content: center;
       gap: 2rem;
       max-width: 1200px;
       margin: 0 auto;
@@ -1242,6 +1373,10 @@
     .rules-col,
     .map-col {
       min-width: 0;
+    }
+
+    .rules-col {
+      display: none;
     }
 
     .section-title {
@@ -1515,8 +1650,8 @@
       .hamburger {
         display: flex;
         position: fixed;
-        top: 0.85rem;
-        right: 1.5rem;
+        top: 0.7rem;
+        right: 0.9rem;
         height: 42px;
         width: 42px;
         align-items: center;
@@ -1583,11 +1718,30 @@
       .intro-container {
         display: flex;
         flex-direction: column;
-        padding: 5rem 1rem 2rem;
+        padding: 7rem 1rem 2rem;
         width: 100%;
         min-height: 100dvh;
         align-items: stretch;
         gap: 1.25rem;
+      }
+
+      .prep-logo-strip {
+        justify-content: center;
+        gap: 0.45rem;
+        margin: -0.25rem auto 0.65rem;
+        padding: 0.32rem 0.45rem;
+      }
+
+      .prep-logo-strip img {
+        height: 22px;
+        max-width: 64px;
+        padding: 2px 4px;
+      }
+
+      .prep-logo-strip .prep-logo-sbeel {
+        height: 26px;
+        max-width: 78px;
+        padding: 0;
       }
 
       .map-col {
@@ -1641,6 +1795,16 @@
         padding: 1rem 1.25rem;
         font-size: 1.25rem;
         margin-top: 1.25rem;
+      }
+
+      #btnResetProgress {
+        min-height: 44px;
+        justify-content: center;
+        padding: 0.65rem 1rem !important;
+        position: relative;
+        z-index: 2;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
       }
 
       .avatar-modal {
@@ -1698,6 +1862,35 @@
       visibility: hidden;
       transition: opacity .25s ease, visibility .25s ease;
       z-index: 900;
+    }
+
+    .mobile-nav-backdrop.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    @media (max-width: 380px) {
+      .nav-container {
+        padding-left: 0.75rem;
+      }
+
+      .nav-brand-text {
+        font-size: 1rem;
+      }
+
+      .nav-links {
+        width: min(86vw, 300px);
+        gap: 0.25rem;
+        padding: 4.75rem 0.75rem 1rem;
+      }
+
+      .nav-btn {
+        height: 54px;
+      }
+
+      .nav-btn .nav-label {
+        font-size: 0.74rem;
+      }
     }
 
     @media (max-width: 480px) {
@@ -2202,6 +2395,32 @@
       letter-spacing: -0.3px;
     }
 
+    .start-rules-mode .rules-modal {
+      width: min(620px, 94vw);
+    }
+
+    .start-rules-mode .rules-content {
+      grid-template-columns: 1fr;
+      max-height: min(58vh, 430px);
+      padding: 1rem 1.4rem;
+      gap: 0.75rem;
+    }
+
+    .start-rules-mode .rule-item {
+      flex-direction: row;
+      text-align: left;
+      align-items: center;
+      padding: 0.85rem 1rem;
+      border-radius: 18px;
+    }
+
+    .start-rules-mode .rule-icon-pro {
+      width: 42px;
+      min-width: 42px;
+      font-size: 1.7rem;
+      text-align: center;
+    }
+
     .btn-back-regreso {
       position: absolute;
       top: 1.5rem;
@@ -2238,35 +2457,218 @@
       position: relative;
     }
 
+    .prep-logo-strip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      width: fit-content;
+      max-width: 100%;
+      margin: -0.5rem auto 0.7rem;
+      padding: 0.38rem 0.55rem;
+      border-radius: 12px;
+      background: rgba(26, 28, 44, 0.08);
+      border: 1px solid rgba(26, 28, 44, 0.08);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
+    }
+
+    .prep-logo-strip img {
+      display: block;
+      width: auto;
+      height: 29px;
+      max-width: 96px;
+      object-fit: contain;
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 6px;
+      padding: 3px 6px;
+    }
+
+    .prep-logo-strip .prep-logo-sbeel {
+      height: 34px;
+      max-width: 116px;
+      padding: 0;
+      background: transparent;
+    }
+
+    .reward-claim-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      width: min(100%, 520px);
+      padding: 0.85rem 1rem;
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 226, 0.98)),
+        linear-gradient(135deg, #FFE66D, #FF6FB1);
+      border: 3px solid rgba(255, 255, 255, 0.95);
+      box-shadow:
+        0 16px 32px rgba(255, 111, 177, 0.22),
+        0 8px 0 rgba(26, 28, 44, 0.16);
+      color: var(--bg-deep);
+      transform-origin: center;
+      animation: rewardPop 0.45s ease both;
+    }
+
+    .reward-claim-box.is-hidden {
+      display: none;
+    }
+
+    .reward-claim-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      text-align: left;
+      line-height: 1.1;
+      min-width: 0;
+    }
+
+    .reward-claim-kicker {
+      color: #FF5EA8;
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .reward-claim-copy strong {
+      font-size: 1rem;
+      font-weight: 900;
+    }
+
+    .btn-claim-reward {
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 999px;
+      padding: 0.72rem 1.05rem;
+      background: linear-gradient(135deg, #775AFF, #32C8E8);
+      color: white;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 8px 16px rgba(50, 200, 232, 0.28);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    }
+
+    .btn-claim-reward:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 12px 22px rgba(119, 90, 255, 0.35);
+      filter: saturate(1.08);
+    }
+
+    .btn-claim-reward:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .btn-claim-reward:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    @keyframes rewardPop {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (max-width: 700px) {
+      .reward-claim-box {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.7rem;
+        padding: 0.75rem;
+      }
+
+      .reward-claim-copy {
+        text-align: center;
+      }
+
+      .btn-claim-reward {
+        width: 100%;
+      }
+    }
+
     .back-button-prep {
       position: absolute;
       top: 1.5rem;
       left: 1.5rem;
-      width: 50px;
-      height: 50px;
+      width: 58px;
+      height: 58px;
       border-radius: 50%;
-      background: var(--msf-purple);
-      border: 4px solid white;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 42%),
+        linear-gradient(135deg, var(--msf-purple), var(--msf-blue));
+      border: 3px solid rgba(255, 255, 255, 0.92);
       color: white;
-      font-size: 1.8rem;
+      font-size: 1.9rem;
+      line-height: 1;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      transition: all 0.2s;
+      box-shadow:
+        0 14px 30px rgba(119, 90, 255, 0.34),
+        0 4px 10px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
       z-index: 1020 !important;
       pointer-events: auto !important;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .back-button-prep::before {
+      content: "";
+      position: absolute;
+      inset: -35%;
+      background: conic-gradient(from 120deg, transparent, rgba(255, 255, 255, 0.7), transparent 38%);
+      opacity: 0;
+      transform: rotate(0deg);
+      transition: opacity 0.22s ease;
+      pointer-events: none;
     }
 
     .back-button-prep:hover {
-      transform: translateY(-3px) scale(1.1);
-      box-shadow: 0 8px 20px rgba(119, 90, 255, 0.35);
-      background: var(--msf-blue);
+      transform: translateY(-4px) scale(1.06);
+      border-color: rgba(255, 255, 255, 1);
+      box-shadow:
+        0 18px 38px rgba(109, 208, 240, 0.34),
+        0 8px 18px rgba(119, 90, 255, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    }
+
+    .back-button-prep:hover::before {
+      opacity: 1;
+      animation: spinGlow 1.2s linear infinite;
+    }
+
+    .back-button-prep:hover,
+    .back-button-prep:focus-visible {
+      text-shadow: -5px 0 0 rgba(255, 255, 255, 0.22);
+    }
+
+    .back-button-prep:focus-visible {
+      outline: 4px solid rgba(255, 197, 73, 0.72);
+      outline-offset: 4px;
     }
 
     .back-button-prep:active {
-      transform: translateY(-1px) scale(0.98);
+      transform: translateY(-1px) scale(0.96);
+      box-shadow:
+        0 8px 18px rgba(119, 90, 255, 0.28),
+        inset 0 3px 8px rgba(0, 0, 0, 0.18);
+    }
+
+    @keyframes spinGlow {
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     /* 👤 PERFIL MODAL */
@@ -3092,10 +3494,35 @@
       overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('open'); };
 
       const rulesOverlay = document.getElementById('rulesOverlay');
+      const btnCerrarReglas = document.getElementById('btnCerrarReglas');
+      const rulesTitle = rulesOverlay ? rulesOverlay.querySelector('.modal-title') : null;
+      const rulesSubtitle = rulesOverlay ? rulesOverlay.querySelector('.modal-header p') : null;
+      let pendingStartAfterRules = false;
+
+      function setRulesModeForStart(isStartingGame) {
+        pendingStartAfterRules = isStartingGame;
+        if (rulesOverlay) rulesOverlay.classList.toggle('start-rules-mode', isStartingGame);
+        if (rulesTitle) rulesTitle.innerText = isStartingGame ? 'Antes de jugar' : 'Cómo Jugar';
+        if (rulesSubtitle) {
+          rulesSubtitle.innerText = isStartingGame
+            ? 'Lee estas reglas rápidas antes de entrar a la estación.'
+            : 'Sigue estos pasos para completar tu misión con éxito';
+        }
+        if (btnCerrarReglas) {
+          btnCerrarReglas.innerText = isStartingGame ? 'Enterado, jugar' : '¡Entendido!';
+        }
+      }
+
+      function closeRulesOverlay() {
+        if (rulesOverlay) rulesOverlay.classList.remove('open');
+        setRulesModeForStart(false);
+      }
+
       const btnComoJugar = document.getElementById('btnComoJugar');
       if (btnComoJugar) {
         btnComoJugar.addEventListener('click', (e) => {
           e.preventDefault();
+          setRulesModeForStart(false);
           rulesOverlay.classList.add('open');
           if (window.innerWidth <= 768 && navLinks) {
             navLinks.classList.remove('open');
@@ -3104,11 +3531,17 @@
           }
         });
       }
-      document.getElementById('btnCerrarReglas').onclick = () => rulesOverlay.classList.remove('open');
-      rulesOverlay.onclick = (e) => { if (e.target === rulesOverlay) rulesOverlay.classList.remove('open'); };
+      if (btnCerrarReglas) {
+        btnCerrarReglas.onclick = () => {
+          const shouldStart = pendingStartAfterRules;
+          closeRulesOverlay();
+          if (shouldStart) playCurrentStation();
+        };
+      }
+      rulesOverlay.onclick = (e) => { if (e.target === rulesOverlay) closeRulesOverlay(); };
 
       // Botón cerrar reglas con X
-      document.getElementById('btnBackRules').onclick = () => rulesOverlay.classList.remove('open');
+      document.getElementById('btnBackRules').onclick = closeRulesOverlay;
 
       // Botón regreso desde vista de preparación
       document.getElementById('btnBackPrep').onclick = () => {
@@ -3200,9 +3633,63 @@
         '6': { x: 42, y: 66 }
       };
 
+      const REQUIRED_REWARD_STATIONS = ['2', '3', '4', '5', '6'];
+
+      function getCompletedStations() {
+        try {
+          return JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
+        } catch (e) {
+          return {};
+        }
+      }
+
+      function areAllRewardStationsCompleted(completed = getCompletedStations()) {
+        return REQUIRED_REWARD_STATIONS.every(stationId => completed[stationId]);
+      }
+
+      function buildMissionPrize() {
+        return {
+          key: 'mision_much_entrada_gratis',
+          title: 'MISIÓN MUCH · Entrada gratis',
+          label: 'Entrada gratis al Museo MUCH',
+          premio: 'Entrada gratis al Museo MUCH',
+          acceso: 'Entrada gratis al Museo MUCH',
+          lugar: 'Museo Chiapas de Ciencia y Tecnología',
+          sala: 'mision-much',
+          date: new Date().toISOString(),
+          emoji: '🎟️'
+        };
+      }
+
+      function updateRewardClaimUI(completed = getCompletedStations()) {
+        const rewardClaimBox = document.getElementById('rewardClaimBox');
+        const btnClaimReward = document.getElementById('btnClaimReward');
+        const isUnlocked = areAllRewardStationsCompleted(completed);
+
+        if (rewardClaimBox) {
+          rewardClaimBox.classList.toggle('is-hidden', !isUnlocked);
+        }
+
+        if (btnClaimReward) {
+          btnClaimReward.disabled = !isUnlocked;
+        }
+      }
+
+      function claimMissionReward() {
+        const completed = getCompletedStations();
+        if (!areAllRewardStationsCompleted(completed)) {
+          alert('Completa todas las estaciones para desbloquear tu boleto gratis.');
+          return;
+        }
+
+        localStorage.setItem('much_quiz_prize', JSON.stringify(buildMissionPrize()));
+        localStorage.setItem('much_mission_reward_claimed', 'true');
+        window.location.href = 'Boleto_Digital/registro.html?sala=mision-much&premio=entrada-gratis';
+      }
+
       function updateCompletedStationsOnMap() {
         try {
-          const completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
+          const completed = getCompletedStations();
           document.querySelectorAll('.map-marker').forEach(marker => {
             const stationId = marker.dataset.station;
             if (completed[stationId]) {
@@ -3213,6 +3700,7 @@
               marker.innerHTML = stationId;
             }
           });
+          updateRewardClaimUI(completed);
         } catch (e) {
           console.warn('Error rendering completed stations on map:', e);
         }
@@ -3236,7 +3724,8 @@
           updateCompletedStationsOnMap();
 
           // Bloquear el botón de comenzar si la estación ya está completada
-          const completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
+          const completed = getCompletedStations();
+          updateRewardClaimUI(completed);
           const btnComenzar = document.getElementById('btnComenzar');
           if (btnComenzar) {
             if (completed[String(stationId)]) {
@@ -3254,17 +3743,40 @@
         }
       }
 
+      let lastResetPromptAt = 0;
+      function resetStationProgress(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        const now = Date.now();
+        if (now - lastResetPromptAt < 800) return;
+        lastResetPromptAt = now;
+
+        if (confirm('¿Estás seguro de que deseas reiniciar el progreso de todas las estaciones? Las palomitas verdes se desmarcarán.')) {
+          localStorage.setItem('much_completed_stations', '{}');
+          localStorage.removeItem('much_quiz_prize');
+          localStorage.removeItem('much_mission_reward_claimed');
+          currentStation = '1';
+          localStorage.setItem('much_current_station', '1');
+          updateCompletedStationsOnMap();
+          updateRewardClaimUI({});
+          moveToStation('1');
+        }
+      }
+
       const btnResetProgress = document.getElementById('btnResetProgress');
       if (btnResetProgress) {
-        btnResetProgress.onclick = () => {
-          if (confirm('¿Estás seguro de que deseas reiniciar el progreso de todas las estaciones? Las palomitas verdes se desmarcarán.')) {
-            localStorage.setItem('much_completed_stations', '{}');
-            currentStation = '1';
-            localStorage.setItem('much_current_station', '1');
-            moveToStation(1);
-          }
-        };
+        btnResetProgress.addEventListener('click', resetStationProgress);
+        btnResetProgress.addEventListener('touchend', resetStationProgress, { passive: false });
       }
+
+      const btnClaimReward = document.getElementById('btnClaimReward');
+      if (btnClaimReward) {
+        btnClaimReward.onclick = claimMissionReward;
+      }
+      updateRewardClaimUI();
 
       // Permitir click en marcadores para probar movimiento
       document.querySelectorAll('.map-marker').forEach(marker => {
@@ -3273,31 +3785,39 @@
         };
       });
 
+      function getCurrentStationGameUrl() {
+        if (currentStation === '2') return 'Juego_Spinosaurio/index.html';
+        if (currentStation === '3') return 'SALA-Biodiversidad-y-Conocimiento/index.html?from=portada&sala=biodiversidad';
+        if (currentStation === '4') return 'sala_energia/index.html?from=portada&sala=energia';
+        if (currentStation === '5') return 'Sala_Desarrollo_Sustentable/index.html?from=portada&sala=desarrollo-sustentable';
+        if (currentStation === '6') return 'Sbeel_Dinosaurios/index.html';
+        return '';
+      }
+
+      function playCurrentStation() {
+        const url = getCurrentStationGameUrl();
+        if (url) {
+          window.location.href = url;
+          return;
+        }
+
+        alert('Coloca tu avatar en la estación correspondiente para entrar al juego.');
+      }
+
       document.getElementById('btnComenzar').onclick = () => {
-        const completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
+        const completed = getCompletedStations();
         if (completed[currentStation]) {
           alert('¡Esta estación ya ha sido completada! Por favor, continúa con la siguiente.');
           return;
         }
 
-        if (currentStation === '2') {
-          window.location.href = 'Juego_Spinosaurio/index.html';
-          return;
-        } else if (currentStation === '3') {
-          window.location.href = 'SALA-Biodiversidad-y-Conocimiento/index.html?from=portada&sala=biodiversidad';
-          return;
-        } else if (currentStation === '4') {
-          window.location.href = 'sala_energia/index.html?from=portada&sala=energia';
-          return;
-        } else if (currentStation === '5') {
-          window.location.href = 'Sala_Desarrollo_Sustentable/index.html?from=portada&sala=desarrollo-sustentable';
-          return;
-        } else if (currentStation === '6') {
-          window.location.href = 'Sbeel_Dinosaurios/index.html';
+        if (!getCurrentStationGameUrl()) {
+          playCurrentStation();
           return;
         }
 
-        alert('Coloca tu avatar en la estación correspondiente para entrar al juego.');
+        setRulesModeForStart(true);
+        rulesOverlay.classList.add('open');
       };
 
       // 6. Hamburguesa Móvil

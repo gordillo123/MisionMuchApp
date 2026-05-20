@@ -62,12 +62,7 @@
         </button>
         <div id="pillSala" class="sala-pill">Sala: Biodiversidad y Conocimiento</div>
 
-        <div class="d-flex align-items-center gap-2 bg-light px-3 py-1 rounded-pill border">
-          <div class="form-check form-switch mb-0 min-h-0">
-            <input class="form-check-input" type="checkbox" id="soundToggle" checked>
-          </div>
-          <span id="timer" class="timer-text">⏰ 19:02</span>
-        </div>
+        <input type="checkbox" id="soundToggle" checked hidden>
       </div>
 
       <div class="progress mb-4" style="height:4px;" role="progressbar">
@@ -84,6 +79,7 @@
           </div>
 
           <h2 id="qText" class="question-text mb-4">¿...?</h2>
+          <div id="questionTimer" class="question-timer mb-3 fw-bold text-warning">⏳ 10s</div>
           <p id="qDesc" class="d-none">...</p>
           <div id="options" class="options-list d-flex flex-column gap-3 mb-4">
           </div>

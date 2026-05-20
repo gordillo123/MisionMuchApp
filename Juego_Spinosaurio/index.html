@@ -240,11 +240,82 @@
     /* ==================================================== */
 
     /* Comportamiento Vertical/Horizontal */
+    .orientation-lock {
+      position: fixed;
+      inset: 0;
+      z-index: 3000000;
+      display: none;
+      place-items: center;
+      padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+      background: linear-gradient(135deg, #101827, #263a6b);
+      color: #fff;
+      text-align: center;
+    }
+
+    .orientation-lock__card {
+      width: min(420px, 92vw);
+      padding: 26px 22px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.36);
+      backdrop-filter: blur(10px);
+    }
+
+    .orientation-lock__icon {
+      width: 92px;
+      height: 58px;
+      margin: 0 auto 18px;
+      border: 6px solid #fff;
+      border-radius: 16px;
+      position: relative;
+      box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.1);
+    }
+
+    .orientation-lock__icon::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 5px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fff;
+      transform: translateX(-50%);
+    }
+
+    .orientation-lock h2 {
+      margin: 0 0 10px;
+      font-size: clamp(24px, 7vw, 34px);
+      line-height: 1.05;
+      font-weight: 900;
+    }
+
+    .orientation-lock p {
+      margin: 0;
+      font-size: clamp(15px, 4vw, 18px);
+      line-height: 1.35;
+      color: rgba(255, 255, 255, 0.86);
+      font-weight: 700;
+    }
+
     @media (orientation: portrait) {
 
       #game,
       .retry-wrap {
         display: none !important;
+      }
+    }
+
+    @media (max-width: 900px) and (orientation: portrait) {
+      body:not(.quiz-mode) .orientation-lock {
+        display: grid;
+      }
+
+      body:not(.quiz-mode) .portada-overlay,
+      body:not(.quiz-mode) #game,
+      body:not(.quiz-mode) .retry-wrap {
+        pointer-events: none;
       }
     }
 
@@ -372,15 +443,22 @@
 </head>
 
 <body>
-  <button id="btnReturnToMap" class="btn-back-premium" title="Volver al Mapa">
+  <button id="btnReturnToMap" class="btn-back-premium" title="Volver al Mapa" aria-label="Volver al mapa">
     <div class="back-icon-wrapper">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 12h8" />
+        <path d="M13 6l6 6-6 6" />
       </svg>
-      <span class="back-icon-label">BACK</span>
     </div>
-    Regresar
   </button>
+
+  <div id="orientationLock" class="orientation-lock" role="dialog" aria-modal="true" aria-live="polite">
+    <div class="orientation-lock__card">
+      <div class="orientation-lock__icon" aria-hidden="true"></div>
+      <h2>Gira tu telefono</h2>
+      <p>Para jugar la estacion 2, coloca tu telefono en horizontal.</p>
+    </div>
+  </div>
 
   <div id="portadaOverlay" class="portada-overlay show">
 
@@ -424,9 +502,11 @@
       <h3 id="quizTitle" class="quiz-title"></h3>
       <p id="quizSub" class="quiz-sub"></p>
       <p id="quizQuestion" class="quiz-q"></p>
+      <p id="quizTimer" class="quiz-timer" style="text-align:center;font-weight:900;margin:6px 0;color:#b91c1c;display:none;">10s</p>
       <div id="quizOptions" class="quiz-options"></div>
       <div class="quiz-actions">
         <button id="btnQuizOk" class="btn-primary">Confirmar</button>
+        <button id="btnQuizNext" class="btn-primary" style="display:none;">Siguiente</button>
         <button id="btnQuizCancel" class="btn-secondary">Cancelar</button>
       </div>
       <div id="quizMsg" class="quiz-msg" aria-live="polite"></div>
@@ -446,7 +526,7 @@
     console.log("Supabase listo para registrar en intentos_juego.");
   </script>
 
-  <script src="game.js?v=2" defer></script>
+  <script src="game.js?v=3" defer></script>
 
   <script>
     /* Prevenir comportamientos indeseados en dispositivos táctiles */

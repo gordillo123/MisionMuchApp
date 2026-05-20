@@ -10,6 +10,12 @@ window.APP_MODULES = {
   <div class="nav-container">
     <a href="#" class="nav-brand">
       <span class="nav-brand-text">MISIÓN MUCH</span>
+      <span class="nav-brand-logos" aria-label="Logos institucionales">
+        <img src="entrada-much/logo-sata.png" alt="SATA" class="nav-brand-logo nav-brand-logo-sata">
+        <img src="entrada-much/logo-much.png" alt="Museo Chiapas de Ciencia y Tecnología" class="nav-brand-logo nav-brand-logo-much">
+        <img src="Sbeel_Dinosaurios/logo-sbeel-dinosaurios.svg" alt="SBEEL Dinosaurios" class="nav-brand-logo nav-brand-logo-sbeel">
+        <img src="Juego_Spinosaurio/logo-agencia.png" alt="Agencia Digital Tecnológica del Estado" class="nav-brand-logo nav-brand-logo-agencia">
+      </span>
     </a>
     <div class="nav-links">
       <a href="#" class="nav-btn active" id="btnInicio">
@@ -140,6 +146,12 @@ window.APP_MODULES = {
 
   <div class="map-col">
     <div class="card" style="height: 100%; display: flex; flex-direction: column;">
+      <div class="prep-logo-strip" aria-label="Logos institucionales">
+        <img src="entrada-much/logo-sata.png" alt="SATA">
+        <img src="entrada-much/logo-much.png" alt="Museo Chiapas de Ciencia y Tecnología">
+        <img src="Sbeel_Dinosaurios/logo-sbeel-dinosaurios.svg" alt="SBEEL Dinosaurios" class="prep-logo-sbeel">
+        <img src="Juego_Spinosaurio/logo-agencia.png" alt="Agencia Digital Tecnológica del Estado">
+      </div>
       <h2 class="section-title">¿En qué estación estás?</h2>
       <div class="museum-map" id="museumMap">
         <img src="mapa 12.png" alt="Mapa del Museo" class="map-bg" />
@@ -160,7 +172,14 @@ window.APP_MODULES = {
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem; margin-top: 1.5rem;">
         <button class="btn-play large" id="btnComenzar" style="width: max-content; min-width: 280px;">🚀 ¡COMENZAR!</button>
-        <button id="btnResetProgress" style="background: transparent; border: 2px dashed rgba(255,255,255,0.25); color: #A0A4B8; padding: 6px 16px; border-radius: 20px; font-family: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 5px;">
+        <div id="rewardClaimBox" class="reward-claim-box is-hidden" aria-live="polite">
+          <div class="reward-claim-copy">
+            <span class="reward-claim-kicker">Misión completada</span>
+            <strong>Entrada gratis al museo desbloqueada</strong>
+          </div>
+          <button id="btnClaimReward" class="btn-claim-reward" type="button">🎟️ Reclamar mi premio</button>
+        </div>
+        <button id="btnResetProgress" type="button" style="background: transparent; border: 2px dashed rgba(255,255,255,0.25); color: #A0A4B8; padding: 6px 16px; border-radius: 20px; font-family: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 5px;">
           <span>🔄</span> Reiniciar Estaciones
         </button>
       </div>

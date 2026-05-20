@@ -37,6 +37,7 @@
     }
 
     .registro-container {
+      position: relative;
       background: var(--card-bg);
       border-radius: var(--card-br);
       box-shadow: var(--shadow-soft);
@@ -44,6 +45,41 @@
       width: 100%;
       max-width: 520px;
       border: 1px solid var(--gris-300);
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px 9px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      background: rgba(15, 18, 24, 0.72);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .back-btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(0, 201, 183, 0.75);
+      background: rgba(0, 201, 183, 0.16);
+    }
+
+    .back-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .back-btn-icon {
+      font-size: 1.15rem;
+      line-height: 1;
     }
 
     .logo-wrap {
@@ -154,6 +190,11 @@
       .brand-logo {
         width: clamp(110px, 50vw, 180px);
       }
+
+      .back-btn {
+        position: static;
+        margin-bottom: 12px;
+      }
     }
 
     /* === MODAL STYLES === */
@@ -235,6 +276,11 @@
 
 <body>
   <div class="registro-container">
+    <button id="btnBackRegistro" class="back-btn" type="button" aria-label="Regresar">
+      <span class="back-btn-icon">←</span>
+      <span>Regresar</span>
+    </button>
+
     <div class="logo-wrap">
       <img src="./logo-much.png" alt="MUCH · Museo de Ciencia y Tecnología" class="brand-logo">
     </div>
@@ -282,6 +328,15 @@
   </div>
 
   <script>
+    document.getElementById('btnBackRegistro')?.addEventListener('click', () => {
+      if (window.history.length > 1) {
+        window.history.back();
+        return;
+      }
+
+      window.location.href = '../index.html';
+    });
+
     // ---------- Supabase Client (BASE MUCH) ----------
     const SUPABASE_URL = 'https://qwgaeorsymfispmtsbut.supabase.co';
     const SUPABASE_ANON_KEY =
