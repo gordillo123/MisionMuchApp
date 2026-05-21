@@ -461,6 +461,7 @@
         box-shadow: -18px 0 36px rgba(0, 0, 0, 0.42);
         opacity: 0;
         visibility: hidden;
+        pointer-events: none;
         transform: translateX(105%);
         transition: transform 0.28s cubic-bezier(0.165, 0.84, 0.44, 1),
           opacity 0.22s ease,
@@ -470,6 +471,7 @@
       .nav-links.open {
         opacity: 1;
         visibility: visible;
+        pointer-events: auto;
         transform: translateX(0);
       }
       
@@ -3789,6 +3791,53 @@
         if (backdrop) backdrop.classList.remove('visible');
       }
 
+      function ensureMobileNavMenu() {
+        const menu = document.querySelector('.nav-links');
+        if (!menu) return;
+
+        const desiredOrder = ['btnInicio', 'btnPuntajes', 'btnComoJugar', 'btnAdmin', 'btnPerfil'];
+        const labels = {
+          btnInicio: ['🏠', 'Inicio', '#'],
+          btnPuntajes: ['🏆', 'Puntajes', '#'],
+          btnComoJugar: ['?', 'Ayuda', '#'],
+          btnAdmin: ['🛡️', 'Admin', 'entrada-much/dashboard.html']
+        };
+
+        if (!document.getElementById('btnAdmin')) {
+          const adminButton = document.createElement('a');
+          adminButton.href = labels.btnAdmin[2];
+          adminButton.className = 'nav-btn';
+          adminButton.id = 'btnAdmin';
+          adminButton.innerHTML = `<span class="nav-icon">${labels.btnAdmin[0]}</span><span class="nav-label">${labels.btnAdmin[1]}</span>`;
+          const profileButton = document.getElementById('btnPerfil');
+          menu.insertBefore(adminButton, profileButton || null);
+        }
+
+        desiredOrder.forEach((id) => {
+          const item = document.getElementById(id);
+          if (item) menu.appendChild(item);
+        });
+
+        Object.entries(labels).forEach(([id, [icon, label, href]]) => {
+          const item = document.getElementById(id);
+          if (!item) return;
+          item.href = href;
+          item.setAttribute('role', 'button');
+          item.setAttribute('data-nav-action', id);
+          item.querySelector('.nav-icon').textContent = icon;
+          item.querySelector('.nav-label').textContent = label;
+        });
+
+        const profileButton = document.getElementById('btnPerfil');
+        if (profileButton) {
+          profileButton.href = '#';
+          profileButton.setAttribute('role', 'button');
+          profileButton.setAttribute('data-nav-action', 'btnPerfil');
+          const label = profileButton.querySelector('.nav-label');
+          if (label) label.textContent = 'Perfil';
+        }
+      }
+
       function handleNavButtonAction(buttonId) {
         closeMobileMenu();
 
@@ -3819,18 +3868,30 @@
         }
       }
 
-      let lastNavTouchAt = 0;
+      let lastNavEvent = { id: '', at: 0 };
       function handleNavButtonEvent(e) {
+        if (!e.target || !e.target.closest) return;
         const navButton = e.target.closest('.nav-btn');
         if (!navButton) return;
 
-        if (e.type === 'click' && Date.now() - lastNavTouchAt < 450) return;
-        if (e.type === 'touchend') lastNavTouchAt = Date.now();
+        const buttonId = navButton.dataset.navAction || navButton.id;
+        if (!buttonId) return;
+
+        const now = Date.now();
+        if (lastNavEvent.id === buttonId && now - lastNavEvent.at < 450) {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+        lastNavEvent = { id: buttonId, at: now };
 
         e.preventDefault();
         e.stopPropagation();
-        handleNavButtonAction(navButton.id);
+        handleNavButtonAction(buttonId);
       }
+
+      ensureMobileNavMenu();
+      window.handleMobileNavButton = handleNavButtonAction;
 
       const btnInicio = document.getElementById('btnInicio');
       if (btnInicio) {
@@ -4157,6 +4218,10 @@
       const navLinks = document.querySelector('.nav-links');
       const mobileBackdrop = document.getElementById('mobileNavBackdrop');
 
+      document.addEventListener('pointerup', handleNavButtonEvent, true);
+      document.addEventListener('touchend', handleNavButtonEvent, { passive: false, capture: true });
+      document.addEventListener('click', handleNavButtonEvent, true);
+
       if (hamburger && navLinks) {
         hamburger.onclick = (e) => {
           e.stopPropagation();
@@ -4164,9 +4229,6 @@
           hamburger.classList.toggle('active');
           if (mobileBackdrop) mobileBackdrop.classList.toggle('visible', navLinks.classList.contains('open'));
         };
-
-        navLinks.addEventListener('click', handleNavButtonEvent, true);
-        navLinks.addEventListener('touchend', handleNavButtonEvent, { passive: false, capture: true });
 
         document.addEventListener('click', (e) => {
           if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
