@@ -185,6 +185,24 @@ document.addEventListener('DOMContentLoaded', () => {
         return pieces.every(piece => piece.currentPos === piece.correctPos);
     }
 
+    function playCompletionSound() {
+        try {
+            const audio = new Audio('../Sonidos/Estacion completada.mp3');
+            audio.play().catch(e => console.warn('No se pudo reproducir audio de completado:', e));
+        } catch (e) {
+            console.warn('Error al reproducir audio:', e);
+        }
+    }
+
+    function playIncorrectSound() {
+        try {
+            const audio = new Audio('../Sonidos/respuesta incorrecta.mp3');
+            audio.play().catch(e => console.warn('No se pudo reproducir audio de incorrecto:', e));
+        } catch (e) {
+            console.warn('Error al reproducir audio:', e);
+        }
+    }
+
     function markStationCompleted() {
         try {
             const completed = JSON.parse(localStorage.getItem(COMPLETED_STATIONS_KEY) || '{}');
@@ -224,7 +242,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (timeRemaining > 0) {
             solvedOnTime = true;
             markStationCompleted();
+            playCompletionSound();
             await guardarSbeelEnSupabase();
+        } else {
+            playIncorrectSound();
         }
         successModal.classList.add('show');
     }
@@ -239,7 +260,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     closeModalBtn.addEventListener('click', () => {
-        window.location.href = '../index.html?view=prep';
+        try { closeModalBtn.style.transform = 'translateY(2px)'; closeModalBtn.style.opacity = '0.9'; setTimeout(() => { closeModalBtn.style.transform = ''; closeModalBtn.style.opacity = ''; }, 160); } catch (e) {}
+        setTimeout(() => { window.location.href = '../index.html?view=prep'; }, 180);
     });
 
     const retryModalBtn = document.getElementById('retry-modal-btn');
@@ -254,7 +276,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     backBtn.addEventListener('click', () => {
-        window.location.href = '../index.html?view=prep';
+        try { backBtn.style.transform = 'translateX(-6px)'; backBtn.style.opacity = '0.9'; setTimeout(() => { backBtn.style.transform = ''; backBtn.style.opacity = ''; }, 160); } catch (e) {}
+        setTimeout(() => { window.location.href = '../index.html?view=prep'; }, 180);
     });
 
     function formatTime(seconds) {

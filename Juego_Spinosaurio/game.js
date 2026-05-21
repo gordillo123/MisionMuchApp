@@ -41,6 +41,24 @@ var QUESTION_SECONDS = 10;
 var questionSecondsLeft = 0;
 var questionTimerInterval = null;
 
+function playCompletionSound() {
+  try {
+    const audio = new Audio('../Sonidos/Estacion completada.mp3');
+    audio.play().catch(e => console.warn('No se pudo reproducir audio de completado:', e));
+  } catch (e) {
+    console.warn('Error al reproducir audio:', e);
+  }
+}
+
+function playIncorrectSound() {
+  try {
+    const audio = new Audio('../Sonidos/respuesta incorrecta.mp3');
+    audio.play().catch(e => console.warn('No se pudo reproducir audio de incorrecto:', e));
+  } catch (e) {
+    console.warn('Error al reproducir audio:', e);
+  }
+}
+
 function markStationCompleted() {
   try {
     const completed = JSON.parse(localStorage.getItem(COMPLETED_STATIONS_KEY) || '{}');
@@ -95,6 +113,18 @@ function playVictoryMusic() {
   } catch (e) {
     console.warn("No se pudo reproducir la musica de victoria:", e);
   }
+}
+
+function goToNextStationAfterVictory(delay) {
+  var target = new URL("../SALA-Biodiversidad-y-Conocimiento/index.html?from=portada&sala=biodiversidad", window.location.href);
+  var searchParams = new URLSearchParams(window.location.search);
+  searchParams.forEach(function (value, key) {
+    if (!target.searchParams.has(key)) target.searchParams.set(key, value);
+  });
+
+  setTimeout(function () {
+    window.location.href = target.href;
+  }, delay || 3000);
 }
 
 async function guardarSpinosaurioEnSupabase(puntajeFinal, aprobado) {
@@ -606,16 +636,19 @@ async function validarQuiz() {
 
     // Marcar completado y avanzar avatar
     markStationCompleted();
+    playCompletionSound();
     localStorage.setItem('much_current_station', '3');
 
     await guardarSpinosaurioEnSupabase(Number(score), true);
     await registrarQuizEnSupabase(Number(score));
+    goToNextStationAfterVictory();
 
     // Mostrar botón Siguiente para que el usuario avance cuando quiera
     try { document.getElementById('btnQuizNext').style.display = 'inline-block'; } catch (e) {}
     btnOk.textContent = "Continuar";
   } else {
     msg.textContent = "Incorrecto. ¡Vuelve a jugar!"; msg.className = "quiz-msg err";
+    playIncorrectSound();
 
     var inputs = document.querySelectorAll('input[name="q1"]');
     inputs.forEach(inp => inp.disabled = true);

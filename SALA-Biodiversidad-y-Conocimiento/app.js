@@ -305,6 +305,41 @@ class SoundFX {
   }
   correct() { this.beep(880, .12, 'sine', .08); setTimeout(() => this.beep(1320, .12, 'sine', .07), 130); }
   wrong() { this.beep(200, .18, 'sawtooth', .07); }
+  victory() {
+    if (this.toggleEl && !this.toggleEl.checked) return;
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    this.ctx = this.ctx || new AudioCtx();
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+
+    const now = this.ctx.currentTime + 0.02;
+    const master = this.ctx.createGain();
+    master.gain.setValueAtTime(0.0001, now);
+    master.gain.exponentialRampToValueAtTime(0.22, now + 0.06);
+    master.gain.exponentialRampToValueAtTime(0.0001, now + 2.8);
+    master.connect(this.ctx.destination);
+
+    [
+      [523.25, 0.00, 0.16], [659.25, 0.18, 0.16], [783.99, 0.36, 0.22],
+      [1046.50, 0.64, 0.30], [783.99, 1.02, 0.16], [1046.50, 1.20, 0.42],
+      [1318.51, 1.72, 0.52], [261.63, 0.00, 0.72], [329.63, 0.00, 0.72],
+      [392.00, 0.00, 0.72], [349.23, 0.82, 0.72], [440.00, 0.82, 0.72],
+      [523.25, 0.82, 0.72], [392.00, 1.62, 1.00], [493.88, 1.62, 1.00],
+      [659.25, 1.62, 1.00]
+    ].forEach(note => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = note[0] < 500 ? 'triangle' : 'sine';
+      osc.frequency.setValueAtTime(note[0], now + note[1]);
+      gain.gain.setValueAtTime(0.0001, now + note[1]);
+      gain.gain.exponentialRampToValueAtTime(note[0] < 500 ? 0.08 : 0.18, now + note[1] + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + note[1] + note[2]);
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start(now + note[1]);
+      osc.stop(now + note[1] + note[2] + 0.05);
+    });
+  }
 }
 
 class Confetti {
@@ -352,11 +387,43 @@ class UIManager {
     this.startFocusDetection();
   }
 
+  goBackToMap() {
+    try {
+      if (this.e && this.e.returnBtn) {
+        this.e.returnBtn.classList.add('pressed');
+        setTimeout(() => this.e.returnBtn.classList.remove('pressed'), 160);
+      }
+      if (this.sound && typeof this.sound.beep === 'function') this.sound.beep(640, 0.06, 'sine', 0.06);
+    } catch (e) { }
+
+    setTimeout(() => {
+      window.location.href = '../index.html?view=prep';
+    }, 180);
+  }
+
   updateScoreboard() {
     const s = this.state;
     if (this.e.pointsEl) this.e.pointsEl.textContent = s.points.toString();
     if (this.e.correctCount) this.e.correctCount.textContent = s.correct.toString();
     if (this.e.correctTotal) this.e.correctTotal.textContent = QUESTIONS.length.toString();
+  }
+
+  playCompletionSound() {
+    try {
+      const audio = new Audio('../Sonidos/Estacion completada.mp3');
+      audio.play().catch(e => console.warn('No se pudo reproducir audio de completado:', e));
+    } catch (e) {
+      console.warn('Error al reproducir audio:', e);
+    }
+  }
+
+  playIncorrectSound() {
+    try {
+      const audio = new Audio('../Sonidos/respuesta incorrecta.mp3');
+      audio.play().catch(e => console.warn('No se pudo reproducir audio de incorrecto:', e));
+    } catch (e) {
+      console.warn('Error al reproducir audio:', e);
+    }
   }
 
   startFocusDetection() {
@@ -451,8 +518,8 @@ class UIManager {
 
   bind() {
     this.e.nextBtn.addEventListener('click', () => this.next());
-    this.e.returnBtn.addEventListener('click', () => this.redirectToRegistration());
-    this.e.openTicketBtn.addEventListener('click', () => this.redirectToRegistration());
+    this.e.returnBtn.addEventListener('click', () => this.goBackToMap());
+    this.e.nextStationBtn.addEventListener('click', () => this.goToNextStation());
     this.e.playAgainBtn1.addEventListener('click', () => location.reload());
     this.e.playAgainBtn2.addEventListener('click', () => location.reload());
   }
@@ -470,6 +537,18 @@ class UIManager {
     const searchParams = new URLSearchParams(window.location.search);
 
     window.location.href = '../index.html?' + searchParams.toString();
+  }
+
+  redirectToNextStation(nextUrl, delay = 3000) {
+    const target = new URL(nextUrl, window.location.href);
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.forEach((value, key) => {
+      if (!target.searchParams.has(key)) target.searchParams.set(key, value);
+    });
+
+    setTimeout(() => {
+      window.location.href = target.href;
+    }, delay);
   }
 
   async render() {
@@ -531,17 +610,21 @@ class UIManager {
         e.finalMsg.textContent = `¡Estación completada con éxito! Lograste un ${Math.round(s.correct / QUESTIONS.length * 100)}% de respuestas correctas. Tu avatar ha avanzado a la siguiente estación.`;
         e.giftRow.classList.remove('d-none');
         e.retryRow.classList.add('d-none');
+        this.sound.victory();
+        this.playCompletionSound();
 
         // Avanzar avatar en el mapa
         localStorage.setItem('much_current_station', '4');
         let completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
         completed['3'] = true;
         localStorage.setItem('much_completed_stations', JSON.stringify(completed));
+        this.redirectToNextStation('../sala_energia/index.html?from=portada&sala=energia');
       } else {
         e.finalTitle.textContent = 'Buen intento 👀';
         e.finalMsg.textContent = `Lograste un ${Math.round(s.correct / QUESTIONS.length * 100)}%. Necesitas al menos 70% de aciertos para completar la estación y avanzar.`;
         e.giftRow.classList.add('d-none');
         e.retryRow.classList.remove('d-none');
+        this.playIncorrectSound();
       }
       return;
     }
@@ -637,7 +720,7 @@ const elements = {
   finalTotal: document.getElementById('finalTotal'),
   giftRow: document.getElementById('giftRow'),
   retryRow: document.getElementById('retryRow'),
-  openTicketBtn: document.getElementById('openTicketBtn'),
+  nextStationBtn: document.getElementById('nextStationBtn'),
   returnBtn: document.getElementById('returnBtn'),
   playAgainBtn1: document.getElementById('playAgainBtn1'),
   playAgainBtn2: document.getElementById('playAgainBtn2'),

@@ -331,6 +331,41 @@ class SoundFX {
   }
   correct() { this.beep(880, .12, 'sine', .08); setTimeout(() => this.beep(1320, .12, 'sine', .07), 130); }
   wrong() { this.beep(200, .18, 'sawtooth', .07); }
+  victory() {
+    if (this.toggleEl && !this.toggleEl.checked) return;
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    this.ctx = this.ctx || new AudioCtx();
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+
+    const now = this.ctx.currentTime + 0.02;
+    const master = this.ctx.createGain();
+    master.gain.setValueAtTime(0.0001, now);
+    master.gain.exponentialRampToValueAtTime(0.22, now + 0.06);
+    master.gain.exponentialRampToValueAtTime(0.0001, now + 2.8);
+    master.connect(this.ctx.destination);
+
+    [
+      [523.25, 0.00, 0.16], [659.25, 0.18, 0.16], [783.99, 0.36, 0.22],
+      [1046.50, 0.64, 0.30], [783.99, 1.02, 0.16], [1046.50, 1.20, 0.42],
+      [1318.51, 1.72, 0.52], [261.63, 0.00, 0.72], [329.63, 0.00, 0.72],
+      [392.00, 0.00, 0.72], [349.23, 0.82, 0.72], [440.00, 0.82, 0.72],
+      [523.25, 0.82, 0.72], [392.00, 1.62, 1.00], [493.88, 1.62, 1.00],
+      [659.25, 1.62, 1.00]
+    ].forEach(note => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = note[0] < 500 ? 'triangle' : 'sine';
+      osc.frequency.setValueAtTime(note[0], now + note[1]);
+      gain.gain.setValueAtTime(0.0001, now + note[1]);
+      gain.gain.exponentialRampToValueAtTime(note[0] < 500 ? 0.08 : 0.18, now + note[1] + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + note[1] + note[2]);
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start(now + note[1]);
+      osc.stop(now + note[1] + note[2] + 0.05);
+    });
+  }
 }
 
 class Confetti {
@@ -389,6 +424,24 @@ class UIManager {
     window.addEventListener('blur', this.handleFocusLoss.bind(this));
   }
 
+  playCompletionSound() {
+    try {
+      const audio = new Audio('./Sonidos/Estacion completada.mp3');
+      audio.play().catch(e => console.warn('No se pudo reproducir audio de completado:', e));
+    } catch (e) {
+      console.warn('Error al reproducir audio:', e);
+    }
+  }
+
+  playIncorrectSound() {
+    try {
+      const audio = new Audio('./Sonidos/respuesta incorrecta.mp3');
+      audio.play().catch(e => console.warn('No se pudo reproducir audio de incorrecto:', e));
+    } catch (e) {
+      console.warn('Error al reproducir audio:', e);
+    }
+  }
+
   handleFocusLoss() {
     if (this.state.locked || this.cheatingDetected || this.state.idx >= QUESTIONS.length) return;
     this.cheatingDetected = true;
@@ -410,7 +463,7 @@ class UIManager {
 
   bind() {
     this.e.nextBtn.addEventListener('click', () => this.next());
-    this.e.openTicketBtn.addEventListener('click', () => this.redirectToRegistration());
+    this.e.nextStationBtn.addEventListener('click', () => this.goBackToMap());
     this.e.playAgainBtn1.addEventListener('click', () => location.reload());
     this.e.playAgainBtn2.addEventListener('click', () => location.reload());
   }
@@ -423,8 +476,11 @@ class UIManager {
     }; tick();
   }
 
-  redirectToRegistration() {
-    if (!this.currentPrize) return;
+  goBackToMap() {
+    window.location.href = '../index.html?view=prep';
+  }
+
+  redirectToRegistration(nextUrl, delay = 3000) {
     const prizeData = {
       key: this.currentPrize.key,
       title: this.currentPrize.title,
@@ -499,6 +555,8 @@ class UIManager {
           e.finalTitle.textContent = '¡Felicidades!';
           e.finalMsg.textContent = '¡Has ganado un boleto! Presiona "Ver mi boleto" 🎟️';
           e.giftRow.classList.remove('d-none');
+          this.sound.victory();
+          this.playCompletionSound();
           this.confetti.launch(120);
         }
         return;
@@ -506,6 +564,7 @@ class UIManager {
         e.finalTitle.textContent = 'Buen intento 👀';
         e.finalMsg.textContent = 'Sigue explorando el museo.';
         e.retryRow.classList.remove('d-none');
+        this.playIncorrectSound();
         return;
       }
     }
@@ -587,7 +646,7 @@ const elements = {
   finalTotal: document.getElementById('finalTotal'),
   giftRow: document.getElementById('giftRow'),
   retryRow: document.getElementById('retryRow'),
-  openTicketBtn: document.getElementById('openTicketBtn'),
+  nextStationBtn: document.getElementById('nextStationBtn'),
   playAgainBtn1: document.getElementById('playAgainBtn1'),
   playAgainBtn2: document.getElementById('playAgainBtn2'),
   soundToggle: document.getElementById('soundToggle'),
