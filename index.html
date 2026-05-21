@@ -384,11 +384,47 @@
       .nav-container {
         position: relative;
         min-height: 60px;
-        padding: 0.65rem 4.75rem 0.65rem 0.9rem;
+        padding: 0.55rem 4.75rem 0.55rem 0.75rem;
       }
 
       .nav-brand-logos {
-        display: none;
+        display: inline-flex;
+        gap: 0.2rem;
+        padding-left: 0.3rem;
+      }
+
+      .nav-brand {
+        gap: 0.28rem;
+        max-width: calc(100vw - 5.6rem);
+      }
+
+      .nav-brand-text {
+        font-size: clamp(0.92rem, 4.6vw, 1.1rem);
+      }
+
+      .nav-brand-logo {
+        border-radius: 5px;
+        padding: 1px 2px;
+      }
+
+      .nav-brand-logo-sata {
+        height: 19px;
+        max-width: 48px;
+      }
+
+      .nav-brand-logo-much {
+        height: 20px;
+        max-width: 34px;
+      }
+
+      .nav-brand-logo-sbeel {
+        height: 22px;
+        max-width: 48px;
+      }
+
+      .nav-brand-logo-agencia {
+        height: 20px;
+        max-width: 40px;
       }
       
       .nav-container:has(.nav-links.open) .nav-brand {
@@ -410,8 +446,8 @@
         flex-direction: column;
         align-items: stretch;
         justify-content: flex-start;
-        gap: 0.85rem;
-        padding: 5.35rem 1rem 1.25rem;
+        gap: 0.72rem;
+        padding: 4.95rem 1rem 1.25rem;
         z-index: 1005;
         box-shadow: -18px 0 36px rgba(0, 0, 0, 0.42);
         opacity: 0;
@@ -441,19 +477,19 @@
       
       .nav-btn {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         background: rgba(255, 255, 255, 0.08);
         border: 1px solid rgba(255, 255, 255, 0.16);
         color: #f8fafc;
         width: 100%;
         min-width: 0;
-        height: 70px;
+        height: 58px;
         border-radius: 14px;
         transition: all 0.2s;
-        padding: 0.62rem 0.75rem;
-        gap: 0.48rem;
+        padding: 0.58rem 1rem;
+        gap: 0.85rem;
         touch-action: manipulation;
         -webkit-tap-highlight-color: transparent;
       }
@@ -465,12 +501,14 @@
       }
       
       .nav-btn .nav-icon {
-        font-size: 1.55rem;
+        width: 2.15rem;
+        font-size: 1.38rem;
         display: flex;
         align-items: center;
         justify-content: center;
         line-height: 1;
         min-height: 1.65rem;
+        flex: 0 0 2.15rem;
       }
       
       .nav-btn .nav-label {
@@ -485,8 +523,8 @@
       }
       
       .nav-links .nav-avatar {
-        width: 34px;
-        height: 34px;
+        width: 30px;
+        height: 30px;
         margin-left: 0;
         border-width: 1.5px;
       }
@@ -1880,11 +1918,46 @@
 
     @media (max-width: 380px) {
       .nav-container {
-        padding-left: 0.75rem;
+        padding-left: 0.6rem;
+        padding-right: 4.35rem;
       }
 
       .nav-brand-text {
-        font-size: 1rem;
+        font-size: 0.84rem;
+      }
+
+      .nav-brand {
+        gap: 0.25rem;
+        max-width: calc(100vw - 5rem);
+      }
+
+      .nav-brand-logos {
+        gap: 0.18rem;
+        padding-left: 0.25rem;
+      }
+
+      .nav-brand-logo {
+        padding: 1px 2px;
+      }
+
+      .nav-brand-logo-sata {
+        height: 17px;
+        max-width: 40px;
+      }
+
+      .nav-brand-logo-much {
+        height: 18px;
+        max-width: 30px;
+      }
+
+      .nav-brand-logo-sbeel {
+        height: 20px;
+        max-width: 42px;
+      }
+
+      .nav-brand-logo-agencia {
+        height: 18px;
+        max-width: 34px;
       }
 
       .nav-links {
@@ -1899,6 +1972,72 @@
 
       .nav-btn .nav-label {
         font-size: 0.78rem;
+      }
+    }
+
+    @media (max-width: 768px) and (orientation: portrait) {
+      .nav-container {
+        min-height: 58px;
+        padding: 0.48rem 4.35rem 0.48rem 0.58rem;
+      }
+
+      .nav-brand {
+        gap: 0.2rem;
+        max-width: calc(100vw - 5rem);
+      }
+
+      .nav-brand-text {
+        font-size: clamp(0.78rem, 4vw, 0.98rem);
+      }
+
+      .nav-brand-logos {
+        display: inline-flex !important;
+        gap: 0.14rem;
+        padding-left: 0.22rem;
+        border-left-color: rgba(255, 255, 255, 0.12);
+        flex: 0 1 auto;
+        overflow: visible;
+      }
+
+      .nav-brand-logo {
+        padding: 1px 2px;
+        border-radius: 4px;
+      }
+
+      .nav-brand-logo-sata {
+        height: 16px;
+        max-width: 38px;
+      }
+
+      .nav-brand-logo-much {
+        height: 17px;
+        max-width: 28px;
+      }
+
+      .nav-brand-logo-sbeel {
+        height: 19px;
+        max-width: 38px;
+      }
+
+      .nav-brand-logo-agencia {
+        height: 17px;
+        max-width: 32px;
+      }
+
+      .hamburger {
+        top: 0.55rem;
+        right: 0.75rem;
+      }
+
+      .nav-links {
+        width: min(82vw, 300px);
+        gap: 0.68rem;
+        padding: 4.6rem 0.85rem 1rem;
+      }
+
+      .nav-btn {
+        height: 56px;
+        padding: 0.55rem 0.9rem;
       }
     }
 
@@ -3504,6 +3643,49 @@
         if (backdrop) backdrop.classList.remove('visible');
       }
 
+      function handleNavButtonAction(buttonId) {
+        closeMobileMenu();
+
+        if (buttonId === 'btnInicio') {
+          showView('viewLanding');
+          return;
+        }
+
+        if (buttonId === 'btnPuntajes') {
+          if (scoresOverlay) scoresOverlay.classList.add('open');
+          loadScores();
+          return;
+        }
+
+        if (buttonId === 'btnComoJugar') {
+          setRulesModeForStart(false);
+          if (rulesOverlay) rulesOverlay.classList.add('open');
+          return;
+        }
+
+        if (buttonId === 'btnAdmin') {
+          window.location.href = 'entrada-much/dashboard.html';
+          return;
+        }
+
+        if (buttonId === 'btnPerfil') {
+          openProfile();
+        }
+      }
+
+      let lastNavTouchAt = 0;
+      function handleNavButtonEvent(e) {
+        const navButton = e.target.closest('.nav-btn');
+        if (!navButton) return;
+
+        if (e.type === 'click' && Date.now() - lastNavTouchAt < 450) return;
+        if (e.type === 'touchend') lastNavTouchAt = Date.now();
+
+        e.preventDefault();
+        e.stopPropagation();
+        handleNavButtonAction(navButton.id);
+      }
+
       const btnInicio = document.getElementById('btnInicio');
       if (btnInicio) {
         btnInicio.addEventListener('click', (e) => {
@@ -3837,20 +4019,15 @@
           if (mobileBackdrop) mobileBackdrop.classList.toggle('visible', navLinks.classList.contains('open'));
         };
 
+        navLinks.addEventListener('click', handleNavButtonEvent, true);
+        navLinks.addEventListener('touchend', handleNavButtonEvent, { passive: false, capture: true });
+
         document.addEventListener('click', (e) => {
           if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
             navLinks.classList.remove('open');
             hamburger.classList.remove('active');
             if (mobileBackdrop) mobileBackdrop.classList.remove('visible');
           }
-        });
-
-        navLinks.querySelectorAll('a').forEach(link => {
-          link.addEventListener('click', () => {
-            navLinks.classList.remove('open');
-            hamburger.classList.remove('active');
-            if (mobileBackdrop) mobileBackdrop.classList.remove('visible');
-          });
         });
       }
 
