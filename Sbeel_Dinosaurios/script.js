@@ -195,11 +195,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function showSuccess() {
+    async function guardarSbeelEnSupabase() {
+        try {
+            const progreso = await import('../supabase-utils.js');
+            const elapsedSeconds = TIME_LIMIT_SECONDS - timeRemaining;
+
+            await progreso.guardarIntentoEstacion(STATION_ID, {
+                aciertos: 1,
+                errores: 0,
+                puntaje: Math.max(0, timeRemaining),
+                aprobado: true
+            });
+
+            await progreso.guardarProgresoUsuario(STATION_ID, {
+                metadata: {
+                    estacion: 'sbeel',
+                    tiempo_restante: timeRemaining,
+                    segundos_usados: elapsedSeconds
+                }
+            });
+        } catch (error) {
+            console.error('[Supabase DB] No se pudo guardar SBEEL:', error);
+        }
+    }
+
+    async function showSuccess() {
         stopTimer();
         if (timeRemaining > 0) {
             solvedOnTime = true;
             markStationCompleted();
+            await guardarSbeelEnSupabase();
         }
         successModal.classList.add('show');
     }

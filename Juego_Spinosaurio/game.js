@@ -50,6 +50,40 @@ function markStationCompleted() {
   }
 }
 
+async function guardarSpinosaurioEnSupabase(puntajeFinal, aprobado) {
+  try {
+    const progreso = await import('../supabase-utils.js');
+    await progreso.guardarPartidaMinijuego({
+      puntaje: puntajeFinal,
+      aprobado,
+      metadata: {
+        estacion_id: Number(STATION_ID),
+        estacion: 'spinosaurio',
+        ubicacion: LUGAR_QR
+      }
+    });
+
+    await progreso.guardarIntentoEstacion(STATION_ID, {
+      aciertos: aprobado ? 1 : 0,
+      errores: aprobado ? 0 : 1,
+      puntaje: puntajeFinal,
+      aprobado
+    });
+
+    if (aprobado) {
+      await progreso.guardarProgresoUsuario(STATION_ID, {
+        metadata: {
+          estacion: 'spinosaurio',
+          puntaje: puntajeFinal,
+          ubicacion: LUGAR_QR
+        }
+      });
+    }
+  } catch (error) {
+    console.error('[Supabase DB] No se pudo guardar Spinosaurio:', error);
+  }
+}
+
 // 🛑 Variables de la cuenta regresiva y estado del juego
 var countdownActive = false;
 var gameStarted = false;
@@ -523,6 +557,7 @@ async function validarQuiz() {
     markStationCompleted();
     localStorage.setItem('much_current_station', '3');
 
+    await guardarSpinosaurioEnSupabase(Number(score), true);
     await registrarQuizEnSupabase(Number(score));
 
     // Mostrar botón Siguiente para que el usuario avance cuando quiera

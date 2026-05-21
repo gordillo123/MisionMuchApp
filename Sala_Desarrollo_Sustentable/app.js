@@ -81,6 +81,34 @@ async function initSupabase() {
   return supabase;
 }
 
+async function guardarResultadoEstacionSupabase({ puntaje_total, num_correctas, num_preguntas, aprobado }) {
+  try {
+    const progreso = await import('../supabase-utils.js');
+    const estacionId = 5;
+
+    await progreso.guardarIntentoEstacion(estacionId, {
+      aciertos: num_correctas,
+      errores: Math.max(0, num_preguntas - num_correctas),
+      puntaje: puntaje_total,
+      aprobado
+    });
+
+    if (aprobado) {
+      await progreso.guardarProgresoUsuario(estacionId, {
+        metadata: {
+          estacion: 'desarrollo-sustentable',
+          puntaje_total,
+          num_correctas,
+          num_preguntas,
+          ubicacion: LUGAR_QR
+        }
+      });
+    }
+  } catch (error) {
+    console.error('[Supabase DB] No se pudo guardar desarrollo sustentable:', error);
+  }
+}
+
 // ⏰ FUNCIÓN CRÍTICA: Obtener hora exacta de México
 function getMexicoTime() {
   const parts = getMexicoDateParts();
@@ -505,6 +533,13 @@ class UIManager {
         puntaje_total: puntajeFinal,
         num_correctas: s.correct,
         num_preguntas: QUESTIONS.length
+      });
+
+      await guardarResultadoEstacionSupabase({
+        puntaje_total: puntajeFinal,
+        num_correctas: s.correct,
+        num_preguntas: QUESTIONS.length,
+        aprobado: isPassed
       });
 
       e.finalPoints.textContent = s.points.toString();
