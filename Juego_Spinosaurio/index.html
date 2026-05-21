@@ -624,6 +624,173 @@
         font-size: clamp(12px, 3vh, 15px);
       }
     }
+
+    /* Ajuste responsivo final: permite jugar en vertical y horizontal */
+    :root {
+      --game-scale: 1;
+    }
+
+    #orientationLock {
+      display: none !important;
+    }
+
+    @media (orientation: portrait) {
+
+      body:not(.quiz-mode) #game {
+        display: block !important;
+      }
+
+      body:not(.quiz-mode) .retry-wrap {
+        display: flex !important;
+      }
+    }
+
+    .contenedor,
+    .stage {
+      width: 100dvw !important;
+      height: 100dvh !important;
+      max-width: 100dvw !important;
+      max-height: 100dvh !important;
+      border-radius: 0 !important;
+    }
+
+    .dino {
+      width: calc(180px * var(--game-scale));
+      height: calc(150px * var(--game-scale));
+      left: clamp(18px, 9vw, 40px);
+      bottom: calc(2px * var(--game-scale));
+      background-size: calc(720px * var(--game-scale)) calc(150px * var(--game-scale));
+    }
+
+    .dino-estrellado {
+      background-position-x: calc(-372px * var(--game-scale));
+    }
+
+    @keyframes animarDino {
+      from {
+        background-position-x: calc(-180px * var(--game-scale));
+      }
+
+      to {
+        background-position-x: calc(-540px * var(--game-scale));
+      }
+    }
+
+    .suelo {
+      height: max(28px, calc(42px * var(--game-scale)));
+      background-size: 50% max(28px, calc(42px * var(--game-scale)));
+    }
+
+    .cactus {
+      bottom: max(12px, calc(20px * var(--game-scale)));
+    }
+
+    .cactus1,
+    .cactus2 {
+      width: calc(60px * var(--game-scale));
+      height: calc(95px * var(--game-scale));
+    }
+
+    .nube {
+      width: calc(92px * var(--game-scale));
+      height: calc(26px * var(--game-scale));
+    }
+
+    .score {
+      width: auto;
+      min-width: calc(74px * var(--game-scale));
+      height: auto;
+      top: max(10px, env(safe-area-inset-top));
+      right: max(12px, env(safe-area-inset-right));
+      font-size: clamp(20px, calc(30px * var(--game-scale)), 30px);
+    }
+
+    .hud-logos {
+      top: max(8px, env(safe-area-inset-top));
+      left: max(8px, env(safe-area-inset-left));
+      gap: clamp(4px, 1.2vmin, 8px);
+    }
+
+    .hud-logos img {
+      height: clamp(20px, calc(40px * var(--game-scale)), 40px);
+      max-width: min(28vw, 150px);
+      padding: 3px 7px;
+      border-radius: 10px;
+    }
+
+    .exit-map-btn {
+      top: calc(max(8px, env(safe-area-inset-top)) + clamp(88px, 24vh, 170px));
+      left: max(8px, env(safe-area-inset-left));
+      min-height: 32px;
+      padding: 6px 10px;
+      font-size: clamp(10px, 2.5vmin, 13px);
+    }
+
+    .retry-wrap {
+      width: 100dvw;
+      height: 100dvh;
+      position: fixed;
+      inset: 0;
+      margin: 0;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.18);
+    }
+
+    .game-over {
+      font-size: clamp(22px, 8vmin, 42px);
+      padding: 0 16px;
+      text-align: center;
+    }
+
+    @media (orientation: portrait) {
+      .portada-overlay {
+        justify-content: stretch;
+        padding: 0;
+        overflow-y: auto;
+      }
+
+      .portada-top-logos {
+        top: max(12px, env(safe-area-inset-top));
+        left: max(12px, env(safe-area-inset-left));
+        right: max(12px, env(safe-area-inset-right));
+        width: auto;
+        max-width: none;
+        padding: 0;
+      }
+
+      .portada-card {
+        min-height: 100dvh;
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        border-radius: 0;
+        border: 0;
+        padding: clamp(92px, 18vh, 150px) 18px max(24px, env(safe-area-inset-bottom));
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .portada-much-logo {
+        width: min(180px, 48vw);
+        max-width: 48vw;
+      }
+
+      .btn-play-portada {
+        width: min(320px, 86vw);
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 430px) {
+      .exit-map-btn {
+        top: calc(max(8px, env(safe-area-inset-top)) + clamp(72px, 22vh, 112px));
+      }
+
+      .hud-logos img {
+        height: clamp(18px, 8vh, 30px);
+      }
+    }
   </style>
 </head>
 
