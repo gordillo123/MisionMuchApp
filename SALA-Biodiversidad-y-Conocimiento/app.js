@@ -39,6 +39,13 @@ const SALA_ENTRADA_ID = '4bdffb5f-1a55-4952-be0c-9d487550fb0c';
 
 let supabase = null;
 
+// Background music helpers
+function ensureBgMusic() {
+  try { if (!window.bgMusic) { window.bgMusic = new Audio('../Sonidos/musica fondo.mp3'); window.bgMusic.loop = true; window.bgMusic.volume = 0.18; window.bgMusic.preload = 'auto'; } } catch (e) {}
+}
+function playBgMusic() { try { ensureBgMusic(); window.bgMusic.play().catch(()=>{}); } catch (e) {} }
+function pauseBgMusic() { try { if (window.bgMusic && !window.bgMusic.paused) window.bgMusic.pause(); } catch (e) {} }
+
 function getMexicoDateParts(date = new Date()) {
   const formatted = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Mexico_City',
@@ -556,6 +563,12 @@ class UIManager {
     const pct = Math.min(100, (s.idx / QUESTIONS.length * 100));
     e.bar.style.width = pct + '%';
 
+    // Pause bg music while answering; resume when round ends
+    try {
+      if (s.idx < QUESTIONS.length && !this.cheatingDetected) { pauseBgMusic(); }
+      if (s.idx >= QUESTIONS.length) { playBgMusic(); }
+    } catch (e) {}
+
     if (this.cheatingDetected) {
       this.stopQuestionTimer();
       e.quizView.classList.add('d-none');
@@ -612,6 +625,7 @@ class UIManager {
         e.retryRow.classList.add('d-none');
         this.sound.victory();
         this.playCompletionSound();
+        try { playBgMusic(); } catch (e) {}
 
         // Avanzar avatar en el mapa
         localStorage.setItem('much_current_station', '4');

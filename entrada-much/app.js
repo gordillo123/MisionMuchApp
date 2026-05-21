@@ -88,6 +88,11 @@ const CURRENT_SALA_ID = SALA_MAP[SALA.toLowerCase()] || SALA_ENTRADA_ID;
 
 let supabase = null;
 
+// Background music helpers
+function ensureBgMusic() { try { if (!window.bgMusic) { window.bgMusic = new Audio('../Sonidos/musica fondo.mp3'); window.bgMusic.loop = true; window.bgMusic.volume = 0.18; window.bgMusic.preload = 'auto'; } } catch (e) {} }
+function playBgMusic() { try { ensureBgMusic(); window.bgMusic.play().catch(()=>{}); } catch (e) {} }
+function pauseBgMusic() { try { if (window.bgMusic && !window.bgMusic.paused) window.bgMusic.pause(); } catch (e) {} }
+
 // Inicializa la librería
 async function initSupabase() {
   if (supabase) return supabase;
@@ -501,6 +506,12 @@ class UIManager {
     const pct = Math.min(100, (s.idx / QUESTIONS.length * 100));
     e.bar.style.width = pct + '%';
 
+    // Pause bg music while answering; resume when round ends
+    try {
+      if (s.idx < QUESTIONS.length && !this.cheatingDetected) { pauseBgMusic(); }
+      if (s.idx >= QUESTIONS.length) { playBgMusic(); }
+    } catch (e) {}
+
     if (this.cheatingDetected) {
       e.quizView.classList.add('d-none');
       e.finalView.classList.remove('d-none');
@@ -557,6 +568,7 @@ class UIManager {
           e.giftRow.classList.remove('d-none');
           this.sound.victory();
           this.playCompletionSound();
+          try { playBgMusic(); } catch (e) {}
           this.confetti.launch(120);
         }
         return;
@@ -565,6 +577,7 @@ class UIManager {
         e.finalMsg.textContent = 'Sigue explorando el museo.';
         e.retryRow.classList.remove('d-none');
         this.playIncorrectSound();
+        try { playBgMusic(); } catch (e) {}
         return;
       }
     }

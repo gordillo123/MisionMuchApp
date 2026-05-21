@@ -69,6 +69,26 @@ function markStationCompleted() {
   }
 }
 
+// Background music control
+function ensureBgMusic() {
+  try {
+    if (!window.bgMusic) {
+      window.bgMusic = new Audio('../Sonidos/musica fondo.mp3');
+      window.bgMusic.loop = true;
+      window.bgMusic.volume = 0.18;
+      window.bgMusic.preload = 'auto';
+    }
+  } catch (e) { console.warn('bgMusic error', e); }
+}
+
+function playBgMusic() {
+  try { ensureBgMusic(); window.bgMusic.play().catch(() => {}); } catch (e) {}
+}
+
+function pauseBgMusic() {
+  try { if (window.bgMusic && !window.bgMusic.paused) window.bgMusic.pause(); } catch (e) {}
+}
+
 function playVictoryMusic() {
   try {
     var AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -348,6 +368,7 @@ async function runCountdown() {
       overlay.remove();
       countdownActive = false;
       gameStarted = true;
+      try { pauseBgMusic(); } catch (e) {}
       time = new Date();
 
       // 📝 Await the initial registration to ensure ultimo_intento_id is saved before any score updates
@@ -641,6 +662,7 @@ async function validarQuiz() {
 
     await guardarSpinosaurioEnSupabase(Number(score), true);
     await registrarQuizEnSupabase(Number(score));
+    try { playBgMusic(); } catch (e) {}
     goToNextStationAfterVictory();
 
     // Mostrar botón Siguiente para que el usuario avance cuando quiera

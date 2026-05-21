@@ -23,6 +23,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let timerInterval = null;
     let solvedOnTime = false;
 
+    // Background music helpers
+    function ensureBgMusic() {
+        try {
+            if (!window.bgMusic) {
+                window.bgMusic = new Audio('../Sonidos/musica fondo.mp3');
+                window.bgMusic.loop = true; window.bgMusic.volume = 0.18; window.bgMusic.preload = 'auto';
+            }
+        } catch (e) { }
+    }
+    function playBgMusic() { try { ensureBgMusic(); window.bgMusic.play().catch(()=>{}); } catch (e) {} }
+    function pauseBgMusic() { try { if (window.bgMusic && !window.bgMusic.paused) window.bgMusic.pause(); } catch (e) {} }
+
     /**
      * Inicializa el juego
      */
@@ -248,6 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
             playIncorrectSound();
         }
         successModal.classList.add('show');
+        try { playBgMusic(); } catch (e) {}
     }
 
     // --- Event Listeners ---
@@ -300,6 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startTimer() {
         stopTimer();
+        try { pauseBgMusic(); } catch (e) {}
         timerInterval = setInterval(() => {
             timeRemaining -= 1;
             updateTimerDisplay();
