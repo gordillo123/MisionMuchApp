@@ -110,19 +110,72 @@ async function guardarProgresoUsuario(estacionId, extra = {}) {
   const user = await obtenerUsuarioActual();
   if (!user) throw new Error('No hay usuario autenticado.');
 
+  const metadata = extra.metadata || {};
+  const payloadExtra = { ...extra };
+  delete payloadExtra.metadata;
+
   const { data, error } = await supabase
     .from('progreso_usuario')
     .upsert({
       user_id: user.id,
-      estacion_id: estacionId,
+      estacion_id: Number(estacionId),
       completada: true,
       completada_en: new Date().toISOString(),
-      ...extra
+      metadata,
+      ...payloadExtra
     }, { onConflict: 'user_id,estacion_id' })
     .select()
     .single();
 
   console.log('[Supabase DB] Progreso guardado:', { data, error });
+  if (error) throw error;
+  return data;
+}
+
+async function guardarIntentoEstacion(estacionId, intento = {}) {
+  const supabase = await initSupabase();
+  const user = await obtenerUsuarioActual();
+  if (!user) throw new Error('No hay usuario autenticado.');
+
+  const payload = {
+    user_id: user.id,
+    estacion_id: Number(estacionId),
+    aciertos: Number(intento.aciertos || 0),
+    errores: Number(intento.errores || 0),
+    puntaje: Number(intento.puntaje || 0),
+    aprobado: Boolean(intento.aprobado),
+    fecha_intento: new Date().toISOString()
+  };
+
+  const { data, error } = await supabase
+    .from('intentos_estacion')
+    .insert(payload)
+    .select()
+    .single();
+
+  console.log('[Supabase DB] Intento de estacion guardado:', { data, error });
+  if (error) throw error;
+  return data;
+}
+
+async function guardarPartidaMinijuego(partida = {}) {
+  const supabase = await initSupabase();
+  const user = await obtenerUsuarioActual();
+  if (!user) throw new Error('No hay usuario autenticado.');
+
+  const { data, error } = await supabase
+    .from('partidas_minijuego')
+    .insert({
+      user_id: user.id,
+      puntaje: Number(partida.puntaje || 0),
+      aprobado: Boolean(partida.aprobado),
+      metadata: partida.metadata || {},
+      fecha_partida: new Date().toISOString()
+    })
+    .select()
+    .single();
+
+  console.log('[Supabase DB] Partida minijuego guardada:', { data, error });
   if (error) throw error;
   return data;
 }
@@ -200,6 +253,8 @@ window.normalizarUsuarioSupabase = normalizarUsuarioSupabase;
 window.verificarUsuarioEnTabla = verificarUsuarioEnTabla;
 window.consultarEstaciones = consultarEstaciones;
 window.guardarProgresoUsuario = guardarProgresoUsuario;
+window.guardarIntentoEstacion = guardarIntentoEstacion;
+window.guardarPartidaMinijuego = guardarPartidaMinijuego;
 window.generarBoletoFinal = generarBoletoFinal;
 window.iniciarJuego = iniciarJuego;
 window.cargarPreguntas = cargarPreguntas;
@@ -215,6 +270,8 @@ export {
   verificarUsuarioEnTabla,
   consultarEstaciones,
   guardarProgresoUsuario,
+  guardarIntentoEstacion,
+  guardarPartidaMinijuego,
   generarBoletoFinal,
   iniciarJuego,
   cargarPreguntas,

@@ -31,6 +31,7 @@ const STATION_ID = '2';
 const COMPLETED_STATIONS_KEY = 'much_completed_stations';
 
 var jumpSound;
+var victoryAudioContext = null;
 var quizData = null;
 var quizAnswerIndex = null;
 var quizVisible = false;
@@ -50,6 +51,86 @@ function markStationCompleted() {
   }
 }
 
+function playVictoryMusic() {
+  try {
+    var AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+
+    if (!victoryAudioContext) victoryAudioContext = new AudioCtx();
+    var ctx = victoryAudioContext;
+    if (ctx.state === "suspended") ctx.resume();
+
+    var now = ctx.currentTime + 0.02;
+    var master = ctx.createGain();
+    master.gain.setValueAtTime(0.0001, now);
+    master.gain.exponentialRampToValueAtTime(0.22, now + 0.06);
+    master.gain.exponentialRampToValueAtTime(0.0001, now + 2.8);
+    master.connect(ctx.destination);
+
+    var melody = [
+      [523.25, 0.00, 0.16], [659.25, 0.18, 0.16], [783.99, 0.36, 0.22],
+      [1046.50, 0.64, 0.30], [783.99, 1.02, 0.16], [1046.50, 1.20, 0.42],
+      [1318.51, 1.72, 0.52]
+    ];
+
+    var chords = [
+      [261.63, 0.00, 0.72], [329.63, 0.00, 0.72], [392.00, 0.00, 0.72],
+      [349.23, 0.82, 0.72], [440.00, 0.82, 0.72], [523.25, 0.82, 0.72],
+      [392.00, 1.62, 1.00], [493.88, 1.62, 1.00], [659.25, 1.62, 1.00]
+    ];
+
+    melody.concat(chords).forEach(function (note) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = note[0] < 500 ? "triangle" : "sine";
+      osc.frequency.setValueAtTime(note[0], now + note[1]);
+      gain.gain.setValueAtTime(0.0001, now + note[1]);
+      gain.gain.exponentialRampToValueAtTime(note[0] < 500 ? 0.08 : 0.18, now + note[1] + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + note[1] + note[2]);
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start(now + note[1]);
+      osc.stop(now + note[1] + note[2] + 0.05);
+    });
+  } catch (e) {
+    console.warn("No se pudo reproducir la musica de victoria:", e);
+  }
+}
+
+async function guardarSpinosaurioEnSupabase(puntajeFinal, aprobado) {
+  try {
+    const progreso = await import('../supabase-utils.js');
+    await progreso.guardarPartidaMinijuego({
+      puntaje: puntajeFinal,
+      aprobado,
+      metadata: {
+        estacion_id: Number(STATION_ID),
+        estacion: 'spinosaurio',
+        ubicacion: LUGAR_QR
+      }
+    });
+
+    await progreso.guardarIntentoEstacion(STATION_ID, {
+      aciertos: aprobado ? 1 : 0,
+      errores: aprobado ? 0 : 1,
+      puntaje: puntajeFinal,
+      aprobado
+    });
+
+    if (aprobado) {
+      await progreso.guardarProgresoUsuario(STATION_ID, {
+        metadata: {
+          estacion: 'spinosaurio',
+          puntaje: puntajeFinal,
+          ubicacion: LUGAR_QR
+        }
+      });
+    }
+  } catch (error) {
+    console.error('[Supabase DB] No se pudo guardar Spinosaurio:', error);
+  }
+}
+
 // 🛑 Variables de la cuenta regresiva y estado del juego
 var countdownActive = false;
 var gameStarted = false;
@@ -57,19 +138,26 @@ var loopRequestId;
 var orientationBlocked = false;
 
 function isMobilePortrait() {
-  const isCoarsePointer = window.matchMedia && window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-  const isSmallScreen = Math.min(window.innerWidth, window.innerHeight) <= 900;
-  return isSmallScreen && isCoarsePointer && window.innerHeight > window.innerWidth;
+  return false;
 }
 
 function updateOrientationGate() {
-  orientationBlocked = isMobilePortrait();
-  document.body.classList.toggle("orientation-blocked", orientationBlocked);
+  orientationBlocked = false;
+  document.body.classList.remove("orientation-blocked");
+  updateResponsiveScale();
   return orientationBlocked;
 }
 
 function canStartLandscapeGame() {
-  return !updateOrientationGate();
+  updateOrientationGate();
+  return true;
+}
+
+function updateResponsiveScale() {
+  var w = Math.max(320, window.innerWidth || document.documentElement.clientWidth || 320);
+  var h = Math.max(280, window.innerHeight || document.documentElement.clientHeight || 280);
+  var scale = Math.min(1, Math.max(0.5, Math.min(w / 920, h / 520)));
+  document.documentElement.style.setProperty("--game-scale", scale.toFixed(3));
 }
 
 /* ===== INICIALIZACIÓN ===== */
@@ -185,12 +273,9 @@ function ConfigurarPortada() {
           await document.documentElement.webkitRequestFullscreen();
         }
 
-        // 2. Forzamos rotación horizontal
-        if (screen.orientation && screen.orientation.lock) {
-          await screen.orientation.lock("landscape");
-        }
+        updateResponsiveScale();
       } catch (err) {
-        console.warn("No se pudo forzar rotación:", err);
+        console.warn("No se pudo activar pantalla completa:", err);
       }
 
       if (!canStartLandscapeGame()) return;
@@ -338,7 +423,9 @@ function CrearObstaculo() {
 function CrearNube() {
   var n = document.createElement("div"); contenedor.appendChild(n);
   n.classList.add("nube"); n.posX = contenedor.clientWidth; n.style.left = n.posX + "px";
-  n.style.bottom = 100 + Math.random() * (270 - 100) + "px"; nubes.push(n);
+  var minBottom = Math.max(70, contenedor.clientHeight * 0.28);
+  var maxBottom = Math.max(minBottom + 20, contenedor.clientHeight * 0.78);
+  n.style.bottom = minBottom + Math.random() * (maxBottom - minBottom) + "px"; nubes.push(n);
   tiempoHastaNube = tiempoNubeMin + Math.random() * (tiempoNubeMax - tiempoNubeMin) / gameVel;
 }
 function MoverObstaculos() {
@@ -450,9 +537,6 @@ function handleQuestionTimeout() {
 function mostrarQuiz() {
   document.body.classList.add("quiz-mode");
   try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) { }
-  setTimeout(() => {
-    try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock("portrait-primary"); } catch (e) { }
-  }, 50);
 
   if (!quizData) {
     quizData = {
@@ -511,6 +595,7 @@ async function validarQuiz() {
   if (Number(sel.value) === quizAnswerIndex) {
     msg.textContent = "¡Felicidades! ¡Correcto! Has completado esta estación con éxito y tu avatar avanzó a la siguiente estación. 🦖"; 
     msg.className = "quiz-msg ok";
+    playVictoryMusic();
 
     navigatingToRegistro = true; 
     quizVisible = false;
@@ -523,6 +608,7 @@ async function validarQuiz() {
     markStationCompleted();
     localStorage.setItem('much_current_station', '3');
 
+    await guardarSpinosaurioEnSupabase(Number(score), true);
     await registrarQuizEnSupabase(Number(score));
 
     // Mostrar botón Siguiente para que el usuario avance cuando quiera
@@ -721,3 +807,4 @@ function initMiniMap() {
 
 // Inicializar Mini-Mapa inmediatamente
 initMiniMap();
+
