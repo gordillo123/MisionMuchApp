@@ -30,7 +30,7 @@ window.APP_MODULES = {
         <span class="nav-icon">❔</span>
         <span class="nav-label">Ayuda</span>
       </a>
-      <a href="entrada-much/dashboard.html" class="nav-btn" id="btnAdmin">
+      <a href="ADMINISTRADOR.html" class="nav-btn" id="btnAdmin">
         <span class="nav-icon">A</span>
         <span class="nav-label">Admin</span>
       </a>
