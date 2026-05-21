@@ -69,8 +69,144 @@
     }
 
     button,
-    input {
+    input,
+    select {
       font: inherit;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .admin-auth-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 28px 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .admin-auth-card {
+      width: min(100%, 460px);
+      background: rgba(12, 20, 36, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 32px;
+      padding: 30px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      display: grid;
+      gap: 18px;
+    }
+
+    .admin-auth-badge {
+      width: 74px;
+      height: 74px;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      font-size: 2rem;
+      background: linear-gradient(135deg, rgba(73, 198, 255, 0.95), rgba(122, 125, 255, 0.92));
+      box-shadow: 0 14px 30px rgba(73, 198, 255, 0.22);
+    }
+
+    .admin-auth-eyebrow {
+      margin: 0;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .admin-auth-card h1 {
+      margin: 0;
+      font-family: 'Fredoka', sans-serif;
+      font-size: clamp(1.9rem, 5vw, 2.6rem);
+      line-height: 1.05;
+    }
+
+    .admin-auth-copy,
+    .admin-auth-hint {
+      margin: 0;
+      color: var(--text-soft);
+      line-height: 1.65;
+    }
+
+    .admin-auth-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .admin-auth-label {
+      color: var(--text-soft);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .admin-auth-input {
+      width: 100%;
+      min-height: 56px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      padding: 0 16px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      appearance: none;
+    }
+
+    .admin-auth-input:focus {
+      border-color: rgba(73, 198, 255, 0.42);
+      box-shadow: 0 0 0 3px rgba(73, 198, 255, 0.12);
+    }
+
+    .admin-auth-button {
+      min-height: 56px;
+      border: 0;
+      border-radius: 18px;
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      background: linear-gradient(135deg, rgba(73, 198, 255, 0.95), rgba(122, 125, 255, 0.95));
+      box-shadow: 0 16px 30px rgba(73, 198, 255, 0.22);
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .admin-auth-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .admin-auth-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+      transform: none;
+    }
+
+    .admin-auth-message {
+      margin: 0;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-soft);
+      line-height: 1.5;
+      min-height: 48px;
+    }
+
+    .admin-auth-message.error {
+      color: #ffb4b4;
+      background: rgba(248, 113, 113, 0.12);
+      border-color: rgba(248, 113, 113, 0.18);
+    }
+
+    .admin-auth-message.success {
+      color: #9ce6b4;
+      background: rgba(34, 197, 94, 0.12);
+      border-color: rgba(34, 197, 94, 0.18);
     }
 
     .page-shell {
@@ -140,6 +276,19 @@
       gap: 12px;
       flex-wrap: wrap;
       justify-content: flex-end;
+    }
+
+    .admin-session-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(73, 198, 255, 0.18);
+      background: rgba(73, 198, 255, 0.08);
+      color: #9be5ff;
+      font-size: 0.85rem;
+      font-weight: 700;
     }
 
     .ghost-link,
@@ -693,7 +842,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 820px;
+      min-width: 1480px;
     }
 
     thead th {
@@ -847,6 +996,15 @@
     }
 
     @media (max-width: 780px) {
+      .admin-auth-screen {
+        padding: 20px 14px 40px;
+      }
+
+      .admin-auth-card {
+        padding: 24px 20px;
+        border-radius: 26px;
+      }
+
       .page-shell {
         padding: 20px 14px 40px;
       }
@@ -862,6 +1020,10 @@
 
       .topbar-actions>* {
         flex: 1;
+      }
+
+      .admin-session-chip {
+        justify-content: center;
       }
 
       .metrics-grid {
@@ -938,20 +1100,52 @@
 </head>
 
 <body>
-  <div class="page-shell">
+  <section class="admin-auth-screen" id="adminAuthScreen">
+    <div class="admin-auth-card">
+      <div class="admin-auth-badge">🛡️</div>
+      <p class="admin-auth-eyebrow">Acceso administrativo</p>
+      <h1>Inicia sesión para entrar al panel</h1>
+      <p class="admin-auth-copy">
+        Este acceso está conectado con Supabase Auth y solo permite las cuentas autorizadas del MUCH y Planetario.
+      </p>
+
+      <form class="admin-auth-form" id="adminLoginForm">
+        <label class="admin-auth-label" for="adminEmail">Correo autorizado</label>
+        <select class="admin-auth-input" id="adminEmail" autocomplete="username">
+          <option value="planetariotuxtla@gmail.com">planetariotuxtla@gmail.com</option>
+          <option value="muchtuxtla@gmail.com">muchtuxtla@gmail.com</option>
+        </select>
+
+        <label class="admin-auth-label" for="adminPassword">Contraseña</label>
+        <input class="admin-auth-input" id="adminPassword" type="password" autocomplete="current-password"
+          placeholder="Escribe la contraseña del administrador" required>
+
+        <button class="admin-auth-button" id="btnAdminLogin" type="submit">Entrar al administrador</button>
+
+        <p class="admin-auth-hint">
+          Cuentas permitidas: <strong>planetariotuxtla@gmail.com</strong> y <strong>muchtuxtla@gmail.com</strong>.
+        </p>
+        <p class="admin-auth-message" id="adminAuthMessage">Ingresa con una cuenta autorizada para consultar la BD.</p>
+      </form>
+    </div>
+  </section>
+
+  <div class="page-shell" id="adminShell" hidden>
     <header class="topbar">
       <div class="brand">
         <div class="brand-badge">🗂️</div>
         <div class="brand-copy">
           <p>Panel interno</p>
           <h1>Administrador de Folios</h1>
-          <span>Consulta folios desde boletos y Ganadores, revisa estados y busca registros rapido.</span>
+          <span>Consulta la BD de boletos en tiempo real, valida QR y busca registros por texto o ID.</span>
         </div>
       </div>
 
       <div class="topbar-actions">
+        <span class="admin-session-chip" id="adminSessionChip" hidden>Administrador</span>
         <a class="ghost-link" href="./index.html">← Volver al inicio</a>
         <button class="solid-button" id="btnRefreshTop" type="button">Actualizar datos</button>
+        <button class="soft-button" id="btnLogoutAdmin" type="button" hidden>Cerrar sesión</button>
       </div>
     </header>
 
@@ -989,7 +1183,7 @@
         <div class="panel-head">
           <div>
             <h2>Escaner de boletos</h2>
-            <p>Escanea el QR del boleto o pega el folio para saber si es valido, invalido y que fecha tiene.</p>
+            <p>Escanea el QR del boleto o captura el folio/ID para consultar todos los datos del registro en tiempo real.</p>
           </div>
           <span class="scanner-support" id="scannerSupport">Camara detenida</span>
         </div>
@@ -1001,7 +1195,7 @@
               <div class="scanner-placeholder" id="scannerPlaceholder">
                 <div>
                   <strong>Listo para escanear</strong>
-                  <span>Presiona "Iniciar escaner" y apunta al QR del boleto.</span>
+                  <span>Presiona "Iniciar escaner" y apunta al QR del boleto para leerlo al instante.</span>
                 </div>
               </div>
             </div>
@@ -1014,12 +1208,12 @@
 
           <div class="scanner-side">
             <p class="scanner-side-note">
-              El QR del boleto trae una URL con el folio. Si la camara no abre, pega ese folio o la URL del QR y el panel lo validara.
+              El QR del boleto trae una URL con el folio. Si la camara no abre, pega aqui el folio, el ID o la URL del QR y el panel lo consultara contra la BD.
             </p>
 
-            <label class="manual-label" for="manualTicketInput">Folio o contenido del QR</label>
+            <label class="manual-label" for="manualTicketInput">Folio, ID o contenido del QR</label>
             <input id="manualTicketInput" class="manual-input" type="text" autocomplete="off"
-              placeholder="Ejemplo: MUCH-123456 o https://.../validar.html?folio=MUCH-123456">
+              placeholder="Ejemplo: 125, MUCH-123456 o https://.../validar.html?folio=MUCH-123456">
 
             <div class="scanner-actions">
               <button class="soft-button" id="btnValidateManual" type="button">Validar boleto</button>
@@ -1034,7 +1228,7 @@
         <div class="panel-head">
           <div>
             <h2>Resultado del escaneo</h2>
-            <p>Revision inmediata del boleto para el control de acceso.</p>
+            <p>Revision inmediata con todos los campos registrados del boleto y su status actual.</p>
           </div>
           <span id="scanCheckedAt">Sin lectura</span>
         </div>
@@ -1043,7 +1237,7 @@
           <div class="scan-result-placeholder">
             <div>
               <strong>Aun no se ha validado un boleto.</strong>
-              <span>Cuando escanees un QR o pegues un folio, aqui veras si es valido o invalido y la fecha del boleto.</span>
+              <span>Cuando escanees un QR o pegues un folio/ID, aqui veras toda la informacion sincronizada desde la BD.</span>
             </div>
           </div>
         </div>
@@ -1053,7 +1247,7 @@
     <section class="toolbar" id="toolbar">
       <label class="search-wrap" for="searchInput">
         <span>🔎</span>
-        <input id="searchInput" type="search" autocomplete="off" placeholder="Buscar por folio, nombre o correo">
+        <input id="searchInput" type="search" autocomplete="off" placeholder="Buscar por ID, folio, nombre, correo, telefono o tipo de entrada">
       </label>
       <button class="soft-button" id="btnClear" type="button">Limpiar</button>
       <button class="soft-button" id="btnRefresh" type="button">Recargar</button>
@@ -1081,16 +1275,22 @@
         <table>
           <thead>
             <tr>
-              <th>Participante</th>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Telefono</th>
               <th>Folio</th>
-              <th>Estatus</th>
-              <th>Fecha de vencimiento</th>
+              <th>Tipo de entrada</th>
+              <th>Estatus BD</th>
+              <th>Status</th>
+              <th>Valido desde</th>
+              <th>Valido hasta</th>
               <th>Fecha de registro</th>
             </tr>
           </thead>
           <tbody id="tableBody">
             <tr>
-              <td colspan="5" class="empty-state">
+              <td colspan="11" class="empty-state">
                 <strong>Cargando informacion...</strong>
                 <span>Espera un momento mientras se consultan los folios.</span>
               </td>
@@ -1101,22 +1301,36 @@
     </section>
 
     <p class="footer-note">
-      Los contadores cambian junto con la busqueda y los filtros activos. El panel fusiona datos de
-      <strong>boletos</strong> y <strong>Ganadores</strong>; si un folio existe en ambas tablas, se combinan en una sola fila.
+      Los contadores cambian junto con la busqueda y los filtros activos. La tabla se sincroniza con
+      <strong>Ganadores</strong>, muestra los mismos campos registrados del boleto y calcula <strong>Status</strong>
+      sin incluir Sala de actividades ni Ubicacion.
     </p>
   </div>
 
   <script>
     const ADMIN_VISUAL_ONLY = false;
-    const ADMIN_RECORD_CUTOFF = '2026-05-20T00:00:00';
+    const ADMIN_ALLOWED_EMAILS = [
+      'planetariotuxtla@gmail.com',
+      'muchtuxtla@gmail.com'
+    ];
+    const TICKET_SELECT_FIELDS = 'id,nombre,correo,telefono,folio,valido_desde,valido_hasta,estatus,tipo_entrada,created_at';
     const SUPABASE_URL = 'https://qwgaeorsymfispmtsbut.supabase.co';
     const SUPABASE_ANON_KEY =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3Z2Flb3JzeW1maXNwbXRzYnV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzODcyODUsImV4cCI6MjA3Nzk2MzI4NX0.FThZIIpz3daC9u8QaKyRTpxUeW0v4QHs5sHX2s1U1eo';
 
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false
+      }
+    });
+
+    const sbAuth = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
         persistSession: true,
         autoRefreshToken: true,
+        storageKey: 'mision-much-admin-auth',
         detectSessionInUrl: false
       }
     });
@@ -1132,6 +1346,15 @@
 
     const els = {
       body: document.body,
+      adminShell: document.getElementById('adminShell'),
+      adminAuthScreen: document.getElementById('adminAuthScreen'),
+      adminLoginForm: document.getElementById('adminLoginForm'),
+      adminEmail: document.getElementById('adminEmail'),
+      adminPassword: document.getElementById('adminPassword'),
+      btnAdminLogin: document.getElementById('btnAdminLogin'),
+      adminAuthMessage: document.getElementById('adminAuthMessage'),
+      adminSessionChip: document.getElementById('adminSessionChip'),
+      btnLogoutAdmin: document.getElementById('btnLogoutAdmin'),
       searchInput: document.getElementById('searchInput'),
       btnClear: document.getElementById('btnClear'),
       btnRefresh: document.getElementById('btnRefresh'),
@@ -1161,6 +1384,15 @@
       lastPayload: '',
       lastFolio: '',
       lastScanAt: 0
+    };
+
+    const adminState = {
+      authorized: false,
+      bootstrapped: false,
+      eventsBound: false,
+      realtimeChannel: null,
+      refreshIntervalId: null,
+      refreshQueued: false
     };
 
     const dateFormatter = new Intl.DateTimeFormat('es-MX', {
@@ -1206,6 +1438,217 @@
       return withTime ? dateTimeFormatter.format(parsed) : dateFormatter.format(parsed);
     }
 
+    function normalizeAdminEmail(value) {
+      return String(value ?? '').trim().toLowerCase();
+    }
+
+    function isAllowedAdminEmail(value) {
+      return ADMIN_ALLOWED_EMAILS.includes(normalizeAdminEmail(value));
+    }
+
+    function setAdminAuthMessage(message, tone = '') {
+      if (!els.adminAuthMessage) return;
+      els.adminAuthMessage.textContent = message;
+      els.adminAuthMessage.classList.toggle('error', tone === 'error');
+      els.adminAuthMessage.classList.toggle('success', tone === 'success');
+    }
+
+    function setAdminAuthLoading(isLoading) {
+      if (els.btnAdminLogin) els.btnAdminLogin.disabled = isLoading;
+      if (els.adminEmail) els.adminEmail.disabled = isLoading;
+      if (els.adminPassword) els.adminPassword.disabled = isLoading;
+    }
+
+    function renderAdminSession(user) {
+      if (!els.adminSessionChip || !els.btnLogoutAdmin) return;
+
+      if (!user?.email) {
+        els.adminSessionChip.hidden = true;
+        els.btnLogoutAdmin.hidden = true;
+        els.adminSessionChip.textContent = 'Administrador';
+        return;
+      }
+
+      els.adminSessionChip.hidden = false;
+      els.btnLogoutAdmin.hidden = false;
+      els.adminSessionChip.textContent = `Admin: ${user.email}`;
+    }
+
+    function showAdminShell(user) {
+      adminState.authorized = true;
+      els.adminAuthScreen.hidden = true;
+      els.adminShell.hidden = false;
+      renderAdminSession(user);
+    }
+
+    async function showAdminLogin(message = 'Ingresa con una cuenta autorizada para consultar la BD.', tone = '') {
+      adminState.authorized = false;
+      els.adminShell.hidden = true;
+      els.adminAuthScreen.hidden = false;
+      renderAdminSession(null);
+      setAdminAuthMessage(message, tone);
+      if (els.adminPassword) els.adminPassword.value = '';
+      stopTicketSync();
+
+      if (scannerState.active) {
+        await stopScanner();
+      }
+    }
+
+    async function bootstrapAdminDashboard() {
+      if (!adminState.bootstrapped) {
+        bindEvents();
+        initScannerState();
+        adminState.bootstrapped = true;
+      }
+
+      await loadRecords();
+    }
+
+    async function authorizeAdminSession(session) {
+      const user = session?.user || null;
+      const email = normalizeAdminEmail(user?.email);
+
+      if (!user || !email || !isAllowedAdminEmail(email)) {
+        await sbAuth.auth.signOut();
+        await showAdminLogin('Esta cuenta no tiene permiso para entrar al administrador.', 'error');
+        return false;
+      }
+
+      showAdminShell(user);
+      await bootstrapAdminDashboard();
+      startTicketSync();
+      return true;
+    }
+
+    async function initializeAdminAccess() {
+      setAdminAuthLoading(true);
+      
+      try {
+        // Acceso directo sin verificación de login
+        showAdminShell({ email: 'Admin' });
+        await bootstrapAdminDashboard();
+        startTicketSync();
+      } catch (error) {
+        console.error('Error inicializando administrador:', error);
+        await showAdminLogin('No se pudo inicializar el administrador.', 'error');
+      } finally {
+        setAdminAuthLoading(false);
+      }
+    }
+
+    async function handleAdminLoginSubmit(event) {
+      event.preventDefault();
+
+      const email = normalizeAdminEmail(els.adminEmail.value);
+      const password = els.adminPassword.value;
+
+      if (!isAllowedAdminEmail(email)) {
+        setAdminAuthMessage('Solo las cuentas autorizadas pueden acceder a este panel.', 'error');
+        return;
+      }
+
+      if (!password) {
+        setAdminAuthMessage('Escribe la contraseña del administrador para continuar.', 'error');
+        return;
+      }
+
+      setAdminAuthLoading(true);
+      setAdminAuthMessage('Iniciando sesion y conectando con Supabase...');
+
+      try {
+        const { data, error } = await sbAuth.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) throw error;
+
+        const authorized = await authorizeAdminSession(data?.session || null);
+        if (authorized) {
+          setAdminAuthMessage(`Sesion iniciada como ${email}.`, 'success');
+        }
+      } catch (error) {
+        console.error('Error de login administrador:', error);
+        const readableError = error?.message === 'Invalid login credentials'
+          ? 'Credenciales invalidas. Verifica el correo autorizado y la contraseña configurada en Supabase Auth.'
+          : (error?.message || 'No se pudo iniciar sesion.');
+
+        await showAdminLogin(readableError, 'error');
+      } finally {
+        setAdminAuthLoading(false);
+      }
+    }
+
+    async function logoutAdmin() {
+      if (scannerState.active) {
+        await stopScanner();
+      }
+
+      try {
+        await sbAuth.auth.signOut();
+      } catch (error) {
+        console.error('Error cerrando sesion del administrador:', error);
+      }
+
+      await showAdminLogin('Sesion cerrada correctamente.');
+    }
+
+    function stopTicketSync() {
+      if (adminState.refreshIntervalId) {
+        window.clearInterval(adminState.refreshIntervalId);
+        adminState.refreshIntervalId = null;
+      }
+
+      if (adminState.realtimeChannel) {
+        sb.removeChannel(adminState.realtimeChannel);
+        adminState.realtimeChannel = null;
+      }
+
+      adminState.refreshQueued = false;
+    }
+
+    function queueTicketRefresh() {
+      if (adminState.refreshQueued || !adminState.authorized) return;
+
+      adminState.refreshQueued = true;
+      window.setTimeout(async () => {
+        adminState.refreshQueued = false;
+        if (!adminState.authorized) return;
+        await loadRecords({ silent: true });
+      }, 250);
+    }
+
+    function startTicketSync() {
+      if (!adminState.refreshIntervalId) {
+        adminState.refreshIntervalId = window.setInterval(() => {
+          if (!adminState.authorized || state.loading) return;
+          loadRecords({ silent: true });
+        }, 30000);
+      }
+
+      if (adminState.realtimeChannel) return;
+
+      try {
+        adminState.realtimeChannel = sb
+          .channel('admin-ganadores-live')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'Ganadores' },
+            () => {
+              queueTicketRefresh();
+            }
+          )
+          .subscribe((status) => {
+            if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+              console.warn('La suscripcion en tiempo real del administrador no pudo mantenerse activa.');
+            }
+          });
+      } catch (error) {
+        console.warn('No se pudo iniciar la sincronizacion en tiempo real:', error);
+      }
+    }
+
     function setScannerSupport(message, tone = '') {
       if (!els.scannerSupport) return;
       els.scannerSupport.textContent = message;
@@ -1245,19 +1688,6 @@
       return normalizeFolio(raw.replace(/^folio[:\s-]*/i, ''));
     }
 
-    function getScanSourceLabel(source) {
-      switch (source) {
-        case 'ganadores':
-          return 'Tabla Ganadores';
-        case 'boletos+ganadores':
-          return 'boletos + Ganadores';
-        case 'boletos':
-          return 'Tabla boletos';
-        default:
-          return 'Registro no identificado';
-      }
-    }
-
     function getScanTone(statusInfo) {
       if (statusInfo.key === 'canjeado') return 'warning';
       return statusInfo.isValid ? 'valid' : 'invalid';
@@ -1268,16 +1698,17 @@
       if (statusInfo.key === 'canjeado') return 'Boleto invalido por uso previo';
       if (statusInfo.key === 'vencido') return 'Boleto invalido por vigencia vencida';
       if (statusInfo.key === 'sin_folio') return 'Boleto invalido sin folio';
+      if (statusInfo.key === 'sin_estatus') return 'Boleto invalido por estatus incompleto';
       return 'Boleto invalido';
     }
 
     function getScanDescription(record, statusInfo) {
       if (statusInfo.isValid) {
-        return 'El boleto aparece vigente y listo para acceso.';
+        return 'El boleto coincide con la BD y aparece vigente para acceso.';
       }
 
       if (statusInfo.key === 'canjeado') {
-        return `Este boleto ya fue usado${record.fecha_uso ? ` el ${formatDate(record.fecha_uso, true)}` : ''}.`;
+        return 'Este boleto ya fue usado y aparece como canjeado en la base de datos.';
       }
 
       if (statusInfo.key === 'vencido') {
@@ -1288,6 +1719,14 @@
         return 'El registro existe, pero no tiene un folio valido para control de acceso.';
       }
 
+      if (statusInfo.key === 'sin_estatus') {
+        return 'El registro existe, pero no tiene estatus en la base de datos.';
+      }
+
+      if (record?.estatus) {
+        return `El estatus almacenado en la base de datos es ${String(record.estatus).toLowerCase()}.`;
+      }
+
       return 'No fue posible validar este boleto.';
     }
 
@@ -1296,11 +1735,17 @@
       badgeTone,
       title,
       description,
+      recordId,
       folio,
       participant,
+      email,
+      phone,
+      ticketType,
+      dbStatus,
+      status,
+      validFrom,
       validUntil,
       createdAt,
-      source,
       rawValue
     }) {
       els.scanCheckedAt.textContent = `Leido: ${formatDate(new Date(), true)}`;
@@ -1316,20 +1761,44 @@
 
           <div class="scan-meta">
             <div class="scan-meta-item">
-              <span>Participante</span>
+              <span>ID</span>
+              <strong>${escapeHtml(recordId || 'Sin ID')}</strong>
+            </div>
+            <div class="scan-meta-item">
+              <span>Nombre</span>
               <strong>${escapeHtml(participant || 'Sin nombre')}</strong>
             </div>
             <div class="scan-meta-item">
-              <span>Fecha de vigencia</span>
+              <span>Correo</span>
+              <strong>${escapeHtml(email || 'Sin correo')}</strong>
+            </div>
+            <div class="scan-meta-item">
+              <span>Telefono</span>
+              <strong>${escapeHtml(phone || 'Sin telefono')}</strong>
+            </div>
+            <div class="scan-meta-item">
+              <span>Tipo de entrada</span>
+              <strong>${escapeHtml(ticketType || 'Sin tipo')}</strong>
+            </div>
+            <div class="scan-meta-item">
+              <span>Estatus BD</span>
+              <strong>${escapeHtml(dbStatus || 'Sin estatus')}</strong>
+            </div>
+            <div class="scan-meta-item">
+              <span>Status</span>
+              <strong>${escapeHtml(status || 'Sin status')}</strong>
+            </div>
+            <div class="scan-meta-item">
+              <span>Valido desde</span>
+              <strong>${escapeHtml(validFrom || 'Sin fecha')}</strong>
+            </div>
+            <div class="scan-meta-item">
+              <span>Valido hasta</span>
               <strong>${escapeHtml(validUntil || 'Sin fecha')}</strong>
             </div>
             <div class="scan-meta-item">
               <span>Fecha de registro</span>
               <strong>${escapeHtml(createdAt || 'Sin fecha')}</strong>
-            </div>
-            <div class="scan-meta-item">
-              <span>Origen</span>
-              <strong>${escapeHtml(source || 'Sin origen')}</strong>
             </div>
           </div>
 
@@ -1343,85 +1812,42 @@
       `;
     }
 
-    function buildFallbackName(record) {
-      if (record?.nombre) return record.nombre;
-      if (record?.user_id) return `Usuario ${String(record.user_id).slice(0, 8)}`;
-      return 'Sin nombre';
+    function normalizeTicketRecord(record) {
+      return {
+        id: record?.id ?? null,
+        nombre: record?.nombre || '',
+        correo: record?.correo || '',
+        telefono: record?.telefono || '',
+        folio: record?.folio || '',
+        valido_desde: record?.valido_desde || null,
+        valido_hasta: record?.valido_hasta || null,
+        estatus: record?.estatus || '',
+        tipo_entrada: record?.tipo_entrada || '',
+        created_at: record?.created_at || null
+      };
     }
 
-    function buildMergedRecords(boletos = [], ganadores = []) {
-      const merged = [];
-      const winnerByFolio = new Map();
-      const consumedWinnerKeys = new Set();
-
-      ganadores.forEach((winner) => {
-        const folioKey = normalizeFolio(winner.folio);
-        if (folioKey) winnerByFolio.set(folioKey, winner);
-      });
-
-      boletos.forEach((boleto) => {
-        const folioKey = normalizeFolio(boleto.folio);
-        const winner = folioKey ? winnerByFolio.get(folioKey) : null;
-        const estadoBoleto = String(boleto.estado || '').trim().toUpperCase();
-        const usado = estadoBoleto === 'USADO' || Boolean(boleto.fecha_uso);
-
-        if (winner && folioKey) consumedWinnerKeys.add(folioKey);
-
-        merged.push({
-          id: `boleto-${boleto.id}`,
-          source: winner ? 'boletos+ganadores' : 'boletos',
-          nombre: winner?.nombre || buildFallbackName(boleto),
-          correo: winner?.correo || '',
-          user_id: boleto.user_id || null,
-          folio: boleto.folio || winner?.folio || '',
-          estatus: usado ? 'canjeado' : (winner?.estatus || 'activo'),
-          valido_desde: winner?.valido_desde || null,
-          valido_hasta: winner?.valido_hasta || null,
-          created_at: boleto.fecha_generacion || winner?.created_at || null,
-          fecha_uso: boleto.fecha_uso || null
+    function normalizeTicketRecords(records = []) {
+      return records
+        .map((record) => normalizeTicketRecord(record))
+        .sort((a, b) => {
+          const left = parseDate(a.created_at)?.getTime() || 0;
+          const right = parseDate(b.created_at)?.getTime() || 0;
+          return right - left;
         });
-      });
-
-      ganadores.forEach((winner) => {
-        const folioKey = normalizeFolio(winner.folio);
-        if (folioKey && consumedWinnerKeys.has(folioKey)) return;
-
-        merged.push({
-          id: `ganador-${winner.id}`,
-          source: 'ganadores',
-          nombre: winner.nombre || 'Sin nombre',
-          correo: winner.correo || '',
-          user_id: null,
-          folio: winner.folio || '',
-          estatus: winner.estatus || 'activo',
-          valido_desde: winner.valido_desde || null,
-          valido_hasta: winner.valido_hasta || null,
-          created_at: winner.created_at || null,
-          fecha_uso: null
-        });
-      });
-
-      return merged.sort((a, b) => {
-        const left = parseDate(a.created_at)?.getTime() || 0;
-        const right = parseDate(b.created_at)?.getTime() || 0;
-        return right - left;
-      });
-    }
-
-    function isNewRecord(record) {
-      const createdAt = parseDate(record?.created_at);
-      const cutoff = parseDate(ADMIN_RECORD_CUTOFF);
-      if (!createdAt || !cutoff) return false;
-      return createdAt.getTime() >= cutoff.getTime();
     }
 
     function getStatusInfo(record) {
       const folio = String(record.folio || '').trim();
-      const estatus = String(record.estatus || 'activo').trim().toLowerCase();
+      const estatus = String(record.estatus || '').trim().toLowerCase();
       const validUntil = parseDate(record.valido_hasta);
 
       if (!folio) {
         return { key: 'sin_folio', label: 'Sin folio', className: 'tone-sin-folio', isValid: false };
+      }
+
+      if (!estatus) {
+        return { key: 'sin_estatus', label: 'Sin estatus', className: 'tone-sin-folio', isValid: false };
       }
 
       if (estatus === 'canjeado') {
@@ -1432,84 +1858,109 @@
         return { key: 'vencido', label: 'Vencido', className: 'tone-vencido', isValid: false };
       }
 
+      if (estatus !== 'activo') {
+        return { key: estatus, label: estatus.toUpperCase(), className: 'tone-sin-folio', isValid: false };
+      }
+
       return { key: 'vigente', label: 'Vigente', className: 'tone-vigente', isValid: true };
     }
 
-    async function fetchRecordByFolio(folio) {
-      const normalizedFolio = normalizeFolio(folio);
-      if (!normalizedFolio) return null;
+    async function fetchRecordByLookup(value) {
+      const lookup = String(value ?? '').trim();
+      if (!lookup) return null;
 
-      const [boletosRes, ganadoresRes] = await Promise.all([
-        sb
-          .from('boletos')
-          .select('id,user_id,folio,estado,fecha_generacion,fecha_uso')
-          .eq('folio', normalizedFolio)
-          .limit(1),
-        sb
+      const extractedFolio = extractFolioFromScan(lookup);
+      const idCandidate = /^\d+$/.test(lookup) ? Number(lookup) : null;
+      let lastError = null;
+
+      if (extractedFolio) {
+        const { data, error } = await sb
           .from('Ganadores')
-          .select('id,nombre,correo,folio,estatus,valido_desde,valido_hasta,created_at')
-          .eq('folio', normalizedFolio)
+          .select(TICKET_SELECT_FIELDS)
+          .eq('folio', extractedFolio)
+          .order('created_at', { ascending: false })
           .limit(1)
-      ]);
+          .maybeSingle();
 
-      const boletosError = boletosRes.error;
-      const ganadoresError = ganadoresRes.error;
-
-      if (boletosError && ganadoresError) {
-        throw new Error(`${boletosError.message} | ${ganadoresError.message}`);
+        if (error) {
+          lastError = error;
+        } else if (data) {
+          return normalizeTicketRecord(data);
+        }
       }
 
-      if (boletosError) {
-        console.warn('Error consultando boletos por folio:', boletosError.message);
+      if (idCandidate !== null) {
+        const { data, error } = await sb
+          .from('Ganadores')
+          .select(TICKET_SELECT_FIELDS)
+          .eq('id', idCandidate)
+          .maybeSingle();
+
+        if (error) {
+          lastError = error;
+        } else if (data) {
+          return normalizeTicketRecord(data);
+        }
       }
 
-      if (ganadoresError) {
-        console.warn('Error consultando Ganadores por folio:', ganadoresError.message);
-      }
-
-      const merged = buildMergedRecords(boletosRes.data || [], ganadoresRes.data || []);
-      return merged.find((record) => normalizeFolio(record.folio) === normalizedFolio) || null;
+      if (lastError) throw lastError;
+      return null;
     }
 
     async function validateTicket(rawValue) {
-      const folio = extractFolioFromScan(rawValue);
+      const lookup = String(rawValue ?? '').trim();
+      const folio = extractFolioFromScan(lookup);
+      const lookupValue = folio || lookup;
+      const looksLikeId = /^\d+$/.test(lookupValue);
 
-      if (!folio) {
-        setScannerFeedback('No se pudo extraer un folio valido del QR o del texto recibido.', 'error');
+      if (!lookupValue || (!folio && !looksLikeId)) {
+        setScannerFeedback('Ingresa un folio, un ID o el contenido del QR. Para texto libre usa el buscador superior.', 'error');
         renderScanResultCard({
           badgeLabel: 'Invalido',
           badgeTone: 'invalid',
           title: 'No se reconocio el boleto',
-          description: 'El contenido escaneado no incluye un folio utilizable.',
+          description: 'El contenido recibido no corresponde a un folio o ID valido.',
+          recordId: 'Sin ID',
           folio: 'Sin folio',
           participant: 'Sin coincidencia',
+          email: 'Sin correo',
+          phone: 'Sin telefono',
+          ticketType: 'Sin tipo',
+          dbStatus: 'Sin estatus',
+          status: 'Invalido',
+          validFrom: 'Sin fecha',
           validUntil: 'Sin fecha',
           createdAt: 'Sin fecha',
-          source: 'Sin registro',
           rawValue
         });
         return;
       }
 
-      els.manualTicketInput.value = folio;
-      scannerState.lastFolio = folio;
-      setScannerFeedback(`Validando ${folio}...`);
+      els.manualTicketInput.value = lookupValue;
+      scannerState.lastFolio = lookupValue;
+      setScannerFeedback(`Validando ${lookupValue}...`);
 
       try {
-        const record = await fetchRecordByFolio(folio);
+        const record = await fetchRecordByLookup(lookupValue);
 
         if (!record) {
-          setScannerFeedback(`El folio ${folio} no existe en las tablas consultadas.`, 'error');
+          setScannerFeedback(`No existe un boleto con el folio o ID ${lookupValue}.`, 'error');
           renderScanResultCard({
             badgeLabel: 'Invalido',
             badgeTone: 'invalid',
             title: 'Folio no encontrado',
-            description: 'No existe un boleto registrado con ese folio.',
-            folio,
+            description: 'No existe un boleto registrado con ese folio o ID.',
+            recordId: 'Sin ID',
+            folio: folio || lookupValue,
             participant: 'Sin coincidencia',
+            email: 'Sin correo',
+            phone: 'Sin telefono',
+            ticketType: 'Sin tipo',
+            dbStatus: 'Sin estatus',
+            status: 'Invalido',
+            validFrom: 'Sin fecha',
             validUntil: 'Sin fecha',
             createdAt: 'Sin fecha',
-            source: 'Busqueda directa en Supabase',
             rawValue
           });
           return;
@@ -1522,17 +1973,23 @@
           badgeTone: getScanTone(statusInfo),
           title: getScanHeadline(statusInfo),
           description: getScanDescription(record, statusInfo),
-          folio: record.folio || folio,
+          recordId: String(record.id ?? 'Sin ID'),
+          folio: record.folio || lookupValue,
           participant: record.nombre || 'Sin nombre',
-          validUntil: record.valido_hasta ? formatDate(record.valido_hasta) : 'Sin fecha',
+          email: record.correo || 'Sin correo',
+          phone: record.telefono || 'Sin telefono',
+          ticketType: record.tipo_entrada || 'Sin tipo',
+          dbStatus: record.estatus || 'Sin estatus',
+          status: statusInfo.label,
+          validFrom: record.valido_desde ? formatDate(record.valido_desde, true) : 'Sin fecha',
+          validUntil: record.valido_hasta ? formatDate(record.valido_hasta, true) : 'Sin fecha',
           createdAt: record.created_at ? formatDate(record.created_at, true) : 'Sin fecha',
-          source: getScanSourceLabel(record.source),
           rawValue
         });
 
         setScannerFeedback(
           statusInfo.isValid
-            ? `Boleto ${folio} valido y vigente.`
+            ? `Boleto ${record.folio || lookupValue} valido y vigente.`
             : `${getScanHeadline(statusInfo)}.`,
           statusInfo.isValid ? 'success' : 'error'
         );
@@ -1544,11 +2001,17 @@
           badgeTone: 'invalid',
           title: 'Error de consulta',
           description: error?.message || 'No fue posible consultar el boleto.',
-          folio,
+          recordId: 'Sin ID',
+          folio: lookupValue || 'Sin folio',
           participant: 'Sin coincidencia',
+          email: 'Sin correo',
+          phone: 'Sin telefono',
+          ticketType: 'Sin tipo',
+          dbStatus: 'Sin estatus',
+          status: 'Invalido',
+          validFrom: 'Sin fecha',
           validUntil: 'Sin fecha',
           createdAt: 'Sin fecha',
-          source: 'Supabase',
           rawValue
         });
       }
@@ -1675,12 +2138,17 @@
       if (!state.query) return true;
       const query = normalizeText(state.query);
       const haystack = [
+        record.id,
         record.nombre,
         record.correo,
+        record.telefono,
         record.folio,
+        record.tipo_entrada,
         record.estatus,
-        record.source,
-        record.user_id
+        record._status?.label,
+        record.valido_desde,
+        record.valido_hasta,
+        record.created_at
       ].map(normalizeText).join(' ');
 
       return haystack.includes(query);
@@ -1730,7 +2198,7 @@
       if (state.error) {
         els.tableBody.innerHTML = `
           <tr>
-            <td colspan="5" class="empty-state">
+            <td colspan="11" class="empty-state">
               <strong>No se pudieron cargar los folios.</strong>
               <span>${escapeHtml(state.error)}</span>
             </td>
@@ -1744,11 +2212,11 @@
           ? 'Todo esta listo visualmente. Los registros apareceran cuando se capture el primero.'
           : state.records.length
             ? 'No hay coincidencias con la busqueda o filtros actuales.'
-            : 'No hay ganadores nuevos registrados en la BD todavia.';
+            : 'No hay boletos registrados en la BD todavia.';
 
         els.tableBody.innerHTML = `
           <tr>
-            <td colspan="5" class="empty-state">
+            <td colspan="11" class="empty-state">
               <strong>Sin resultados</strong>
               <span>${escapeHtml(emptyCopy)}</span>
             </td>
@@ -1758,28 +2226,34 @@
       }
 
       els.tableBody.innerHTML = rows.map((row) => {
+        const rowId = row.id ?? 'Sin ID';
         const participantName = row.nombre || 'Sin nombre';
-        const participantEmail = row.correo || (row.user_id ? `ID: ${escapeHtml(String(row.user_id).slice(0, 12))}` : 'Sin correo');
+        const participantEmail = row.correo || 'Sin correo';
+        const participantPhone = row.telefono || 'Sin telefono';
         const folio = row.folio ? escapeHtml(row.folio) : 'Sin folio';
         const folioClass = row.folio ? 'folio-code' : 'folio-code empty';
-        const validUntil = row.valido_hasta ? formatDate(row.valido_hasta) : 'Sin fecha';
+        const ticketType = row.tipo_entrada || 'Sin tipo';
+        const dbStatus = row.estatus || 'Sin estatus';
+        const validFrom = row.valido_desde ? formatDate(row.valido_desde, true) : 'Sin fecha';
+        const validUntil = row.valido_hasta ? formatDate(row.valido_hasta, true) : 'Sin fecha';
         const createdAt = row.created_at ? formatDate(row.created_at, true) : 'Sin fecha';
 
         return `
           <tr>
-            <td data-label="Participante">
-              <div class="participant-cell">
-                <strong>${escapeHtml(participantName)}</strong>
-                <span>${escapeHtml(participantEmail)}</span>
-              </div>
-            </td>
+            <td data-label="ID" class="muted">${escapeHtml(String(rowId))}</td>
+            <td data-label="Nombre">${escapeHtml(participantName)}</td>
+            <td data-label="Correo" class="muted">${escapeHtml(participantEmail)}</td>
+            <td data-label="Telefono" class="muted">${escapeHtml(participantPhone)}</td>
             <td data-label="Folio">
               <span class="${folioClass}">${folio}</span>
             </td>
-            <td data-label="Estatus">
+            <td data-label="Tipo de entrada" class="muted">${escapeHtml(ticketType)}</td>
+            <td data-label="Estatus BD" class="muted">${escapeHtml(dbStatus)}</td>
+            <td data-label="Status">
               <span class="status-badge ${row._status.className}">${row._status.label}</span>
             </td>
-            <td data-label="Fecha de vencimiento" class="muted">${escapeHtml(validUntil)}</td>
+            <td data-label="Valido desde" class="muted">${escapeHtml(validFrom)}</td>
+            <td data-label="Valido hasta" class="muted">${escapeHtml(validUntil)}</td>
             <td data-label="Fecha de registro" class="muted">${escapeHtml(createdAt)}</td>
           </tr>
         `;
@@ -1799,20 +2273,22 @@
       }
 
       if (state.error) {
-        els.resultsHint.textContent = 'Error consultando boletos o Ganadores. Revisa conexion, permisos o sesion.';
+        els.resultsHint.textContent = 'Error consultando la base de datos de boletos. Revisa conexion, permisos o sesion.';
         els.updatedAt.textContent = 'Ultimo intento sin exito';
         return;
       }
 
       if (!total && !hasSearch && !hasFilter) {
-        els.resultsHint.textContent = 'Esperando un nuevo ganador registrado en la BD.';
-        els.updatedAt.textContent = 'Se ocultan registros previos al 20/05/2026';
+        els.resultsHint.textContent = 'Esperando el primer boleto registrado en la BD.';
+        els.updatedAt.textContent = state.syncedAt
+          ? `Actualizado: ${dateTimeFormatter.format(state.syncedAt)}`
+          : 'Sin sincronizar';
         return;
       }
 
       els.resultsHint.textContent = hasSearch || hasFilter
-        ? `Mostrando ${filtered} de ${total} registros cargados.`
-        : `${filtered} registros cargados desde boletos y Ganadores.`;
+        ? `Mostrando ${filtered} de ${total} boletos sincronizados.`
+        : `${filtered} boletos sincronizados desde la BD.`;
 
       els.updatedAt.textContent = state.syncedAt
         ? `Actualizado: ${dateTimeFormatter.format(state.syncedAt)}`
@@ -1833,68 +2309,66 @@
       renderRows(visibleRows);
     }
 
-    async function loadRecords() {
-      setLoading(true);
-      state.error = '';
+    async function loadRecords(options = {}) {
+      if (!adminState.authorized) return;
+      if (state.loading) return;
+
+      const { silent = false } = options;
+
+      if (!silent) {
+        setLoading(true);
+        state.error = '';
+      }
 
       if (ADMIN_VISUAL_ONLY) {
         state.records = [];
         state.syncedAt = null;
-        setLoading(false);
+        if (!silent) setLoading(false);
         render();
         return;
       }
 
-      els.tableBody.innerHTML = `
-        <tr>
-          <td colspan="5" class="empty-state">
-            <strong>Cargando informacion...</strong>
-            <span>Se estan consultando las tablas boletos y Ganadores.</span>
-          </td>
-        </tr>
-      `;
+      if (!silent) {
+        els.tableBody.innerHTML = `
+          <tr>
+            <td colspan="11" class="empty-state">
+              <strong>Cargando informacion...</strong>
+              <span>Se esta consultando la tabla Ganadores.</span>
+            </td>
+          </tr>
+        `;
+      }
 
       try {
-        const [boletosRes, ganadoresRes] = await Promise.all([
-          sb
-            .from('boletos')
-            .select('id,user_id,folio,estado,fecha_generacion,fecha_uso')
-            .order('fecha_generacion', { ascending: false }),
-          sb
-            .from('Ganadores')
-            .select('id,nombre,correo,folio,estatus,valido_desde,valido_hasta,created_at')
-            .order('created_at', { ascending: false })
-        ]);
+        const { data, error } = await sb
+          .from('Ganadores')
+          .select(TICKET_SELECT_FIELDS)
+          .order('created_at', { ascending: false });
 
-        const boletosError = boletosRes.error;
-        const ganadoresError = ganadoresRes.error;
+        if (error) throw error;
 
-        if (boletosError && ganadoresError) {
-          throw new Error(`${boletosError.message} | ${ganadoresError.message}`);
-        }
-
-        if (boletosError) {
-          console.warn('No se pudieron cargar boletos:', boletosError.message);
-        }
-
-        if (ganadoresError) {
-          console.warn('No se pudieron cargar Ganadores:', ganadoresError.message);
-        }
-
-        state.records = buildMergedRecords(boletosRes.data || [], ganadoresRes.data || []).filter(isNewRecord);
+        state.records = normalizeTicketRecords(data || []);
         state.syncedAt = new Date();
         state.error = '';
       } catch (error) {
-        console.error('Error cargando boletos/Ganadores:', error);
-        state.records = [];
-        state.error = error?.message || 'No se pudieron consultar las tablas boletos y Ganadores.';
+        console.error('Error cargando Ganadores:', error);
+        if (!silent) {
+          state.records = [];
+          state.error = error?.message || 'No se pudo consultar la tabla Ganadores.';
+        }
       } finally {
-        setLoading(false);
+        if (!silent) setLoading(false);
         render();
       }
     }
 
     function bindEvents() {
+      if (adminState.eventsBound) return;
+      adminState.eventsBound = true;
+
+      els.adminLoginForm.addEventListener('submit', handleAdminLoginSubmit);
+      els.btnLogoutAdmin.addEventListener('click', () => logoutAdmin());
+
       els.searchInput.addEventListener('input', (event) => {
         state.query = event.target.value;
         render();
@@ -1941,8 +2415,7 @@
     }
 
     bindEvents();
-    initScannerState();
-    loadRecords();
+    initializeAdminAccess();
   </script>
 </body>
 
