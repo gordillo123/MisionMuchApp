@@ -30,10 +30,6 @@ window.APP_MODULES = {
         <span class="nav-icon">❔</span>
         <span class="nav-label">Ayuda</span>
       </a>
-      <a href="entrada-much/dashboard.html" class="nav-btn" id="btnAdmin">
-        <span class="nav-icon">🛡️</span>
-        <span class="nav-label">Admin</span>
-      </a>
       <a href="#" class="nav-btn" id="btnPerfil">
         <div class="nav-avatar">
           <img src="avatars/dino1.png" alt="Avatar" id="navAvatarImg">
