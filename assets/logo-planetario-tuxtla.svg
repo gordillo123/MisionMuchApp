@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 550" role="img" aria-labelledby="title desc">
+  <title id="title">Planetario Tuxtla</title>
+  <desc id="desc">Logotipo azul del Planetario Tuxtla.</desc>
+  <rect width="980" height="550" fill="#fff"/>
+  <g fill="#2850a7">
+    <path d="M175 80v170c-55 16-80 38-78 61 2 20 29 38 76 50l-1 55H70V104l105-24z"/>
+    <path d="M246 238c95-18 246-23 564-22v43c-292 0-445 8-560 25-78 12-120 28-142 52-49-9-82-25-88-43-8-24 35-43 134-55z"/>
+    <path d="M243 345l46-9 1 80h-47v-71z"/>
+    <path d="M333 329l80-9 1 96h-81v-87z"/>
+    <path d="M476 313c70-4 142-6 220-6v109H476V313z"/>
+    <path d="M754 306h138v110H754V306z"/>
+    <path d="M525 65c142-91 363-82 491 31 79 70 128 159 147 260H346c27-125 86-222 179-291z"/>
+    <path d="M918 216h126l133 167h-55L918 216z"/>
+  </g>
+  <text x="34" y="535" fill="#2850a7" font-family="Arial Black, Arial, sans-serif" font-size="92" font-weight="900" letter-spacing="-3">PLANETARIO TUXTLA</text>
+</svg>

@@ -11,9 +11,10 @@ window.APP_MODULES = {
     <a href="#" class="nav-brand">
       <span class="nav-brand-text">MISIÓN MUCH</span>
       <span class="nav-brand-logos" aria-label="Logos institucionales">
-        <img src="entrada-much/logo-sata.png" alt="SATA" class="nav-brand-logo nav-brand-logo-sata">
         <img src="entrada-much/logo-much.png" alt="Museo Chiapas de Ciencia y Tecnología" class="nav-brand-logo nav-brand-logo-much">
+        <img src="entrada-much/logo-sata.png" alt="SATA" class="nav-brand-logo nav-brand-logo-sata">
         <img src="Sbeel_Dinosaurios/logo-sbeel-dinosaurios.svg" alt="SBEEL Dinosaurios" class="nav-brand-logo nav-brand-logo-sbeel">
+        <img src="assets/logo-planetario-tuxtla.svg" alt="Planetario Tuxtla" class="nav-brand-logo nav-brand-logo-planetario">
         <img src="Juego_Spinosaurio/logo-agencia.png" alt="Agencia Digital Tecnológica del Estado" class="nav-brand-logo nav-brand-logo-agencia">
       </span>
     </a>
@@ -151,9 +152,10 @@ window.APP_MODULES = {
   <div class="map-col">
     <div class="card" style="height: 100%; display: flex; flex-direction: column;">
       <div class="prep-logo-strip" aria-label="Logos institucionales">
+        <img src="entrada-much/logo-much.png" alt="Museo Chiapas de Ciencia y Tecnología" class="prep-logo-much">
         <img src="entrada-much/logo-sata.png" alt="SATA">
-        <img src="entrada-much/logo-much.png" alt="Museo Chiapas de Ciencia y Tecnología">
         <img src="Sbeel_Dinosaurios/logo-sbeel-dinosaurios.svg" alt="SBEEL Dinosaurios" class="prep-logo-sbeel">
+        <img src="assets/logo-planetario-tuxtla.svg" alt="Planetario Tuxtla" class="prep-logo-planetario">
         <img src="Juego_Spinosaurio/logo-agencia.png" alt="Agencia Digital Tecnológica del Estado">
       </div>
       <h2 class="section-title">¿En qué estación estás?</h2>
@@ -163,12 +165,30 @@ window.APP_MODULES = {
           <path id="mapPath" class="animated-path" d="M 80 18 L 56 42 L 21 24 L 10 44 L 30 43 L 42 66" />
         </svg>
 
-        <div class="map-marker" style="left: 80%; top: 18%;" data-station="1">1</div>
-        <div class="map-marker" style="left: 56%; top: 42%;" data-station="2">2</div>
-        <div class="map-marker" style="left: 21%; top: 24%;" data-station="3">3</div>
-        <div class="map-marker" style="left: 10%; top: 44%;" data-station="4">4</div>
-        <div class="map-marker" style="left: 30%; top: 43%;" data-station="5">5</div>
-        <div class="map-marker" style="left: 42%; top: 66%;" data-station="6">6</div>
+        <div class="map-marker" style="left: 80%; top: 18%;" data-station="1">
+          <span class="map-marker-number">1</span>
+          <span class="map-marker-label">TAQUILLA</span>
+        </div>
+        <div class="map-marker" style="left: 56%; top: 42%;" data-station="2">
+          <span class="map-marker-number">2</span>
+          <span class="map-marker-label">ESPINOZAURIO</span>
+        </div>
+        <div class="map-marker" style="left: 21%; top: 24%;" data-station="3">
+          <span class="map-marker-number">3</span>
+          <span class="map-marker-label">SALA A</span>
+        </div>
+        <div class="map-marker" style="left: 10%; top: 44%;" data-station="4">
+          <span class="map-marker-number">4</span>
+          <span class="map-marker-label">SALA B</span>
+        </div>
+        <div class="map-marker" style="left: 30%; top: 43%;" data-station="5">
+          <span class="map-marker-number">5</span>
+          <span class="map-marker-label">SALA C</span>
+        </div>
+        <div class="map-marker" style="left: 42%; top: 66%;" data-station="6">
+          <span class="map-marker-number">6</span>
+          <span class="map-marker-label">SBELL</span>
+        </div>
 
         <div class="map-avatar" id="mapAvatar">
           <div id="mapAvatarImgCont" style="width: 100%; height: 100%;"></div>

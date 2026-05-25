@@ -563,4 +563,82 @@ body {
     width: 22px;
     height: 22px;
   }
-}
+}
+
+/* Responsive answer list and prominent counter */
+.timer-text {
+  font-size: clamp(1.25rem, 3.2vw, 2rem);
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+#options,
+#options.options-list {
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: none !important;
+  gap: clamp(10px, 1.8vw, 16px) !important;
+  width: 100%;
+  max-width: min(760px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#options > * {
+  width: 100%;
+}
+
+#options .option-btn {
+  width: 100%;
+  min-height: clamp(54px, 9svh, 76px);
+  padding: clamp(12px, 2.4vw, 18px) clamp(14px, 3vw, 24px);
+  font-size: clamp(0.95rem, 2.6vw, 1.15rem);
+  line-height: 1.2;
+  white-space: normal;
+}
+
+#options .option-btn span:not(.emoji) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-height: 640px) {
+  .timer-text {
+    font-size: clamp(1.1rem, 5svh, 1.6rem);
+  }
+
+  #options {
+    gap: 8px !important;
+    max-height: 38svh;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  #options .option-btn {
+    min-height: 46px;
+    padding-block: 10px;
+  }
+}
+
+/* Larger score/status area */
+.footer-info {
+  margin-top: clamp(1.1rem, 3vw, 1.8rem) !important;
+}
+
+.points-pill {
+  padding: clamp(0.65rem, 2vw, 0.9rem) clamp(1.2rem, 3.4vw, 1.8rem) !important;
+  font-size: clamp(1rem, 2.9vw, 1.35rem) !important;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.points-pill strong {
+  font-size: 1.12em;
+}
+
+.status-msg {
+  font-size: clamp(1rem, 2.6vw, 1.22rem) !important;
+  line-height: 1.35;
+  margin-top: clamp(0.75rem, 2vw, 1rem);
+}

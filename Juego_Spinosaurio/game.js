@@ -136,15 +136,7 @@ function playVictoryMusic() {
 }
 
 function goToNextStationAfterVictory(delay) {
-  var target = new URL("../SALA-Biodiversidad-y-Conocimiento/index.html?from=portada&sala=biodiversidad", window.location.href);
-  var searchParams = new URLSearchParams(window.location.search);
-  searchParams.forEach(function (value, key) {
-    if (!target.searchParams.has(key)) target.searchParams.set(key, value);
-  });
-
-  setTimeout(function () {
-    window.location.href = target.href;
-  }, delay || 3000);
+  return;
 }
 
 async function guardarSpinosaurioEnSupabase(puntajeFinal, aprobado) {
@@ -260,6 +252,10 @@ function Start() {
     const btnNext = document.getElementById("btnQuizNext");
     if (btnNext) {
       btnNext.addEventListener("click", function () {
+        const mapParams = new URLSearchParams(window.location.search);
+        mapParams.set('view', 'prep');
+        window.location.href = '../index.html?' + mapParams.toString();
+        return;
         // Navegar a la siguiente estación basada en localStorage (misma lógica que index.html)
         try {
           const searchParams = new URLSearchParams(window.location.search);
@@ -579,7 +575,7 @@ function handleQuestionTimeout() {
   try {
     const msg = document.getElementById('quizMsg'); if (msg) { msg.textContent = 'Tiempo agotado. Incorrecto.'; msg.className = 'quiz-msg err'; }
     var inputs = document.querySelectorAll('input[name="q1"]'); inputs.forEach(inp => inp.disabled = true);
-    try { document.getElementById('btnQuizNext').style.display = 'inline-block'; } catch (e) {}
+    try { document.getElementById('btnQuizNext').style.display = 'none'; } catch (e) {}
     try { document.getElementById('btnQuizOk').textContent = 'Volver a jugar'; } catch (e) {}
     // Reiniciar juego Espinosaurio automáticamente después de una pequeña pausa
     setTimeout(() => { location.reload(); }, 1400);
@@ -613,7 +609,7 @@ function mostrarQuiz() {
   var msg = document.getElementById("quizMsg"); msg.textContent = ""; msg.className = "quiz-msg";
   // Preparar botones: ocultar 'Siguiente' y restaurar 'Confirmar'
   try { document.getElementById('btnQuizNext').style.display = 'none'; } catch (e) {}
-  try { const b = document.getElementById('btnQuizOk'); if (b) { b.disabled = false; b.textContent = 'Confirmar'; } } catch (e) {}
+  try { const b = document.getElementById('btnQuizOk'); if (b) { b.disabled = false; b.style.display = 'inline-block'; b.textContent = 'Confirmar'; } } catch (e) {}
 
   o.classList.add("show"); quizVisible = true;
   try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { }
@@ -663,11 +659,15 @@ async function validarQuiz() {
     await guardarSpinosaurioEnSupabase(Number(score), true);
     await registrarQuizEnSupabase(Number(score));
     try { playBgMusic(); } catch (e) {}
-    goToNextStationAfterVictory();
+    msg.textContent = "Estacion completada con exito. Presiona Volver al mapa para continuar.";
 
     // Mostrar botón Siguiente para que el usuario avance cuando quiera
-    try { document.getElementById('btnQuizNext').style.display = 'inline-block'; } catch (e) {}
-    btnOk.textContent = "Continuar";
+    try {
+      const btnNext = document.getElementById('btnQuizNext');
+      btnNext.textContent = 'Volver al mapa';
+      btnNext.style.display = 'inline-block';
+    } catch (e) {}
+    btnOk.style.display = "none";
   } else {
     msg.textContent = "Incorrecto. ¡Vuelve a jugar!"; msg.className = "quiz-msg err";
     playIncorrectSound();
@@ -676,7 +676,7 @@ async function validarQuiz() {
     inputs.forEach(inp => inp.disabled = true);
 
     // Mostrar botón Siguiente incluso en incorrecto para permitir navegación/recarga
-    try { document.getElementById('btnQuizNext').style.display = 'inline-block'; } catch (e) {}
+    try { document.getElementById('btnQuizNext').style.display = 'none'; } catch (e) {}
     btnOk.textContent = "Volver a jugar";
   }
 }

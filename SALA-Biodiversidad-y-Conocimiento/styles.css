@@ -826,6 +826,120 @@ body {
   }
 }
 
+/* Final layout lock: answers stay as a responsive vertical list on every viewport. */
+#options.options-list,
+.options-list {
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: none !important;
+  gap: clamp(8px, 1.8vw, 16px) !important;
+}
+
+#options > * {
+  width: 100%;
+}
+
+#options .option-btn {
+  width: 100%;
+  min-height: clamp(46px, 9svh, 78px);
+  font-size: clamp(0.95rem, 2.7vw, 1.2rem);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.question-timer {
+  font-size: clamp(1.3rem, 5vw, 2.45rem);
+  min-width: clamp(116px, 28vw, 210px);
+}
+
+/* Larger score/status area */
+.footer-info.score-panel,
+.score-panel {
+  gap: clamp(0.9rem, 2.4vw, 1.4rem) !important;
+  margin-top: clamp(1.1rem, 3vw, 1.8rem) !important;
+}
+
+.points-pill,
+.score-stat {
+  min-width: clamp(150px, 30vw, 210px) !important;
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(1.25rem, 3.4vw, 1.9rem) !important;
+  font-size: clamp(1rem, 2.8vw, 1.35rem) !important;
+  line-height: 1.1;
+}
+
+.points-pill strong,
+.score-stat strong {
+  font-size: 1.14em;
+}
+
+.status-msg {
+  font-size: clamp(1rem, 2.6vw, 1.22rem) !important;
+  line-height: 1.35 !important;
+  margin-top: clamp(0.75rem, 2vw, 1rem);
+}
+
+/* Responsive answer list and prominent per-question counter */
+.question-timer {
+  min-width: clamp(132px, 28vw, 210px);
+  padding: clamp(0.75rem, 2.4vw, 1.1rem) clamp(1.25rem, 4vw, 2rem);
+  font-size: clamp(1.55rem, 5vw, 2.45rem);
+  line-height: 1;
+}
+
+.options-list,
+#options.options-list {
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: none !important;
+  gap: clamp(10px, 1.8vw, 16px) !important;
+  width: 100%;
+  max-width: min(780px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#options > * {
+  width: 100%;
+}
+
+#options .option-btn {
+  width: 100%;
+  min-height: clamp(54px, 9svh, 78px);
+  padding: clamp(0.8rem, 2.4vw, 1.15rem) clamp(1rem, 3vw, 1.5rem);
+  font-size: clamp(0.98rem, 2.7vw, 1.2rem);
+  line-height: 1.2;
+  text-align: left;
+  justify-content: flex-start;
+  white-space: normal;
+}
+
+#options .option-btn span:not(.emoji) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+@media (max-height: 640px) {
+  .question-timer {
+    min-width: 116px;
+    padding: 0.5rem 0.95rem;
+    font-size: clamp(1.2rem, 6svh, 1.75rem);
+  }
+
+  #options.options-list {
+    gap: 8px !important;
+    max-height: 38svh;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  #options .option-btn {
+    min-height: 46px;
+    padding-block: 0.65rem;
+  }
+}
+
 @media (orientation: landscape) and (max-height: 500px) {
   body {
     padding: 0.5rem;
@@ -1090,4 +1204,30 @@ body {
   .mini-map-container {
     display: none !important;
   }
+}
+
+/* Final layout lock: answers stay as a responsive vertical list on every viewport. */
+#options.options-list,
+.options-list {
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: none !important;
+  gap: clamp(8px, 1.8vw, 16px) !important;
+}
+
+#options > * {
+  width: 100%;
+}
+
+#options .option-btn {
+  width: 100%;
+  min-height: clamp(46px, 9svh, 78px);
+  font-size: clamp(0.95rem, 2.7vw, 1.2rem);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.question-timer {
+  font-size: clamp(1.3rem, 5vw, 2.45rem);
+  min-width: clamp(116px, 28vw, 210px);
 }

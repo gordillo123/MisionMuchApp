@@ -318,3 +318,34 @@ header h1 {
         padding: 6px 12px;
     }
 }
+
+/* Responsive prominent puzzle timer */
+.timer-box {
+    min-width: clamp(180px, 44vw, 280px);
+    padding: clamp(0.85rem, 2.8vw, 1.15rem) clamp(1rem, 4vw, 1.65rem);
+    font-size: clamp(1.35rem, 4.8vw, 2.25rem);
+    line-height: 1;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.timer-box span {
+    font-size: 1.12em;
+    font-weight: 900;
+}
+
+@media (max-width: 520px) {
+    .timer-box {
+        min-width: min(250px, 88vw);
+        margin: 0 auto 0.75rem;
+    }
+}
+
+@media (max-height: 640px) {
+    .timer-box {
+        min-width: 160px;
+        padding: 0.65rem 0.95rem;
+        font-size: clamp(1.1rem, 5.5svh, 1.7rem);
+    }
+}

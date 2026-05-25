@@ -530,7 +530,7 @@ class UIManager {
   bind() {
     this.e.nextBtn.addEventListener('click', () => this.next());
     this.e.returnBtn.addEventListener('click', () => this.goBackToMap());
-    this.e.nextStationBtn.addEventListener('click', () => this.goToNextStation());
+    this.e.nextStationBtn.addEventListener('click', () => this.goBackToMap());
     this.e.playAgainBtn1.addEventListener('click', () => location.reload());
     this.e.playAgainBtn2.addEventListener('click', () => location.reload());
   }
@@ -638,7 +638,7 @@ class UIManager {
 
       if (isPassed) {
         e.finalTitle.textContent = '¡Felicidades! 🎉';
-        e.finalMsg.textContent = `¡Estación completada con éxito! Lograste un ${Math.round(s.correct / QUESTIONS.length * 100)}% de respuestas correctas. Tu avatar ha avanzado a la siguiente estación.`;
+        e.finalMsg.textContent = `¡Estación completada con éxito! Lograste un ${Math.round(s.correct / QUESTIONS.length * 100)}% de respuestas correctas. Presiona Volver al mapa para continuar.`;
         e.giftRow.classList.remove('d-none');
         e.retryRow.classList.add('d-none');
         this.sound.victory();
@@ -650,7 +650,6 @@ class UIManager {
         let completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
         completed['5'] = true;
         localStorage.setItem('much_completed_stations', JSON.stringify(completed));
-        this.redirectToNextStation('../Sbeel_Dinosaurios/index.html');
       } else {
         e.finalTitle.textContent = 'Buen intento 👀';
         e.finalMsg.textContent = `Lograste un ${Math.round(s.correct / QUESTIONS.length * 100)}%. Necesitas al menos 70% de aciertos para completar la estación y avanzar.`;

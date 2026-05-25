@@ -791,6 +791,66 @@
         height: clamp(18px, 8vh, 30px);
       }
     }
+
+    /* Responsive quiz answer list and prominent counter */
+    .quiz-timer {
+      width: max-content;
+      min-width: clamp(92px, 22vw, 160px);
+      margin: 8px auto 14px !important;
+      padding: clamp(8px, 2vw, 12px) clamp(16px, 4vw, 24px);
+      border-radius: 999px;
+      background: rgba(254, 242, 242, 0.96);
+      border: 2px solid rgba(185, 28, 28, 0.2);
+      box-shadow: 0 12px 28px rgba(185, 28, 28, 0.16);
+      font-size: clamp(1.55rem, 5vw, 2.5rem) !important;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .quiz-options {
+      display: flex !important;
+      flex-direction: column !important;
+      grid-template-columns: none !important;
+      gap: clamp(8px, 1.8vw, 12px) !important;
+      width: 100%;
+      max-width: min(620px, 100%);
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .quiz-opt {
+      width: 100%;
+      min-height: clamp(46px, 8svh, 64px);
+      align-items: center;
+      padding: clamp(10px, 2.4vw, 14px) clamp(12px, 3vw, 18px);
+      font-size: clamp(0.95rem, 2.8vw, 1.15rem);
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    .quiz-opt input {
+      flex: 0 0 auto;
+    }
+
+    @media (max-height: 520px) {
+      .quiz-timer {
+        min-width: 84px;
+        padding: 7px 14px;
+        font-size: clamp(1.2rem, 6svh, 1.8rem) !important;
+      }
+
+      .quiz-options {
+        gap: 7px !important;
+        max-height: 38svh;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .quiz-opt {
+        min-height: 40px;
+        padding-block: 8px;
+      }
+    }
   </style>
 </head>
 
@@ -853,7 +913,7 @@
       <div id="quizOptions" class="quiz-options"></div>
       <div class="quiz-actions">
         <button id="btnQuizOk" class="btn-primary">Confirmar</button>
-        <button id="btnQuizNext" class="btn-primary" style="display:none;">Siguiente</button>
+        <button id="btnQuizNext" class="btn-primary" style="display:none;">Volver al mapa</button>
         <button id="btnQuizCancel" class="btn-secondary">Cancelar</button>
       </div>
       <div id="quizMsg" class="quiz-msg" aria-live="polite"></div>

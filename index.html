@@ -302,8 +302,8 @@
     }
 
     .nav-brand-logo-much {
-      height: 34px;
-      max-width: 88px;
+      height: 44px;
+      max-width: 116px;
     }
 
     .nav-brand-logo-sbeel {
@@ -317,6 +317,11 @@
     .nav-brand-logo-agencia {
       height: 34px;
       max-width: 118px;
+    }
+
+    .nav-brand-logo-planetario {
+      height: 34px;
+      max-width: 120px;
     }
 
     .nav-links {
@@ -422,8 +427,8 @@
       }
 
       .nav-brand-logo-much {
-        height: 27px;
-        max-width: 54px;
+        height: 34px;
+        max-width: 76px;
       }
 
       .nav-brand-logo-sbeel {
@@ -434,6 +439,11 @@
       .nav-brand-logo-agencia {
         height: 27px;
         max-width: 56px;
+      }
+
+      .nav-brand-logo-planetario {
+        height: 27px;
+        max-width: 62px;
       }
       
       .nav-container:has(.nav-links.open) .nav-brand {
@@ -918,8 +928,8 @@
       }
 
       .nav-brand-logo-much {
-        height: 24px;
-        max-width: 58px;
+        height: 31px;
+        max-width: 78px;
       }
 
       .nav-brand-logo-sbeel {
@@ -1545,6 +1555,29 @@
 
     .map-marker {
       position: absolute;
+      width: max-content;
+      min-width: 88px;
+      min-height: 68px;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-weight: 900;
+      font-size: 1.2rem;
+      color: var(--bg-deep);
+      z-index: 10;
+      transform: translate(-50%, -50%);
+      box-shadow: none;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    .map-marker-number {
       width: 40px;
       height: 40px;
       background: white;
@@ -1553,28 +1586,42 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 900;
-      font-size: 1.2rem;
-      color: var(--bg-deep);
-      z-index: 10;
-      transform: translate(-50%, -50%);
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(.34, 1.56, .64, 1);
+      line-height: 1;
+      flex-shrink: 0;
+      transition: inherit;
+    }
+
+    .map-marker-label {
+      max-width: 96px;
+      padding: 3px 8px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 2px solid var(--bg-deep);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      font-size: 0.58rem;
+      line-height: 1.05;
+      letter-spacing: 0;
+      text-align: center;
+      white-space: normal;
+      overflow-wrap: anywhere;
     }
 
     .map-marker:hover {
       transform: translate(-50%, -50%) scale(1.2);
+    }
+
+    .map-marker:hover .map-marker-number {
       background: var(--msf-yellow);
     }
 
-    .map-marker.active {
+    .map-marker.active .map-marker-number {
       background: var(--msf-pink);
       color: white;
       border-color: white;
       box-shadow: 0 0 20px var(--msf-pink);
     }
-    .map-marker.completed {
+    .map-marker.completed .map-marker-number {
       background: var(--msf-green) !important;
       border-color: #ffffff !important;
       color: #ffffff !important;
@@ -1585,11 +1632,11 @@
     @keyframes completePulse {
       0% {
         box-shadow: 0 0 10px rgba(0, 180, 135, 0.6);
-        transform: translate(-50%, -50%) scale(1);
+        transform: scale(1);
       }
       100% {
         box-shadow: 0 0 22px rgba(0, 180, 135, 1);
-        transform: translate(-50%, -50%) scale(1.12);
+        transform: scale(1.12);
       }
     }
 
@@ -1850,10 +1897,22 @@
       }
 
       .map-marker {
+        min-width: 74px;
+        min-height: 58px;
+        border-width: 3px;
+        font-size: .9rem;
+      }
+
+      .map-marker-number {
         width: 32px;
         height: 32px;
         border-width: 3px;
-        font-size: .9rem;
+      }
+
+      .map-marker-label {
+        max-width: 82px;
+        padding: 2px 6px;
+        font-size: 0.5rem;
       }
 
       .btn-play.large {
@@ -1965,8 +2024,8 @@
       }
 
       .nav-brand-logo-much {
-        height: 24px;
-        max-width: 44px;
+        height: 31px;
+        max-width: 68px;
       }
 
       .nav-brand-logo-sbeel {
@@ -1977,6 +2036,11 @@
       .nav-brand-logo-agencia {
         height: 24px;
         max-width: 46px;
+      }
+
+      .nav-brand-logo-planetario {
+        height: 24px;
+        max-width: 50px;
       }
 
       .nav-links {
@@ -2029,8 +2093,8 @@
       }
 
       .nav-brand-logo-much {
-        height: 24px;
-        max-width: 44px;
+        height: 31px;
+        max-width: 68px;
       }
 
       .nav-brand-logo-sbeel {
@@ -2041,6 +2105,11 @@
       .nav-brand-logo-agencia {
         height: 24px;
         max-width: 46px;
+      }
+
+      .nav-brand-logo-planetario {
+        height: 24px;
+        max-width: 50px;
       }
 
       .hamburger {
@@ -2139,9 +2208,21 @@
       }
 
       .map-marker {
+        min-width: 66px;
+        min-height: 52px;
+        font-size: .8rem;
+      }
+
+      .map-marker-number {
         width: 28px;
         height: 28px;
-        font-size: .8rem;
+        border-width: 3px;
+      }
+
+      .map-marker-label {
+        max-width: 74px;
+        padding: 2px 5px;
+        font-size: 0.44rem;
       }
 
       .avatar-modal {
@@ -2784,6 +2865,83 @@
       max-width: 116px;
       padding: 0;
       background: transparent;
+    }
+
+    .prep-logo-strip .prep-logo-planetario {
+      height: 31px;
+      max-width: 108px;
+    }
+
+    /* Logo strip layout: keep all institutional logos balanced and readable. */
+    .prep-logo-strip {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: clamp(0.35rem, 1.2vw, 0.7rem);
+      width: min(100%, 620px);
+      padding: clamp(0.35rem, 1.2vw, 0.55rem) clamp(0.45rem, 1.5vw, 0.75rem);
+    }
+
+    .prep-logo-strip img {
+      flex: 0 1 auto;
+      height: clamp(25px, 4.2vw, 34px);
+      max-width: clamp(64px, 16vw, 112px);
+      padding: 3px 6px;
+    }
+
+    .prep-logo-strip .prep-logo-much {
+      height: clamp(34px, 5.4vw, 48px);
+      max-width: clamp(78px, 20vw, 136px);
+      order: 1;
+    }
+
+    .prep-logo-strip img[alt="SATA"] {
+      order: 2;
+    }
+
+    .prep-logo-strip .prep-logo-sbeel {
+      height: clamp(32px, 5vw, 43px);
+      max-width: clamp(96px, 23vw, 142px);
+      order: 3;
+    }
+
+    .prep-logo-strip .prep-logo-planetario {
+      height: clamp(28px, 4.5vw, 38px);
+      max-width: clamp(82px, 20vw, 128px);
+      order: 4;
+    }
+
+    .prep-logo-strip img[alt="Agencia Digital Tecnológica del Estado"] {
+      order: 5;
+    }
+
+    @media (max-width: 520px) {
+      .prep-logo-strip {
+        width: min(100%, 360px);
+        gap: 0.28rem;
+      }
+
+      .prep-logo-strip img {
+        height: 25px;
+        max-width: 74px;
+        padding: 2px 4px;
+      }
+
+      .prep-logo-strip .prep-logo-much {
+        height: 34px;
+        max-width: 86px;
+      }
+
+      .prep-logo-strip .prep-logo-sbeel {
+        height: 31px;
+        max-width: 94px;
+      }
+
+      .prep-logo-strip .prep-logo-planetario {
+        height: 28px;
+        max-width: 86px;
+      }
     }
 
     .reward-claim-box {
@@ -5062,6 +5220,12 @@
           const completed = getCompletedStations();
           document.querySelectorAll('.map-marker').forEach(marker => {
             const stationId = marker.dataset.station;
+            const numberEl = marker.querySelector('.map-marker-number');
+            if (numberEl) {
+              marker.classList.toggle('completed', Boolean(completed[stationId]));
+              numberEl.textContent = completed[stationId] ? '\u2713' : stationId;
+              return;
+            }
             if (completed[stationId]) {
               marker.classList.add('completed');
               marker.innerHTML = '✓';
