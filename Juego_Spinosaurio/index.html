@@ -683,23 +683,18 @@
       }
     }
 
-    /* Ajuste responsivo final: permite jugar en vertical y horizontal */
+    /* Ajuste responsivo final: Spinosaurio se mantiene en horizontal en móvil */
     :root {
       --game-scale: 1;
     }
 
     #orientationLock {
-      display: none !important;
+      display: none;
     }
 
     @media (orientation: portrait) {
-
-      body:not(.quiz-mode) #game {
-        display: block !important;
-      }
-
-      body:not(.quiz-mode) .retry-wrap {
-        display: flex !important;
+      body:not(.quiz-mode) #orientationLock {
+        display: grid !important;
       }
     }
 

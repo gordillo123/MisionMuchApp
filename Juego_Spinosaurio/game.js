@@ -180,18 +180,33 @@ var loopRequestId;
 var orientationBlocked = false;
 
 function isMobilePortrait() {
+  var isPortrait = window.matchMedia("(orientation: portrait)").matches;
+  var isTouchLike = window.matchMedia("(pointer: coarse)").matches;
+  var mobileSized = Math.max(window.innerWidth || 0, window.innerHeight || 0) <= 1024;
+  return isPortrait && isTouchLike && mobileSized;
+}
+
+async function requestLandscapeLock() {
+  try {
+    if (screen.orientation && typeof screen.orientation.lock === "function") {
+      await screen.orientation.lock("landscape");
+      return true;
+    }
+  } catch (e) { }
   return false;
 }
 
 function updateOrientationGate() {
-  orientationBlocked = false;
-  document.body.classList.remove("orientation-blocked");
+  orientationBlocked = isMobilePortrait() && !document.body.classList.contains("quiz-mode");
+  document.body.classList.toggle("orientation-blocked", orientationBlocked);
   updateResponsiveScale();
   return orientationBlocked;
 }
 
 function canStartLandscapeGame() {
   updateOrientationGate();
+  if (orientationBlocked) return false;
+  requestLandscapeLock();
   return true;
 }
 

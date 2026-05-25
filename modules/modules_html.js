@@ -11,7 +11,6 @@ window.APP_MODULES = {
     <a href="#" class="nav-brand">
       <span class="nav-brand-text">MISIÓN MUCH</span>
       <span class="nav-brand-logos" aria-label="Logos institucionales">
-        <img src="entrada-much/logo-much.png" alt="Museo Chiapas de Ciencia y Tecnología" class="nav-brand-logo nav-brand-logo-much">
         <img src="entrada-much/logo-sata.png" alt="SATA" class="nav-brand-logo nav-brand-logo-sata">
         <img src="Sbeel_Dinosaurios/logo-sbeel-dinosaurios.svg" alt="SBEEL Dinosaurios" class="nav-brand-logo nav-brand-logo-sbeel">
         <img src="assets/logo-planetario-tuxtla.svg" alt="Planetario Tuxtla" class="nav-brand-logo nav-brand-logo-planetario">
@@ -149,10 +148,9 @@ window.APP_MODULES = {
     </div>
   </div>
 
-  <div class="map-col">
+    <div class="map-col">
     <div class="card" style="height: 100%; display: flex; flex-direction: column;">
       <div class="prep-logo-strip" aria-label="Logos institucionales">
-        <img src="entrada-much/logo-much.png" alt="Museo Chiapas de Ciencia y Tecnología" class="prep-logo-much">
         <img src="entrada-much/logo-sata.png" alt="SATA">
         <img src="Sbeel_Dinosaurios/logo-sbeel-dinosaurios.svg" alt="SBEEL Dinosaurios" class="prep-logo-sbeel">
         <img src="assets/logo-planetario-tuxtla.svg" alt="Planetario Tuxtla" class="prep-logo-planetario">

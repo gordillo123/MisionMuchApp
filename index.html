@@ -4583,6 +4583,81 @@
       tbody td:last-child { border-bottom: 0; }
       tbody td::before { content: attr(data-label); color: #6c829f; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
     }
+    /* BLOQUEO DE ORIENTACION: mantener la app principal en vertical en movil */
+    body.orientation-portrait-locked {
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    #orientationOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255, 244, 209, 0.18), transparent 30%),
+        linear-gradient(135deg, rgba(16, 24, 39, 0.96), rgba(38, 58, 107, 0.97));
+      backdrop-filter: blur(10px);
+      text-align: center;
+    }
+
+    .orientation-overlay-card {
+      width: min(420px, 92vw);
+      padding: 1.5rem 1.25rem;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.34);
+      color: #fff;
+    }
+
+    .orientation-overlay-icon {
+      width: 90px;
+      height: 56px;
+      margin: 0 auto 1rem;
+      border: 5px solid rgba(255, 255, 255, 0.94);
+      border-radius: 16px;
+      position: relative;
+      box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.1);
+    }
+
+    .orientation-overlay-icon::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 5px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.94);
+      transform: translateX(-50%);
+    }
+
+    .orientation-overlay-card h2 {
+      margin: 0 0 0.6rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(1.7rem, 6vw, 2.15rem);
+      line-height: 1.05;
+      color: #f8df97;
+    }
+
+    .orientation-overlay-card p {
+      margin: 0;
+      font-size: clamp(0.96rem, 3.7vw, 1.08rem);
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 700;
+    }
+
+    @media (orientation: landscape) and (max-height: 620px) and (pointer: coarse) {
+      #orientationOverlay {
+        display: flex !important;
+      }
+    }
+
     /* REGLAS: VERSION FINAL SIN ILUSTRACION */
     .rules-modal,
     .start-rules-mode .rules-modal {
@@ -4614,6 +4689,9 @@
     .rules-content,
     .start-rules-mode .rules-content {
       padding: 0.8rem 1rem 0.95rem;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
     }
 
     .rules-stage,
@@ -4636,14 +4714,23 @@
     .rules-board {
       padding-left: 0 !important;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      grid-template-rows: repeat(3, minmax(0, 1fr));
+      grid-template-rows: repeat(3, minmax(0, auto));
+      grid-auto-rows: minmax(0, auto);
       gap: 0.85rem;
-      height: 100%;
+      height: auto;
+      min-height: min-content;
+      align-content: start;
+      align-items: stretch;
     }
 
     .rule-card {
       --rule-accent: #5aa7e2;
+      --rule-radius: 22px;
       overflow: hidden;
+      min-height: 0;
+      height: auto;
+      border-radius: var(--rule-radius);
+      clip-path: none;
       border: 1px solid rgba(122, 98, 58, 0.18);
       background: linear-gradient(180deg, rgba(255, 253, 247, 0.99), rgba(247, 241, 227, 0.98));
       box-shadow:
@@ -4653,12 +4740,15 @@
 
     .rule-card::before {
       inset: 8px;
+      clip-path: none;
+      border-radius: calc(var(--rule-radius) - 7px);
       border-color: rgba(122, 98, 58, 0.22);
     }
 
     .rule-card::after {
       inset: 0 0 auto 0;
       height: 12px;
+      border-radius: var(--rule-radius) var(--rule-radius) 0 0;
       background: linear-gradient(90deg, var(--rule-accent), rgba(255, 255, 255, 0.4));
       mix-blend-mode: normal;
     }
@@ -4713,12 +4803,18 @@
       font-size: clamp(0.96rem, 1.15vw, 1.12rem);
       line-height: 1.12;
       color: #2f3c49;
+      text-wrap: balance;
+      overflow-wrap: break-word;
+      hyphens: auto;
     }
 
     .rule-card-copy {
       font-size: clamp(0.8rem, 0.98vw, 0.92rem);
       line-height: 1.34;
       color: #544b3e;
+      text-wrap: pretty;
+      overflow-wrap: break-word;
+      hyphens: auto;
     }
 
     .rule-card-copy strong {
@@ -4746,6 +4842,47 @@
       min-width: 240px;
       background: linear-gradient(135deg, #4b6dd8, #6fa8f3);
       box-shadow: 0 8px 0 #3a3a43;
+    }
+
+    @media (max-width: 640px) {
+      .rules-modal,
+      .start-rules-mode .rules-modal {
+        width: min(98vw, 420px);
+        height: min(92svh, 760px);
+        max-height: 92svh;
+      }
+
+      .rules-content,
+      .start-rules-mode .rules-content {
+        padding: 0.58rem 0.62rem 0.78rem;
+      }
+
+      .rules-board {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: repeat(3, minmax(0, auto));
+        gap: 0.48rem;
+      }
+
+      .rule-card,
+      .start-rules-mode .rule-card,
+      .rule-card-wide,
+      .start-rules-mode .rule-card-wide {
+        padding: 0.58rem 0.56rem 0.54rem;
+      }
+
+      .rule-card-wide,
+      .start-rules-mode .rule-card-wide {
+        grid-column: 1 / -1;
+      }
+
+      .rules-footer {
+        padding: 0.3rem 0.72rem 0.75rem;
+      }
+
+      .rules-confirm {
+        width: 100%;
+        min-width: 0;
+      }
     }
 
     @media (max-height: 720px) {
@@ -4874,16 +5011,544 @@
         font-size: 0.9rem;
       }
     }
+
+    /* Ajuste final del modal de reglas para teléfonos y pantallas angostas. */
+    @media (max-width: 760px) {
+      .rules-modal,
+      .start-rules-mode .rules-modal {
+        width: min(98vw, 460px);
+        height: min(92dvh, 760px);
+        max-height: 92dvh;
+      }
+
+      .rules-header {
+        padding: 0.88rem 3.1rem 0.18rem;
+      }
+
+      .rules-modal .modal-title {
+        font-size: clamp(1.5rem, 6.2vw, 2rem);
+        line-height: 1.04;
+        text-wrap: balance;
+      }
+
+      .rules-header p {
+        max-width: 28ch;
+        margin-top: 0.28rem;
+        font-size: clamp(0.72rem, 2.55vw, 0.84rem);
+        line-height: 1.22;
+        text-wrap: pretty;
+      }
+
+      .rules-content,
+      .start-rules-mode .rules-content {
+        padding: 0.58rem 0.62rem 0.8rem;
+      }
+
+      .rules-board {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: repeat(3, minmax(0, auto));
+        gap: 0.48rem;
+      }
+
+      .rule-card,
+      .start-rules-mode .rule-card,
+      .rule-card-wide,
+      .start-rules-mode .rule-card-wide {
+        padding: 0.58rem 0.56rem 0.54rem;
+      }
+
+      .rule-card-wide,
+      .start-rules-mode .rule-card-wide {
+        grid-column: 1 / -1;
+      }
+
+      .rule-card-head {
+        gap: 0.32rem;
+        margin-bottom: 0.28rem;
+      }
+
+      .rule-card-icon {
+        width: 31px;
+        height: 31px;
+        border-radius: 10px;
+        font-size: 0.88rem;
+      }
+
+      .rule-card-step {
+        min-width: 28px;
+        padding: 0.16rem 0.34rem;
+        font-size: 0.53rem;
+        letter-spacing: 0.08em;
+      }
+
+      .rule-card-title {
+        margin-bottom: 0.18rem;
+        font-size: clamp(0.7rem, 2.45vw, 0.82rem);
+        line-height: 1.16;
+      }
+
+      .rule-card-copy {
+        font-size: clamp(0.6rem, 2.08vw, 0.69rem);
+        line-height: 1.2;
+      }
+
+      .rule-card-wide .rule-card-copy {
+        max-width: none;
+      }
+
+      .rules-footer {
+        padding: 0.34rem 0.72rem 0.76rem;
+      }
+
+      .rules-confirm {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .rules-modal,
+      .start-rules-mode .rules-modal {
+        width: min(98vw, 360px);
+      }
+
+      .rules-header {
+        padding: 0.82rem 2.85rem 0.12rem;
+      }
+
+      .rules-content,
+      .start-rules-mode .rules-content {
+        padding-inline: 0.5rem;
+      }
+
+      .rules-board {
+        gap: 0.4rem;
+      }
+
+      .rule-card,
+      .start-rules-mode .rule-card,
+      .rule-card-wide,
+      .start-rules-mode .rule-card-wide {
+        padding: 0.52rem 0.48rem 0.5rem;
+      }
+
+      .rule-card-title {
+        font-size: 0.66rem;
+        line-height: 1.14;
+      }
+
+      .rule-card-copy {
+        font-size: 0.57rem;
+        line-height: 1.18;
+      }
+
+      .rule-card-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.78rem;
+      }
+
+      .rule-card-step {
+        min-width: 25px;
+        padding-inline: 0.28rem;
+        font-size: 0.5rem;
+      }
+    }
+
+    @media (max-height: 760px) and (max-width: 760px) {
+      .rules-chip,
+      .rules-header p {
+        display: none;
+      }
+
+      .rules-header {
+        padding-top: 0.82rem;
+        padding-bottom: 0;
+      }
+
+      .rules-content,
+      .start-rules-mode .rules-content {
+        padding-top: 0.45rem;
+      }
+    }
+
+    @media (max-width: 760px) {
+      #rulesOverlay.avatar-overlay {
+        padding: 0;
+        align-items: stretch;
+        justify-content: stretch;
+      }
+
+      #rulesOverlay.avatar-overlay.open {
+        display: flex;
+      }
+
+      #rulesOverlay .rules-modal,
+      #rulesOverlay.start-rules-mode .rules-modal,
+      #rulesOverlay .start-rules-mode.rules-modal {
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        width: 100vw;
+        height: 100dvh;
+        max-height: 100dvh;
+        border-width: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      #rulesOverlay .rules-header {
+        padding-top: max(0.9rem, env(safe-area-inset-top));
+      }
+
+      #rulesOverlay .rules-content,
+      #rulesOverlay.start-rules-mode .rules-content {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        padding-bottom: 0.72rem;
+        overflow: hidden;
+      }
+
+      #rulesOverlay .rules-stage,
+      #rulesOverlay.start-rules-mode .rules-stage {
+        display: flex;
+        flex: 1 1 auto;
+        min-height: 0;
+      }
+
+      #rulesOverlay .rules-board,
+      #rulesOverlay.start-rules-mode .rules-board {
+        flex: 1 1 auto;
+        height: 100%;
+        min-height: 0;
+        grid-template-rows: minmax(112px, 1fr) minmax(112px, 1fr) minmax(138px, 1.12fr);
+        grid-auto-rows: minmax(112px, 1fr);
+        gap: 0.56rem;
+        align-content: stretch;
+      }
+
+      #rulesOverlay .rule-card,
+      #rulesOverlay.start-rules-mode .rule-card,
+      #rulesOverlay .rule-card-wide,
+      #rulesOverlay.start-rules-mode .rule-card-wide {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 0.06rem;
+        padding: 0.68rem 0.62rem 0.64rem;
+      }
+
+      #rulesOverlay .rule-card-head,
+      #rulesOverlay.start-rules-mode .rule-card-head {
+        margin-bottom: 0.22rem;
+      }
+
+      #rulesOverlay .rule-card-title,
+      #rulesOverlay.start-rules-mode .rule-card-title {
+        margin-bottom: 0.16rem;
+        font-size: clamp(0.82rem, 2.7vw, 0.96rem);
+        line-height: 1.14;
+        hyphens: none;
+        word-break: normal;
+        text-wrap: balance;
+      }
+
+      #rulesOverlay .rule-card-copy,
+      #rulesOverlay.start-rules-mode .rule-card-copy {
+        margin-top: 0;
+        font-size: clamp(0.78rem, 2.62vw, 0.88rem);
+        line-height: 1.29;
+        hyphens: none;
+        word-break: normal;
+        overflow-wrap: break-word;
+      }
+
+      #rulesOverlay .rule-card-wide,
+      #rulesOverlay.start-rules-mode .rule-card-wide {
+        padding-top: 1.12rem;
+      }
+
+      #rulesOverlay .rule-card-banner,
+      #rulesOverlay.start-rules-mode .rule-card-banner {
+        top: -0.18rem;
+      }
+
+      #rulesOverlay .rule-card-wide .rule-card-copy,
+      #rulesOverlay.start-rules-mode .rule-card-wide .rule-card-copy {
+        max-width: none;
+      }
+
+      #rulesOverlay .rules-footer {
+        margin-top: auto;
+        padding:
+          0.45rem
+          max(0.72rem, env(safe-area-inset-right))
+          max(0.9rem, env(safe-area-inset-bottom))
+          max(0.72rem, env(safe-area-inset-left));
+      }
+    }
+
+    @media (max-width: 380px) {
+      #rulesOverlay .rule-card-title,
+      #rulesOverlay.start-rules-mode .rule-card-title {
+        font-size: clamp(0.78rem, 2.9vw, 0.9rem);
+      }
+
+      #rulesOverlay .rule-card-copy,
+      #rulesOverlay.start-rules-mode .rule-card-copy {
+        font-size: clamp(0.74rem, 2.5vw, 0.84rem);
+        line-height: 1.27;
+      }
+    }
+
+    /* Ajuste final de equilibrio visual para escritorio y vertical. */
+    .rules-modal,
+    .start-rules-mode .rules-modal {
+      height: min(92vh, 760px);
+      max-height: 92vh;
+    }
+
+    .rules-header {
+      padding: 1rem 3.4rem 0.28rem;
+    }
+
+    .rules-modal .modal-title {
+      font-size: clamp(2.25rem, 3.35vw, 3.15rem);
+      line-height: 1.02;
+      letter-spacing: -0.02em;
+    }
+
+    .rules-header p {
+      max-width: 44ch;
+      font-size: clamp(0.88rem, 1vw, 1rem);
+      line-height: 1.28;
+    }
+
+    .rules-content,
+    .start-rules-mode .rules-content {
+      padding: 0.7rem 1rem 0.88rem;
+    }
+
+    .rules-board,
+    .start-rules-mode .rules-board {
+      grid-template-rows: minmax(118px, auto) minmax(118px, auto) minmax(110px, auto);
+      gap: 0.82rem;
+    }
+
+    .rule-card,
+    .start-rules-mode .rule-card {
+      padding: 0.8rem 0.82rem 0.76rem;
+    }
+
+    .rule-card-head,
+    .start-rules-mode .rule-card-head {
+      margin-bottom: 0.38rem;
+    }
+
+    .rule-card-icon,
+    .start-rules-mode .rule-card-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 1rem;
+      border-radius: 12px;
+    }
+
+    .rule-card-step,
+    .start-rules-mode .rule-card-step {
+      min-width: 34px;
+      padding: 0.18rem 0.44rem;
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+    }
+
+    .rule-card-title,
+    .start-rules-mode .rule-card-title {
+      margin-bottom: 0.24rem;
+      font-size: clamp(1rem, 1.18vw, 1.16rem);
+      line-height: 1.14;
+      hyphens: none;
+      word-break: normal;
+      overflow-wrap: normal;
+    }
+
+    .rule-card-copy,
+    .start-rules-mode .rule-card-copy {
+      font-size: clamp(0.84rem, 0.98vw, 0.95rem);
+      line-height: 1.3;
+      hyphens: none;
+      word-break: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .rule-card-wide,
+    .start-rules-mode .rule-card-wide {
+      padding-top: 1.32rem;
+    }
+
+    .rule-card-wide .rule-card-copy,
+    .start-rules-mode .rule-card-wide .rule-card-copy {
+      max-width: 76ch;
+    }
+
+    .rules-footer {
+      padding: 0.45rem 1rem 0.92rem;
+    }
+
+    .rules-confirm {
+      min-width: 300px;
+      font-size: 1rem;
+      padding: 0.76rem 1.55rem;
+    }
+
+    @media (max-width: 900px) {
+      .rules-modal,
+      .start-rules-mode .rules-modal {
+        height: min(94vh, 740px);
+      }
+
+      .rules-header {
+        padding: 0.94rem 3.1rem 0.18rem;
+      }
+
+      .rules-modal .modal-title {
+        font-size: clamp(2rem, 5vw, 2.6rem);
+      }
+
+      .rules-header p {
+        font-size: clamp(0.8rem, 2.25vw, 0.92rem);
+      }
+
+      .rules-content,
+      .start-rules-mode .rules-content {
+        padding: 0.62rem 0.82rem 0.82rem;
+      }
+
+      .rules-board,
+      .start-rules-mode .rules-board {
+        grid-template-rows: minmax(110px, auto) minmax(110px, auto) minmax(108px, auto);
+        gap: 0.56rem;
+      }
+
+      .rule-card,
+      .start-rules-mode .rule-card {
+        padding: 0.68rem 0.68rem 0.64rem;
+      }
+
+      .rule-card-title,
+      .start-rules-mode .rule-card-title {
+        font-size: clamp(0.88rem, 2.25vw, 1rem);
+      }
+
+      .rule-card-copy,
+      .start-rules-mode .rule-card-copy {
+        font-size: clamp(0.74rem, 1.85vw, 0.84rem);
+        line-height: 1.26;
+      }
+
+      .rules-confirm {
+        min-width: 230px;
+        font-size: 0.94rem;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .rules-header {
+        padding-inline: 3rem;
+      }
+
+      .rules-modal .modal-title {
+        font-size: clamp(1.7rem, 6.2vw, 2.2rem);
+      }
+
+      .rules-header p {
+        max-width: 32ch;
+        font-size: clamp(0.8rem, 2.95vw, 0.92rem);
+      }
+
+      .rules-board,
+      .start-rules-mode .rules-board {
+        grid-template-rows: minmax(124px, auto) minmax(124px, auto) minmax(138px, auto);
+      }
+
+      .rule-card-title,
+      .start-rules-mode .rule-card-title {
+        font-size: clamp(0.82rem, 2.85vw, 0.96rem);
+      }
+
+      .rule-card-copy,
+      .start-rules-mode .rule-card-copy {
+        font-size: clamp(0.7rem, 2.45vw, 0.8rem);
+        line-height: 1.24;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .rules-header {
+        padding-inline: 2.8rem;
+      }
+
+      .rules-modal .modal-title {
+        font-size: clamp(1.56rem, 6.6vw, 1.96rem);
+      }
+
+      .rules-board,
+      .start-rules-mode .rules-board {
+        gap: 0.5rem;
+      }
+
+      .rule-card,
+      .start-rules-mode .rule-card,
+      .rule-card-wide,
+      .start-rules-mode .rule-card-wide {
+        padding: 0.64rem 0.6rem 0.6rem;
+      }
+
+      .rule-card-icon,
+      .start-rules-mode .rule-card-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 0.92rem;
+      }
+
+      .rule-card-step,
+      .start-rules-mode .rule-card-step {
+        min-width: 30px;
+        font-size: 0.56rem;
+      }
+
+      .rule-card-title,
+      .start-rules-mode .rule-card-title {
+        font-size: clamp(0.8rem, 2.9vw, 0.9rem);
+      }
+
+      .rule-card-copy,
+      .start-rules-mode .rule-card-copy {
+        font-size: clamp(0.68rem, 2.35vw, 0.76rem);
+      }
+    }
+
+    @media (max-width: 760px) and (orientation: portrait) {
+      #rulesOverlay .rule-card-wide .rule-card-copy,
+      #rulesOverlay.start-rules-mode .rule-card-wide .rule-card-copy {
+        font-size: clamp(0.82rem, 2.9vw, 0.92rem);
+        line-height: 1.3;
+      }
+    }
+
   </style>
 </head>
 
 <body>
 
   <!-- ORIENTATION OVERLAY -->
-  <div id="orientationOverlay">
-    <div style="font-size: 4rem; margin-bottom: 1rem;">🔄</div>
-    <h2 style="font-family: 'Outfit', sans-serif; font-size: 2rem; margin-bottom: 0.5rem; color: #E2C288;">Gira tu dispositivo</h2>
-    <p style="font-size: 1.1rem; max-width: 85%; margin: 0 auto; line-height: 1.5; color: #A0A4B8;">Para disfrutar de la mejor experiencia, pon tu celular en posición horizontal (acostado).</p>
+  <div id="orientationOverlay" aria-live="polite" aria-hidden="true">
+    <div class="orientation-overlay-card">
+      <div class="orientation-overlay-icon" aria-hidden="true"></div>
+      <h2>Gira tu teléfono</h2>
+      <p>Esta parte se usa en vertical. Solo la estación del Espinosaurio se juega en horizontal.</p>
+    </div>
   </div>
 
   <!-- FONDO ANIMADO -->
@@ -5189,6 +5854,50 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       includeHTML();
+
+      const orientationOverlay = document.getElementById('orientationOverlay');
+      const hasCoarsePointer = () => window.matchMedia('(pointer: coarse)').matches;
+      const isCompactLandscape = () => window.innerWidth > window.innerHeight && window.innerHeight <= 620;
+
+      async function requestPortraitLock() {
+        if (!hasCoarsePointer()) return false;
+        try {
+          if (screen.orientation && typeof screen.orientation.lock === 'function') {
+            await screen.orientation.lock('portrait');
+            return true;
+          }
+        } catch (error) {
+          return false;
+        }
+        return false;
+      }
+
+      function syncPortraitGuard() {
+        const shouldBlock = hasCoarsePointer() && isCompactLandscape();
+        document.body.classList.toggle('orientation-portrait-locked', shouldBlock);
+        if (orientationOverlay) {
+          orientationOverlay.setAttribute('aria-hidden', shouldBlock ? 'false' : 'true');
+        }
+      }
+
+      syncPortraitGuard();
+      requestPortraitLock();
+      window.addEventListener('resize', syncPortraitGuard, { passive: true });
+      window.addEventListener('orientationchange', () => {
+        setTimeout(() => {
+          syncPortraitGuard();
+          requestPortraitLock();
+        }, 120);
+      }, { passive: true });
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          syncPortraitGuard();
+          requestPortraitLock();
+        }
+      });
+      ['pointerdown', 'touchstart'].forEach((eventName) => {
+        document.addEventListener(eventName, requestPortraitLock, { passive: true });
+      });
 
       // 1. Partículas
       const bg = document.getElementById('bgParticles');
@@ -6005,6 +6714,15 @@
       function playCurrentStation() {
         const url = getCurrentStationGameUrl();
         if (url) {
+          if (currentStation === '2') {
+            try {
+              if (screen.orientation && typeof screen.orientation.unlock === 'function') {
+                screen.orientation.unlock();
+              }
+            } catch (error) {
+              // Ignorar: algunos navegadores no soportan unlock fuera de fullscreen.
+            }
+          }
           window.location.href = url;
           return;
         }
