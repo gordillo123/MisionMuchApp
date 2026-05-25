@@ -49,8 +49,8 @@ window.APP_MODULES = {
     <div class="hero-glass">
 
       <h1 class="hero-title">
-        <span class="animal-deco animal-left">🦋</span> MISIÓN <span class="animal-deco animal-right">🦖</span><br/>
-        <span class="animal-deco animal-left2">🐙</span> MUCH <span class="animal-deco animal-right2">🦜</span>
+        <span class="animal-deco animal-left">🦋</span> <span class="animal-deco animal-right">🦖</span><br/>
+        <span class="animal-deco animal-left2">🐙</span> <span class="animal-deco animal-right2">🦜</span>
       </h1>
       <p class="hero-subtitle">Descubre dinosaurios, animales y tecnología<br/>¡Demuestra cuánto sabes!</p>
       <div class="hero-play-mobile">
