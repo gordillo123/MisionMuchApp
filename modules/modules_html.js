@@ -9,7 +9,6 @@ window.APP_MODULES = {
 <nav class="top-nav">
   <div class="nav-container">
     <a href="#" class="nav-brand">
-      <span class="nav-brand-text">MISIÓN MUCH</span>
       <span class="nav-brand-logos" aria-label="Logos institucionales">
         <img src="entrada-much/logo-sata.png" alt="SATA" class="nav-brand-logo nav-brand-logo-sata">
         <img src="Sbeel_Dinosaurios/logo-sbeel-dinosaurios.svg" alt="SBEEL Dinosaurios" class="nav-brand-logo nav-brand-logo-sbeel">
@@ -50,8 +49,8 @@ window.APP_MODULES = {
     <div class="hero-glass">
 
       <h1 class="hero-title">
-        <span class="animal-deco animal-left">🦋</span> MISIÓN <span class="animal-deco animal-right">🦖</span><br/>
-        <span class="animal-deco animal-left2">🐙</span> MUCH <span class="animal-deco animal-right2">🦜</span>
+        <span class="animal-deco animal-left">🦋</span> <span class="animal-deco animal-right">🦖</span><br/>
+        <span class="animal-deco animal-left2">🐙</span> <span class="animal-deco animal-right2">🦜</span>
       </h1>
       <p class="hero-subtitle">Descubre dinosaurios, animales y tecnología<br/>¡Demuestra cuánto sabes!</p>
       <div class="hero-play-mobile">
