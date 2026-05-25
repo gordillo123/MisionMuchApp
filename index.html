@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-orientation="portrait">
 
 <head>
   <meta charset="UTF-8" />
@@ -57,7 +57,22 @@
     }
 
     #orientationOverlay {
-      display: none !important;
+      display: none;
+    }
+
+    @media (orientation: landscape) and (pointer: coarse) {
+      #orientationOverlay {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 2rem;
+        background: rgba(26, 28, 44, 0.96);
+      }
     }
 
     .bg-particles {
@@ -5543,12 +5558,10 @@
 <body>
 
   <!-- ORIENTATION OVERLAY -->
-  <div id="orientationOverlay" aria-live="polite" aria-hidden="true">
-    <div class="orientation-overlay-card">
-      <div class="orientation-overlay-icon" aria-hidden="true"></div>
-      <h2>Gira tu teléfono</h2>
-      <p>Esta parte se usa en vertical. Solo la estación del Espinosaurio se juega en horizontal.</p>
-    </div>
+  <div id="orientationOverlay">
+    <div style="font-size: 4rem; margin-bottom: 1rem;">🔄</div>
+    <h2 style="font-family: 'Outfit', sans-serif; font-size: 2rem; margin-bottom: 0.5rem; color: #E2C288;">Gira tu dispositivo</h2>
+    <p style="font-size: 1.1rem; max-width: 85%; margin: 0 auto; line-height: 1.5; color: #A0A4B8;">Para disfrutar de la mejor experiencia, pon tu celular en posición horizontal (acostado).</p>
   </div>
 
   <!-- FONDO ANIMADO -->
@@ -7692,6 +7705,7 @@
     showAdminLogin();
   </script>
   <script src="scripts/bg-music.js"></script>
+  <script src="scripts/orientation-manager.js"></script>
   <script>
     try { ensureBgMusic('Sonidos/musica fondo.mp3'); initBgAutoPlay(); } catch(e){}
   </script>

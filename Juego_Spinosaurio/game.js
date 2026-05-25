@@ -180,25 +180,12 @@ var loopRequestId;
 var orientationBlocked = false;
 
 function isMobilePortrait() {
-  var isPortrait = window.matchMedia("(orientation: portrait)").matches;
-  var isTouchLike = window.matchMedia("(pointer: coarse)").matches;
-  var mobileSized = Math.max(window.innerWidth || 0, window.innerHeight || 0) <= 1024;
-  return isPortrait && isTouchLike && mobileSized;
-}
-
-async function requestLandscapeLock() {
-  try {
-    if (screen.orientation && typeof screen.orientation.lock === "function") {
-      await screen.orientation.lock("landscape");
-      return true;
-    }
-  } catch (e) { }
   return false;
 }
 
 function updateOrientationGate() {
-  orientationBlocked = isMobilePortrait() && !document.body.classList.contains("quiz-mode");
-  document.body.classList.toggle("orientation-blocked", orientationBlocked);
+  orientationBlocked = false;
+  document.body.classList.remove("orientation-blocked");
   updateResponsiveScale();
   return orientationBlocked;
 }
@@ -269,6 +256,7 @@ function Start() {
       btnNext.addEventListener("click", function () {
         const mapParams = new URLSearchParams(window.location.search);
         mapParams.set('view', 'prep');
+        try { window.lockPortraitOrientation?.(); } catch (e) {}
         window.location.href = '../index.html?' + mapParams.toString();
         return;
         // Navegar a la siguiente estación basada en localStorage (misma lógica que index.html)
@@ -324,6 +312,7 @@ function ConfigurarPortada() {
 
   if (btnJugar) {
     btnJugar.addEventListener("click", async () => {
+      try { await window.lockLandscapeOrientation?.(); } catch (e) {}
       if (!canStartLandscapeGame()) return;
 
       try {
@@ -334,6 +323,7 @@ function ConfigurarPortada() {
           await document.documentElement.webkitRequestFullscreen();
         }
 
+        try { await window.lockLandscapeOrientation?.(); } catch (e) {}
         updateResponsiveScale();
       } catch (err) {
         console.warn("No se pudo activar pantalla completa:", err);
@@ -598,7 +588,7 @@ function handleQuestionTimeout() {
 }
 function mostrarQuiz() {
   document.body.classList.add("quiz-mode");
-  try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) { }
+  try { window.lockLandscapeOrientation?.(); } catch (e) { }
 
   if (!quizData) {
     quizData = {
