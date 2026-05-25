@@ -180,12 +180,12 @@ var loopRequestId;
 var orientationBlocked = false;
 
 function isMobilePortrait() {
-  return false;
+  return window.matchMedia("(pointer: coarse) and (orientation: portrait)").matches;
 }
 
 function updateOrientationGate() {
-  orientationBlocked = false;
-  document.body.classList.remove("orientation-blocked");
+  orientationBlocked = isMobilePortrait();
+  document.body.classList.toggle("orientation-blocked", orientationBlocked);
   updateResponsiveScale();
   return orientationBlocked;
 }
@@ -254,6 +254,7 @@ function Start() {
       btnNext.addEventListener("click", function () {
         const mapParams = new URLSearchParams(window.location.search);
         mapParams.set('view', 'prep');
+        try { window.lockPortraitOrientation?.(); } catch (e) {}
         window.location.href = '../index.html?' + mapParams.toString();
         return;
         // Navegar a la siguiente estación basada en localStorage (misma lógica que index.html)
@@ -309,6 +310,7 @@ function ConfigurarPortada() {
 
   if (btnJugar) {
     btnJugar.addEventListener("click", async () => {
+      try { await window.lockLandscapeOrientation?.(); } catch (e) {}
       if (!canStartLandscapeGame()) return;
 
       try {
@@ -319,6 +321,7 @@ function ConfigurarPortada() {
           await document.documentElement.webkitRequestFullscreen();
         }
 
+        try { await window.lockLandscapeOrientation?.(); } catch (e) {}
         updateResponsiveScale();
       } catch (err) {
         console.warn("No se pudo activar pantalla completa:", err);
@@ -583,7 +586,7 @@ function handleQuestionTimeout() {
 }
 function mostrarQuiz() {
   document.body.classList.add("quiz-mode");
-  try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) { }
+  try { window.lockLandscapeOrientation?.(); } catch (e) { }
 
   if (!quizData) {
     quizData = {

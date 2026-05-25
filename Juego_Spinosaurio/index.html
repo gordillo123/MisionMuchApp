@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-orientation="landscape">
 
 <head>
   <meta charset="UTF-8" />
@@ -44,16 +44,23 @@
     }
 
     /* Logos HUD */
-    .hud-logos {
+    .hud-controls {
       position: absolute;
       top: max(8px, env(safe-area-inset-top));
       left: max(8px, env(safe-area-inset-left));
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       z-index: 5;
+      align-items: flex-start;
+    }
+
+    .hud-logos {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      opacity: .95;
       pointer-events: none;
-      opacity: .9;
     }
 
     .hud-logos img {
@@ -279,29 +286,58 @@
     }
 
     .exit-map-btn {
-      position: absolute;
-      top: calc(max(8px, env(safe-area-inset-top)) + clamp(150px, 30vh, 190px));
-      left: max(12px, env(safe-area-inset-left));
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      min-width: 96px;
+      border: 1px solid rgba(31, 41, 55, 0.12);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.96);
+      color: #111827;
+      font-weight: 800;
+      font-size: clamp(14px, 2.2vw, 16px);
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.14);
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+      backdrop-filter: blur(12px);
+      -webkit-tap-highlight-color: transparent;
       z-index: 2000000;
+      text-decoration: none;
+    }
+
+    .exit-map-btn__icon {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      min-height: 34px;
-      padding: 7px 11px;
-      border: 0;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.88);
-      color: #1f2937;
-      font-weight: 900;
-      font-size: clamp(11px, 2.3vw, 13px);
-      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
-      cursor: pointer;
-      backdrop-filter: blur(8px);
+      width: 1.2em;
+      height: 1.2em;
+      line-height: 1;
+      font-size: 1.1em;
+    }
+
+    .exit-map-btn__label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .exit-map-btn:hover {
+      transform: translateY(-1px) scale(1.03);
+      background: rgba(255, 255, 255, 1);
+      border-color: rgba(59, 130, 246, 0.32);
+      box-shadow: 0 22px 40px rgba(15, 23, 42, 0.24);
+    }
+
+    .exit-map-btn:focus-visible {
+      outline: 3px solid rgba(59, 130, 246, 0.35);
+      outline-offset: 4px;
     }
 
     .exit-map-btn:active {
-      transform: scale(0.97);
+      transform: translateY(0) scale(0.98);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.16);
+      background: rgba(248, 250, 252, 0.98);
     }
 
     @media (orientation: landscape) and (max-height: 650px) {
@@ -764,8 +800,6 @@
     }
 
     .hud-logos {
-      top: max(8px, env(safe-area-inset-top));
-      left: max(8px, env(safe-area-inset-left));
       gap: clamp(4px, 1.2vmin, 8px);
     }
 
@@ -777,11 +811,11 @@
     }
 
     .exit-map-btn {
-      top: calc(max(8px, env(safe-area-inset-top)) + clamp(88px, 24vh, 170px));
-      left: max(8px, env(safe-area-inset-left));
-      min-height: 32px;
-      padding: 6px 10px;
-      font-size: clamp(10px, 2.5vmin, 13px);
+      width: auto;
+      min-width: 96px;
+      height: auto;
+      padding: 10px 14px;
+      font-size: clamp(14px, 2.2vmin, 16px);
     }
 
     .retry-wrap {
@@ -846,7 +880,8 @@
 
     @media (orientation: landscape) and (max-height: 430px) {
       .exit-map-btn {
-        top: calc(max(8px, env(safe-area-inset-top)) + clamp(72px, 22vh, 112px));
+        top: max(10px, env(safe-area-inset-top));
+        right: max(10px, env(safe-area-inset-right));
       }
 
       .hud-logos img {
@@ -949,15 +984,18 @@
 
   <div class="contenedor" id="game">
     <div class="stage">
-      <div class="hud-logos" aria-hidden="true">
-        <img src="Logo-Ag-14.png" alt="Agencia Digital Chiapas">
-        <img src="logo-sata.png" alt="SATA">
-        <img src="logo-much.png" alt="MUCH">
+      <div class="hud-controls">
+        <div class="hud-logos" aria-hidden="true">
+          <img src="Logo-Ag-14.png" alt="Agencia Digital Chiapas">
+          <img src="logo-sata.png" alt="SATA">
+          <img src="logo-much.png" alt="MUCH">
+        </div>
+
+        <button id="btnExitToMap" class="exit-map-btn" type="button" aria-label="Salir al mapa" title="Salir al mapa de estaciones">
+          <span class="exit-map-btn__icon" aria-hidden="true">🚪</span>
+          <span class="exit-map-btn__label">Salir</span>
+        </button>
       </div>
-      <button id="btnExitToMap" class="exit-map-btn" type="button" aria-label="Salir al mapa">
-        <span aria-hidden="true">🚪</span>
-        <span>Salir</span>
-      </button>
       <div class="suelo"></div>
       <div class="dino dino-corriendo"></div>
       <div class="score">0</div>
@@ -998,6 +1036,7 @@
     console.log("Supabase listo para registrar en intentos_juego.");
   </script>
 
+  <script src="../scripts/orientation-manager.js"></script>
   <script src="game.js?v=3" defer></script>
 
   <script>
@@ -1011,13 +1050,26 @@
     }, { passive: false });
     document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
 
-    function goBackToMap(e) {
+    async function goBackToMap(e) {
       e.preventDefault();
       const searchParams = new URLSearchParams(window.location.search);
+      searchParams.set('view', 'prep');
+      try { await window.lockPortraitOrientation?.(); } catch (error) {}
       window.location.href = '../index.html?' + searchParams.toString();
     }
 
-    document.getElementById('btnExitToMap').addEventListener('click', goBackToMap);
+    const exitToMapButton = document.getElementById('btnExitToMap');
+    const mapTargetURL = new URL('../index.html?view=prep', window.location.href).href;
+
+    async function goBackToMap(e) {
+      if (e) e.preventDefault();
+      try { await window.lockPortraitOrientation?.(); } catch (error) {}
+      window.location.href = mapTargetURL;
+    }
+
+    if (exitToMapButton) {
+      exitToMapButton.addEventListener('click', goBackToMap);
+    }
 
     const btnBackPortadaMap = document.getElementById('btnBackPortadaMap');
     if (btnBackPortadaMap) {
