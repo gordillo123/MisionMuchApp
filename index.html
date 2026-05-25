@@ -5552,6 +5552,356 @@
       }
     }
 
+    /* AJUSTES RESPONSIVE GENERALES */
+    img,
+    svg,
+    canvas,
+    video {
+      max-width: 100%;
+      height: auto;
+    }
+
+    button,
+    a,
+    input,
+    select,
+    textarea {
+      max-width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      html,
+      body,
+      .view-section,
+      .main-area,
+      .intro-container,
+      .avatar-overlay,
+      .admin-overlay {
+        max-width: 100vw;
+        overflow-x: hidden;
+      }
+
+      .nav-container,
+      .nav-brand,
+      .nav-brand-logos,
+      .map-col .card,
+      .panel,
+      .metric-card,
+      .scanner-stage,
+      .scanner-side,
+      .scan-result-shell,
+      .scan-result-card,
+      .admin-auth-card {
+        min-width: 0;
+      }
+
+      .nav-container {
+        width: 100%;
+        max-width: 100%;
+        gap: 0.5rem;
+      }
+
+      .nav-brand-logo,
+      .prep-logo-strip img,
+      .map-bg {
+        object-fit: contain;
+      }
+
+      .hero,
+      .hero-glass,
+      .hero-badges,
+      .prep-logo-strip,
+      .museum-map,
+      .reward-claim-box {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .hero-glass {
+        margin-inline: auto;
+      }
+
+      .prep-logo-strip {
+        flex-wrap: wrap;
+        overflow: hidden;
+      }
+
+      .hero-title,
+      .hero-subtitle,
+      .section-title,
+      .modal-title,
+      .rule-card-title,
+      .rule-card-copy,
+      .scan-folio,
+      .scan-raw,
+      .brand-copy h1,
+      .brand-copy span {
+        overflow-wrap: anywhere;
+        word-break: normal;
+      }
+
+      .badge {
+        min-width: 0;
+        max-width: 100%;
+        line-height: 1.2;
+      }
+
+      .btn-play,
+      .btn-confirm,
+      .btn-google,
+      .admin-auth-button,
+      .soft-button,
+      .solid-button,
+      .filter-chip,
+      .btn-claim-reward {
+        min-height: 44px;
+        line-height: 1.15;
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
+
+      .btn-play.large,
+      #btnComenzar {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 22rem;
+        align-self: center;
+      }
+
+      .avatar-modal,
+      .admin-modal-content,
+      .rules-modal,
+      .scores-modal {
+        width: min(96vw, 860px);
+        max-width: 96vw;
+      }
+
+      .admin-modal-content {
+        max-height: 96dvh;
+      }
+
+      .admin-close-btn {
+        top: 0.75rem;
+        right: 0.75rem;
+        width: 42px;
+        height: 42px;
+      }
+
+      .scanner-actions,
+      .topbar-actions {
+        flex-wrap: wrap;
+      }
+
+      .search-wrap input,
+      .manual-input,
+      .admin-auth-input {
+        min-width: 0;
+        width: 100%;
+      }
+
+      .filter-row {
+        max-width: 100%;
+        overflow-x: auto;
+        padding-bottom: 0.25rem;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .nav-container {
+        min-height: 56px;
+        padding-right: 4rem;
+      }
+
+      .nav-brand {
+        max-width: calc(100vw - 4.8rem);
+      }
+
+      .nav-brand-logos {
+        gap: 0.18rem;
+      }
+
+      .nav-brand-logo {
+        padding: 1px;
+      }
+
+      .nav-brand-logo-much {
+        height: 28px;
+        max-width: 58px;
+      }
+
+      .nav-brand-logo-sata {
+        height: 20px;
+        max-width: 44px;
+      }
+
+      .nav-brand-logo-sbeel {
+        height: 24px;
+        max-width: 50px;
+      }
+
+      .nav-brand-logo-planetario {
+        height: 21px;
+        max-width: 46px;
+      }
+
+      .nav-brand-logo-agencia {
+        height: 21px;
+        max-width: 42px;
+      }
+
+      .hamburger {
+        width: 40px;
+        height: 40px;
+        right: 0.6rem;
+      }
+
+      .nav-links {
+        width: min(88vw, 292px);
+      }
+
+      .main-area {
+        min-height: 100dvh;
+        padding-inline: 0.75rem;
+      }
+
+      .hero-glass {
+        padding-inline: 1rem;
+      }
+
+      .hero-subtitle {
+        font-size: 0.88rem;
+        line-height: 1.35;
+      }
+
+      .hero-badges {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .badge {
+        width: 100%;
+        flex-basis: auto;
+      }
+
+      .intro-container {
+        padding-top: 5rem;
+        padding-inline: 0.75rem;
+        padding-bottom: 1.25rem;
+      }
+
+      .card {
+        padding: 0.9rem;
+        border-radius: 20px;
+      }
+
+      .prep-logo-strip {
+        gap: 0.28rem;
+        padding: 0.28rem;
+      }
+
+      .prep-logo-strip img {
+        height: 20px;
+        max-width: 54px;
+      }
+
+      .prep-logo-strip .prep-logo-much {
+        height: 27px;
+        max-width: 62px;
+      }
+
+      .prep-logo-strip .prep-logo-sbeel {
+        height: 24px;
+        max-width: 60px;
+      }
+
+      .prep-logo-strip .prep-logo-planetario {
+        height: 22px;
+        max-width: 58px;
+      }
+
+      .section-title {
+        font-size: 1.25rem;
+        line-height: 1.15;
+      }
+
+      .museum-map {
+        aspect-ratio: 1 / 1;
+        border-radius: 18px;
+      }
+
+      .map-marker {
+        min-width: 52px;
+        min-height: 44px;
+        gap: 3px;
+      }
+
+      .map-marker-number {
+        width: 25px;
+        height: 25px;
+        font-size: 0.72rem;
+      }
+
+      .map-marker-label {
+        max-width: 58px;
+        padding: 1px 4px;
+        font-size: 0.38rem;
+        border-width: 1px;
+      }
+
+      .map-avatar {
+        width: 42px;
+        height: 42px;
+      }
+
+      .avatar-preview-box {
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .avatar-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .av-name {
+        font-size: 0.78rem;
+        overflow-wrap: anywhere;
+      }
+
+      .admin-auth-card {
+        padding: 1.25rem;
+        border-radius: 22px;
+      }
+
+      .admin-auth-card h1,
+      .brand-copy h1 {
+        font-size: clamp(1.35rem, 8vw, 2rem);
+      }
+
+      .panel-head,
+      .scan-head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.55rem;
+      }
+
+      .scanner-actions > *,
+      .topbar-actions > *,
+      .toolbar > button {
+        width: 100%;
+        flex: 1 1 100%;
+      }
+
+      tbody tr {
+        border-radius: 16px;
+      }
+
+      tbody td {
+        padding: 12px 14px;
+      }
+    }
+
   </style>
 </head>
 

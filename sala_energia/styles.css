@@ -759,6 +759,32 @@ body {
   min-width: clamp(120px, 28vw, 220px);
 }
 
+/* Respuestas mas amplias en movil */
+@media (max-width: 768px) {
+  #options,
+  #options.options-list,
+  .options-list {
+    gap: clamp(12px, 2svh, 18px) !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  #options .option-btn,
+  .options-list .option-btn {
+    min-height: clamp(68px, 11svh, 96px) !important;
+    padding: clamp(16px, 3svh, 22px) clamp(16px, 5vw, 24px) !important;
+    align-items: center;
+  }
+}
+
+@media (max-width: 380px) {
+  #options .option-btn,
+  .options-list .option-btn {
+    min-height: clamp(62px, 10svh, 86px) !important;
+    padding-block: 14px !important;
+  }
+}
+
 /* Larger score/status area */
 .footer-info.score-panel,
 .score-panel {

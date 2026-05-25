@@ -112,6 +112,54 @@
     font-weight: bold;
     margin-top: 1rem;
   }
+
+  img, svg, canvas, video {
+    max-width: 100%;
+    height: auto;
+  }
+
+  @media (max-width: 768px) {
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+
+    .card {
+      width: min(94vw, 920px);
+      min-width: 0;
+      padding-inline: clamp(16px, 5vw, 28px);
+    }
+
+    .logo-esquina,
+    .logo-much {
+      object-fit: contain;
+    }
+
+    .btn {
+      min-height: 44px;
+      max-width: 100%;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      line-height: 1.15;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .card {
+      margin-top: 54px;
+      border-radius: 22px;
+    }
+
+    .logo-izq-abs,
+    .logo-der-abs {
+      --logo-h: 38px;
+      top: -48px;
+    }
+
+    .logo-much {
+      height: 76px;
+    }
+  }
 </style>
 </head>
 <body>
