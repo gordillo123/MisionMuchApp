@@ -125,6 +125,40 @@
       transform: translateY(1px);
     }
 
+    .actions {
+      width: min(320px, 100%);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .actions .btn {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .btn-back {
+      appearance: none;
+      border: 2px solid rgba(255, 255, 255, .72);
+      cursor: pointer;
+      display: inline-block;
+      text-decoration: none;
+      padding: clamp(11px, 3.5vw, 15px) clamp(18px, 6vw, 22px);
+      border-radius: 16px;
+      font-weight: 900;
+      font-size: clamp(15px, 3.8vw, 18px);
+      color: #fff;
+      background: rgba(255, 255, 255, .14);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, .18);
+      transition: transform .06s, box-shadow .2s, background .2s;
+      backdrop-filter: blur(6px);
+    }
+
+    .btn-back:active {
+      transform: translateY(1px);
+    }
+
     .tip {
       margin-top: clamp(10px, 3vw, 14px);
       font-size: clamp(12px, 3.4vw, 14px);
@@ -169,6 +203,7 @@
         padding: 12px 16px;
       }
     }
+
   </style>
 </head>
 
@@ -184,7 +219,10 @@
     <h1>SPINOSAURUS RUNNER</h1>
     <p class="sub">Salta los cactus, acumula puntos y ¡reclama tu premio! 🦖</p>
 
-    <a class="btn" href="index.html?start=1">Jugar ahora 🦖</a>
+    <div class="actions">
+      <a class="btn" href="index.html?start=1">Jugar ahora 🦖</a>
+      <a class="btn-back" href="../index.html">Regresar al mapa</a>
+    </div>
     <p class="tip">Tip: toca cualquier parte de la pantalla para saltar • evita los cactus</p>
   </main>
 </body>

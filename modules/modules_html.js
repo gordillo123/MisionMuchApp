@@ -353,78 +353,65 @@ window.APP_MODULES = {
 
   "modules/rules.html": `
 <div class="avatar-modal rules-modal">
-  <button class="btn-back-regreso" id="btnBackRules" title="Cerrar">✕</button>
-  <div class="modal-header">
-    <h2 class="modal-title" style="color: var(--msf-purple);">Cómo Jugar</h2>
-    <p>Sigue estos pasos para completar tu misión con éxito</p>
+  <button class="btn-back-regreso" id="btnBackRules" title="Cerrar">&#10005;</button>
+  <div class="modal-header rules-header">
+    <span class="rules-chip">Gu&iacute;a del Explorador</span>
+    <h2 class="modal-title">C&oacute;mo Jugar</h2>
+    <p>Lee estas reglas clave para completar tu recorrido cient&iacute;fico dentro del museo.</p>
   </div>
   <div class="rules-content">
-    <div class="rule-item">
-      <div class="rule-icon-pro">📱</div>
-      <div class="rule-text">Usa el celular en vertical para las preguntas. Solo el Espinosaurio se juega en horizontal.</div>
-    </div>
-    <div class="rule-item">
-      <div class="rule-icon-pro">📷</div>
-      <div class="rule-text">Escanea el código QR de cualquier estación del museo.</div>
-    </div>
-    <div class="rule-item">
-      <div class="rule-icon-pro">👤</div>
-      <div class="rule-text">Inicia sesión con tu cuenta de Google.</div>
-    </div>
-    <div class="rule-item">
-      <div class="rule-icon-pro">📍</div>
-      <div class="rule-text">Acepta el permiso de ubicación para mostrar dónde estás dentro del recorrido.</div>
-    </div>
-    <div class="rule-item">
-      <div class="rule-icon-pro">🧑‍🚀</div>
-      <div class="rule-text">Selecciona tu avatar.</div>
-    </div>
-    <div class="rule-item">
-      <div class="rule-icon-pro">🗺️</div>
-      <div class="rule-text">Revisa el mapa interactivo para ver tu ubicación, estaciones pendientes y estaciones
-        completadas.</div>
-    </div>
-    <div class="rule-item">
-      <div class="rule-icon-pro">🔍</div>
-      <div class="rule-text">Escanea el QR de la estación donde te encuentres.</div>
-    </div>
-    <div class="rule-item">
-      <div class="rule-icon-pro">📖</div>
-      <div class="rule-text">Lee o revisa el contenido educativo de la estación.</div>
-    </div>
-    <div class="rule-item">
-      <div class="rule-icon-pro">🧠</div>
-      <div class="rule-text">Responde las 10 preguntas de la trivia.</div>
-    </div>
-    <div class="rule-item">
-      <div class="rule-icon-pro">🦖</div>
-      <div class="rule-text">Si estás en la estación del Espinosaurio, completa el reto de 10 saltos.</div>
-    </div>
-    <div class="rule-item">
-      <div class="rule-icon-pro">💖</div>
-      <div class="rule-text">Tienes máximo 3 intentos por estación.</div>
-    </div>
-    <div class="rule-item">
-      <div class="rule-icon-pro">💀</div>
-      <div class="rule-text">Si fallas los 3 intentos, el juego se reinicia desde cero.</div>
-    </div>
-    <div class="rule-item">
-      <div class="rule-icon-pro">💾</div>
-      <div class="rule-text">Si sales del juego, presiona “Seguir jugando” para continuar desde tu progreso
-        guardado.</div>
-    </div>
-    <div class="rule-item">
-      <div class="rule-icon-pro">🏁</div>
-      <div class="rule-text">Completa todas las estaciones para terminar la misión.</div>
-    </div>
-    <div class="rule-item">
-      <div class="rule-icon-pro">🏆</div>
-      <div class="rule-text">Al finalizar, revisa tu resultado final.</div>
+    <div class="rules-stage">
+      <div class="rules-board">
+        <article class="rule-card rule-card-ornate">
+          <div class="rule-card-head">
+            <span class="rule-card-icon" aria-hidden="true">&#128247;</span>
+            <span class="rule-card-step">01</span>
+          </div>
+          <h3 class="rule-card-title">Escanea y comienza tu aventura</h3>
+          <p class="rule-card-copy">Inicia el recorrido desde cualquier estaci&oacute;n escaneando su <strong>c&oacute;digo QR</strong>.</p>
+        </article>
+
+        <article class="rule-card">
+          <div class="rule-card-head">
+            <span class="rule-card-icon" aria-hidden="true">&#128506;</span>
+            <span class="rule-card-step">02</span>
+          </div>
+          <h3 class="rule-card-title">Explora a tu ritmo</h3>
+          <p class="rule-card-copy">No necesitas seguir un orden. Avanza <strong>libremente</strong> por el museo y descubre cada estaci&oacute;n.</p>
+        </article>
+
+        <article class="rule-card">
+          <div class="rule-card-head">
+            <span class="rule-card-icon" aria-hidden="true">&#129504;</span>
+            <span class="rule-card-step">03</span>
+          </div>
+          <h3 class="rule-card-title">Completa los retos</h3>
+          <p class="rule-card-copy">En cada estaci&oacute;n deber&aacute;s responder <strong>10 preguntas</strong> y acertar m&iacute;nimo <strong>7</strong> para superarla.</p>
+        </article>
+
+        <article class="rule-card">
+          <div class="rule-card-head">
+            <span class="rule-card-icon" aria-hidden="true">&#11088;</span>
+            <span class="rule-card-step">04</span>
+          </div>
+          <h3 class="rule-card-title">Suma puntos en tu misi&oacute;n</h3>
+          <p class="rule-card-copy">Cada estaci&oacute;n completada vale <strong>10 puntos</strong>, y la estaci&oacute;n del Espinosaurio vale <strong>15 puntos</strong>.</p>
+        </article>
+
+        <article class="rule-card rule-card-wide">
+          <span class="rule-card-banner">Meta final</span>
+          <div class="rule-card-head">
+            <span class="rule-card-icon" aria-hidden="true">&#127942;</span>
+            <span class="rule-card-step">05</span>
+          </div>
+          <h3 class="rule-card-title">Gana tu recompensa final</h3>
+          <p class="rule-card-copy">Junta al menos <strong>45 puntos de 55</strong> y completa tu misi&oacute;n cient&iacute;fica para obtener tu recompensa digital.</p>
+        </article>
+      </div>
     </div>
   </div>
-  <div class="modal-footer" style="justify-content: center;">
-    <button class="btn-confirm" id="btnCerrarReglas"
-      style="background: linear-gradient(135deg, var(--msf-purple), var(--msf-blue));">¡Entendido!</button>
+  <div class="modal-footer rules-footer">
+    <button class="btn-confirm rules-confirm" id="btnCerrarReglas">&iexcl;Entendido!</button>
   </div>
 </div>
   `

@@ -230,6 +230,47 @@
       transform: scale(0.96);
     }
 
+    .portada-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: min(320px, 86%);
+      margin: 0 auto 25px;
+    }
+
+    .portada-actions .btn-play-portada {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+    }
+
+    .btn-back-portada {
+      appearance: none;
+      border: 2px solid rgba(255, 255, 255, 0.72);
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+      border-radius: 16px;
+      cursor: pointer;
+      width: 100%;
+      min-height: 48px;
+      padding: 13px 18px;
+      font-size: clamp(15px, 4vw, 18px);
+      font-weight: 800;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.18);
+      backdrop-filter: blur(6px);
+      transition: transform 0.1s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-back-portada:hover {
+      background: rgba(255, 255, 255, 0.24);
+      box-shadow: 0 12px 26px rgba(15, 23, 42, 0.22);
+    }
+
+    .btn-back-portada:active {
+      transform: scale(0.97);
+    }
+
     .portada-tips {
       font-size: clamp(11px, 3vw, 14px);
       opacity: 0.9;
@@ -330,6 +371,23 @@
         margin: 0 auto clamp(8px, 2vh, 14px);
         border-radius: 14px;
         font-size: clamp(16px, 4.4vh, 24px);
+      }
+
+      .portada-actions {
+        width: min(320px, 42vw);
+        gap: 10px;
+        margin: 0 auto clamp(8px, 2vh, 14px);
+      }
+
+      .portada-actions .btn-play-portada {
+        margin: 0;
+      }
+
+      .btn-back-portada {
+        min-height: 42px;
+        padding: 10px 14px;
+        font-size: clamp(13px, 3.4vh, 17px);
+        border-radius: 13px;
       }
 
       .portada-tips {
@@ -780,6 +838,10 @@
       .btn-play-portada {
         width: min(320px, 86vw);
       }
+
+      .portada-actions {
+        width: min(320px, 86vw);
+      }
     }
 
     @media (orientation: landscape) and (max-height: 430px) {
@@ -876,7 +938,10 @@
       <h1 class="portada-title">SPINOSAURUS<br>RUNNER</h1>
       <p class="portada-sub">Salta los cactus, acumula puntos y demuestra tu habilidad 🦖</p>
 
-      <button id="btnJugarPortada" class="btn-play-portada">Jugar ahora 🦕</button>
+      <div class="portada-actions">
+        <button id="btnJugarPortada" class="btn-play-portada">Jugar ahora 🦕</button>
+        <button id="btnBackPortadaMap" class="btn-back-portada" type="button">Regresar al mapa</button>
+      </div>
 
       <p class="portada-tips">Tip: toca cualquier parte de la pantalla para saltar • evita los cactus</p>
     </div>
@@ -946,11 +1011,18 @@
     }, { passive: false });
     document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
 
-    document.getElementById('btnExitToMap').addEventListener('click', function(e) {
+    function goBackToMap(e) {
       e.preventDefault();
       const searchParams = new URLSearchParams(window.location.search);
       window.location.href = '../index.html?' + searchParams.toString();
-    });
+    }
+
+    document.getElementById('btnExitToMap').addEventListener('click', goBackToMap);
+
+    const btnBackPortadaMap = document.getElementById('btnBackPortadaMap');
+    if (btnBackPortadaMap) {
+      btnBackPortadaMap.addEventListener('click', goBackToMap);
+    }
 
   </script>
 
