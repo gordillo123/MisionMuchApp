@@ -168,7 +168,7 @@ window.APP_MODULES = {
         </div>
         <div class="map-marker" style="left: 56%; top: 42%;" data-station="2">
           <span class="map-marker-number">2</span>
-          <span class="map-marker-label">ESPINOZAURIO</span>
+          <span class="map-marker-label">ESPINOSAURIO</span>
         </div>
         <div class="map-marker" style="left: 21%; top: 24%;" data-station="3">
           <span class="map-marker-number">3</span>

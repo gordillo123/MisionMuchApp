@@ -27,6 +27,7 @@ var tiempoHastaNube = 0.5, tiempoNubeMin = 0.7, tiempoNubeMax = 2.7, nubes = [],
 
 var contenedor, dino, textoScore, suelo, gameOver;
 var WIN_SCORE = 15;
+var QUIZ_WARNING_SCORE = 12;
 const STATION_ID = '2';
 const COMPLETED_STATIONS_KEY = 'much_completed_stations';
 
@@ -35,6 +36,7 @@ var victoryAudioContext = null;
 var quizData = null;
 var quizAnswerIndex = null;
 var quizVisible = false;
+var quizWarningShown = false;
 var navigatingToRegistro = false;
 // Temporizador de pregunta especial
 var QUESTION_SECONDS = 10;
@@ -193,7 +195,7 @@ function updateOrientationGate() {
 function canStartLandscapeGame() {
   updateOrientationGate();
   if (orientationBlocked) return false;
-  requestLandscapeLock();
+  try { window.lockLandscapeOrientation?.(); } catch (e) {}
   return true;
 }
 
@@ -510,11 +512,26 @@ function GanarPuntos() {
   if (score == 5) { contenedor.classList.add("mediodia"); }
   else if (score == 10) { contenedor.classList.add("tarde"); }
 
+  if (!quizWarningShown && score >= QUIZ_WARNING_SCORE && score < WIN_SCORE) {
+    showQuizWarning();
+  }
+
   if (score >= WIN_SCORE) {
     contenedor.classList.add("noche"); parado = true;
     dino.classList.remove("dino-corriendo"); mostrarQuiz(); return;
   }
   suelo.style.animationDuration = "3s";
+}
+
+function showQuizWarning() {
+  quizWarningShown = true;
+  var warning = document.getElementById("quizWarning");
+  if (!warning) return;
+
+  warning.classList.add("show");
+  setTimeout(function () {
+    warning.classList.remove("show");
+  }, 3200);
 }
 
 async function GameOver() {

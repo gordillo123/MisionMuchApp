@@ -89,10 +89,16 @@
       place-items: center;
       z-index: 9999;
       padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+      pointer-events: none;
     }
 
     .retry-wrap.show {
       display: grid;
+    }
+
+    .retry-wrap.show .btn-retry {
+      pointer-events: auto;
+      transform: translateY(clamp(58px, 11vh, 96px));
     }
 
     .btn-retry {
@@ -106,6 +112,33 @@
       background: linear-gradient(135deg, #00c9b7, #9b5cf9);
       box-shadow: 0 10px 26px rgba(155, 92, 249, .35);
       font-size: clamp(14px, 2.8vw, 18px);
+    }
+
+    .quiz-warning {
+      position: absolute;
+      left: 50%;
+      top: clamp(82px, 18vh, 150px);
+      z-index: 20;
+      width: min(520px, calc(100vw - 32px));
+      transform: translate(-50%, -10px);
+      opacity: 0;
+      pointer-events: none;
+      padding: 14px 18px;
+      border-radius: 18px;
+      background: rgba(17, 24, 39, 0.88);
+      border: 2px solid rgba(255, 255, 255, 0.32);
+      color: #fff;
+      box-shadow: 0 16px 38px rgba(15, 23, 42, 0.28);
+      text-align: center;
+      font-weight: 900;
+      font-size: clamp(16px, 2.7vw, 22px);
+      line-height: 1.15;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+
+    .quiz-warning.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
     }
 
     /* Botón Regresar al Mapa (Circular Púrpura como el Mapa) */
@@ -828,6 +861,7 @@
       font-size: clamp(22px, 8vmin, 42px);
       padding: 0 16px;
       text-align: center;
+      transform: translateY(clamp(-54px, -8vh, -34px));
     }
 
     @media (orientation: portrait) {
@@ -994,6 +1028,7 @@
       <div class="suelo"></div>
       <div class="dino dino-corriendo"></div>
       <div class="score">0</div>
+      <div id="quizWarning" class="quiz-warning" aria-live="polite">Preparate: al llegar a 15 puntos habra una pregunta.</div>
       <div class="game-over">GAME OVER</div>
     </div>
   </div>
