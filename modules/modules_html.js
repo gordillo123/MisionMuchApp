@@ -89,7 +89,7 @@ window.APP_MODULES = {
   <div class="rules-col">
     <div class="card">
       <h2 class="section-title"> Reglas</h2>
-      <ul class="rules-list" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+      <ul id="prepRulesList" class="rules-list" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
         <li><span class="rule-icon">📱</span>
           <div>Usa el celular en vertical para las preguntas. Solo el Espinosaurio se juega en horizontal.</div>
         </li>

@@ -5588,6 +5588,134 @@
       }
     }
 
+    /* Station 2 (Spinosaurio) rules theme in prep panel */
+    .rules-list.station2-rules-list li {
+      background: linear-gradient(140deg, rgba(16, 185, 129, 0.18), rgba(59, 130, 246, 0.14));
+      border: 1px solid rgba(16, 185, 129, 0.34);
+      border-radius: 16px;
+      padding: 0.7rem 0.72rem;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.14);
+    }
+
+    .rules-list.station2-rules-list .rule-icon {
+      background: linear-gradient(135deg, #14b8a6, #2563eb);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.62);
+      box-shadow: 0 6px 14px rgba(20, 184, 166, 0.26);
+    }
+
+    .rules-list.station2-rules-list li div {
+      color: #0b2e38;
+      font-weight: 700;
+      line-height: 1.3;
+      font-size: 0.92rem;
+    }
+
+    /* Station 2 (Spinosaurio) rules theme in modal */
+    #rulesOverlay.spino-station-rules-mode .rules-modal {
+      border-color: #10b981;
+      box-shadow: 0 20px 0px #0f172a;
+      background:
+        radial-gradient(circle at 12% 16%, rgba(20, 184, 166, 0.18), transparent 42%),
+        radial-gradient(circle at 88% 84%, rgba(56, 189, 248, 0.16), transparent 45%),
+        #f8fffd;
+    }
+
+    #rulesOverlay.spino-station-rules-mode .rules-chip {
+      background: linear-gradient(135deg, #10b981, #2563eb);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.32);
+      box-shadow: 0 8px 18px rgba(16, 185, 129, 0.25);
+    }
+
+    #rulesOverlay.spino-station-rules-mode .rule-card,
+    #rulesOverlay.spino-station-rules-mode .start-rules-mode .rule-card {
+      background: linear-gradient(145deg, rgba(236, 253, 245, 0.95), rgba(239, 246, 255, 0.92));
+      border: 1px solid rgba(16, 185, 129, 0.34);
+    }
+
+    #rulesOverlay.spino-station-rules-mode .rule-card-step {
+      background: linear-gradient(135deg, #0ea5e9, #0f766e);
+      color: #ffffff;
+    }
+
+    #rulesOverlay.spino-station-rules-mode .rule-card-icon {
+      background: linear-gradient(135deg, #14b8a6, #2563eb);
+      color: #ffffff;
+    }
+
+    #rulesOverlay.spino-station-rules-mode .rule-card-title {
+      color: #0f172a;
+    }
+
+    #rulesOverlay.spino-station-rules-mode .rule-card-copy {
+      color: #0f3d33;
+    }
+
+    /* Station 6 (Sbeel) rules theme in prep panel */
+    .rules-list.sbeel-station-rules-list li {
+      background: linear-gradient(142deg, rgba(251, 191, 36, 0.2), rgba(45, 212, 191, 0.18));
+      border: 1px solid rgba(14, 116, 144, 0.36);
+      border-radius: 16px;
+      padding: 0.72rem 0.75rem;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.13);
+    }
+
+    .rules-list.sbeel-station-rules-list .rule-icon {
+      background: linear-gradient(135deg, #0ea5e9, #14b8a6);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.64);
+      box-shadow: 0 6px 14px rgba(14, 165, 233, 0.26);
+    }
+
+    .rules-list.sbeel-station-rules-list li div {
+      color: #083344;
+      font-weight: 700;
+      line-height: 1.32;
+      font-size: 0.92rem;
+    }
+
+    /* Station 6 (Sbeel) rules theme in modal */
+    #rulesOverlay.sbeel-station-rules-mode .rules-modal {
+      border-color: #0ea5e9;
+      box-shadow: 0 20px 0px #0f172a;
+      background:
+        radial-gradient(circle at 14% 16%, rgba(251, 191, 36, 0.2), transparent 40%),
+        radial-gradient(circle at 86% 80%, rgba(20, 184, 166, 0.18), transparent 44%),
+        #f0fdfa;
+    }
+
+    #rulesOverlay.sbeel-station-rules-mode .rules-chip {
+      background: linear-gradient(135deg, #0284c7, #14b8a6);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.34);
+      box-shadow: 0 8px 18px rgba(14, 165, 233, 0.25);
+    }
+
+    #rulesOverlay.sbeel-station-rules-mode .rule-card,
+    #rulesOverlay.sbeel-station-rules-mode .start-rules-mode .rule-card {
+      background: linear-gradient(145deg, rgba(236, 254, 255, 0.95), rgba(254, 249, 195, 0.9));
+      border: 1px solid rgba(14, 165, 233, 0.36);
+    }
+
+    #rulesOverlay.sbeel-station-rules-mode .rule-card-step {
+      background: linear-gradient(135deg, #0284c7, #0f766e);
+      color: #ffffff;
+    }
+
+    #rulesOverlay.sbeel-station-rules-mode .rule-card-icon {
+      background: linear-gradient(135deg, #0ea5e9, #14b8a6);
+      color: #ffffff;
+    }
+
+    #rulesOverlay.sbeel-station-rules-mode .rule-card-title {
+      color: #0f172a;
+    }
+
+    #rulesOverlay.sbeel-station-rules-mode .rule-card-copy {
+      color: #134e4a;
+    }
+
   </style>
 </head>
 
@@ -6421,7 +6549,7 @@
         }
 
         if (buttonId === 'btnComoJugar') {
-          setRulesModeForStart(false);
+          applyRulesModeForStart(false);
           if (rulesOverlay) rulesOverlay.classList.add('open');
           return;
         }
@@ -6495,9 +6623,172 @@
       const btnCerrarReglas = document.getElementById('btnCerrarReglas');
       const rulesTitle = rulesOverlay ? rulesOverlay.querySelector('.modal-title') : null;
       const rulesSubtitle = rulesOverlay ? rulesOverlay.querySelector('.modal-header p') : null;
+      const rulesBoard = rulesOverlay ? rulesOverlay.querySelector('.rules-board') : null;
+      const prepRulesList = document.getElementById('prepRulesList');
+      const prepRulesTitle = document.querySelector('.rules-col .section-title');
+      const defaultRulesBoardMarkup = rulesBoard ? rulesBoard.innerHTML : '';
+      const defaultPrepRulesMarkup = prepRulesList ? prepRulesList.innerHTML : '';
+      const SPINO_STATION_ID = '2';
+      const SBEEL_STATION_ID = '6';
       let pendingStartAfterRules = false;
 
-      function setRulesModeForStart(isStartingGame) {
+      const station2SpinoRules = [
+        {
+          icon: '&#129430;',
+          step: '01',
+          title: '&iexcl;Prep&aacute;rate, peque&ntilde;o explorador!',
+          copy: 'Ayuda al Espinosaurio a comenzar su gran aventura.'
+        },
+        {
+          icon: '&#11014;',
+          step: '02',
+          title: '&iexcl;Salta, salta, salta!',
+          copy: 'Haz que el dinosaurio brinque hasta completar <strong>15 saltos</strong>.'
+        },
+        {
+          icon: '&#9888;',
+          step: '03',
+          title: '&iexcl;Cuidado con el camino!',
+          copy: 'Mantente atento y no dejes que el Espinosaurio pierda el ritmo.'
+        },
+        {
+          icon: '&#10067;',
+          step: '04',
+          title: '&iexcl;Responde la pregunta secreta!',
+          copy: 'Despues de los 15 saltos, contesta una pregunta especial.'
+        },
+        {
+          icon: '&#127942;',
+          step: '05',
+          title: '&iexcl;Gana tus puntos de campeon!',
+          copy: 'Si respondes bien, ganas los <strong>15 puntos</strong> del reto del Espinosaurio.'
+        }
+      ];
+
+      const station6SbeelRules = [
+        {
+          icon: '&#127775;',
+          step: '01',
+          title: '&iexcl;Bienvenido al reto de Sbeel!',
+          copy: 'Prep&aacute;rate para armar un rompecabezas lleno de aventura y aprendizaje.'
+        },
+        {
+          icon: '&#129513;',
+          step: '02',
+          title: '&iexcl;Encuentra cada pieza!',
+          copy: 'Observa bien las formas y coloca cada pieza en su lugar correcto.'
+        },
+        {
+          icon: '&#9201;',
+          step: '03',
+          title: '&iexcl;El tiempo corre!',
+          copy: 'Tienes <strong>2 minutos</strong> para completar todo el rompecabezas.'
+        },
+        {
+          icon: '&#128170;',
+          step: '04',
+          title: '&iexcl;No te rindas, explorador!',
+          copy: 'Si una pieza no queda bien, int&eacute;ntalo de nuevo hasta encontrar su lugar.'
+        },
+        {
+          icon: '&#127942;',
+          step: '05',
+          title: 'Completa el reto y gana',
+          copy: 'Si armas el rompecabezas antes de que termine el tiempo, completas la estaci&oacute;n de Sbeel y ganas tus puntos del reto.'
+        }
+      ];
+
+      function buildStation2PrepRulesMarkup() {
+        return station2SpinoRules.map((rule) => `
+          <li>
+            <span class="rule-icon">${rule.icon}</span>
+            <div><strong>${rule.title}</strong> ${rule.copy}</div>
+          </li>
+        `).join('');
+      }
+
+      function buildStation2RulesBoardMarkup() {
+        return station2SpinoRules.map((rule, index) => `
+          <article class="rule-card ${index === 0 ? 'rule-card-ornate' : ''} ${index === 4 ? 'rule-card-wide' : ''}">
+            ${index === 4 ? '<span class="rule-card-banner">Estacion 2</span>' : ''}
+            <div class="rule-card-head">
+              <span class="rule-card-icon" aria-hidden="true">${rule.icon}</span>
+              <span class="rule-card-step">${rule.step}</span>
+            </div>
+            <h3 class="rule-card-title">${rule.title}</h3>
+            <p class="rule-card-copy">${rule.copy}</p>
+          </article>
+        `).join('');
+      }
+
+      function buildStation6PrepRulesMarkup() {
+        return station6SbeelRules.map((rule) => `
+          <li>
+            <span class="rule-icon">${rule.icon}</span>
+            <div><strong>${rule.title}</strong> ${rule.copy}</div>
+          </li>
+        `).join('');
+      }
+
+      function buildStation6RulesBoardMarkup() {
+        return station6SbeelRules.map((rule, index) => `
+          <article class="rule-card ${index === 0 ? 'rule-card-ornate' : ''} ${index === 4 ? 'rule-card-wide' : ''}">
+            ${index === 4 ? '<span class="rule-card-banner">Estacion 6</span>' : ''}
+            <div class="rule-card-head">
+              <span class="rule-card-icon" aria-hidden="true">${rule.icon}</span>
+              <span class="rule-card-step">${rule.step}</span>
+            </div>
+            <h3 class="rule-card-title">${rule.title}</h3>
+            <p class="rule-card-copy">${rule.copy}</p>
+          </article>
+        `).join('');
+      }
+
+      function syncPrepRulesForStation(stationId) {
+        if (!prepRulesList) return;
+        const isStation2 = String(stationId) === SPINO_STATION_ID;
+        const isStation6 = String(stationId) === SBEEL_STATION_ID;
+
+        prepRulesList.classList.toggle('station2-rules-list', isStation2);
+        prepRulesList.classList.toggle('sbeel-station-rules-list', isStation6);
+
+        if (isStation2) {
+          prepRulesList.innerHTML = buildStation2PrepRulesMarkup();
+        } else if (isStation6) {
+          prepRulesList.innerHTML = buildStation6PrepRulesMarkup();
+        } else {
+          prepRulesList.innerHTML = defaultPrepRulesMarkup;
+        }
+
+        if (prepRulesTitle) {
+          if (isStation2) {
+            prepRulesTitle.textContent = 'Reglas Estacion 2 · Spinosaurio';
+          } else if (isStation6) {
+            prepRulesTitle.textContent = 'Reglas Estacion 6 · Sbeel';
+          } else {
+            prepRulesTitle.textContent = 'Reglas';
+          }
+        }
+      }
+
+      function syncRulesOverlayForStation(isStartingGame) {
+        if (!rulesOverlay || !rulesBoard) return;
+        const isStation2Start = isStartingGame && String(currentStation) === SPINO_STATION_ID;
+        const isStation6Start = isStartingGame && String(currentStation) === SBEEL_STATION_ID;
+
+        rulesOverlay.classList.toggle('spino-station-rules-mode', isStation2Start);
+        rulesOverlay.classList.toggle('sbeel-station-rules-mode', isStation6Start);
+
+        if (isStation2Start) {
+          rulesBoard.innerHTML = buildStation2RulesBoardMarkup();
+        } else if (isStation6Start) {
+          rulesBoard.innerHTML = buildStation6RulesBoardMarkup();
+        } else {
+          rulesBoard.innerHTML = defaultRulesBoardMarkup;
+        }
+      }
+
+      function setRulesModeForStartLegacy(isStartingGame) {
         pendingStartAfterRules = isStartingGame;
         if (rulesOverlay) rulesOverlay.classList.toggle('start-rules-mode', isStartingGame);
         if (rulesTitle) rulesTitle.innerText = isStartingGame ? 'Antes de jugar' : 'Cómo Jugar';
@@ -6511,9 +6802,46 @@
         }
       }
 
+      function applyRulesModeForStart(isStartingGame) {
+        pendingStartAfterRules = isStartingGame;
+        if (rulesOverlay) rulesOverlay.classList.toggle('start-rules-mode', isStartingGame);
+        syncRulesOverlayForStation(isStartingGame);
+
+        const isStation2Start = isStartingGame && String(currentStation) === SPINO_STATION_ID;
+        const isStation6Start = isStartingGame && String(currentStation) === SBEEL_STATION_ID;
+
+        if (rulesTitle) {
+          if (isStation2Start) {
+            rulesTitle.innerText = 'Mision Espinosaurio';
+          } else if (isStation6Start) {
+            rulesTitle.innerText = 'Mision Sbeel';
+          } else {
+            rulesTitle.innerText = isStartingGame ? 'Antes de jugar' : 'Como Jugar';
+          }
+        }
+        if (rulesSubtitle) {
+          if (isStation2Start) {
+            rulesSubtitle.innerText = 'Estas son las reglas secretas de la estacion 2. Cumple el reto y gana tus 15 puntos.';
+          } else if (isStation6Start) {
+            rulesSubtitle.innerText = 'Sigue estas reglas del rompecabezas, vence el tiempo y completa la estacion 6.';
+          } else {
+            rulesSubtitle.innerText = isStartingGame
+              ? 'Lee estas reglas rapidas antes de entrar a la estacion.'
+              : 'Lee estas reglas clave para completar tu recorrido cientifico dentro del museo.';
+          }
+        }
+        if (btnCerrarReglas) {
+          if (isStation2Start || isStation6Start) {
+            btnCerrarReglas.innerText = 'Listo, vamos al reto';
+          } else {
+            btnCerrarReglas.innerText = isStartingGame ? 'Enterado, jugar' : 'Entendido';
+          }
+        }
+      }
+
       function closeRulesOverlay() {
         if (rulesOverlay) rulesOverlay.classList.remove('open');
-        setRulesModeForStart(false);
+        applyRulesModeForStart(false);
       }
 
       const btnComoJugar = document.getElementById('btnComoJugar');
@@ -6521,7 +6849,7 @@
         btnComoJugar.addEventListener('click', (e) => {
           e.preventDefault();
           closeMobileMenu();
-          setRulesModeForStart(false);
+          applyRulesModeForStart(false);
           rulesOverlay.classList.add('open');
         });
       }
@@ -6690,6 +7018,7 @@
           });
 
           updateCompletedStationsOnMap();
+          syncPrepRulesForStation(currentStation);
 
           // Bloquear el botón de comenzar si la estación ya está completada
           const completed = getCompletedStations();
@@ -6794,7 +7123,7 @@
           return;
         }
 
-        setRulesModeForStart(true);
+        applyRulesModeForStart(true);
         rulesOverlay.classList.add('open');
       };
 
