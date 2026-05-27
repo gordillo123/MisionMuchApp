@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Administrador de Folios</title>
-  <meta name="description" content="Panel administrador para consultar folios.">
+  <meta name="description" content="Panel interno para administrar registros y validar boletos.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -276,6 +276,20 @@
       gap: 12px;
       flex-wrap: wrap;
       justify-content: flex-end;
+    }
+
+    .section-switch {
+      display: inline-flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .section-link.active {
+      background: linear-gradient(135deg, rgba(73, 198, 255, 0.95), rgba(122, 125, 255, 0.95));
+      color: white;
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 12px 30px rgba(73, 198, 255, 0.2);
     }
 
     .admin-session-chip {
@@ -1135,13 +1149,17 @@
       <div class="brand">
         <div class="brand-badge">🗂️</div>
         <div class="brand-copy">
-          <p>Panel interno</p>
-          <h1>Administrador de Folios</h1>
-          <span>Consulta la BD de boletos en tiempo real, valida QR y busca registros por texto o ID.</span>
+          <p id="panelKicker">Panel interno</p>
+          <h1 id="panelTitle">Administrador de Folios</h1>
+          <span id="panelDescription">Consulta el registro de consultados en tiempo real y busca registros por texto o ID.</span>
         </div>
       </div>
 
       <div class="topbar-actions">
+        <div class="section-switch" aria-label="Cambiar de seccion">
+          <a class="ghost-link section-link" id="btnSectionAdmin" href="./ADMINISTRADOR.html">Admin</a>
+          <a class="ghost-link section-link" id="btnSectionTaquilla" href="./ADMINISTRADOR.html?section=taquilla">Taquilla</a>
+        </div>
         <span class="admin-session-chip" id="adminSessionChip" hidden>Administrador</span>
         <a class="ghost-link" href="./index.html">← Volver al inicio</a>
         <button class="solid-button" id="btnRefreshTop" type="button">Actualizar datos</button>
@@ -1149,7 +1167,7 @@
       </div>
     </header>
 
-    <section class="metrics-grid">
+    <section class="metrics-grid" id="adminMetrics" hidden>
       <article class="metric-card">
         <div>
           <span class="label">Total folios</span>
@@ -1178,7 +1196,7 @@
       </article>
     </section>
 
-    <section class="scanner-grid">
+    <section class="scanner-grid" id="taquillaView" hidden>
       <section class="panel">
         <div class="panel-head">
           <div>
@@ -1244,6 +1262,7 @@
       </section>
     </section>
 
+    <div id="adminRecordsView">
     <section class="toolbar" id="toolbar">
       <label class="search-wrap" for="searchInput">
         <span>🔎</span>
@@ -1301,10 +1320,9 @@
     </section>
 
     <p class="footer-note">
-      Los contadores cambian junto con la busqueda y los filtros activos. La tabla se sincroniza con
-      <strong>Ganadores</strong>, muestra los mismos campos registrados del boleto y calcula <strong>Status</strong>
-      sin incluir Sala de actividades ni Ubicacion.
+      La tabla se sincroniza con <strong>Ganadores</strong>, conserva los filtros activos y muestra el status actual de cada boleto consultado.
     </p>
+    </div>
   </div>
 
   <script>
@@ -1344,10 +1362,36 @@
       error: ''
     };
 
+    const currentPanelView = (() => {
+      const section = new URLSearchParams(window.location.search).get('section');
+      return section === 'taquilla' ? 'taquilla' : 'admin';
+    })();
+
+    const PANEL_VIEW_COPY = {
+      admin: {
+        title: 'Administrador de Folios',
+        kicker: 'Panel interno',
+        description: 'Consulta el registro de consultados en tiempo real y busca registros por texto o ID.'
+      },
+      taquilla: {
+        title: 'Taquilla',
+        kicker: 'Validacion de boletos',
+        description: 'Escanea, lee o valida boletos desde una vista dedicada para el acceso en taquilla.'
+      }
+    };
+
     const els = {
       body: document.body,
       adminShell: document.getElementById('adminShell'),
       adminAuthScreen: document.getElementById('adminAuthScreen'),
+      panelKicker: document.getElementById('panelKicker'),
+      panelTitle: document.getElementById('panelTitle'),
+      panelDescription: document.getElementById('panelDescription'),
+      btnSectionAdmin: document.getElementById('btnSectionAdmin'),
+      btnSectionTaquilla: document.getElementById('btnSectionTaquilla'),
+      adminMetrics: document.getElementById('adminMetrics'),
+      adminRecordsView: document.getElementById('adminRecordsView'),
+      taquillaView: document.getElementById('taquillaView'),
       adminLoginForm: document.getElementById('adminLoginForm'),
       adminEmail: document.getElementById('adminEmail'),
       adminPassword: document.getElementById('adminPassword'),
@@ -1446,6 +1490,33 @@
       return ADMIN_ALLOWED_EMAILS.includes(normalizeAdminEmail(value));
     }
 
+    function applyPanelView() {
+      const viewCopy = PANEL_VIEW_COPY[currentPanelView];
+
+      document.title = viewCopy.title;
+      if (els.panelKicker) els.panelKicker.textContent = viewCopy.kicker;
+      if (els.panelTitle) els.panelTitle.textContent = viewCopy.title;
+      if (els.panelDescription) els.panelDescription.textContent = viewCopy.description;
+      if (els.adminMetrics) els.adminMetrics.hidden = true;
+      if (els.adminRecordsView) els.adminRecordsView.hidden = currentPanelView !== 'admin';
+      if (els.taquillaView) els.taquillaView.hidden = currentPanelView !== 'taquilla';
+      if (els.btnRefreshTop) els.btnRefreshTop.hidden = currentPanelView !== 'admin';
+
+      [
+        [els.btnSectionAdmin, 'admin'],
+        [els.btnSectionTaquilla, 'taquilla']
+      ].forEach(([button, section]) => {
+        if (!button) return;
+        const isActive = currentPanelView === section;
+        button.classList.toggle('active', isActive);
+        if (isActive) {
+          button.setAttribute('aria-current', 'page');
+        } else {
+          button.removeAttribute('aria-current');
+        }
+      });
+    }
+
     function setAdminAuthMessage(message, tone = '') {
       if (!els.adminAuthMessage) return;
       els.adminAuthMessage.textContent = message;
@@ -1479,6 +1550,7 @@
       els.adminAuthScreen.hidden = true;
       els.adminShell.hidden = false;
       renderAdminSession(user);
+      applyPanelView();
     }
 
     async function showAdminLogin(message = 'Ingresa con una cuenta autorizada para consultar la BD.', tone = '') {
@@ -1498,11 +1570,15 @@
     async function bootstrapAdminDashboard() {
       if (!adminState.bootstrapped) {
         bindEvents();
-        initScannerState();
+        if (currentPanelView === 'taquilla') {
+          initScannerState();
+        }
         adminState.bootstrapped = true;
       }
 
-      await loadRecords();
+      if (currentPanelView === 'admin') {
+        await loadRecords();
+      }
     }
 
     async function authorizeAdminSession(session) {
@@ -1517,7 +1593,11 @@
 
       showAdminShell(user);
       await bootstrapAdminDashboard();
-      startTicketSync();
+      if (currentPanelView === 'admin') {
+        startTicketSync();
+      } else {
+        stopTicketSync();
+      }
       return true;
     }
 
@@ -1528,7 +1608,11 @@
         // Acceso directo sin verificación de login
         showAdminShell({ email: 'Admin' });
         await bootstrapAdminDashboard();
-        startTicketSync();
+        if (currentPanelView === 'admin') {
+          startTicketSync();
+        } else {
+          stopTicketSync();
+        }
       } catch (error) {
         console.error('Error inicializando administrador:', error);
         await showAdminLogin('No se pudo inicializar el administrador.', 'error');

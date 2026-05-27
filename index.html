@@ -6491,12 +6491,13 @@
         const menu = document.querySelector('.nav-links');
         if (!menu) return;
 
-        const desiredOrder = ['btnInicio', 'btnPuntajes', 'btnComoJugar', 'btnAdmin', 'btnPerfil'];
+        const desiredOrder = ['btnInicio', 'btnPuntajes', 'btnComoJugar', 'btnAdmin', 'btnTaquilla', 'btnPerfil'];
         const labels = {
           btnInicio: ['🏠', 'Inicio', '#'],
           btnPuntajes: ['🏆', 'Puntajes', '#'],
           btnComoJugar: ['?', 'Ayuda', '#'],
-          btnAdmin: ['🛡️', 'Admin', 'ADMINISTRADOR.html']
+          btnAdmin: ['🛡️', 'Admin', 'ADMINISTRADOR.html'],
+          btnTaquilla: ['🎟️', 'Taquilla', 'ADMINISTRADOR.html?section=taquilla']
         };
 
         if (!document.getElementById('btnAdmin')) {
@@ -6507,6 +6508,16 @@
           adminButton.innerHTML = `<span class="nav-icon">${labels.btnAdmin[0]}</span><span class="nav-label">${labels.btnAdmin[1]}</span>`;
           const profileButton = document.getElementById('btnPerfil');
           menu.insertBefore(adminButton, profileButton || null);
+        }
+
+        if (!document.getElementById('btnTaquilla')) {
+          const taquillaButton = document.createElement('a');
+          taquillaButton.href = labels.btnTaquilla[2];
+          taquillaButton.className = 'nav-btn';
+          taquillaButton.id = 'btnTaquilla';
+          taquillaButton.innerHTML = `<span class="nav-icon">${labels.btnTaquilla[0]}</span><span class="nav-label">${labels.btnTaquilla[1]}</span>`;
+          const profileButton = document.getElementById('btnPerfil');
+          menu.insertBefore(taquillaButton, profileButton || null);
         }
 
         desiredOrder.forEach((id) => {
@@ -6556,6 +6567,11 @@
 
         if (buttonId === 'btnAdmin') {
           window.location.href = 'ADMINISTRADOR.html';
+          return;
+        }
+
+        if (buttonId === 'btnTaquilla') {
+          window.location.href = 'ADMINISTRADOR.html?section=taquilla';
           return;
         }
 
@@ -7288,7 +7304,15 @@
     if (btnAdmin) {
       btnAdmin.addEventListener('click', (e) => {
         e.preventDefault();
-        openAdminModal();
+        window.location.href = 'ADMINISTRADOR.html';
+      });
+    }
+
+    const btnTaquilla = document.getElementById('btnTaquilla');
+    if (btnTaquilla) {
+      btnTaquilla.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'ADMINISTRADOR.html?section=taquilla';
       });
     }
 
