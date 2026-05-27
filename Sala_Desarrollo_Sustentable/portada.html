@@ -109,43 +109,78 @@
   }
   .tip{margin-top:clamp(10px, 3vw, 14px); font-size:clamp(12px, 3.4vw, 14px); opacity:.9}
 
-    /* Botón Regresar al Mapa (Circular Púrpura como el Mapa) */
+    /* Botón Regresar al Mapa (Píldora Premium) */
     .btn-regresar-mapa {
       position: absolute;
       top: 1.5rem;
       left: 1.5rem;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: #775AFF;
-      border: 4px solid white;
+      height: 46px;
+      padding: 0 22px;
+      border-radius: 23px;
+      background: linear-gradient(135deg, #f72585, #7209b7);
+      border: 2px solid rgba(255, 255, 255, 0.85);
       color: white;
-      font-size: 1.8rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 800;
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-      transition: all 0.2s ease;
+      gap: 8px;
+      box-shadow:
+        0 8px 22px rgba(247, 37, 133, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       z-index: 1000;
       text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-regresar-mapa svg {
+      transition: transform 0.3s ease;
     }
 
     .btn-regresar-mapa:hover {
-      transform: translateY(-3px) scale(1.1);
-      box-shadow: 0 8px 20px rgba(119, 90, 255, 0.4);
-      background: #6DD0F0;
+      transform: translateY(-3px) scale(1.04);
+      box-shadow:
+        0 12px 28px rgba(247, 37, 133, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      background: linear-gradient(135deg, #7209b7, #f72585);
+    }
+
+    .btn-regresar-mapa:hover svg {
+      transform: translateX(-3px);
     }
 
     .btn-regresar-mapa:active {
-      transform: translateY(-1px) scale(0.98);
+      transform: translateY(1px) scale(0.96);
+      box-shadow: 0 4px 10px rgba(247, 37, 133, 0.2);
+    }
+
+    /* Prevención de colisión en móviles */
+    @media (max-width: 600px) {
+      .btn-regresar-mapa {
+        position: relative;
+        top: auto;
+        left: auto;
+        margin: 15px auto 0;
+        display: inline-flex;
+        height: 42px;
+        padding: 0 18px;
+        font-size: 0.88rem;
+        border-radius: 21px;
+      }
     }
 
 </style>
 </head>
 <body>
   <a href="#" class="btn-regresar-mapa" id="btnReturnToMap" title="Volver al Mapa">
-    ←
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    <span>Regresar</span>
   </a>
 
   <main class="card">
