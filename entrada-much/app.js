@@ -445,7 +445,6 @@ class UIManager {
       this.progressManager.resetProgress();
     }
     this.currentPrize = null;
-    this.cheatingDetected = false;
 
     if (this.e.pillSala) this.e.pillSala.textContent = `Sala: ${SALA}`;
     if (this.e.qTotal) this.e.qTotal.textContent = QUESTIONS.length.toString();
@@ -456,7 +455,7 @@ class UIManager {
   }
 
   startFocusDetection() {
-    window.addEventListener('blur', this.handleFocusLoss.bind(this));
+    // Anti-trampas desactivado: el juego simplemente se pausa y reanuda sin penalizaciones
   }
 
   playCompletionSound() {
@@ -477,25 +476,6 @@ class UIManager {
     }
   }
 
-  handleFocusLoss() {
-    if (this.state.locked || this.cheatingDetected || this.state.idx >= QUESTIONS.length) return;
-    this.cheatingDetected = true;
-    this.state.locked = true;
-
-    if (this.e.status) this.e.status.textContent = '🛑 ¡ATENCIÓN! No cambies de pestaña.';
-    if (this.e.hint) this.e.hint.textContent = 'La ronda ha sido invalidada por salir del juego.';
-
-    [...this.e.options.querySelectorAll('.option-btn')].forEach(btn => {
-      btn.disabled = true;
-      btn.classList.add('option-btn--incorrect');
-    });
-
-    this.e.nextBtn.textContent = '❌ Reintentar';
-    this.e.nextBtn.classList.remove('btn-primary');
-    this.e.nextBtn.classList.add('btn-danger');
-    this.progressManager.resetProgress();
-    this.sound.wrong();
-  }
 
   bind() {
     this.e.nextBtn.addEventListener('click', () => this.next());
@@ -545,22 +525,9 @@ class UIManager {
 
     // Pause bg music while answering; resume when round ends
     try {
-      if (s.idx < QUESTIONS.length && !this.cheatingDetected) { pauseBgMusic(); }
+      if (s.idx < QUESTIONS.length) { pauseBgMusic(); }
       if (s.idx >= QUESTIONS.length) { playBgMusic(); }
     } catch (e) {}
-
-    if (this.cheatingDetected) {
-      e.quizView.classList.add('d-none');
-      e.finalView.classList.remove('d-none');
-      e.finalTitle.textContent = '¡Ronda Invalidada!';
-      e.finalMsg.textContent = 'Se detectó actividad sospechosa. Intenta de nuevo.';
-      e.giftRow.classList.add('d-none');
-      e.retryRow.classList.remove('d-none');
-      e.finalPoints.textContent = s.points.toString();
-      e.finalCorrect.textContent = s.correct.toString();
-      e.finalTotal.textContent = QUESTIONS.length.toString();
-      return;
-    }
 
     if (s.idx >= QUESTIONS.length) {
       this.progressManager.resetProgress();
@@ -645,7 +612,6 @@ class UIManager {
   choose(i) {
     const s = this.state, { e } = this;
     if (s.locked) return;
-    if (this.cheatingDetected) return;
 
     s.locked = true; s.selected = i;
     const q = QUESTIONS[s.idx], correctIdx = q.correctIndex;
@@ -667,7 +633,6 @@ class UIManager {
 
   next() {
     const s = this.state, { e } = this;
-    if (this.cheatingDetected) { location.reload(); return; }
     if (s.selected === null) { if (e.status) e.status.textContent = '⚠️ Selecciona una respuesta.'; return; }
     e.nextBtn.disabled = true; setTimeout(() => { e.nextBtn.disabled = false; }, 180);
     s.idx += 1;

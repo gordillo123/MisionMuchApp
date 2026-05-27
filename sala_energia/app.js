@@ -25,29 +25,17 @@ class ProgressManager {
     this.storageKey = storageKey;
   }
 
-  saveProgress(currentQuestionIndex, questionDeadlineAt) {
+  saveProgress(currentQuestionIndex) {
     const safeIndex = Number.isInteger(currentQuestionIndex) && currentQuestionIndex >= 0 ? currentQuestionIndex : 0;
-    const safeDeadline = Number.isFinite(questionDeadlineAt) ? questionDeadlineAt : Date.now();
-    const payload = {
-      currentQuestionIndex: safeIndex,
-      questionDeadlineAt: safeDeadline
-    };
-    localStorage.setItem(this.storageKey, JSON.stringify(payload));
+    localStorage.setItem(this.storageKey, String(safeIndex));
   }
 
   loadProgress() {
     const raw = localStorage.getItem(this.storageKey);
-    if (!raw) return null;
-    try {
-      const parsed = JSON.parse(raw);
-      const index = Number.parseInt(parsed?.currentQuestionIndex, 10);
-      const deadline = Number(parsed?.questionDeadlineAt);
-      if (Number.isNaN(index) || index < 0) return null;
-      if (!Number.isFinite(deadline) || deadline <= 0) return null;
-      return { currentQuestionIndex: index, questionDeadlineAt: deadline };
-    } catch (error) {
-      return null;
-    }
+    if (raw === null) return null;
+    const parsed = Number.parseInt(raw, 10);
+    if (Number.isNaN(parsed) || parsed < 0) return null;
+    return parsed;
   }
 
   resetProgress() {
@@ -414,15 +402,13 @@ class UIManager {
     this.progressManager = new ProgressManager(`much_quiz_progress_${SALA}`);
     this.state = { idx: 0, selected: null, points: 0, correct: 0, locked: false, answers: [] };
     this.currentQuestionDeadline = null;
-    const savedProgress = this.progressManager.loadProgress();
-    if (savedProgress && savedProgress.currentQuestionIndex < QUESTIONS.length) {
-      this.state.idx = savedProgress.currentQuestionIndex;
-      this.currentQuestionDeadline = savedProgress.questionDeadlineAt;
-    } else if (savedProgress && savedProgress.currentQuestionIndex >= QUESTIONS.length) {
+    const savedIndex = this.progressManager.loadProgress();
+    if (savedIndex !== null && savedIndex < QUESTIONS.length) {
+      this.state.idx = savedIndex;
+    } else if (savedIndex !== null && savedIndex >= QUESTIONS.length) {
       this.progressManager.resetProgress();
     }
     this.currentPrize = null;
-    this.cheatingDetected = false;
     this.questionTimer = null;
     this.questionCountdown = QUESTION_SECONDS;
 
@@ -434,6 +420,7 @@ class UIManager {
     this.render();
     this.clock();
     this.startFocusDetection();
+    document.addEventListener('visibilitychange', () => this.handleVisibilityChange());
   }
 
   updateScoreboard() {
@@ -465,6 +452,21 @@ class UIManager {
     // Anti-trampas desactivado: no invalidamos la ronda al cambiar de pestaña.
   }
 
+  handleVisibilityChange() {
+    if (document.hidden) {
+      // Ventana oculta: pausar temporizador
+      if (this.questionTimer) {
+        clearTimeout(this.questionTimer);
+        this.questionTimer = null;
+      }
+    } else {
+      // Ventana visible nuevamente: reanudar temporizador
+      if (this.state.idx < QUESTIONS.length && !this.state.locked) {
+        this.startQuestionTimer();
+      }
+    }
+  }
+
   updateQuestionTimerDisplay() {
     if (!this.e.questionTimer) return;
     this.e.questionTimer.textContent = `⏳ ${this.questionCountdown}s`;
@@ -480,21 +482,19 @@ class UIManager {
   }
 
   persistCurrentQuestionProgress() {
-    this.progressManager.saveProgress(this.state.idx, this.currentQuestionDeadline || Date.now());
+    this.progressManager.saveProgress(this.state.idx);
   }
 
   createQuestionDeadline() {
+    // Siempre crear un nuevo deadline desde cero (10 segundos)
     this.currentQuestionDeadline = Date.now() + (QUESTION_SECONDS * 1000);
     this.persistCurrentQuestionProgress();
   }
 
   startQuestionTimer() {
     this.stopQuestionTimer();
-    if (!Number.isFinite(this.currentQuestionDeadline) || this.currentQuestionDeadline <= 0) {
-      this.createQuestionDeadline();
-    } else {
-      this.persistCurrentQuestionProgress();
-    }
+    // Siempre crear un nuevo deadline al iniciar el timer
+    this.createQuestionDeadline();
 
     const tick = () => {
       const remainingMs = this.currentQuestionDeadline - Date.now();
@@ -521,7 +521,7 @@ class UIManager {
       this.render();
       return;
     }
-    this.createQuestionDeadline();
+    // El nuevo deadline se creará en render() cuando se llame startQuestionTimer()
     this.render();
   }
 
@@ -666,7 +666,7 @@ class UIManager {
 
     // Pause bg music while user is answering (playing); resume when round ends
     try {
-      if (s.idx < QUESTIONS.length && !this.cheatingDetected) { pauseBgMusic(); }
+      if (s.idx < QUESTIONS.length) { pauseBgMusic(); }
       if (s.idx >= QUESTIONS.length) { playBgMusic(); }
     } catch (e) {}
 
@@ -758,9 +758,6 @@ class UIManager {
     if (e.status) e.status.textContent = '';
     if (e.options) e.options.innerHTML = '';
     s.selected = null; s.locked = false;
-    if (!Number.isFinite(this.currentQuestionDeadline) || this.currentQuestionDeadline <= 0) {
-      this.createQuestionDeadline();
-    }
 
     q.options.forEach((label, i) => {
       const col = document.createElement('div'); col.className = 'col-12';

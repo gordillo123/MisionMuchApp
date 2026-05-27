@@ -5716,6 +5716,432 @@
       color: #134e4a;
     }
 
+    /* Station 3 (Biodiversidad) rules theme in prep panel */
+    .rules-list.biodiversity-station-rules-list li {
+      align-items: flex-start;
+      gap: 0.78rem;
+    }
+
+    .rules-list.biodiversity-station-rules-list li div strong {
+      display: block;
+      margin-bottom: 0.2rem;
+      font-size: 0.98em;
+      line-height: 1.25;
+    }
+
+    .rules-list.biodiversity-station-rules-list {
+      display: grid;
+      gap: 0.72rem;
+      padding-right: 0.2rem !important;
+    }
+
+    .rules-list.biodiversity-station-rules-list li {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top right, rgba(190, 242, 100, 0.34), transparent 34%),
+        linear-gradient(145deg, rgba(240, 253, 244, 0.96), rgba(220, 252, 231, 0.88));
+      border: 1px solid rgba(34, 197, 94, 0.28);
+      border-radius: 20px;
+      padding: 0.88rem 0.92rem;
+      box-shadow: 0 10px 24px rgba(21, 128, 61, 0.12);
+    }
+
+    .rules-list.biodiversity-station-rules-list li::after {
+      content: "";
+      position: absolute;
+      right: -18px;
+      bottom: -26px;
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 35%, rgba(74, 222, 128, 0.32), transparent 42%),
+        radial-gradient(circle at 66% 62%, rgba(16, 185, 129, 0.2), transparent 48%);
+      pointer-events: none;
+    }
+
+    .rules-list.biodiversity-station-rules-list .rule-icon {
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(135deg, #22c55e, #0f766e);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 8px 16px rgba(21, 128, 61, 0.2);
+    }
+
+    .rules-list.biodiversity-station-rules-list li div {
+      position: relative;
+      z-index: 1;
+      color: #14532d;
+      font-weight: 700;
+      line-height: 1.46;
+      font-size: 0.92rem;
+    }
+
+    .rules-list.biodiversity-station-rules-list li div strong {
+      color: #166534;
+      text-wrap: balance;
+    }
+
+    /* Station 3 (Biodiversidad) rules theme in modal */
+    #rulesOverlay.biodiversity-station-rules-mode .rules-modal {
+      border-color: #15803d;
+      box-shadow: 0 20px 0px #14532d;
+      background:
+        radial-gradient(circle at 14% 16%, rgba(74, 222, 128, 0.26), transparent 38%),
+        radial-gradient(circle at 84% 80%, rgba(16, 185, 129, 0.2), transparent 42%),
+        linear-gradient(180deg, #f7fee7 0%, #ecfccb 100%);
+    }
+
+    #rulesOverlay.biodiversity-station-rules-mode .rules-chip {
+      background: linear-gradient(135deg, #15803d, #0f766e);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.36);
+      box-shadow: 0 8px 18px rgba(21, 128, 61, 0.24);
+    }
+
+    #rulesOverlay.biodiversity-station-rules-mode .rules-header p {
+      max-width: 54ch;
+      color: #166534;
+    }
+
+    #rulesOverlay.biodiversity-station-rules-mode .rules-content {
+      padding: 0.62rem 0.92rem 0.84rem;
+    }
+
+    #rulesOverlay.biodiversity-station-rules-mode .rules-board.biodiversity-rules-board {
+      gap: 0.74rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(3, minmax(112px, auto));
+    }
+
+    #rulesOverlay.biodiversity-station-rules-mode .rule-card {
+      overflow: hidden;
+      clip-path: none;
+      border-radius: 24px;
+      padding: 0.92rem 0.92rem 0.84rem;
+      background:
+        radial-gradient(circle at top right, rgba(190, 242, 100, 0.32), transparent 32%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(220, 252, 231, 0.94));
+      border: 1px solid rgba(34, 197, 94, 0.28);
+      box-shadow:
+        0 14px 26px rgba(21, 128, 61, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    #rulesOverlay.biodiversity-station-rules-mode .rule-card::before {
+      inset: auto -14px -16px auto;
+      width: 88px;
+      height: 88px;
+      border: 0;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 32% 32%, rgba(34, 197, 94, 0.18), transparent 44%),
+        radial-gradient(circle at 66% 68%, rgba(20, 184, 166, 0.12), transparent 48%);
+      pointer-events: none;
+    }
+
+    #rulesOverlay.biodiversity-station-rules-mode .rule-card::after {
+      background:
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.56), transparent 38%),
+        linear-gradient(135deg, transparent 0 36%, rgba(16, 185, 129, 0.08) 52%, transparent 72%);
+      mix-blend-mode: normal;
+      opacity: 0.9;
+    }
+
+    #rulesOverlay.biodiversity-station-rules-mode .rule-card:nth-child(1) {
+      background:
+        radial-gradient(circle at top right, rgba(250, 204, 21, 0.22), transparent 34%),
+        linear-gradient(145deg, rgba(254, 252, 232, 0.98), rgba(220, 252, 231, 0.96));
+    }
+
+    #rulesOverlay.biodiversity-station-rules-mode .rule-card:nth-child(3),
+    #rulesOverlay.biodiversity-station-rules-mode .rule-card:nth-child(6) {
+      background:
+        radial-gradient(circle at top right, rgba(110, 231, 183, 0.28), transparent 34%),
+        linear-gradient(145deg, rgba(240, 253, 250, 0.96), rgba(220, 252, 231, 0.94));
+    }
+
+    #rulesOverlay.biodiversity-station-rules-mode .rule-card-step {
+      background: linear-gradient(135deg, #15803d, #0f766e);
+      color: #ffffff;
+      box-shadow: 0 6px 12px rgba(21, 128, 61, 0.16);
+    }
+
+    #rulesOverlay.biodiversity-station-rules-mode .rule-card-icon {
+      background: linear-gradient(135deg, #22c55e, #0f766e);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.62);
+      box-shadow: 0 10px 18px rgba(21, 128, 61, 0.18);
+    }
+
+    #rulesOverlay.biodiversity-station-rules-mode .rule-card-title {
+      color: #14532d;
+      font-size: clamp(0.92rem, 1.03vw, 1.04rem);
+      line-height: 1.18;
+      text-wrap: balance;
+    }
+
+    #rulesOverlay.biodiversity-station-rules-mode .rule-card-copy {
+      color: #166534;
+      font-size: clamp(0.78rem, 0.9vw, 0.9rem);
+      line-height: 1.4;
+    }
+
+    #rulesOverlay.biodiversity-station-rules-mode .rule-card-copy strong {
+      color: #14532d;
+    }
+
+    @media (max-width: 1024px) {
+      #rulesOverlay.biodiversity-station-rules-mode .rules-board.biodiversity-rules-board {
+        gap: 0.64rem;
+      }
+
+      #rulesOverlay.biodiversity-station-rules-mode .rule-card {
+        padding: 0.82rem 0.8rem 0.76rem;
+      }
+    }
+
+    @media (max-width: 760px) {
+      #rulesOverlay.biodiversity-station-rules-mode .rules-content {
+        overflow: hidden;
+      }
+
+      #rulesOverlay.biodiversity-station-rules-mode .rules-board.biodiversity-rules-board {
+        grid-template-columns: 1fr;
+        grid-template-rows: none;
+        grid-auto-rows: auto;
+        align-content: start;
+        height: auto;
+        overflow-y: auto;
+        padding-right: 0.18rem;
+      }
+
+      #rulesOverlay.biodiversity-station-rules-mode .rule-card {
+        height: auto;
+        min-height: 0;
+        padding: 0.9rem 0.88rem 0.82rem;
+      }
+
+      #rulesOverlay.biodiversity-station-rules-mode .rule-card-title {
+        font-size: clamp(0.92rem, 3.35vw, 1rem);
+      }
+
+      #rulesOverlay.biodiversity-station-rules-mode .rule-card-copy {
+        font-size: clamp(0.8rem, 3vw, 0.9rem);
+        line-height: 1.4;
+      }
+    }
+
+    /* Station 4 (Sala B - Energia) rules theme in prep panel */
+    .rules-list.energy-station-rules-list {
+      display: grid;
+      gap: 0.7rem;
+      padding-right: 0.18rem !important;
+    }
+
+    .rules-list.energy-station-rules-list li {
+      position: relative;
+      overflow: hidden;
+      align-items: flex-start;
+      gap: 0.78rem;
+      background:
+        radial-gradient(circle at top right, rgba(253, 224, 71, 0.3), transparent 34%),
+        linear-gradient(145deg, rgba(239, 246, 255, 0.98), rgba(224, 242, 254, 0.92));
+      border: 1px solid rgba(14, 116, 144, 0.28);
+      border-radius: 20px;
+      padding: 0.88rem 0.92rem;
+      box-shadow: 0 10px 24px rgba(3, 105, 161, 0.12);
+    }
+
+    .rules-list.energy-station-rules-list li::after {
+      content: "";
+      position: absolute;
+      right: -16px;
+      bottom: -24px;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 36% 34%, rgba(234, 179, 8, 0.28), transparent 44%),
+        radial-gradient(circle at 64% 64%, rgba(14, 165, 233, 0.2), transparent 48%);
+      pointer-events: none;
+    }
+
+    .rules-list.energy-station-rules-list .rule-icon {
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(135deg, #eab308, #0284c7);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 8px 16px rgba(2, 132, 199, 0.2);
+    }
+
+    .rules-list.energy-station-rules-list li div {
+      position: relative;
+      z-index: 1;
+      color: #0c4a6e;
+      font-weight: 700;
+      line-height: 1.44;
+      font-size: 0.92rem;
+    }
+
+    .rules-list.energy-station-rules-list li div strong {
+      display: block;
+      margin-bottom: 0.22rem;
+      color: #075985;
+      text-wrap: balance;
+    }
+
+    /* Station 4 (Sala B - Energia) rules theme in modal */
+    #rulesOverlay.energy-station-rules-mode .rules-modal {
+      border-color: #0284c7;
+      box-shadow: 0 20px 0px #0f172a;
+      background:
+        radial-gradient(circle at 14% 16%, rgba(253, 224, 71, 0.28), transparent 38%),
+        radial-gradient(circle at 84% 82%, rgba(14, 165, 233, 0.2), transparent 42%),
+        linear-gradient(180deg, #eff6ff 0%, #e0f2fe 100%);
+    }
+
+    #rulesOverlay.energy-station-rules-mode .rules-chip {
+      background: linear-gradient(135deg, #ca8a04, #0284c7);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.36);
+      box-shadow: 0 8px 18px rgba(2, 132, 199, 0.24);
+    }
+
+    #rulesOverlay.energy-station-rules-mode .rules-header p {
+      max-width: 56ch;
+      color: #0c4a6e;
+    }
+
+    #rulesOverlay.energy-station-rules-mode .rules-content {
+      padding: 0.62rem 0.92rem 0.84rem;
+    }
+
+    #rulesOverlay.energy-station-rules-mode .rules-board.energy-rules-board {
+      gap: 0.74rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(3, minmax(112px, auto));
+    }
+
+    #rulesOverlay.energy-station-rules-mode .rule-card {
+      overflow: hidden;
+      border-radius: 24px;
+      padding: 0.92rem 0.92rem 0.84rem;
+      background:
+        radial-gradient(circle at top right, rgba(253, 224, 71, 0.28), transparent 32%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.97), rgba(224, 242, 254, 0.95));
+      border: 1px solid rgba(14, 116, 144, 0.28);
+      box-shadow:
+        0 14px 26px rgba(3, 105, 161, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.84);
+    }
+
+    #rulesOverlay.energy-station-rules-mode .rule-card::before {
+      inset: auto -14px -16px auto;
+      width: 88px;
+      height: 88px;
+      border: 0;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 32% 32%, rgba(234, 179, 8, 0.22), transparent 44%),
+        radial-gradient(circle at 66% 66%, rgba(14, 165, 233, 0.14), transparent 48%);
+      pointer-events: none;
+    }
+
+    #rulesOverlay.energy-station-rules-mode .rule-card::after {
+      background:
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.56), transparent 38%),
+        linear-gradient(135deg, transparent 0 36%, rgba(2, 132, 199, 0.08) 52%, transparent 72%);
+      opacity: 0.92;
+    }
+
+    #rulesOverlay.energy-station-rules-mode .rule-card:nth-child(1) {
+      background:
+        radial-gradient(circle at top right, rgba(250, 204, 21, 0.26), transparent 34%),
+        linear-gradient(145deg, rgba(254, 249, 195, 0.98), rgba(224, 242, 254, 0.96));
+    }
+
+    #rulesOverlay.energy-station-rules-mode .rule-card:nth-child(3),
+    #rulesOverlay.energy-station-rules-mode .rule-card:nth-child(6) {
+      background:
+        radial-gradient(circle at top right, rgba(125, 211, 252, 0.28), transparent 34%),
+        linear-gradient(145deg, rgba(240, 249, 255, 0.97), rgba(224, 242, 254, 0.95));
+    }
+
+    #rulesOverlay.energy-station-rules-mode .rule-card-step {
+      background: linear-gradient(135deg, #ca8a04, #0369a1);
+      color: #ffffff;
+      box-shadow: 0 6px 12px rgba(2, 132, 199, 0.16);
+    }
+
+    #rulesOverlay.energy-station-rules-mode .rule-card-icon {
+      background: linear-gradient(135deg, #eab308, #0284c7);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.64);
+      box-shadow: 0 10px 18px rgba(2, 132, 199, 0.18);
+    }
+
+    #rulesOverlay.energy-station-rules-mode .rule-card-title {
+      color: #0c4a6e;
+      font-size: clamp(0.92rem, 1.03vw, 1.04rem);
+      line-height: 1.18;
+      text-wrap: balance;
+    }
+
+    #rulesOverlay.energy-station-rules-mode .rule-card-copy {
+      color: #075985;
+      font-size: clamp(0.78rem, 0.9vw, 0.9rem);
+      line-height: 1.4;
+    }
+
+    #rulesOverlay.energy-station-rules-mode .rule-card-copy strong {
+      color: #0c4a6e;
+    }
+
+    @media (max-width: 1024px) {
+      #rulesOverlay.energy-station-rules-mode .rules-board.energy-rules-board {
+        gap: 0.64rem;
+      }
+
+      #rulesOverlay.energy-station-rules-mode .rule-card {
+        padding: 0.82rem 0.8rem 0.76rem;
+      }
+    }
+
+    @media (max-width: 760px) {
+      #rulesOverlay.energy-station-rules-mode .rules-content {
+        overflow: hidden;
+      }
+
+      #rulesOverlay.energy-station-rules-mode .rules-board.energy-rules-board {
+        grid-template-columns: 1fr;
+        grid-template-rows: none;
+        grid-auto-rows: auto;
+        align-content: start;
+        height: auto;
+        overflow-y: auto;
+        padding-right: 0.18rem;
+      }
+
+      #rulesOverlay.energy-station-rules-mode .rule-card {
+        height: auto;
+        min-height: 0;
+        padding: 0.9rem 0.88rem 0.82rem;
+      }
+
+      #rulesOverlay.energy-station-rules-mode .rule-card-title {
+        font-size: clamp(0.92rem, 3.35vw, 1rem);
+      }
+
+      #rulesOverlay.energy-station-rules-mode .rule-card-copy {
+        font-size: clamp(0.8rem, 3vw, 0.9rem);
+        line-height: 1.4;
+      }
+    }
+
   </style>
 </head>
 
@@ -6645,6 +7071,8 @@
       const defaultRulesBoardMarkup = rulesBoard ? rulesBoard.innerHTML : '';
       const defaultPrepRulesMarkup = prepRulesList ? prepRulesList.innerHTML : '';
       const SPINO_STATION_ID = '2';
+      const BIODIVERSITY_STATION_ID = '3';
+      const ENERGY_STATION_ID = '4';
       const SBEEL_STATION_ID = '6';
       let pendingStartAfterRules = false;
 
@@ -6714,6 +7142,84 @@
         }
       ];
 
+      const station3BiodiversityRules = [
+        {
+          icon: '&#127807;',
+          step: '01',
+          title: '&iexcl;Bienvenido a la aventura de la vida!',
+          copy: 'En esta sala descubrir&aacute;s animales, plantas, ecosistemas y por qu&eacute; cuidar la biodiversidad es tan importante.'
+        },
+        {
+          icon: '&#128064;',
+          step: '02',
+          title: 'Observa y aprende',
+          copy: 'Lee con atenci&oacute;n la informaci&oacute;n para encontrar pistas y datos clave sobre la naturaleza.'
+        },
+        {
+          icon: '&#129504;',
+          step: '03',
+          title: 'Responde el reto',
+          copy: 'Tendr&aacute;s <strong>10 preguntas</strong> sobre la Sala A de Biodiversidad.'
+        },
+        {
+          icon: '&#9989;',
+          step: '04',
+          title: 'Completa la estaci&oacute;n',
+          copy: 'Necesitas acertar al menos <strong>7 de 10</strong> preguntas para completar la estaci&oacute;n.'
+        },
+        {
+          icon: '&#128257;',
+          step: '05',
+          title: 'Vuelve a intentarlo si lo necesitas',
+          copy: 'Si a&uacute;n no logras los <strong>7 aciertos</strong>, puedes repetir la estaci&oacute;n y seguir aprendiendo.'
+        },
+        {
+          icon: '&#127793;',
+          step: '06',
+          title: 'Gana tus puntos verdes',
+          copy: 'Si completas el reto, ganas <strong>10 puntos verdes</strong> y avanzas en tu misi&oacute;n cient&iacute;fica.'
+        }
+      ];
+
+      const station4EnergyRules = [
+        {
+          icon: '&#9889;',
+          step: '01',
+          title: '&iexcl;Bienvenido a la aventura de la energ&iacute;a!',
+          copy: 'En esta estaci&oacute;n conocer&aacute;s diferentes formas de energ&iacute;a, c&oacute;mo se producen y por qu&eacute; son importantes en la vida diaria.'
+        },
+        {
+          icon: '&#128064;',
+          step: '02',
+          title: 'Observa y aprende',
+          copy: 'Lee con atenci&oacute;n la informaci&oacute;n de la sala para descubrir datos importantes sobre la energ&iacute;a y su uso.'
+        },
+        {
+          icon: '&#129504;',
+          step: '03',
+          title: 'Responde el reto',
+          copy: 'Tendr&aacute;s <strong>10 preguntas</strong> sobre el &Aacute;rea de Energ&iacute;a.'
+        },
+        {
+          icon: '&#9989;',
+          step: '04',
+          title: 'Completa la estaci&oacute;n',
+          copy: 'Para superar el reto, necesitas responder correctamente m&iacute;nimo <strong>7 de 10</strong> preguntas.'
+        },
+        {
+          icon: '&#128257;',
+          step: '05',
+          title: 'Vuelve a intentarlo si lo necesitas',
+          copy: 'Si no alcanzas los <strong>7 aciertos</strong>, podr&aacute;s repetir la estaci&oacute;n y seguir aprendiendo.'
+        },
+        {
+          icon: '&#127793;',
+          step: '06',
+          title: 'Gana tus puntos de energ&iacute;a',
+          copy: 'Si completas el reto, ganas <strong>10 puntos</strong> y avanzas en tu misi&oacute;n cient&iacute;fica.'
+        }
+      ];
+
       function buildStation2PrepRulesMarkup() {
         return station2SpinoRules.map((rule) => `
           <li>
@@ -6760,16 +7266,68 @@
         `).join('');
       }
 
+      function buildStation3PrepRulesMarkup() {
+        return station3BiodiversityRules.map((rule) => `
+          <li>
+            <span class="rule-icon">${rule.icon}</span>
+            <div><strong>${rule.title}</strong> ${rule.copy}</div>
+          </li>
+        `).join('');
+      }
+
+      function buildStation3RulesBoardMarkup() {
+        return station3BiodiversityRules.map((rule, index) => `
+          <article class="rule-card biodiversity-rule-card ${index === 0 ? 'rule-card-ornate' : ''}">
+            <div class="rule-card-head">
+              <span class="rule-card-icon" aria-hidden="true">${rule.icon}</span>
+              <span class="rule-card-step">${rule.step}</span>
+            </div>
+            <h3 class="rule-card-title">${rule.title}</h3>
+            <p class="rule-card-copy">${rule.copy}</p>
+          </article>
+        `).join('');
+      }
+
+      function buildStation4PrepRulesMarkup() {
+        return station4EnergyRules.map((rule) => `
+          <li>
+            <span class="rule-icon">${rule.icon}</span>
+            <div><strong>${rule.title}</strong> ${rule.copy}</div>
+          </li>
+        `).join('');
+      }
+
+      function buildStation4RulesBoardMarkup() {
+        return station4EnergyRules.map((rule, index) => `
+          <article class="rule-card energy-rule-card ${index === 0 ? 'rule-card-ornate' : ''}">
+            <div class="rule-card-head">
+              <span class="rule-card-icon" aria-hidden="true">${rule.icon}</span>
+              <span class="rule-card-step">${rule.step}</span>
+            </div>
+            <h3 class="rule-card-title">${rule.title}</h3>
+            <p class="rule-card-copy">${rule.copy}</p>
+          </article>
+        `).join('');
+      }
+
       function syncPrepRulesForStation(stationId) {
         if (!prepRulesList) return;
         const isStation2 = String(stationId) === SPINO_STATION_ID;
+        const isStation3 = String(stationId) === BIODIVERSITY_STATION_ID;
+        const isStation4 = String(stationId) === ENERGY_STATION_ID;
         const isStation6 = String(stationId) === SBEEL_STATION_ID;
 
         prepRulesList.classList.toggle('station2-rules-list', isStation2);
+        prepRulesList.classList.toggle('biodiversity-station-rules-list', isStation3);
+        prepRulesList.classList.toggle('energy-station-rules-list', isStation4);
         prepRulesList.classList.toggle('sbeel-station-rules-list', isStation6);
 
         if (isStation2) {
           prepRulesList.innerHTML = buildStation2PrepRulesMarkup();
+        } else if (isStation3) {
+          prepRulesList.innerHTML = buildStation3PrepRulesMarkup();
+        } else if (isStation4) {
+          prepRulesList.innerHTML = buildStation4PrepRulesMarkup();
         } else if (isStation6) {
           prepRulesList.innerHTML = buildStation6PrepRulesMarkup();
         } else {
@@ -6779,24 +7337,42 @@
         if (prepRulesTitle) {
           if (isStation2) {
             prepRulesTitle.textContent = 'Reglas Estacion 2 · Spinosaurio';
+          } else if (isStation3) {
+            prepRulesTitle.textContent = 'Reglas Estacion 3 · Sala A Biodiversidad';
+          } else if (isStation4) {
+            prepRulesTitle.textContent = 'Reglas Estacion 4 - Sala B Energia';
           } else if (isStation6) {
             prepRulesTitle.textContent = 'Reglas Estacion 6 · Sbeel';
           } else {
             prepRulesTitle.textContent = 'Reglas';
           }
         }
+
+        if (prepRulesTitle && isStation3) {
+          prepRulesTitle.textContent = 'Reglas Estacion 3 - Sala A - Biodiversidad';
+        }
       }
 
       function syncRulesOverlayForStation(isStartingGame) {
         if (!rulesOverlay || !rulesBoard) return;
         const isStation2Start = isStartingGame && String(currentStation) === SPINO_STATION_ID;
+        const isStation3Start = isStartingGame && String(currentStation) === BIODIVERSITY_STATION_ID;
+        const isStation4Start = isStartingGame && String(currentStation) === ENERGY_STATION_ID;
         const isStation6Start = isStartingGame && String(currentStation) === SBEEL_STATION_ID;
 
         rulesOverlay.classList.toggle('spino-station-rules-mode', isStation2Start);
+        rulesOverlay.classList.toggle('biodiversity-station-rules-mode', isStation3Start);
+        rulesOverlay.classList.toggle('energy-station-rules-mode', isStation4Start);
         rulesOverlay.classList.toggle('sbeel-station-rules-mode', isStation6Start);
+        rulesBoard.classList.toggle('biodiversity-rules-board', isStation3Start);
+        rulesBoard.classList.toggle('energy-rules-board', isStation4Start);
 
         if (isStation2Start) {
           rulesBoard.innerHTML = buildStation2RulesBoardMarkup();
+        } else if (isStation3Start) {
+          rulesBoard.innerHTML = buildStation3RulesBoardMarkup();
+        } else if (isStation4Start) {
+          rulesBoard.innerHTML = buildStation4RulesBoardMarkup();
         } else if (isStation6Start) {
           rulesBoard.innerHTML = buildStation6RulesBoardMarkup();
         } else {
@@ -6824,11 +7400,17 @@
         syncRulesOverlayForStation(isStartingGame);
 
         const isStation2Start = isStartingGame && String(currentStation) === SPINO_STATION_ID;
+        const isStation3Start = isStartingGame && String(currentStation) === BIODIVERSITY_STATION_ID;
+        const isStation4Start = isStartingGame && String(currentStation) === ENERGY_STATION_ID;
         const isStation6Start = isStartingGame && String(currentStation) === SBEEL_STATION_ID;
 
         if (rulesTitle) {
           if (isStation2Start) {
             rulesTitle.innerText = 'Mision Espinosaurio';
+          } else if (isStation3Start) {
+            rulesTitle.innerText = 'Sala A - Biodiversidad';
+          } else if (isStation4Start) {
+            rulesTitle.innerText = 'Sala B - Energia';
           } else if (isStation6Start) {
             rulesTitle.innerText = 'Mision Sbeel';
           } else {
@@ -6838,6 +7420,10 @@
         if (rulesSubtitle) {
           if (isStation2Start) {
             rulesSubtitle.innerText = 'Estas son las reglas secretas de la estacion 2. Cumple el reto y gana tus 15 puntos.';
+          } else if (isStation3Start) {
+            rulesSubtitle.innerText = 'Explora animales, plantas y ecosistemas. Responde 10 preguntas y logra 7 aciertos para completar tu mision verde.';
+          } else if (isStation4Start) {
+            rulesSubtitle.innerText = 'Explora las formas de energia, responde 10 preguntas y consigue minimo 7 aciertos para completar la mision.';
           } else if (isStation6Start) {
             rulesSubtitle.innerText = 'Sigue estas reglas del rompecabezas, vence el tiempo y completa la estacion 6.';
           } else {
@@ -6847,7 +7433,7 @@
           }
         }
         if (btnCerrarReglas) {
-          if (isStation2Start || isStation6Start) {
+          if (isStation2Start || isStation3Start || isStation4Start || isStation6Start) {
             btnCerrarReglas.innerText = 'Listo, vamos al reto';
           } else {
             btnCerrarReglas.innerText = isStartingGame ? 'Enterado, jugar' : 'Entendido';
