@@ -6147,6 +6147,214 @@
       }
     }
 
+    /* Station 5 (Sala C - Desarrollo Sustentable) rules theme in prep panel */
+    .rules-list.sustainable-station-rules-list {
+      display: grid;
+      gap: 0.72rem;
+      padding-right: 0.18rem !important;
+    }
+
+    .rules-list.sustainable-station-rules-list li {
+      position: relative;
+      overflow: hidden;
+      align-items: flex-start;
+      gap: 0.78rem;
+      background:
+        radial-gradient(circle at top right, rgba(190, 242, 100, 0.3), transparent 34%),
+        linear-gradient(145deg, rgba(240, 253, 244, 0.98), rgba(220, 252, 231, 0.92));
+      border: 1px solid rgba(22, 163, 74, 0.28);
+      border-radius: 20px;
+      padding: 0.88rem 0.92rem;
+      box-shadow: 0 10px 24px rgba(21, 128, 61, 0.12);
+    }
+
+    .rules-list.sustainable-station-rules-list li::after {
+      content: "";
+      position: absolute;
+      right: -18px;
+      bottom: -26px;
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 34% 34%, rgba(74, 222, 128, 0.28), transparent 44%),
+        radial-gradient(circle at 66% 66%, rgba(20, 184, 166, 0.16), transparent 48%);
+      pointer-events: none;
+    }
+
+    .rules-list.sustainable-station-rules-list .rule-icon {
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(135deg, #22c55e, #0f766e);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 8px 16px rgba(21, 128, 61, 0.2);
+    }
+
+    .rules-list.sustainable-station-rules-list li div {
+      position: relative;
+      z-index: 1;
+      color: #14532d;
+      font-weight: 700;
+      line-height: 1.46;
+      font-size: 0.92rem;
+    }
+
+    .rules-list.sustainable-station-rules-list li div strong {
+      display: block;
+      margin-bottom: 0.22rem;
+      color: #166534;
+      text-wrap: balance;
+    }
+
+    /* Station 5 (Sala C - Desarrollo Sustentable) rules theme in modal */
+    #rulesOverlay.sustainable-station-rules-mode .rules-modal {
+      border-color: #16a34a;
+      box-shadow: 0 20px 0px #14532d;
+      background:
+        radial-gradient(circle at 14% 16%, rgba(190, 242, 100, 0.24), transparent 38%),
+        radial-gradient(circle at 84% 82%, rgba(20, 184, 166, 0.18), transparent 42%),
+        linear-gradient(180deg, #f0fdf4 0%, #dcfce7 100%);
+    }
+
+    #rulesOverlay.sustainable-station-rules-mode .rules-chip {
+      background: linear-gradient(135deg, #16a34a, #0f766e);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.36);
+      box-shadow: 0 8px 18px rgba(21, 128, 61, 0.24);
+    }
+
+    #rulesOverlay.sustainable-station-rules-mode .rules-header p {
+      max-width: 56ch;
+      color: #166534;
+    }
+
+    #rulesOverlay.sustainable-station-rules-mode .rules-content {
+      padding: 0.62rem 0.92rem 0.84rem;
+    }
+
+    #rulesOverlay.sustainable-station-rules-mode .rules-board.sustainable-rules-board {
+      gap: 0.74rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(3, minmax(112px, auto));
+    }
+
+    #rulesOverlay.sustainable-station-rules-mode .rule-card {
+      overflow: hidden;
+      border-radius: 24px;
+      padding: 0.92rem 0.92rem 0.84rem;
+      background:
+        radial-gradient(circle at top right, rgba(190, 242, 100, 0.28), transparent 32%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.97), rgba(220, 252, 231, 0.95));
+      border: 1px solid rgba(22, 163, 74, 0.28);
+      box-shadow:
+        0 14px 26px rgba(21, 128, 61, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.84);
+    }
+
+    #rulesOverlay.sustainable-station-rules-mode .rule-card::before {
+      inset: auto -14px -16px auto;
+      width: 88px;
+      height: 88px;
+      border: 0;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 32% 32%, rgba(74, 222, 128, 0.2), transparent 44%),
+        radial-gradient(circle at 66% 66%, rgba(20, 184, 166, 0.12), transparent 48%);
+      pointer-events: none;
+    }
+
+    #rulesOverlay.sustainable-station-rules-mode .rule-card::after {
+      background:
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.56), transparent 38%),
+        linear-gradient(135deg, transparent 0 36%, rgba(22, 163, 74, 0.08) 52%, transparent 72%);
+      opacity: 0.92;
+    }
+
+    #rulesOverlay.sustainable-station-rules-mode .rule-card:nth-child(1) {
+      background:
+        radial-gradient(circle at top right, rgba(250, 204, 21, 0.18), transparent 34%),
+        linear-gradient(145deg, rgba(254, 252, 232, 0.97), rgba(220, 252, 231, 0.95));
+    }
+
+    #rulesOverlay.sustainable-station-rules-mode .rule-card:nth-child(3),
+    #rulesOverlay.sustainable-station-rules-mode .rule-card:nth-child(6) {
+      background:
+        radial-gradient(circle at top right, rgba(94, 234, 212, 0.24), transparent 34%),
+        linear-gradient(145deg, rgba(240, 253, 250, 0.97), rgba(220, 252, 231, 0.95));
+    }
+
+    #rulesOverlay.sustainable-station-rules-mode .rule-card-step {
+      background: linear-gradient(135deg, #15803d, #0f766e);
+      color: #ffffff;
+      box-shadow: 0 6px 12px rgba(21, 128, 61, 0.16);
+    }
+
+    #rulesOverlay.sustainable-station-rules-mode .rule-card-icon {
+      background: linear-gradient(135deg, #22c55e, #0f766e);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.64);
+      box-shadow: 0 10px 18px rgba(21, 128, 61, 0.18);
+    }
+
+    #rulesOverlay.sustainable-station-rules-mode .rule-card-title {
+      color: #14532d;
+      font-size: clamp(0.92rem, 1.03vw, 1.04rem);
+      line-height: 1.18;
+      text-wrap: balance;
+    }
+
+    #rulesOverlay.sustainable-station-rules-mode .rule-card-copy {
+      color: #166534;
+      font-size: clamp(0.78rem, 0.9vw, 0.9rem);
+      line-height: 1.4;
+    }
+
+    #rulesOverlay.sustainable-station-rules-mode .rule-card-copy strong {
+      color: #14532d;
+    }
+
+    @media (max-width: 1024px) {
+      #rulesOverlay.sustainable-station-rules-mode .rules-board.sustainable-rules-board {
+        gap: 0.64rem;
+      }
+
+      #rulesOverlay.sustainable-station-rules-mode .rule-card {
+        padding: 0.82rem 0.8rem 0.76rem;
+      }
+    }
+
+    @media (max-width: 760px) {
+      #rulesOverlay.sustainable-station-rules-mode .rules-content {
+        overflow: hidden;
+      }
+
+      #rulesOverlay.sustainable-station-rules-mode .rules-board.sustainable-rules-board {
+        grid-template-columns: 1fr;
+        grid-template-rows: none;
+        grid-auto-rows: auto;
+        align-content: start;
+        height: auto;
+        overflow-y: auto;
+        padding-right: 0.18rem;
+      }
+
+      #rulesOverlay.sustainable-station-rules-mode .rule-card {
+        height: auto;
+        min-height: 0;
+        padding: 0.9rem 0.88rem 0.82rem;
+      }
+
+      #rulesOverlay.sustainable-station-rules-mode .rule-card-title {
+        font-size: clamp(0.92rem, 3.35vw, 1rem);
+      }
+
+      #rulesOverlay.sustainable-station-rules-mode .rule-card-copy {
+        font-size: clamp(0.8rem, 3vw, 0.9rem);
+        line-height: 1.4;
+      }
+    }
+
   </style>
 </head>
 
@@ -7078,6 +7286,7 @@
       const SPINO_STATION_ID = '2';
       const BIODIVERSITY_STATION_ID = '3';
       const ENERGY_STATION_ID = '4';
+      const SUSTAINABLE_STATION_ID = '5';
       const SBEEL_STATION_ID = '6';
       let pendingStartAfterRules = false;
 
@@ -7194,7 +7403,7 @@
           copy: 'En esta estaci&oacute;n conocer&aacute;s diferentes formas de energ&iacute;a, c&oacute;mo se producen y por qu&eacute; son importantes en la vida diaria.'
         },
         {
-          icon: '&#128064;',
+          icon: '&#128161;',
           step: '02',
           title: 'Observa y aprende',
           copy: 'Lee con atenci&oacute;n la informaci&oacute;n de la sala para descubrir datos importantes sobre la energ&iacute;a y su uso.'
@@ -7218,9 +7427,48 @@
           copy: 'Si no alcanzas los <strong>7 aciertos</strong>, podr&aacute;s repetir la estaci&oacute;n y seguir aprendiendo.'
         },
         {
-          icon: '&#127793;',
+          icon: '&#128267;',
           step: '06',
           title: 'Gana tus puntos de energ&iacute;a',
+          copy: 'Si completas el reto, ganas <strong>10 puntos</strong> y avanzas en tu misi&oacute;n cient&iacute;fica.'
+        }
+      ];
+
+      const station5SustainableRules = [
+        {
+          icon: '&#127757;',
+          step: '01',
+          title: '&iexcl;Bienvenido a la aventura sustentable!',
+          copy: 'En esta estaci&oacute;n aprender&aacute;s c&oacute;mo cuidar el planeta y usar los recursos de manera responsable.'
+        },
+        {
+          icon: '&#9851;',
+          step: '02',
+          title: 'Observa y aprende',
+          copy: 'Lee con atenci&oacute;n la informaci&oacute;n de la sala para descubrir acciones que ayudan al medio ambiente.'
+        },
+        {
+          icon: '&#129504;',
+          step: '03',
+          title: 'Responde el reto',
+          copy: 'Tendr&aacute;s <strong>10 preguntas</strong> sobre el &Aacute;rea de Desarrollo Sustentable.'
+        },
+        {
+          icon: '&#9989;',
+          step: '04',
+          title: 'Completa la estaci&oacute;n',
+          copy: 'Para superar el reto, necesitas responder correctamente m&iacute;nimo <strong>7 de 10</strong> preguntas.'
+        },
+        {
+          icon: '&#128257;',
+          step: '05',
+          title: 'Vuelve a intentarlo si lo necesitas',
+          copy: 'Si no alcanzas los <strong>7 aciertos</strong>, podr&aacute;s repetir la estaci&oacute;n y seguir aprendiendo.'
+        },
+        {
+          icon: '&#127793;',
+          step: '06',
+          title: 'Gana tus puntos sustentables',
           copy: 'Si completas el reto, ganas <strong>10 puntos</strong> y avanzas en tu misi&oacute;n cient&iacute;fica.'
         }
       ];
@@ -7315,16 +7563,40 @@
         `).join('');
       }
 
+      function buildStation5PrepRulesMarkup() {
+        return station5SustainableRules.map((rule) => `
+          <li>
+            <span class="rule-icon">${rule.icon}</span>
+            <div><strong>${rule.title}</strong> ${rule.copy}</div>
+          </li>
+        `).join('');
+      }
+
+      function buildStation5RulesBoardMarkup() {
+        return station5SustainableRules.map((rule, index) => `
+          <article class="rule-card sustainable-rule-card ${index === 0 ? 'rule-card-ornate' : ''}">
+            <div class="rule-card-head">
+              <span class="rule-card-icon" aria-hidden="true">${rule.icon}</span>
+              <span class="rule-card-step">${rule.step}</span>
+            </div>
+            <h3 class="rule-card-title">${rule.title}</h3>
+            <p class="rule-card-copy">${rule.copy}</p>
+          </article>
+        `).join('');
+      }
+
       function syncPrepRulesForStation(stationId) {
         if (!prepRulesList) return;
         const isStation2 = String(stationId) === SPINO_STATION_ID;
         const isStation3 = String(stationId) === BIODIVERSITY_STATION_ID;
         const isStation4 = String(stationId) === ENERGY_STATION_ID;
+        const isStation5 = String(stationId) === SUSTAINABLE_STATION_ID;
         const isStation6 = String(stationId) === SBEEL_STATION_ID;
 
         prepRulesList.classList.toggle('station2-rules-list', isStation2);
         prepRulesList.classList.toggle('biodiversity-station-rules-list', isStation3);
         prepRulesList.classList.toggle('energy-station-rules-list', isStation4);
+        prepRulesList.classList.toggle('sustainable-station-rules-list', isStation5);
         prepRulesList.classList.toggle('sbeel-station-rules-list', isStation6);
 
         if (isStation2) {
@@ -7333,6 +7605,8 @@
           prepRulesList.innerHTML = buildStation3PrepRulesMarkup();
         } else if (isStation4) {
           prepRulesList.innerHTML = buildStation4PrepRulesMarkup();
+        } else if (isStation5) {
+          prepRulesList.innerHTML = buildStation5PrepRulesMarkup();
         } else if (isStation6) {
           prepRulesList.innerHTML = buildStation6PrepRulesMarkup();
         } else {
@@ -7345,7 +7619,7 @@
           } else if (isStation3) {
             prepRulesTitle.textContent = 'Reglas Estacion 3 · Sala A Biodiversidad';
           } else if (isStation4) {
-            prepRulesTitle.textContent = 'Reglas Estacion 4 - Sala B Energia';
+            prepRulesTitle.textContent = 'Reglas Estacion 4 - Sala B de Energia';
           } else if (isStation6) {
             prepRulesTitle.textContent = 'Reglas Estacion 6 · Sbeel';
           } else {
@@ -7356,6 +7630,10 @@
         if (prepRulesTitle && isStation3) {
           prepRulesTitle.textContent = 'Reglas Estacion 3 - Sala A - Biodiversidad';
         }
+
+        if (prepRulesTitle && isStation5) {
+          prepRulesTitle.textContent = 'Reglas Estacion 5 - Sala C - Desarrollo Sustentable';
+        }
       }
 
       function syncRulesOverlayForStation(isStartingGame) {
@@ -7363,14 +7641,17 @@
         const isStation2Start = isStartingGame && String(currentStation) === SPINO_STATION_ID;
         const isStation3Start = isStartingGame && String(currentStation) === BIODIVERSITY_STATION_ID;
         const isStation4Start = isStartingGame && String(currentStation) === ENERGY_STATION_ID;
+        const isStation5Start = isStartingGame && String(currentStation) === SUSTAINABLE_STATION_ID;
         const isStation6Start = isStartingGame && String(currentStation) === SBEEL_STATION_ID;
 
         rulesOverlay.classList.toggle('spino-station-rules-mode', isStation2Start);
         rulesOverlay.classList.toggle('biodiversity-station-rules-mode', isStation3Start);
         rulesOverlay.classList.toggle('energy-station-rules-mode', isStation4Start);
+        rulesOverlay.classList.toggle('sustainable-station-rules-mode', isStation5Start);
         rulesOverlay.classList.toggle('sbeel-station-rules-mode', isStation6Start);
         rulesBoard.classList.toggle('biodiversity-rules-board', isStation3Start);
         rulesBoard.classList.toggle('energy-rules-board', isStation4Start);
+        rulesBoard.classList.toggle('sustainable-rules-board', isStation5Start);
 
         if (isStation2Start) {
           rulesBoard.innerHTML = buildStation2RulesBoardMarkup();
@@ -7378,6 +7659,8 @@
           rulesBoard.innerHTML = buildStation3RulesBoardMarkup();
         } else if (isStation4Start) {
           rulesBoard.innerHTML = buildStation4RulesBoardMarkup();
+        } else if (isStation5Start) {
+          rulesBoard.innerHTML = buildStation5RulesBoardMarkup();
         } else if (isStation6Start) {
           rulesBoard.innerHTML = buildStation6RulesBoardMarkup();
         } else {
@@ -7407,6 +7690,7 @@
         const isStation2Start = isStartingGame && String(currentStation) === SPINO_STATION_ID;
         const isStation3Start = isStartingGame && String(currentStation) === BIODIVERSITY_STATION_ID;
         const isStation4Start = isStartingGame && String(currentStation) === ENERGY_STATION_ID;
+        const isStation5Start = isStartingGame && String(currentStation) === SUSTAINABLE_STATION_ID;
         const isStation6Start = isStartingGame && String(currentStation) === SBEEL_STATION_ID;
 
         if (rulesTitle) {
@@ -7415,7 +7699,9 @@
           } else if (isStation3Start) {
             rulesTitle.innerText = 'Sala A - Biodiversidad';
           } else if (isStation4Start) {
-            rulesTitle.innerText = 'Sala B - Energia';
+            rulesTitle.innerText = 'Sala B de Energia';
+          } else if (isStation5Start) {
+            rulesTitle.innerText = 'Sala C - Desarrollo Sustentable';
           } else if (isStation6Start) {
             rulesTitle.innerText = 'Mision Sbeel';
           } else {
@@ -7428,7 +7714,9 @@
           } else if (isStation3Start) {
             rulesSubtitle.innerText = 'Explora animales, plantas y ecosistemas. Responde 10 preguntas y logra 7 aciertos para completar tu mision verde.';
           } else if (isStation4Start) {
-            rulesSubtitle.innerText = 'Explora las formas de energia, responde 10 preguntas y consigue minimo 7 aciertos para completar la mision.';
+            rulesSubtitle.innerText = 'Explora las formas de energia, responde 10 preguntas del Area de Energia y consigue minimo 7 aciertos para completar tu mision.';
+          } else if (isStation5Start) {
+            rulesSubtitle.innerText = 'Descubre acciones para cuidar el planeta, responde 10 preguntas del Area de Desarrollo Sustentable y consigue minimo 7 aciertos para completar tu mision.';
           } else if (isStation6Start) {
             rulesSubtitle.innerText = 'Sigue estas reglas del rompecabezas, vence el tiempo y completa la estacion 6.';
           } else {
@@ -7438,7 +7726,7 @@
           }
         }
         if (btnCerrarReglas) {
-          if (isStation2Start || isStation3Start || isStation4Start || isStation6Start) {
+          if (isStation2Start || isStation3Start || isStation4Start || isStation5Start || isStation6Start) {
             btnCerrarReglas.innerText = 'Listo, vamos al reto';
           } else {
             btnCerrarReglas.innerText = isStartingGame ? 'Enterado, jugar' : 'Entendido';
