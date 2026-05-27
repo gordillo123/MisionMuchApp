@@ -59,6 +59,29 @@ let QUESTIONS = [];
 // 🔒 BANDERA DE SEGURIDAD (Evita dobles registros al dar clic rápido)
 let quizIniciando = false;
 
+class ProgressManager {
+  constructor(storageKey) {
+    this.storageKey = storageKey;
+  }
+
+  saveProgress(index) {
+    const safeIndex = Number.isInteger(index) && index >= 0 ? index : 0;
+    localStorage.setItem(this.storageKey, String(safeIndex));
+  }
+
+  loadProgress() {
+    const raw = localStorage.getItem(this.storageKey);
+    if (raw === null) return 0;
+    const parsed = Number.parseInt(raw, 10);
+    if (Number.isNaN(parsed) || parsed < 0) return 0;
+    return parsed;
+  }
+
+  resetProgress() {
+    localStorage.removeItem(this.storageKey);
+  }
+}
+
 /* ================================================================= */
 /* ==== SUPABASE: CONEXIÓN Y LÓGICA DE BASE DE DATOS =========== */
 /* ================================================================= */
@@ -413,7 +436,14 @@ class PrizeManager {
 class UIManager {
   constructor({ elements, sound, confetti, prizeMgr }) {
     this.e = elements; this.sound = sound; this.confetti = confetti; this.prizeMgr = prizeMgr;
+    this.progressManager = new ProgressManager(`much_quiz_progress_${SALA}`);
     this.state = { idx: 0, selected: null, points: 0, correct: 0, locked: false, answers: [] };
+    const savedIndex = this.progressManager.loadProgress();
+    if (savedIndex > 0 && savedIndex < QUESTIONS.length) {
+      this.state.idx = savedIndex;
+    } else if (savedIndex >= QUESTIONS.length) {
+      this.progressManager.resetProgress();
+    }
     this.currentPrize = null;
     this.cheatingDetected = false;
 
@@ -463,14 +493,21 @@ class UIManager {
     this.e.nextBtn.textContent = '❌ Reintentar';
     this.e.nextBtn.classList.remove('btn-primary');
     this.e.nextBtn.classList.add('btn-danger');
+    this.progressManager.resetProgress();
     this.sound.wrong();
   }
 
   bind() {
     this.e.nextBtn.addEventListener('click', () => this.next());
     this.e.nextStationBtn.addEventListener('click', () => this.goBackToMap());
-    this.e.playAgainBtn1.addEventListener('click', () => location.reload());
-    this.e.playAgainBtn2.addEventListener('click', () => location.reload());
+    this.e.playAgainBtn1.addEventListener('click', () => {
+      this.progressManager.resetProgress();
+      location.reload();
+    });
+    this.e.playAgainBtn2.addEventListener('click', () => {
+      this.progressManager.resetProgress();
+      location.reload();
+    });
   }
 
   clock() {
@@ -526,6 +563,7 @@ class UIManager {
     }
 
     if (s.idx >= QUESTIONS.length) {
+      this.progressManager.resetProgress();
       e.quizView.classList.add('d-none');
       e.finalView.classList.remove('d-none');
       e.finalTitle.textContent = 'Verificando resultados...';
@@ -632,7 +670,9 @@ class UIManager {
     if (this.cheatingDetected) { location.reload(); return; }
     if (s.selected === null) { if (e.status) e.status.textContent = '⚠️ Selecciona una respuesta.'; return; }
     e.nextBtn.disabled = true; setTimeout(() => { e.nextBtn.disabled = false; }, 180);
-    s.idx += 1; this.render();
+    s.idx += 1;
+    this.progressManager.saveProgress(s.idx);
+    this.render();
   }
 }
 

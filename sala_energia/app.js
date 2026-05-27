@@ -20,6 +20,41 @@ let QUESTIONS = [];
 // 🔒 BANDERA DE SEGURIDAD (Evita dobles registros al dar clic rápido)
 let quizIniciando = false;
 
+class ProgressManager {
+  constructor(storageKey) {
+    this.storageKey = storageKey;
+  }
+
+  saveProgress(currentQuestionIndex, questionDeadlineAt) {
+    const safeIndex = Number.isInteger(currentQuestionIndex) && currentQuestionIndex >= 0 ? currentQuestionIndex : 0;
+    const safeDeadline = Number.isFinite(questionDeadlineAt) ? questionDeadlineAt : Date.now();
+    const payload = {
+      currentQuestionIndex: safeIndex,
+      questionDeadlineAt: safeDeadline
+    };
+    localStorage.setItem(this.storageKey, JSON.stringify(payload));
+  }
+
+  loadProgress() {
+    const raw = localStorage.getItem(this.storageKey);
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw);
+      const index = Number.parseInt(parsed?.currentQuestionIndex, 10);
+      const deadline = Number(parsed?.questionDeadlineAt);
+      if (Number.isNaN(index) || index < 0) return null;
+      if (!Number.isFinite(deadline) || deadline <= 0) return null;
+      return { currentQuestionIndex: index, questionDeadlineAt: deadline };
+    } catch (error) {
+      return null;
+    }
+  }
+
+  resetProgress() {
+    localStorage.removeItem(this.storageKey);
+  }
+}
+
 class PrizeManager {
   constructor() {}
 }
@@ -376,7 +411,16 @@ class Confetti {
 class UIManager {
   constructor({ elements, sound, confetti }) {
     this.e = elements; this.sound = sound; this.confetti = confetti;
+    this.progressManager = new ProgressManager(`much_quiz_progress_${SALA}`);
     this.state = { idx: 0, selected: null, points: 0, correct: 0, locked: false, answers: [] };
+    this.currentQuestionDeadline = null;
+    const savedProgress = this.progressManager.loadProgress();
+    if (savedProgress && savedProgress.currentQuestionIndex < QUESTIONS.length) {
+      this.state.idx = savedProgress.currentQuestionIndex;
+      this.currentQuestionDeadline = savedProgress.questionDeadlineAt;
+    } else if (savedProgress && savedProgress.currentQuestionIndex >= QUESTIONS.length) {
+      this.progressManager.resetProgress();
+    }
     this.currentPrize = null;
     this.cheatingDetected = false;
     this.questionTimer = null;
@@ -418,7 +462,7 @@ class UIManager {
   }
 
   startFocusDetection() {
-    window.addEventListener('blur', this.handleFocusLoss.bind(this));
+    // Anti-trampas desactivado: no invalidamos la ronda al cambiar de pestaña.
   }
 
   updateQuestionTimerDisplay() {
@@ -430,32 +474,60 @@ class UIManager {
 
   stopQuestionTimer() {
     if (this.questionTimer) {
-      clearInterval(this.questionTimer);
+      clearTimeout(this.questionTimer);
       this.questionTimer = null;
     }
   }
 
+  persistCurrentQuestionProgress() {
+    this.progressManager.saveProgress(this.state.idx, this.currentQuestionDeadline || Date.now());
+  }
+
+  createQuestionDeadline() {
+    this.currentQuestionDeadline = Date.now() + (QUESTION_SECONDS * 1000);
+    this.persistCurrentQuestionProgress();
+  }
+
   startQuestionTimer() {
     this.stopQuestionTimer();
-    this.questionCountdown = QUESTION_SECONDS;
-    this.updateQuestionTimerDisplay();
+    if (!Number.isFinite(this.currentQuestionDeadline) || this.currentQuestionDeadline <= 0) {
+      this.createQuestionDeadline();
+    } else {
+      this.persistCurrentQuestionProgress();
+    }
 
-    this.questionTimer = setInterval(() => {
-      if (this.questionCountdown <= 0) {
+    const tick = () => {
+      const remainingMs = this.currentQuestionDeadline - Date.now();
+      const remainingSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
+      this.questionCountdown = remainingSeconds;
+      this.updateQuestionTimerDisplay();
+
+      if (remainingMs <= 0) {
         this.handleQuestionTimeout();
         return;
       }
-      this.questionCountdown -= 1;
-      this.updateQuestionTimerDisplay();
-      if (this.questionCountdown <= 0) {
-        this.handleQuestionTimeout();
-      }
-    }, 1000);
+      this.questionTimer = setTimeout(tick, 250);
+    };
+
+    tick();
+  }
+
+  advanceToNextQuestion() {
+    const s = this.state;
+    s.idx += 1;
+    if (s.idx >= QUESTIONS.length) {
+      this.currentQuestionDeadline = null;
+      this.progressManager.resetProgress();
+      this.render();
+      return;
+    }
+    this.createQuestionDeadline();
+    this.render();
   }
 
   handleQuestionTimeout() {
     const s = this.state, { e } = this;
-    if (s.locked || this.cheatingDetected || s.idx >= QUESTIONS.length) return;
+    if (s.locked || s.idx >= QUESTIONS.length) return;
     this.stopQuestionTimer();
 
     s.locked = true;
@@ -480,39 +552,26 @@ class UIManager {
     this.sound.wrong();
 
     setTimeout(() => {
-      if (!this.cheatingDetected) {
-        s.idx += 1;
-        this.render();
-      }
+      this.advanceToNextQuestion();
     }, 1400);
   }
 
   handleFocusLoss() {
-    if (this.state.locked || this.cheatingDetected || this.state.idx >= QUESTIONS.length) return;
-    this.cheatingDetected = true;
-    this.state.locked = true;
-
-    if (this.e.status) this.e.status.textContent = '🛑 ¡ATENCIÓN! No cambies de pestaña.';
-    if (this.e.hint) this.e.hint.textContent = 'La ronda ha sido invalidada por salir del juego.';
-
-    [...this.e.options.querySelectorAll('.option-btn')].forEach(btn => {
-      btn.disabled = true;
-      btn.classList.add('option-btn--incorrect');
-    });
-
-    this.e.nextBtn.textContent = '❌ Reintentar';
-    this.e.nextBtn.classList.remove('btn-primary');
-    this.e.nextBtn.classList.add('btn-danger');
-    if (this.e.nextBtn) this.e.nextBtn.classList.remove('d-none');
-    this.sound.wrong();
+    // Anti-trampas desactivado.
   }
 
   bind() {
     this.e.nextBtn.addEventListener('click', () => this.next());
     this.e.returnBtn.addEventListener('click', () => this.goBackToMap());
     this.e.nextStationBtn.addEventListener('click', () => this.goBackToMap());
-    this.e.playAgainBtn1.addEventListener('click', () => location.reload());
-    this.e.playAgainBtn2.addEventListener('click', () => location.reload());
+    this.e.playAgainBtn1.addEventListener('click', () => {
+      this.progressManager.resetProgress();
+      location.reload();
+    });
+    this.e.playAgainBtn2.addEventListener('click', () => {
+      this.progressManager.resetProgress();
+      location.reload();
+    });
   }
 
   clock() {
@@ -617,23 +676,8 @@ class UIManager {
       e.finalAutoNote.innerHTML = '';
     }
 
-    if (this.cheatingDetected) {
-      this.stopQuestionTimer();
-      e.quizView.classList.add('d-none');
-      e.finalView.classList.remove('d-none');
-      e.finalTitle.classList.remove('visually-hidden');
-      e.finalTitle.textContent = '¡Ronda Invalidada!';
-      window.MuchStationCompletion?.clearInline(e.finalMsg, 'Se detectó actividad sospechosa. Intenta de nuevo.');
-      e.giftRow.classList.add('d-none');
-      e.retryRow.classList.add('d-none');
-      e.finalPoints.textContent = s.points.toString();
-      e.finalCorrect.textContent = s.correct.toString();
-      e.finalTotal.textContent = QUESTIONS.length.toString();
-      this.startAutoTransition('Reiniciando la ronda en', 4, () => location.reload(), 'retry');
-      return;
-    }
-
     if (s.idx >= QUESTIONS.length) {
+      this.progressManager.resetProgress();
       this.stopQuestionTimer();
       e.quizView.classList.add('d-none');
       e.finalView.classList.remove('d-none');
@@ -714,6 +758,9 @@ class UIManager {
     if (e.status) e.status.textContent = '';
     if (e.options) e.options.innerHTML = '';
     s.selected = null; s.locked = false;
+    if (!Number.isFinite(this.currentQuestionDeadline) || this.currentQuestionDeadline <= 0) {
+      this.createQuestionDeadline();
+    }
 
     q.options.forEach((label, i) => {
       const col = document.createElement('div'); col.className = 'col-12';
@@ -733,7 +780,6 @@ class UIManager {
   choose(i) {
     const s = this.state, { e } = this;
     if (s.locked) return;
-    if (this.cheatingDetected) return;
 
     this.stopQuestionTimer();
     s.locked = true; s.selected = i;
@@ -756,19 +802,15 @@ class UIManager {
 
     // Auto-advance after 3 seconds (3000ms)
     setTimeout(() => {
-      if (!this.cheatingDetected) {
-        s.idx += 1;
-        this.render();
-      }
+      this.advanceToNextQuestion();
     }, 3000);
   }
 
   next() {
     const s = this.state, { e } = this;
-    if (this.cheatingDetected) { location.reload(); return; }
     if (s.selected === null) { if (e.status) e.status.textContent = '⚠️ Selecciona una respuesta.'; return; }
     e.nextBtn.disabled = true; setTimeout(() => { e.nextBtn.disabled = false; }, 180);
-    s.idx += 1; this.render();
+    this.advanceToNextQuestion();
   }
 }
 
