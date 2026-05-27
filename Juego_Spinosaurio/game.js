@@ -658,12 +658,21 @@ async function validarQuiz() {
   }
 
   if (!sel) {
-    msg.textContent = "Selecciona una opción 😉"; msg.className = "quiz-msg err"; return;
+    window.MuchStationCompletion?.clearInline(msg, "Selecciona una opcion 😉");
+    msg.className = "quiz-msg err";
+    return;
   }
 
   if (Number(sel.value) === quizAnswerIndex) {
-    msg.textContent = "¡Felicidades! ¡Correcto! Has completado esta estación con éxito y tu avatar avanzó a la siguiente estación. 🦖"; 
-    msg.className = "quiz-msg ok";
+    var completionData = window.MuchStationCompletion?.renderInline(msg, {
+      stationId: '2',
+      nextStationId: '3'
+    });
+    window.MuchStationCompletion?.queueMapNotice({
+      stationId: '2',
+      nextStationId: '3'
+    });
+    msg.className = "quiz-msg ok station-completion-host";
     playVictoryMusic();
 
     navigatingToRegistro = true; 
@@ -681,17 +690,17 @@ async function validarQuiz() {
     await guardarSpinosaurioEnSupabase(Number(score), true);
     await registrarQuizEnSupabase(Number(score));
     try { playBgMusic(); } catch (e) {}
-    msg.textContent = "Estacion completada con exito. Presiona Volver al mapa para continuar.";
 
     // Mostrar botón Siguiente para que el usuario avance cuando quiera
     try {
       const btnNext = document.getElementById('btnQuizNext');
-      btnNext.textContent = 'Volver al mapa';
+      btnNext.textContent = completionData?.ctaLabel || 'Volver al mapa y continuar';
       btnNext.style.display = 'inline-block';
     } catch (e) {}
     btnOk.style.display = "none";
   } else {
-    msg.textContent = "Incorrecto. ¡Vuelve a jugar!"; msg.className = "quiz-msg err";
+    window.MuchStationCompletion?.clearInline(msg, "Incorrecto. ¡Vuelve a jugar!");
+    msg.className = "quiz-msg err";
     playIncorrectSound();
 
     var inputs = document.querySelectorAll('input[name="q1"]');

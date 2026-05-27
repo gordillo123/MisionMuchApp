@@ -542,6 +542,50 @@ class UIManager {
     }, delay);
   }
 
+  clearAutoTransition() {
+    if (this.autoTransitionTimer) {
+      clearTimeout(this.autoTransitionTimer);
+      this.autoTransitionTimer = null;
+    }
+    if (this.autoTransitionInterval) {
+      clearInterval(this.autoTransitionInterval);
+      this.autoTransitionInterval = null;
+    }
+  }
+
+  startAutoTransition(message, seconds, onComplete, tone = 'success') {
+    const note = this.e.finalAutoNote;
+    this.clearAutoTransition();
+    if (!note) {
+      this.autoTransitionTimer = setTimeout(onComplete, seconds * 1000);
+      return;
+    }
+
+    let remaining = seconds;
+    note.classList.remove('d-none', 'station-auto-note--retry');
+    note.classList.toggle('station-auto-note--retry', tone === 'retry');
+
+    const updateLabel = () => {
+      note.innerHTML = `${message} <strong>${remaining}s</strong>`;
+    };
+
+    updateLabel();
+    this.autoTransitionInterval = setInterval(() => {
+      remaining -= 1;
+      if (remaining <= 0) {
+        clearInterval(this.autoTransitionInterval);
+        this.autoTransitionInterval = null;
+        return;
+      }
+      updateLabel();
+    }, 1000);
+
+    this.autoTransitionTimer = setTimeout(() => {
+      this.clearAutoTransition();
+      onComplete();
+    }, seconds * 1000);
+  }
+
   goBackToMap() {
     try {
       if (this.e && this.e.returnBtn) {
@@ -567,17 +611,25 @@ class UIManager {
       if (s.idx >= QUESTIONS.length) { playBgMusic(); }
     } catch (e) {}
 
+    if (e.finalAutoNote) {
+      e.finalAutoNote.classList.add('d-none');
+      e.finalAutoNote.classList.remove('station-auto-note--retry');
+      e.finalAutoNote.innerHTML = '';
+    }
+
     if (this.cheatingDetected) {
       this.stopQuestionTimer();
       e.quizView.classList.add('d-none');
       e.finalView.classList.remove('d-none');
+      e.finalTitle.classList.remove('visually-hidden');
       e.finalTitle.textContent = '¡Ronda Invalidada!';
-      e.finalMsg.textContent = 'Se detectó actividad sospechosa. Intenta de nuevo.';
+      window.MuchStationCompletion?.clearInline(e.finalMsg, 'Se detectó actividad sospechosa. Intenta de nuevo.');
       e.giftRow.classList.add('d-none');
-      e.retryRow.classList.remove('d-none');
+      e.retryRow.classList.add('d-none');
       e.finalPoints.textContent = s.points.toString();
       e.finalCorrect.textContent = s.correct.toString();
       e.finalTotal.textContent = QUESTIONS.length.toString();
+      this.startAutoTransition('Reiniciando la ronda en', 4, () => location.reload(), 'retry');
       return;
     }
 
@@ -585,10 +637,12 @@ class UIManager {
       this.stopQuestionTimer();
       e.quizView.classList.add('d-none');
       e.finalView.classList.remove('d-none');
+      e.finalTitle.classList.remove('visually-hidden');
       e.finalTitle.textContent = 'Verificando resultados...';
-      e.finalMsg.textContent = 'Por favor espera.';
+      window.MuchStationCompletion?.clearInline(e.finalMsg, 'Por favor espera.');
       e.giftRow.classList.add('d-none');
       e.retryRow.classList.add('d-none');
+      this.clearAutoTransition();
 
       const isPassed = s.correct >= 7; // 70% or more
       const puntajeFinal = s.correct * 10;
@@ -617,13 +671,21 @@ class UIManager {
       e.finalTotal.textContent = QUESTIONS.length.toString();
 
       if (isPassed) {
-        e.finalTitle.textContent = '¡Felicidades! 🎉';
-        e.finalMsg.textContent = `¡Estación completada con éxito! Lograste un ${Math.round(s.correct / QUESTIONS.length * 100)}% de respuestas correctas. Presiona Volver al mapa para continuar.`;
-        e.giftRow.classList.remove('d-none');
+        const completionData = window.MuchStationCompletion?.renderInline(e.finalMsg, {
+          stationId: '4',
+          nextStationId: '5'
+        });
+        window.MuchStationCompletion?.queueMapNotice({
+          stationId: '4',
+          nextStationId: '5'
+        });
+        e.finalTitle.classList.add('visually-hidden');
+        e.giftRow.classList.add('d-none');
         e.retryRow.classList.add('d-none');
         this.sound.victory();
         this.playCompletionSound();
         try { playBgMusic(); } catch (e) {}
+        this.startAutoTransition('Regresando al mapa para continuar en', 4, () => this.goBackToMap());
 
         // Avanzar avatar en el mapa
         localStorage.setItem('much_current_station', '5');
@@ -631,11 +693,16 @@ class UIManager {
         completed['4'] = true;
         localStorage.setItem('much_completed_stations', JSON.stringify(completed));
       } else {
+        e.finalTitle.classList.remove('visually-hidden');
         e.finalTitle.textContent = 'Buen intento 👀';
-        e.finalMsg.textContent = `Lograste un ${Math.round(s.correct / QUESTIONS.length * 100)}%. Necesitas al menos 70% de aciertos para completar la estación y avanzar.`;
+        window.MuchStationCompletion?.clearInline(
+          e.finalMsg,
+          `Lograste un ${Math.round(s.correct / QUESTIONS.length * 100)}%. Necesitas al menos 70% de aciertos para completar la estación y avanzar.`
+        );
         e.giftRow.classList.add('d-none');
-        e.retryRow.classList.remove('d-none');
+        e.retryRow.classList.add('d-none');
         this.playIncorrectSound();
+        this.startAutoTransition('Preparando un nuevo intento en', 4, () => location.reload(), 'retry');
       }
       return;
     }
@@ -729,6 +796,7 @@ const elements = {
   finalPoints: document.getElementById('finalPoints'),
   finalCorrect: document.getElementById('finalCorrect'),
   finalTotal: document.getElementById('finalTotal'),
+  finalAutoNote: document.getElementById('finalAutoNote'),
   giftRow: document.getElementById('giftRow'),
   retryRow: document.getElementById('retryRow'),
   nextStationBtn: document.getElementById('nextStationBtn'),

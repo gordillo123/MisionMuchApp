@@ -9,8 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const countdownEl = document.getElementById('countdown');
     const timerBox = document.getElementById('timer-box');
     const successModal = document.getElementById('success-modal');
+    const successHeading = successModal ? successModal.querySelector('h2') : null;
+    const successText = successModal ? successModal.querySelector('p') : null;
     const closeModalBtn = document.getElementById('close-modal');
     const backBtn = document.getElementById('btn-back');
+    let successMessageHost = null;
+    let successAutoNote = null;
+    let successAutoTimer = null;
+    let successAutoInterval = null;
 
     const size = 3; // 3x3
     const TIME_LIMIT_SECONDS = 120;
@@ -251,12 +257,96 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function showSuccess() {
         stopTimer();
+        if (successAutoTimer) {
+            clearTimeout(successAutoTimer);
+            successAutoTimer = null;
+        }
+        if (successAutoInterval) {
+            clearInterval(successAutoInterval);
+            successAutoInterval = null;
+        }
+
+        const retryModalBtn = document.getElementById('retry-modal-btn');
         if (timeRemaining > 0) {
             solvedOnTime = true;
             markStationCompleted();
             playCompletionSound();
             await guardarSbeelEnSupabase();
+            if (successHeading) successHeading.style.display = 'none';
+            if (successText) {
+                if (!successMessageHost) {
+                    successMessageHost = document.createElement('div');
+                    successMessageHost.className = 'result-message';
+                    successText.parentNode.insertBefore(successMessageHost, successText);
+                }
+                successText.style.display = 'none';
+                const completionData = window.MuchStationCompletion?.renderInline(successMessageHost, {
+                    stationId: '6',
+                    isFinalStation: true,
+                    badge: 'Estacion completada',
+                    title: 'Sbeel Dinosaurios completada',
+                    body: 'Completaste <strong>Sbeel Dinosaurios</strong>. Gracias por resolver el rompecabezas y demostrar tu mirada de explorador del pasado.',
+                    detailLabel: 'Logro',
+                    detailValue: 'Rompecabezas resuelto',
+                    ctaLabel: 'Volver al mapa'
+                });
+                window.MuchStationCompletion?.queueMapNotice({
+                    stationId: '6',
+                    isFinalStation: true,
+                    badge: 'Estacion completada',
+                    title: 'Sbeel Dinosaurios completada',
+                    body: 'Completaste <strong>Sbeel Dinosaurios</strong>. Gracias por resolver el rompecabezas y demostrar tu mirada de explorador del pasado.',
+                    detailLabel: 'Logro',
+                    detailValue: 'Rompecabezas resuelto',
+                    ctaLabel: 'Volver al mapa'
+                });
+                closeModalBtn.style.display = 'none';
+                if (retryModalBtn) retryModalBtn.style.display = 'none';
+                if (!successAutoNote) {
+                    successAutoNote = document.createElement('div');
+                    successAutoNote.className = 'station-auto-note';
+                    successMessageHost.parentNode.insertBefore(successAutoNote, closeModalBtn);
+                }
+
+                let remaining = 4;
+                const updateLabel = () => {
+                    successAutoNote.innerHTML = 'Volviendo al mapa en <strong>' + remaining + 's</strong>';
+                };
+
+                updateLabel();
+                successAutoInterval = setInterval(() => {
+                    remaining -= 1;
+                    if (remaining <= 0) {
+                        clearInterval(successAutoInterval);
+                        successAutoInterval = null;
+                        return;
+                    }
+                    updateLabel();
+                }, 1000);
+
+                successAutoTimer = setTimeout(() => {
+                    window.location.href = '../index.html?view=prep';
+                }, 4000);
+            }
         } else {
+            if (successMessageHost) {
+                successMessageHost.innerHTML = '';
+            }
+            if (successAutoNote) {
+                successAutoNote.remove();
+                successAutoNote = null;
+            }
+            if (successHeading) {
+                successHeading.style.display = '';
+                successHeading.textContent = 'Sigue intentando';
+            }
+            if (successText) {
+                successText.style.display = '';
+                successText.textContent = 'Se acabo el tiempo. Mezcla las piezas y vuelve a intentarlo.';
+            }
+            closeModalBtn.style.display = '';
+            if (retryModalBtn) retryModalBtn.style.display = '';
+            closeModalBtn.textContent = 'Volver al mapa';
             playIncorrectSound();
         }
         successModal.classList.add('show');

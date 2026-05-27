@@ -12,6 +12,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Outfit:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap"
     rel="stylesheet" />
+  <link rel="stylesheet" href="assets/station-completion.css" />
   <style>
     /* ────────────────────────────────────────────────
        MISIÓN MUCH — STYLES (TODO EN UNO)
@@ -5857,6 +5858,7 @@
   <div class="avatar-overlay" id="rulesOverlay" data-include="modules/rules.html"></div>
 
   <script src="modules/modules_html.js"></script>
+  <script src="scripts/station-completion.js"></script>
   <script type="module" src="./supabase-utils.js"></script>
   <script>
     /* ────────────────────────────────────────────────
@@ -6574,6 +6576,7 @@
           currentStation = savedStation ? String(savedStation) : '1';
           setTimeout(() => {
             moveToStation(currentStation);
+            window.MuchStationCompletion?.showPendingMapNotice();
           }, 500);
         } else {
           showView('viewLanding');
@@ -6723,6 +6726,7 @@
           localStorage.setItem('much_completed_stations', '{}');
           localStorage.removeItem('much_quiz_prize');
           localStorage.removeItem('much_mission_reward_claimed');
+          window.MuchStationCompletion?.clearPendingNotice();
           currentStation = '1';
           localStorage.setItem('much_current_station', '1');
           updateCompletedStationsOnMap();

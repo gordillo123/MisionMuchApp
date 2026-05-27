@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/btn-back-premium.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="../assets/station-completion.css">
   <link rel="stylesheet" href="../assets/quiz-options.css">
 </head>
 
@@ -116,7 +117,7 @@
 
       <section id="finalView" class="d-none text-center py-4">
         <h2 id="finalTitle" class="h4 fw-bold mb-2">Resultados</h2>
-        <p id="finalMsg" class="text-secondary mb-4"></p>
+        <div id="finalMsg" class="result-message text-secondary mb-4"></div>
 
         <div class="result-score mb-4">
           <div class="display-4 fw-bold text-primary mb-0"><span id="finalPoints">0</span></div>
@@ -127,8 +128,10 @@
           Aciertos: <strong id="finalCorrect">0</strong> de <strong id="finalTotal">0</strong>
         </p>
 
+        <div id="finalAutoNote" class="station-auto-note d-none" aria-live="polite"></div>
+
         <div id="giftRow" class="d-flex flex-column gap-2 d-none">
-          <button id="nextStationBtn" class="btn btn-success w-100 py-3 rounded-4">Volver al mapa</button>
+          <button id="nextStationBtn" class="btn btn-success w-100 py-3 rounded-4">Volver al mapa y continuar</button>
           <button id="playAgainBtn1" class="btn btn-outline-secondary w-100 py-2 rounded-4">🔁 Jugar otra vez</button>
         </div>
 
@@ -143,6 +146,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script src="../scripts/orientation-manager.js"></script>
+  <script src="../scripts/station-completion.js"></script>
   <script src="preguntas-local.js"></script>
   <script src="app.js"></script>
 
