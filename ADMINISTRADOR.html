@@ -1332,26 +1332,16 @@
       'muchtuxtla@gmail.com'
     ];
     const TICKET_SELECT_FIELDS = 'id,nombre,correo,telefono,folio,valido_desde,valido_hasta,estatus,tipo_entrada,created_at';
-    const SUPABASE_URL = 'https://qwgaeorsymfispmtsbut.supabase.co';
-    const SUPABASE_ANON_KEY =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3Z2Flb3JzeW1maXNwbXRzYnV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzODcyODUsImV4cCI6MjA3Nzk2MzI4NX0.FThZIIpz3daC9u8QaKyRTpxUeW0v4QHs5sHX2s1U1eo';
+    const API_BASE_URL = 'http://localhost:3000';
 
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        detectSessionInUrl: false
-      }
-    });
-
-    const sbAuth = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        storageKey: 'mision-much-admin-auth',
-        detectSessionInUrl: false
-      }
-    });
+    function obtenerHeadersAutorizacion() {
+      const user = JSON.parse(localStorage.getItem('much_google_user') || '{}');
+      return {
+        'Content-Type': 'application/json',
+        'x-user-id': String(user.id_usuario || user.id || '1'),
+        'x-user-email': String(user.email || 'planetariotuxtla@gmail.com')
+      };
+    }
 
     const state = {
       records: [],
@@ -1579,14 +1569,10 @@
       if (currentPanelView === 'admin') {
         await loadRecords();
       }
-    }
-
-    async function authorizeAdminSession(session) {
-      const user = session?.user || null;
+    }    async function authorizeAdminSession(user) {
       const email = normalizeAdminEmail(user?.email);
 
       if (!user || !email || !isAllowedAdminEmail(email)) {
-        await sbAuth.auth.signOut();
         await showAdminLogin('Esta cuenta no tiene permiso para entrar al administrador.', 'error');
         return false;
       }
@@ -1605,13 +1591,14 @@
       setAdminAuthLoading(true);
       
       try {
-        // Acceso directo sin verificación de login
-        showAdminShell({ email: 'Admin' });
-        await bootstrapAdminDashboard();
-        if (currentPanelView === 'admin') {
-          startTicketSync();
+        const user = JSON.parse(localStorage.getItem('much_google_user') || 'null');
+        if (user && isAllowedAdminEmail(user.email)) {
+          const authorized = await authorizeAdminSession(user);
+          if (authorized) {
+            setAdminAuthMessage(`Sesión iniciada como ${user.email}.`, 'success');
+          }
         } else {
-          stopTicketSync();
+          await showAdminLogin('Inicia sesión con Google para continuar.');
         }
       } catch (error) {
         console.error('Error inicializando administrador:', error);
@@ -1623,42 +1610,20 @@
 
     async function handleAdminLoginSubmit(event) {
       event.preventDefault();
-
-      const email = normalizeAdminEmail(els.adminEmail.value);
-      const password = els.adminPassword.value;
-
-      if (!isAllowedAdminEmail(email)) {
-        setAdminAuthMessage('Solo las cuentas autorizadas pueden acceder a este panel.', 'error');
-        return;
-      }
-
-      if (!password) {
-        setAdminAuthMessage('Escribe la contraseña del administrador para continuar.', 'error');
-        return;
-      }
-
       setAdminAuthLoading(true);
-      setAdminAuthMessage('Iniciando sesion y conectando con Supabase...');
+      setAdminAuthMessage('Conectando con Google...');
 
       try {
-        const { data, error } = await sbAuth.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (error) throw error;
-
-        const authorized = await authorizeAdminSession(data?.session || null);
-        if (authorized) {
-          setAdminAuthMessage(`Sesion iniciada como ${email}.`, 'success');
+        const user = await window.iniciarSesionConGoogle();
+        if (user) {
+          const authorized = await authorizeAdminSession(user);
+          if (authorized) {
+            setAdminAuthMessage(`Sesión iniciada como ${user.email}.`, 'success');
+          }
         }
       } catch (error) {
         console.error('Error de login administrador:', error);
-        const readableError = error?.message === 'Invalid login credentials'
-          ? 'Credenciales invalidas. Verifica el correo autorizado y la contraseña configurada en Supabase Auth.'
-          : (error?.message || 'No se pudo iniciar sesion.');
-
-        await showAdminLogin(readableError, 'error');
+        await showAdminLogin(error?.message || 'No se pudo iniciar sesión con Google.', 'error');
       } finally {
         setAdminAuthLoading(false);
       }
@@ -1668,14 +1633,12 @@
       if (scannerState.active) {
         await stopScanner();
       }
-
       try {
-        await sbAuth.auth.signOut();
+        await window.cerrarSesion();
       } catch (error) {
-        console.error('Error cerrando sesion del administrador:', error);
+        console.error('Error cerrando sesión del administrador:', error);
       }
-
-      await showAdminLogin('Sesion cerrada correctamente.');
+      await showAdminLogin('Sesión cerrada correctamente.');
     }
 
     function stopTicketSync() {
@@ -1683,12 +1646,6 @@
         window.clearInterval(adminState.refreshIntervalId);
         adminState.refreshIntervalId = null;
       }
-
-      if (adminState.realtimeChannel) {
-        sb.removeChannel(adminState.realtimeChannel);
-        adminState.realtimeChannel = null;
-      }
-
       adminState.refreshQueued = false;
     }
 
@@ -1710,29 +1667,7 @@
           loadRecords({ silent: true });
         }, 30000);
       }
-
-      if (adminState.realtimeChannel) return;
-
-      try {
-        adminState.realtimeChannel = sb
-          .channel('admin-ganadores-live')
-          .on(
-            'postgres_changes',
-            { event: '*', schema: 'public', table: 'Ganadores' },
-            () => {
-              queueTicketRefresh();
-            }
-          )
-          .subscribe((status) => {
-            if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-              console.warn('La suscripcion en tiempo real del administrador no pudo mantenerse activa.');
-            }
-          });
-      } catch (error) {
-        console.warn('No se pudo iniciar la sincronizacion en tiempo real:', error);
-      }
     }
-
     function setScannerSupport(message, tone = '') {
       if (!els.scannerSupport) return;
       els.scannerSupport.textContent = message;
@@ -1892,22 +1827,78 @@
               ${escapeHtml(rawValue)}
             </div>
           ` : ''}
+
+          ${(recordId && recordId !== 'Sin ID') ? `
+            <div class="scan-actions" style="display: flex; gap: 15px; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+              ${(dbStatus === 'activo' || dbStatus === 'Vigente') ? `
+                <button class="solid-button" style="flex: 1; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer;" onclick="window.canjearBoletoTaquilla('${recordId}')">🎟️ Canjear Boleto</button>
+              ` : ''}
+              ${(dbStatus !== 'cancelado') ? `
+                <button class="soft-button" style="flex: 1; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer;" onclick="window.cancelarBoletoTaquilla('${recordId}')">🚫 Cancelar Boleto</button>
+              ` : ''}
+            </div>
+          ` : ''}
         </article>
       `;
     }
 
+    window.canjearBoletoTaquilla = async function(idBoleto) {
+      if (!confirm('¿Estás seguro de que deseas MARCAR este boleto como CANJEADO?')) return;
+      setScannerFeedback('Procesando canje...');
+      try {
+        const user = JSON.parse(localStorage.getItem('much_google_user') || '{}');
+        const res = await fetch(`http://localhost:3000/api/taquilla/boletos/${idBoleto}/canjear`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-user-id': String(user.id_usuario || user.id || '1')
+          },
+          body: JSON.stringify({ observaciones: 'Canje manual desde panel de taquilla' })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'No se pudo canjear.');
+        setScannerFeedback('¡Boleto canjeado con éxito!', 'success');
+        // Recargar el boleto de forma automática
+        await validateTicket(scannerState.lastFolio);
+      } catch (error) {
+        setScannerFeedback(error.message, 'error');
+      }
+    };
+
+    window.cancelarBoletoTaquilla = async function(idBoleto) {
+      if (!confirm('¿Estás seguro de que deseas CANCELAR este boleto? Esta acción es irreversible.')) return;
+      setScannerFeedback('Procesando cancelación...');
+      try {
+        const user = JSON.parse(localStorage.getItem('much_google_user') || '{}');
+        const res = await fetch(`http://localhost:3000/api/taquilla/boletos/${idBoleto}/cancelar`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-user-id': String(user.id_usuario || user.id || '1')
+          },
+          body: JSON.stringify({ observaciones: 'Cancelación manual desde panel de taquilla' })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'No se pudo cancelar.');
+        setScannerFeedback('Boleto cancelado / dado de baja con éxito.', 'error');
+        await validateTicket(scannerState.lastFolio);
+      } catch (error) {
+        setScannerFeedback(error.message, 'error');
+      }
+    };
+
     function normalizeTicketRecord(record) {
       return {
-        id: record?.id ?? null,
-        nombre: record?.nombre || '',
-        correo: record?.correo || '',
-        telefono: record?.telefono || '',
+        id: record?.id_boleto ?? record?.id ?? null,
+        nombre: record?.nombre_usuario ?? record?.nombre ?? '',
+        correo: record?.correo_usuario ?? record?.correo ?? '',
+        telefono: record?.telefono ?? '',
         folio: record?.folio || '',
-        valido_desde: record?.valido_desde || null,
-        valido_hasta: record?.valido_hasta || null,
-        estatus: record?.estatus || '',
-        tipo_entrada: record?.tipo_entrada || '',
-        created_at: record?.created_at || null
+        valido_desde: record?.fecha_generacion ?? record?.valido_desde ?? null,
+        valido_hasta: record?.valido_hasta ?? null,
+        estatus: record?.estado ?? record?.estatus ?? '',
+        tipo_entrada: record?.tipo_entrada ?? 'Entrada General',
+        created_at: record?.fecha_generacion ?? record?.created_at ?? null
       };
     }
 
@@ -1948,49 +1939,43 @@
 
       return { key: 'vigente', label: 'Vigente', className: 'tone-vigente', isValid: true };
     }
-
     async function fetchRecordByLookup(value) {
       const lookup = String(value ?? '').trim();
       if (!lookup) return null;
 
-      const extractedFolio = extractFolioFromScan(lookup);
-      const idCandidate = /^\d+$/.test(lookup) ? Number(lookup) : null;
-      let lastError = null;
+      // Intentar extraer token de QR si el lookup es una URL
+      let qrToken = '';
+      try {
+        const parsedUrl = new URL(lookup);
+        qrToken = parsedUrl.searchParams.get('token') || '';
+      } catch (e) {
+        // No es una URL válida
+      }
 
-      if (extractedFolio) {
-        const { data, error } = await sb
-          .from('Ganadores')
-          .select(TICKET_SELECT_FIELDS)
-          .eq('folio', extractedFolio)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
+      // Si no es URL, pero tiene 32 caracteres hexadecimales, asumimos que es el token directo
+      if (!qrToken && /^[a-fA-F0-9]{32}$/.test(lookup)) {
+        qrToken = lookup;
+      }
 
-        if (error) {
-          lastError = error;
-        } else if (data) {
+      const headers = obtenerHeadersAutorizacion();
+
+      if (qrToken) {
+        const res = await fetch(`http://localhost:3000/api/taquilla/boleto/qr/${qrToken}`, { headers });
+        if (res.ok) {
+          const data = await res.json();
           return normalizeTicketRecord(data);
         }
       }
 
-      if (idCandidate !== null) {
-        const { data, error } = await sb
-          .from('Ganadores')
-          .select(TICKET_SELECT_FIELDS)
-          .eq('id', idCandidate)
-          .maybeSingle();
-
-        if (error) {
-          lastError = error;
-        } else if (data) {
-          return normalizeTicketRecord(data);
-        }
+      const extractedFolio = extractFolioFromScan(lookup) || lookup;
+      const res = await fetch(`http://localhost:3000/api/taquilla/boleto/folio/${extractedFolio}`, { headers });
+      if (res.ok) {
+        const data = await res.json();
+        return normalizeTicketRecord(data);
       }
 
-      if (lastError) throw lastError;
       return null;
     }
-
     async function validateTicket(rawValue) {
       const lookup = String(rawValue ?? '').trim();
       const folio = extractFolioFromScan(lookup);
@@ -2416,29 +2401,33 @@
         els.tableBody.innerHTML = `
           <tr>
             <td colspan="11" class="empty-state">
-              <strong>Cargando informacion...</strong>
-              <span>Se esta consultando la tabla Ganadores.</span>
+              <strong>Cargando información...</strong>
+              <span>Se está consultando el backend de MySQL local.</span>
             </td>
           </tr>
         `;
       }
 
       try {
-        const { data, error } = await sb
-          .from('Ganadores')
-          .select(TICKET_SELECT_FIELDS)
-          .order('created_at', { ascending: false });
+        const res = await fetch('http://localhost:3000/api/admin/boletos', {
+          headers: obtenerHeadersAutorizacion()
+        });
 
-        if (error) throw error;
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || 'Error al consultar boletos.');
+        }
+
+        const data = await res.json();
 
         state.records = normalizeTicketRecords(data || []);
         state.syncedAt = new Date();
         state.error = '';
       } catch (error) {
-        console.error('Error cargando Ganadores:', error);
+        console.error('Error cargando boletos:', error);
         if (!silent) {
           state.records = [];
-          state.error = error?.message || 'No se pudo consultar la tabla Ganadores.';
+          state.error = error?.message || 'No se pudo consultar los boletos.';
         }
       } finally {
         if (!silent) setLoading(false);

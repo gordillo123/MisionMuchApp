@@ -1,17 +1,25 @@
-const { Pool } = require('pg');
+// backend/db.js
+// Configuración de la conexión a MySQL usando mysql2/promise
+
+const mysql = require('mysql2/promise');
 require('dotenv').config();
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_DATABASE,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
+console.log('⏳ Intentando conectar con MySQL local...');
+
+const pool = mysql.createPool({
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '3306'),
+  database: process.env.DB_DATABASE || 'mision_much',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
-// Probar conexión inicial
-pool.connect()
-  .then(() => console.log('✅ Conexión a PostgreSQL establecida correctamente.'))
-  .catch(err => console.error('❌ Error al conectar con PostgreSQL:', err.message));
+// Probar la conexión inicial
+pool.query('SELECT 1')
+  .then(() => console.log('✅ Conexión a MySQL establecida correctamente.'))
+  .catch(err => console.error('❌ Error al conectar con MySQL:', err.message));
 
 module.exports = pool;

@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Validación Entrada MUCH</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <style>
     body { font-family: system-ui, sans-serif; background: #0f172a; color: white; text-align: center; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
@@ -40,19 +39,7 @@
   </div>
 
   <script>
-    // Configuración
-    const SUPABASE_URL = 'https://qwgaeorsymfispmtsbut.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3Z2Flb3JzeW1maXNwbXRzYnV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzODcyODUsImV4cCI6MjA3Nzk2MzI4NX0.FThZIIpz3daC9u8QaKyRTpxUeW0v4QHs5sHX2s1U1eo';
-    const SUPABASE_PUBLIC_OPTIONS = {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        detectSessionInUrl: false
-      }
-    };
-
-    // Inicializar cliente (usando la variable global 'supabase')
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_PUBLIC_OPTIONS);
+    const API_BASE_URL = 'http://localhost:3000';
 
     const loader = document.getElementById('loader');
     const resultArea = document.getElementById('resultArea');
@@ -64,7 +51,6 @@
     const params = new URLSearchParams(window.location.search);
     const folioBoleto = params.get('folio') || params.get('ticket');
 
-    // Cambiar mensaje inicial para confirmar que el JS corre
     loader.textContent = "Buscando boleto...";
 
     if (!folioBoleto) {
@@ -75,122 +61,95 @@
 
     async function verificarBoleto(id) {
       try {
-        loader.textContent = "Consultando base de datos...";
+        loader.textContent = "Consultando base de datos MySQL local...";
 
-        // Consultar tabla 'Ganadores' (asegúrate que exista en Supabase)
-        const { data, error } = await sb
-          .from('Ganadores') 
-          .select('*')
-          .eq('folio', id)
-          .single();
-
+        const res = await fetch(`${API_BASE_URL}/api/boletos/${id}`);
         loader.style.display = 'none';
         resultArea.style.display = 'block';
 
-        if (error || !data) {
+        if (!res.ok) {
           statusBox.textContent = '❌ NO EXISTE';
           statusBox.className = 'status invalid';
-          details.innerHTML = `<p>El folio <b>${id}</b> no se encuentra registrado.</p>`;
+          details.innerHTML = `<p>El folio <b>${id}</b> no se encuentra registrado en MySQL.</p>`;
           return;
         }
 
-        // --- Inicio: Captura de Geolocalización (fire-and-forget) ---
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(async (position) => {
-            const { latitude, longitude } = position.coords;
-            const locationString = `${latitude}, ${longitude}`;
-            console.log('Geolocalización capturada:', locationString);
-
-            try {
-              const { error: geoError } = await sb
-                .from('Ganadores')
-                .update({ ubicacion: locationString })
-                .eq('folio', id);
-              
-              if (geoError) {
-                console.error('Error al guardar geolocalización en Supabase:', geoError.message);
-              } else {
-                console.log('Geolocalización guardada para el folio:', id);
-              }
-            } catch (e) {
-              console.error('Error inesperado al intentar guardar geolocalización:', e.message);
-            }
-          }, (err) => {
-            console.warn(`No se pudo obtener la geolocalización: ${err.message}`);
-          }, {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-          });
-        } else {
-          console.warn('Geolocalización no soportada en este navegador.');
-        }
-        // --- Fin: Captura de Geolocalización ---
-
-        // Cálculos de fecha
-        const fechaLimite = new Date(data.valido_hasta);
-        const hoy = new Date();
-        const estaVencido = hoy > fechaLimite;
+        const data = await res.json();
 
         // Mostrar información
         details.innerHTML = `
           <span class="label">Participante</span>
-          <p style="font-size:18px; color:white; font-weight:bold">${data.nombre || 'Sin nombre'}</p>
+          <p style="font-size:18px; color:white; font-weight:bold">${data.nombre_usuario || 'Sin nombre'}</p>
           <span class="label">Folio</span>
           <p style="font-family:monospace; color:#22d3ee; font-size:16px">${data.folio}</p>
-          <span class="label">Vence</span>
-          <p>${fechaLimite.toLocaleDateString('es-MX')}</p>
+          <span class="label">Correo</span>
+          <p style="font-size:14px; color:#cbd5e1">${data.correo_usuario || 'Sin correo'}</p>
+          <span class="label">Fecha Generación</span>
+          <p>${new Date(data.fecha_generacion).toLocaleDateString('es-MX', { hour: '2-digit', minute: '2-digit' })}</p>
         `;
 
         // Lógica de validación (Semáforo)
-        if (data.estatus === 'canjeado') {
-          // YA SE USÓ
+        if (data.estado === 'canjeado' || data.usado) {
           statusBox.textContent = '⚠️ YA USADO';
           statusBox.className = 'status used';
           details.innerHTML += `<p style="color:#f59e0b; font-weight:bold; margin-top:10px; border-top:1px solid #333; padding-top:10px">Este boleto ya fue validado antes.</p>`;
           btnCanjear.style.display = 'none';
           
-        } else if (estaVencido) {
-          // FECHA PASADA
+        } else if (data.estado === 'cancelado') {
+          statusBox.textContent = '🚫 CANCELADO';
+          statusBox.className = 'status invalid';
+          details.innerHTML += `<p style="color:#ef4444; font-weight:bold; margin-top:10px; border-top:1px solid #333; padding-top:10px">Este boleto está cancelado.</p>`;
+          btnCanjear.style.display = 'none';
+          
+        } else if (data.estado === 'vencido') {
           statusBox.textContent = '⛔ CADUCADO';
           statusBox.className = 'status invalid';
           details.innerHTML += `<p style="color:#f87171; font-weight:bold; margin-top:10px;">Su vigencia terminó.</p>`;
           btnCanjear.style.display = 'none';
           
         } else {
-          // ACTIVO Y LISTO PARA VALIDAR
           statusBox.textContent = '✅ ACTIVO';
           statusBox.className = 'status valid';
           btnCanjear.style.display = 'block';
         }
 
-        // Evento del botón
+        // Evento del botón de Validar Entrada
         btnCanjear.onclick = async () => {
-          if(!confirm(`¿Confirmar acceso para ${data.nombre}?`)) return;
+          if (!confirm(`¿Confirmar acceso para ${data.nombre_usuario || 'Participante'}?`)) return;
           
           btnCanjear.disabled = true;
           btnCanjear.textContent = "Registrando...";
           
-          const update = await sb
-            .from('Ganadores')
-            .update({ estatus: 'canjeado' })
-            .eq('folio', id);
+          try {
+            // Simulamos x-user-id como 1 (Administrador) para fines de validación rápida
+            const updateRes = await fetch(`${API_BASE_URL}/api/taquilla/boletos/${data.id_boleto}/canjear`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-user-id': '1' // ID de administrador o taquilla por defecto para el log
+              },
+              body: JSON.stringify({ observaciones: 'Canje automático vía validador rápido de entrada' })
+            });
 
-          if (update.error) {
-            alert("Error al guardar: " + update.error.message);
-            btnCanjear.disabled = false;
-            btnCanjear.textContent = "✅ VALIDAR ENTRADA";
-          } else {
+            if (!updateRes.ok) {
+              const errData = await updateRes.json();
+              throw new Error(errData.error || 'Error de canje en el backend.');
+            }
+
             alert("¡Entrada validada con éxito!");
             window.location.reload();
+          } catch (err) {
+            alert("Error al validar entrada: " + err.message);
+            btnCanjear.disabled = false;
+            btnCanjear.textContent = "✅ VALIDAR ENTRADA";
           }
         };
 
       } catch (e) {
-        loader.textContent = "Error de conexión";
+        loader.textContent = "Error de conexión local";
         loader.style.color = "red";
         console.error(e);
-        alert("Ocurrió un error: " + e.message);
+        alert("Ocurrió un error de comunicación local: " + e.message);
       }
     }
   </script>

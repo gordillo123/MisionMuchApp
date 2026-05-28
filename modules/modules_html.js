@@ -216,30 +216,88 @@ window.APP_MODULES = {
   `,
 
   "modules/profile.html": `
-<div class="profile-card">
+<div class="profile-card profile-card--expanded">
   <button class="modal-close" id="btnCerrarPerfil">×</button>
-  <div class="profile-header">
-    <div class="profile-avatar-wrap">
-      <img src="avatars/dino1.png" class="profile-avatar-img" id="profAvatarImg">
-    </div>
-    <h2 class="profile-name" id="profName">Explorador</h2>
-    <p style="color: #A0A4B8;" id="profEmail">invitado@misionmuch.com</p>
-  </div>
+  
+  <div class="profile-layout">
+    <!-- COLUMNA IZQUIERDA: DETALLES DE USUARIO Y AVANCE -->
+    <div class="profile-sidebar">
+      <div class="profile-header">
+        <div class="profile-avatar-wrap">
+          <img src="avatars/dino1.png" class="profile-avatar-img" id="profAvatarImg">
+          <span class="profile-badge" id="profUserBadge">Explorador</span>
+        </div>
+        <h2 class="profile-name" id="profName">Explorador</h2>
+        <p class="profile-email" id="profEmail">invitado@misionmuch.com</p>
+        <p class="profile-reg-date" id="profRegDate">Registrado: --/--/----</p>
+      </div>
 
-  <div class="profile-stats">
-    <div class="stat-box">
-      <span class="stat-value" id="profScore">0</span>
-      <span class="stat-label">Puntaje Total</span>
-    </div>
-    <div class="stat-box">
-      <span class="stat-value" id="profRank">--</span>
-      <span class="stat-label">Rango</span>
-    </div>
-  </div>
+      <!-- Medidor de progreso visual -->
+      <div class="profile-progress-widget">
+        <div class="widget-header">
+          <span class="widget-title">Progreso de Recorrido</span>
+          <span class="widget-pct" id="profProgressPct">0%</span>
+        </div>
+        <div class="widget-progress-bar-wrap">
+          <div class="widget-progress-bar" id="profProgressBar" style="width: 0%;"></div>
+        </div>
+        <div class="widget-stats">
+          <div class="widget-stat">
+            <span class="w-stat-val" id="profCompletedCount">0</span>
+            <span class="w-stat-lbl">Completadas</span>
+          </div>
+          <div class="widget-stat">
+            <span class="w-stat-val" id="profRemainingCount">5</span>
+            <span class="w-stat-lbl">Pendientes</span>
+          </div>
+        </div>
+      </div>
 
-  <div class="profile-actions">
-    <button class="btn-profile-action btn-profile-primary" id="btnCambiarAvatar">Cambiar Avatar</button>
-    <button class="btn-profile-action" onclick="localStorage.clear(); location.reload();">Cerrar Sesión</button>
+      <div class="profile-actions">
+        <button class="btn-profile-action btn-profile-primary" id="btnCambiarAvatar">Cambiar Avatar</button>
+        <button class="btn-profile-action btn-profile-danger" onclick="window.cerrarSesion ? window.cerrarSesion().finally(() => location.reload()) : (localStorage.clear(), location.reload());">Cerrar Sesión</button>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA: ESTACIÓN ACTUAL, DETALLE DE PUNTOS Y HISTORIAL BOLETOS -->
+    <div class="profile-main">
+      
+      <!-- Sección Estación Actual -->
+      <div class="profile-section-card current-station-card">
+        <div class="section-card-icon">📍</div>
+        <div class="section-card-info">
+          <span class="card-kicker">Estación Actual</span>
+          <strong class="card-val" id="profCurrentStation">Espinosaurio</strong>
+        </div>
+      </div>
+
+      <!-- Sección Tabla de Puntuaciones / Estaciones -->
+      <div class="profile-section">
+        <h3 class="section-title">🏆 Puntuación por Estación</h3>
+        <div class="profile-stats-summary">
+          <div class="summary-box">
+            <span class="summary-val" id="profScore">0</span>
+            <span class="summary-lbl">Puntos Totales</span>
+          </div>
+          <div class="summary-box">
+            <span class="summary-val" id="profRank">Novato</span>
+            <span class="summary-lbl">Rango</span>
+          </div>
+        </div>
+        <div class="stations-grid" id="profStationsGrid">
+          <!-- Cargado dinámicamente -->
+        </div>
+      </div>
+
+      <!-- Sección Historial de Boletos -->
+      <div class="profile-section">
+        <h3 class="section-title">🎟️ Historial de Boletos</h3>
+        <div class="tickets-list" id="profTicketsList">
+          <!-- Cargado dinámicamente -->
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>
   `,

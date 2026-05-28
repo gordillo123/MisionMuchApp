@@ -3566,28 +3566,62 @@
 
     /* 👤 PERFIL MODAL */
     .profile-card {
-      background: rgba(26, 28, 44, 0.95);
+      background: rgba(20, 21, 35, 0.98);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 2px solid rgba(255, 255, 255, 0.1);
       border-radius: 30px;
-      width: 400px;
-      max-width: 90vw;
-      padding: 2.5rem;
-      text-align: center;
+      width: 720px;
+      max-width: 95vw;
+      max-height: 90vh;
+      padding: 2rem;
       position: relative;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(255,255,255,0.02);
       animation: modalFadeIn 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      overflow-y: auto;
+      overflow-x: hidden;
+      font-family: 'Outfit', 'Inter', sans-serif;
+    }
+
+    .profile-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 2rem;
+      text-align: left;
+    }
+
+    @media (max-width: 680px) {
+      .profile-card {
+        padding: 1.5rem;
+      }
+      .profile-layout {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    .profile-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .profile-main {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
     }
 
     .profile-header {
-      margin-bottom: 2rem;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 1.25rem;
     }
 
     .profile-avatar-wrap {
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 1.5rem;
+      width: 110px;
+      height: 110px;
+      margin: 0 auto 1.25rem;
       position: relative;
     }
 
@@ -3597,77 +3631,469 @@
       border-radius: 50%;
       border: 4px solid var(--msf-yellow);
       background: var(--bg-soft);
-      padding: 5px;
+      padding: 4px;
       object-fit: cover;
-      box-shadow: 0 0 20px rgba(226, 194, 136, 0.3);
+      box-shadow: 0 0 20px rgba(255, 192, 0, 0.2);
+    }
+
+    .profile-badge {
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--msf-purple);
+      color: white;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      border: 2px solid #141523;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .profile-name {
-      font-size: 1.8rem;
-      font-family: 'Outfit', sans-serif;
-      font-weight: 800;
+      font-size: 1.5rem;
+      font-weight: 850;
       color: white;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .profile-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .stat-box {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 1rem;
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .stat-value {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--msf-yellow);
-      display: block;
-    }
-
-    .stat-label {
-      font-size: 0.8rem;
+    .profile-email {
       color: #A0A4B8;
+      font-size: 0.82rem;
+      word-break: break-all;
+      margin: 0;
+    }
+
+    .profile-reg-date {
+      color: #718096;
+      font-size: 0.72rem;
+      margin: 0.5rem 0 0 0;
+      font-weight: 600;
+    }
+
+    /* PROGRESO WIDGET */
+    .profile-progress-widget {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      padding: 1rem;
+    }
+
+    .widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+    }
+
+    .widget-title {
+      font-size: 0.72rem;
       text-transform: uppercase;
+      color: #718096;
+      font-weight: 800;
       letter-spacing: 1px;
     }
 
+    .widget-pct {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--msf-pink);
+    }
+
+    .widget-progress-bar-wrap {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+    }
+
+    .widget-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--msf-blue), var(--msf-pink));
+      border-radius: 10px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .widget-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 0.6rem;
+    }
+
+    .widget-stat {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .w-stat-val {
+      font-size: 0.95rem;
+      font-weight: 850;
+      color: white;
+    }
+
+    .w-stat-lbl {
+      font-size: 0.65rem;
+      color: #A0A4B8;
+    }
+
+    /* SECCIÓN CARD */
+    .profile-section-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 0.9rem 1.25rem;
+    }
+
+    .section-card-icon {
+      font-size: 2rem;
+    }
+
+    .section-card-info {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .card-kicker {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      color: #A0A4B8;
+      letter-spacing: 0.8px;
+      font-weight: 700;
+    }
+
+    .card-val {
+      font-size: 1.15rem;
+      font-weight: 850;
+      color: white;
+    }
+
+    /* SECCIONES Y CONTENIDOS */
+    .profile-section {
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 24px;
+      padding: 1.25rem;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 850;
+      color: white;
+      margin: 0 0 1rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-align: left;
+    }
+
+    .profile-stats-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .summary-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 0.75rem 1rem;
+      border-radius: 16px;
+      text-align: center;
+    }
+
+    .summary-val {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--msf-yellow);
+    }
+
+    .summary-lbl {
+      font-size: 0.68rem;
+      color: #A0A4B8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ESTACIONES LISTA */
+    .stations-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .station-row-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 0.75rem 1.1rem;
+      border-radius: 16px;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .station-row-card:hover {
+      transform: translateX(4px);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .station-row-card.pending {
+      opacity: 0.55;
+      border-style: dashed;
+    }
+
+    .station-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .station-name {
+      font-size: 0.88rem;
+      font-weight: 750;
+      color: white;
+    }
+
+    .station-points-pill {
+      font-size: 0.65rem;
+      background: rgba(119, 90, 255, 0.15);
+      border: 1px solid rgba(119, 90, 255, 0.35);
+      color: #b2a8ff;
+      padding: 1px 6px;
+      border-radius: 8px;
+      font-weight: 800;
+    }
+
+    .station-points-pill.espinosaurio {
+      background: rgba(255, 197, 73, 0.12);
+      border: 1px solid rgba(255, 197, 73, 0.35);
+      color: var(--msf-yellow);
+    }
+
+    .station-score-badge {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.1rem;
+    }
+
+    .score-badge-val {
+      font-size: 0.9rem;
+      font-weight: 850;
+      color: #10b981;
+    }
+
+    .score-badge-val.pending {
+      color: #718096;
+    }
+
+    .score-badge-lbl {
+      font-size: 0.65rem;
+      color: #A0A4B8;
+    }
+
+    /* HISTORIAL BOLETOS */
+    .tickets-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .ticket-card {
+      display: flex;
+      background: linear-gradient(135deg, #1d2035 0%, #151624 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .ticket-card::before, .ticket-card::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #141523;
+      border-radius: 50%;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+    }
+
+    .ticket-card::before {
+      left: -6px;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .ticket-card::after {
+      right: -6px;
+      border-left: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .ticket-stub {
+      flex: 1;
+      padding: 0.8rem 1.1rem;
+      border-right: 2px dashed rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .ticket-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .ticket-type-pill {
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .ticket-type-pill.much {
+      background: rgba(230, 0, 122, 0.15);
+      border: 1px solid rgba(230, 0, 122, 0.4);
+      color: var(--msf-pink);
+    }
+
+    .ticket-type-pill.planetario {
+      background: rgba(0, 201, 183, 0.15);
+      border: 1px solid rgba(0, 201, 183, 0.4);
+      color: var(--turquesa);
+    }
+
+    .ticket-folio {
+      font-family: monospace;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: white;
+      letter-spacing: 0.5px;
+      margin: 0;
+    }
+
+    .ticket-date {
+      font-size: 0.65rem;
+      color: #718096;
+      margin: 0;
+    }
+
+    .ticket-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 1.1rem;
+      font-weight: 800;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      width: 95px;
+      box-sizing: border-box;
+    }
+
+    .ticket-badge.activo {
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.08);
+    }
+
+    .ticket-badge.usado {
+      color: #718096;
+      background: rgba(113, 128, 150, 0.08);
+    }
+
+    .ticket-badge.cancelado {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.08);
+    }
+
+    .no-tickets-msg {
+      text-align: center;
+      color: #A0A4B8;
+      font-size: 0.82rem;
+      padding: 1.5rem 1rem;
+      border: 2px dashed rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.015);
+      line-height: 1.4;
+      font-weight: 550;
+    }
+
+    /* PROFILE ACTIONS */
     .profile-actions {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
     }
 
     .btn-profile-action {
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       color: white;
-      padding: 1rem;
-      border-radius: 15px;
-      font-weight: 600;
+      padding: 0.85rem;
+      border-radius: 14px;
+      font-weight: 650;
       cursor: pointer;
       transition: all 0.2s;
+      font-family: inherit;
+      font-size: 0.9rem;
     }
 
     .btn-profile-action:hover {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255,255,255,0.18);
     }
 
     .btn-profile-primary {
       background: linear-gradient(135deg, var(--msf-purple), var(--msf-blue));
       color: white;
-      font-weight: 700;
+      font-weight: 750;
+      border: none;
+      box-shadow: 0 4px 15px rgba(119, 90, 255, 0.2);
     }
 
     .btn-profile-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(119, 90, 255, 0.4);
+      box-shadow: 0 6px 20px rgba(119, 90, 255, 0.35);
+    }
+
+    .btn-profile-danger {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #ff6b6b;
+      font-weight: 600;
+    }
+
+    .btn-profile-danger:hover {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: white;
     }
 
     /* 📱 MÓDULOS Y DIÁLOGOS COMPACTOS PARA MÓVIL EN HORIZONTAL (LANDSCAPE) */
@@ -6792,55 +7218,212 @@
         }
       }
 
-      function openProfile() {
+      async function openProfile() {
         if (!googleUser && !selectedAvatar) {
           startGameFlow();
           return;
         }
 
-        profName.innerText = (googleUser ? googleUser.name : selectedAvatar.name) || 'Explorador';
-        profEmail.innerText = googleUser ? googleUser.email : 'Modo Invitado';
-        profAvatarImg.src = `avatars/${selectedAvatar ? selectedAvatar.id : 'dino1'}.png`;
-        
-        // Simular carga de puntaje (aquí se podría sumar de Supabase)
-        profScore.innerText = 'Cargando...';
-        loadTotalScore();
-
+        // Mostrar el modal primero con cargando
         profileOverlay.classList.add('open');
-      }
 
-      async function loadTotalScore() {
-        try {
-          const sb = await initSupabase();
-          let total = 0;
-          const userId = googleUser ? googleUser.email : null;
+        const isGuest = !googleUser;
+        
+        // Elementos UI
+        const nameEl = document.getElementById('profName');
+        const emailEl = document.getElementById('profEmail');
+        const regDateEl = document.getElementById('profRegDate');
+        const avatarImgEl = document.getElementById('profAvatarImg');
+        const userBadgeEl = document.getElementById('profUserBadge');
+        
+        const pctEl = document.getElementById('profProgressPct');
+        const barEl = document.getElementById('profProgressBar');
+        const completedEl = document.getElementById('profCompletedCount');
+        const remainingEl = document.getElementById('profRemainingCount');
+        
+        const currentStationEl = document.getElementById('profCurrentStation');
+        const scoreEl = document.getElementById('profScore');
+        const rankEl = document.getElementById('profRank');
+        
+        const stationsGridEl = document.getElementById('profStationsGrid');
+        const ticketsListEl = document.getElementById('profTicketsList');
 
-          if (userId) {
-            const [qRes, iRes] = await Promise.all([
-              sb.from('quizzes').select('puntaje_total').eq('participante_id', userId),
-              sb.from('intentos_juego').select('puntaje').eq('participante_id', userId)
-            ]);
-
-            const qSum = (qRes.data || []).reduce((acc, curr) => acc + (Number(curr.puntaje_total) || 0), 0);
-            const iSum = (iRes.data || []).reduce((acc, curr) => acc + (Number(curr.puntaje) || 0), 0);
-            total = qSum + iSum;
+        // Estado inicial de carga
+        if (nameEl) nameEl.innerText = isGuest ? (selectedAvatar?.name || 'Explorador') : (googleUser.name || 'Cargando...');
+        if (emailEl) emailEl.innerText = isGuest ? 'Modo Invitado' : (googleUser.email || '');
+        if (regDateEl) regDateEl.innerText = 'Cargando...';
+        if (userBadgeEl) userBadgeEl.innerText = isGuest ? 'Invitado' : 'Google';
+        
+        if (avatarImgEl) {
+          if (isGuest) {
+            avatarImgEl.src = `avatars/${selectedAvatar?.id || 'dino1'}.png`;
+          } else {
+            avatarImgEl.src = googleUser.avatar_url || googleUser.picture || `avatars/${selectedAvatar?.id || 'dino1'}.png`;
           }
+        }
 
-          profScore.innerText = formatScore(total);
+        if (stationsGridEl) stationsGridEl.innerHTML = '<p style="color:#A0A4B8;font-size:0.85rem;">Cargando estaciones...</p>';
+        if (ticketsListEl) ticketsListEl.innerHTML = '<p style="color:#A0A4B8;font-size:0.85rem;">Cargando boletos...</p>';
+
+        if (isGuest) {
+          // Lógica local para Invitados
+          const localCompleted = getCompletedStations();
+          const estaciones = [
+            { id: 2, nombre: 'Espinosaurio', puntos_base: 15, key: '2', detalle: '15 saltos' },
+            { id: 3, nombre: 'Biodiversidad y Conocimiento', puntos_base: 10, key: '3', detalle: '10 preguntas' },
+            { id: 4, nombre: 'Sala de Energía', puntos_base: 10, key: '4', detalle: '10 preguntas' },
+            { id: 5, nombre: 'Desarrollo Sustentable', puntos_base: 10, key: '5', detalle: '10 preguntas' },
+            { id: 6, nombre: 'SBEEL Dinosaurios', puntos_base: 10, key: '6', detalle: 'Rompecabezas' }
+          ];
+
+          let completedCount = 0;
+          let totalScore = 0;
+          let currentSt = 'Recorrido completado';
+          let firstPending = false;
           
-          // Lógica de Rango
+          let gridHtml = '';
+
+          estaciones.forEach(est => {
+            const completada = Boolean(localCompleted[est.key]);
+            if (completada) {
+              completedCount++;
+              totalScore += est.puntos_base;
+            } else if (!firstPending) {
+              currentSt = est.nombre;
+              firstPending = true;
+            }
+
+            gridHtml += `
+              <div class="station-row-card ${completada ? '' : 'pending'}">
+                <div class="station-info">
+                  <span class="station-name">${est.nombre}</span>
+                  <span class="station-points-pill ${est.id === 2 ? 'espinosaurio' : ''}">${est.puntos_base} pts</span>
+                </div>
+                <div class="station-score-badge">
+                  <span class="score-badge-val ${completada ? '' : 'pending'}">${completada ? `+${est.puntos_base}` : '0'}</span>
+                  <span class="score-badge-lbl">${completada ? 'Completado' : 'Pendiente'}</span>
+                </div>
+              </div>
+            `;
+          });
+
+          const totalEst = estaciones.length;
+          const remainingCount = totalEst - completedCount;
+          const progressPct = Math.round((completedCount / totalEst) * 100);
+
           let rank = 'Novato';
-          if (total >= 5000) rank = 'Leyenda';
-          else if (total >= 3000) rank = 'Experto';
-          else if (total >= 1500) rank = 'Explorador';
-          else if (total >= 500) rank = 'Iniciado';
-          
-          const profRank = document.getElementById('profRank');
-          if (profRank) profRank.innerText = rank;
+          if (totalScore >= 50) rank = 'Leyenda';
+          else if (totalScore >= 35) rank = 'Experto';
+          else if (totalScore >= 20) rank = 'Explorador';
+          else if (totalScore >= 10) rank = 'Iniciado';
 
-        } catch (e) {
-          console.error('Error cargando puntaje total:', e);
-          profScore.innerText = '0';
+          // Asignar UI
+          if (regDateEl) regDateEl.innerText = 'Sin registrar';
+          if (pctEl) pctEl.innerText = `${progressPct}%`;
+          if (barEl) barEl.style.width = `${progressPct}%`;
+          if (completedEl) completedEl.innerText = completedCount;
+          if (remainingEl) remainingEl.innerText = remainingCount;
+          if (currentStationEl) currentStationEl.innerText = currentSt;
+          if (scoreEl) scoreEl.innerText = totalScore;
+          if (rankEl) rankEl.innerText = rank;
+          
+          if (stationsGridEl) stationsGridEl.innerHTML = gridHtml;
+          if (ticketsListEl) ticketsListEl.innerHTML = `
+            <div class="no-tickets-msg">
+              Aún no has ganado boletos.<br>
+              <strong>¡Inicia sesión con Google</strong> para registrar tu progreso y reclamar tus entradas gratuitas!
+            </div>
+          `;
+
+        } else {
+          // Lógica remota (Usuario Google)
+          try {
+            const userId = googleUser.id_usuario || googleUser.id;
+            const res = await fetch(`http://localhost:3000/api/usuarios/${userId}/perfil`);
+            
+            if (!res.ok) {
+              throw new Error('No se pudo obtener el perfil del servidor.');
+            }
+
+            const data = await res.json();
+            
+            // Asignar datos de perfil básicos
+            if (nameEl) nameEl.innerText = data.usuario.nombre || 'Explorador';
+            if (emailEl) emailEl.innerText = data.usuario.correo || '';
+            if (regDateEl) {
+              const regDateStr = data.usuario.fecha_registro 
+                ? new Date(data.usuario.fecha_registro).toLocaleDateString('es-MX', {day: '2-digit', month: 'long', year: 'numeric'})
+                : 'Sin fecha';
+              regDateEl.innerText = `Registrado: ${regDateStr}`;
+            }
+
+            // Asignar Progreso
+            const prog = data.progreso;
+            if (pctEl) pctEl.innerText = `${prog.porcentaje}%`;
+            if (barEl) barEl.style.width = `${prog.porcentaje}%`;
+            if (completedEl) completedEl.innerText = prog.completadas;
+            if (remainingEl) remainingEl.innerText = prog.faltantes;
+            if (currentStationEl) currentStationEl.innerText = prog.estacion_actual;
+
+            // Asignar Puntuaciones
+            const pts = data.puntuacion;
+            if (scoreEl) scoreEl.innerText = pts.total_base;
+            if (rankEl) rankEl.innerText = pts.rango;
+
+            // Estaciones Grid
+            let stationsHtml = '';
+            pts.estaciones.forEach(est => {
+              stationsHtml += `
+                <div class="station-row-card ${est.completada ? '' : 'pending'}">
+                  <div class="station-info">
+                    <span class="station-name">${est.nombre}</span>
+                    <span class="station-points-pill ${est.id_estacion === 2 ? 'espinosaurio' : ''}">${est.puntos_base} pts</span>
+                  </div>
+                  <div class="station-score-badge">
+                    <span class="score-badge-val ${est.completada ? '' : 'pending'}">${est.completada ? `+${est.puntos_base}` : '0'}</span>
+                    <span class="score-badge-lbl">${est.detalle}</span>
+                  </div>
+                </div>
+              `;
+            });
+            if (stationsGridEl) stationsGridEl.innerHTML = stationsHtml;
+
+            // Boletos List
+            let ticketsHtml = '';
+            if (!data.boletos || data.boletos.length === 0) {
+              ticketsHtml = `
+                <div class="no-tickets-msg">
+                  Aún no has ganado boletos. Completa el recorrido para obtener tu recompensa.
+                </div>
+              `;
+            } else {
+              data.boletos.forEach(ticket => {
+                const dateStr = ticket.fecha_generacion 
+                  ? new Date(ticket.fecha_generacion).toLocaleDateString('es-MX', {day: '2-digit', month: 'short', year: 'numeric'})
+                  : '';
+                
+                ticketsHtml += `
+                  <div class="ticket-card">
+                    <div class="ticket-stub">
+                      <div class="ticket-meta">
+                        <span class="ticket-type-pill ${ticket.tipo.toLowerCase()}">${ticket.tipo}</span>
+                        <span class="ticket-date">${dateStr}</span>
+                      </div>
+                      <h4 class="ticket-folio">${ticket.folio}</h4>
+                    </div>
+                    <div class="ticket-badge ${ticket.estado.toLowerCase()}">${ticket.estado}</div>
+                  </div>
+                `;
+              });
+            }
+            if (ticketsListEl) ticketsListEl.innerHTML = ticketsHtml;
+
+          } catch (error) {
+            console.error('Error al cargar datos remotos de perfil:', error);
+            if (regDateEl) regDateEl.innerText = 'Error de conexión';
+            if (stationsGridEl) stationsGridEl.innerHTML = '<p style="color:#ef4444;font-size:0.85rem;">No se pudieron sincronizar las estaciones con el servidor.</p>';
+            if (ticketsListEl) ticketsListEl.innerHTML = '<p style="color:#ef4444;font-size:0.85rem;">No se pudieron sincronizar los boletos con el servidor.</p>';
+          }
         }
       }
 
@@ -6947,22 +7530,23 @@
         scoresListContainer.innerHTML = '<div class="score-row"><div class="score-info"><div class="score-name">Cargando puntajes...</div></div></div>';
 
         try {
-          const sb = await initSupabase();
-          const [{ data: quizzes, error: quizError }, { data: intentos, error: intentosError }] = await Promise.all([
-            sb.from('quizzes').select('id,puntaje_total,estatus,participante_id,ubicacion,started_at,finished_at').order('puntaje_total', { ascending: false }).limit(20),
-            sb.from('intentos_juego').select('id,puntaje,ubicacion,created_at,estatus,participante_id').order('puntaje', { ascending: false }).limit(20)
-          ]);
+          const res = await fetch('http://localhost:3000/api/leaderboard');
+          if (!res.ok) throw new Error('Error al conectar con la API de puntajes.');
+          const leaderboard = await res.json();
 
-          if (quizError) console.warn('No se pudieron cargar quizzes:', quizError.message);
-          if (intentosError) console.warn('No se pudieron cargar intentos_juego:', intentosError.message);
+          const rows = leaderboard.map((row, index) => ({
+            name: row.nombre || row.correo || `Explorador ${index + 1}`,
+            score: Number(row.puntaje_total || 0),
+            avatar: row.avatar_url && row.avatar_url.includes('dino') ? row.avatar_url.replace('.png', '').replace('avatars/', '') : avatars[index % avatars.length].id,
+            date: ''
+          }));
 
-          const rows = normalizeScoreRows(quizzes || [], intentos || []);
           renderPodium(rows);
           renderScoreList(rows);
         } catch (error) {
           console.error('Error cargando puntajes:', error);
           renderPodium([]);
-          scoresListContainer.innerHTML = '<div class="score-row"><div class="score-info"><div class="score-name">No se pudieron cargar los puntajes. Revisa la conexion o los permisos de Supabase.</div></div></div>';
+          scoresListContainer.innerHTML = '<div class="score-row"><div class="score-info"><div class="score-name">No se pudieron cargar los puntajes. Revisa el backend Express local.</div></div></div>';
         }
       }
 

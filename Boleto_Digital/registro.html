@@ -553,95 +553,47 @@
     }
 
     async function guardarEnSupabase(nombre, correo, telefono, prizeData) {
-      if (!supabaseClient) {
-        throw new Error('Supabase no se inicializo. Revisa la carga del script y la conexion a Internet.');
-      }
-
-      const folioNew = prizeData.folio || generatePrizeFolio(prizeData);
-      prizeData.folio = folioNew;
-      const validUntil = new Date();
-      validUntil.setDate(validUntil.getDate() + 30);
-
-      const winnerPayload = {
-        nombre,
-        correo,
-        telefono,
-        folio: folioNew,
-        valido_desde: new Date().toISOString(),
-        valido_hasta: validUntil.toISOString(),
-        estatus: 'activo',
-        tipo_entrada: getTipoEntrada(prizeData),
-        ubicacion: prizeData.lugar || 'Museo Chiapas'
-      };
-
-      const { data: winnerData, error: winnerError } = await supabaseClient
-        .from('Ganadores')
-        .insert(winnerPayload)
-        .select('id')
-        .maybeSingle();
-
-      if (winnerError) {
-        throw new Error(formatSupabaseError('Error guardando en la tabla Ganadores', winnerError));
-      }
-
-      const winnerID = winnerData?.id ?? null;
-      console.log('[REGISTRO] Ganador guardado. ID:', winnerID ?? '(sin ID retornado)');
-
-      try {
-        let quizDbId = null;
-        try { quizDbId = localStorage.getItem('much_quiz_db_id'); } catch (_) { }
-
-        const quizRaw = localStorage.getItem('much_quiz_final_data');
-        let qData = {};
-        if (quizRaw) qData = JSON.parse(quizRaw);
-
-        if (quizDbId) {
-          console.log('[REGISTRO] Actualizando Quiz existente:', quizDbId);
-
-          const updatePayload = {
-            participante_id: winnerID,
-            estatus: 'finalizado'
-          };
-
-          if (qData.puntaje_total !== undefined) {
-            updatePayload.puntaje_total = qData.puntaje_total;
-            updatePayload.num_correctas = qData.num_correctas;
-            updatePayload.num_preguntas = qData.num_preguntas;
-            updatePayload.finished_at = qData.finished_at || new Date().toISOString();
+      // 1. Registrar o iniciar sesión del usuario participante en MySQL
+      const authRes = await fetch('http://localhost:3000/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userData: {
+            nombre,
+            correo,
+            google_id: `reg_${correo.replace(/[^a-zA-Z0-9]/g, '')}_${telefono}`,
+            avatar_url: 'avatars/dino1.png'
           }
+        })
+      });
 
-          const { error: quizUpdateError } = await supabaseClient
-            .from('quizzes')
-            .update(updatePayload)
-            .eq('id', quizDbId);
-
-          if (quizUpdateError) console.error('[REGISTRO] Error actualizando quiz:', quizUpdateError);
-          else console.log('[REGISTRO] Quiz actualizado correctamente.');
-        } else if (qData.sala_id) {
-          console.log('[REGISTRO] Insertando Quiz nuevo (Fallback)');
-          const quizPayload = {
-            sala_id: qData.sala_id,
-            participante_id: winnerID,
-            started_at: qData.started_at,
-            finished_at: qData.finished_at,
-            puntaje_total: qData.puntaje_total,
-            num_correctas: qData.num_correctas,
-            num_preguntas: qData.num_preguntas,
-            estatus: 'finalizado'
-          };
-
-          const { error: quizError } = await supabaseClient
-            .from('quizzes')
-            .insert(quizPayload);
-
-          if (quizError) console.error('[REGISTRO] Error guardando Quiz (Fallback):', quizError.message);
-          else console.log('[REGISTRO] Quiz guardado correctamente (Fallback).');
-        }
-      } catch (quizErr) {
-        console.warn('[REGISTRO] Ganador guardado, pero no se pudo enlazar el quiz:', quizErr);
+      if (!authRes.ok) {
+        const errData = await authRes.json();
+        throw new Error(errData.error || 'No se pudo registrar el participante en MySQL.');
       }
 
-      return { winnerID, folio: folioNew };
+      const user = await authRes.json();
+      const idUsuario = user.id_usuario;
+
+      // 2. Generar el boleto final en MySQL
+      const ticketRes = await fetch('http://localhost:3000/api/boletos', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-user-id': String(idUsuario)
+        },
+        body: JSON.stringify({ id_usuario: idUsuario })
+      });
+
+      if (!ticketRes.ok) {
+        const errData = await ticketRes.json();
+        throw new Error(errData.error || 'No se pudo generar el boleto en MySQL.');
+      }
+
+      const boleto = await ticketRes.json();
+      prizeData.folio = boleto.folio;
+
+      return { winnerID: idUsuario, folio: boleto.folio };
     }
 
     // ---------- Submit ----------

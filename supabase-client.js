@@ -1,17 +1,30 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+// supabase-client.js
+// RESPALDO DE SUPABASE - Reemplazado por Backend MySQL Local en Express
+// Se conserva este archivo únicamente como respaldo y compatibilidad.
 
-const SUPABASE_URL =
-  window.MISION_MUCH_SUPABASE_URL ||
-  'https://thajrezykoictubybvkq.supabase.co';
-const SUPABASE_ANON_KEY =
-  window.MISION_MUCH_SUPABASE_ANON_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoYWpyZXp5a29pY3R1YnlidmtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNzI3MzQsImV4cCI6MjA5NDg0ODczNH0.Ev0sEwjQ7978z7fb_4cK13m4uIGFC1VkhBnK-Zj3vDI';
+console.log('ℹ️ Supabase ha sido desactivado. Las peticiones ahora se redirigen a la API Express local.');
 
-if (SUPABASE_URL.includes('/rest/v1')) {
-  console.warn('[Supabase] Usa la URL base del proyecto, no la URL /rest/v1.');
-}
+// Mock inofensivo para evitar errores de importación en el frontend legacy
+const supabase = {
+  auth: {
+    getSession: async () => ({ data: { session: null }, error: null }),
+    getUser: async () => ({ data: { user: null }, error: null }),
+    signInWithOAuth: async () => ({ data: {}, error: new Error('Supabase Auth desactivado. Usa Google Login local.') }),
+    signOut: async () => ({ error: null })
+  },
+  from: () => ({
+    select: () => ({
+      eq: () => ({
+        single: async () => ({ data: null, error: null }),
+        maybeSingle: async () => ({ data: null, error: null })
+      }),
+      order: () => ({
+        limit: async () => ({ data: [], error: null })
+      })
+    })
+  })
+};
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 window.supabase = supabase;
 
 export { supabase };

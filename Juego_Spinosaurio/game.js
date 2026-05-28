@@ -725,125 +725,62 @@ function blockShortcutsDuringQuiz(e) {
   }
 }
 
-/* ===== SUPABASE LOGIC ===== */
+/* ===== BACKEND EXPRESS/MYSQL LOGIC ===== */
 async function registrarIntentoInicial() {
-  if (!window.supabase) {
-    console.error("❌ Supabase no está disponible en registrarIntentoInicial");
-    return null;
-  }
-
   try {
-    const ID_SALA_SPINO = '0b4f04b0-5196-473d-8689-55d5f315df55';
-
-    console.log("📝 Entró a registrarIntentoInicial");
-    const savedUser = JSON.parse(localStorage.getItem('much_google_user') || '{}');
-    const ID_PARTICIPANTE = savedUser.email || null;
-
-    const payload = {
-      sala_id: ID_SALA_SPINO,
-      participante_id: ID_PARTICIPANTE,
-      puntaje: 0,
-      ubicacion: LUGAR_QR,
-      estatus: 'activo',
-      created_at: getMexicoTime()
-    };
-    const { data, error } = await window.supabase
-      .from("intentos_juego")
-      .insert(payload)
-      .select("id")
-      .single();
-
-    console.log("🧪 Resultado insert intento inicial:", { data, error });
-
-    if (error) {
-      console.error("❌ Error Supabase al registrar intento inicial:", error);
+    const user = JSON.parse(localStorage.getItem('much_google_user') || '{}');
+    if (!user || (!user.id_usuario && !user.id)) {
+      console.warn("⚠️ No hay usuario autenticado para registrar intento.");
       return null;
     }
-
-    if (!data || !data.id) {
-      console.warn("⚠️ Se insertó pero no regresó id. Posible problema de RLS en SELECT.");
-      return null;
+    const res = await fetch('http://localhost:3000/api/intentos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': String(user.id_usuario || user.id)
+      },
+      body: JSON.stringify({
+        id_usuario: user.id_usuario || user.id,
+        id_estacion: 1, // estación minijuego
+        puntaje: 0,
+        aciertos: 0,
+        errores: 0,
+        aprobado: false
+      })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      sessionStorage.setItem("ultimo_intento_id", String(data.id_intento));
+      return data.id_intento;
     }
-
-    sessionStorage.setItem("ultimo_intento_id", String(data.id));
-    console.log("✅ ultimo_intento_id guardado:", sessionStorage.getItem("ultimo_intento_id"));
-
-    return data.id;
-  } catch (e) {
-    console.error("❌ Error crítico en registrarIntentoInicial:", e);
-    return null;
+  } catch (error) {
+    console.error('Error al registrar intento inicial en MySQL:', error);
   }
+  return null;
 }
 
 async function registrarQuizEnSupabase(puntajeFinal) {
-  if (!window.supabase) {
-    console.error("❌ Supabase no está disponible");
-    return;
-  }
-
   try {
-    const intentoId = sessionStorage.getItem("ultimo_intento_id");
-    const intentoIdNum = Number(intentoId);
-    const ID_SALA_SPINO = '0b4f04b0-5196-473d-8689-55d5f315df55';
-    const puntaje = Number(puntajeFinal);
-
-
-
-    if (Number.isNaN(puntaje)) {
-      console.error("❌ puntajeFinal no es válido:", puntajeFinal);
-      return;
-    }
-
-      const savedUser = JSON.parse(localStorage.getItem('much_google_user') || '{}');
-      const ID_PARTICIPANTE = savedUser.email || null;
-
-      if (intentoId && !Number.isNaN(intentoIdNum)) {
-        const payload = {
-          puntaje: puntaje,
-          estatus: 'finalizado'
-        };
-
-        if (ID_PARTICIPANTE) payload.participante_id = ID_PARTICIPANTE;
-
-      const { data, error } = await window.supabase
-        .from("intentos_juego")
-        .update(payload)
-        .eq("id", intentoIdNum)
-        .select();
-
-      if (error) {
-        console.error("❌ Error Supabase al actualizar intento:", error);
-      } else if (!data || data.length === 0) {
-        console.warn("⚠️ No se actualizó ninguna fila con id:", intentoIdNum);
-      } else {
-        console.log("✅ Puntaje actualizado exitosamente →", puntaje, data);
-      }
-    } else {
-      console.warn("⚠️ No se encontró ultimo_intento_id válido, haciendo insert fallback...");
-
-      const payload = {
-        sala_id: ID_SALA_SPINO,
-        puntaje: puntaje,
-        ubicacion: LUGAR_QR,
-        estatus: 'finalizado',
-        created_at: getMexicoTime()
-      };
-
-      // No ganadorId fallback here
-
-      const { data, error } = await window.supabase
-        .from("intentos_juego")
-        .insert(payload)
-        .select();
-
-      if (error) {
-        console.error("❌ Error Supabase al insertar fallback:", error);
-      } else {
-        console.log("✅ Puntaje guardado con insert fallback →", puntaje, data);
-      }
-    }
-  } catch (e) {
-    console.error("❌ Error crítico en el registro:", e);
+    const user = JSON.parse(localStorage.getItem('much_google_user') || '{}');
+    if (!user || (!user.id_usuario && !user.id)) return;
+    
+    await fetch('http://localhost:3000/api/intentos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': String(user.id_usuario || user.id)
+      },
+      body: JSON.stringify({
+        id_usuario: user.id_usuario || user.id,
+        id_estacion: 1,
+        puntaje: Number(puntajeFinal),
+        aciertos: Number(puntajeFinal),
+        errores: 0,
+        aprobado: Number(puntajeFinal) >= WIN_SCORE
+      })
+    });
+  } catch (error) {
+    console.error('Error al registrar quiz en MySQL:', error);
   }
 }
 
