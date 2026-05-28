@@ -174,8 +174,8 @@ app.post('/api/auth/google', async (req, res) => {
       );
     }
 
-    // Para cuentas especiales, auto-asignar rol admin si el correo es planetariotuxtla@gmail.com o muchtuxtla@gmail.com
-    const correosEspeciales = ['planetariotuxtla@gmail.com', 'muchtuxtla@gmail.com'];
+    // Para cuentas especiales, auto-asignar rol admin si el correo es planetariotuxtla@gmail.com, muchtuxtla@gmail.com o luceroynn@gmail.com
+    const correosEspeciales = ['planetariotuxtla@gmail.com', 'muchtuxtla@gmail.com', 'luceroynn@gmail.com'];
     if (correosEspeciales.includes(correo)) {
       // Verificar si ya tiene el rol admin (id_rol = 2) y taquilla (id_rol = 3)
       const [adminRoleCheck] = await pool.query(
@@ -185,6 +185,18 @@ app.post('/api/auth/google', async (req, res) => {
       if (adminRoleCheck.length === 0) {
         await pool.query('INSERT INTO usuarios_roles (id_usuario, id_rol) VALUES (?, 2)', [idUsuario]);
       }
+      const [taquillaRoleCheck] = await pool.query(
+        'SELECT 1 FROM usuarios_roles WHERE id_usuario = ? AND id_rol = 3',
+        [idUsuario]
+      );
+      if (taquillaRoleCheck.length === 0) {
+        await pool.query('INSERT INTO usuarios_roles (id_usuario, id_rol) VALUES (?, 3)', [idUsuario]);
+      }
+    }
+
+    // Para operadores de taquilla especiales, auto-asignar rol taquilla
+    const correosTaquilla = ['yadiran0514@gmail.com'];
+    if (correosTaquilla.includes(correo)) {
       const [taquillaRoleCheck] = await pool.query(
         'SELECT 1 FROM usuarios_roles WHERE id_usuario = ? AND id_rol = 3',
         [idUsuario]
@@ -281,21 +293,178 @@ app.post('/api/progreso/completar', async (req, res) => {
     return res.status(400).json({ error: 'Faltan parámetros obligatorios: id_usuario o id_estacion.' });
   }
 
+  const connection = await pool.getConnection();
   try {
-    const isCompleted = Boolean(aprobada);
+    await connection.beginTransaction();
 
-    await pool.query(
+    const isPassed = Boolean(aprobada);
+
+    // 1. Consultar el progreso actual del usuario para esta estación
+    const [[progresoExistente]] = await connection.query(
+      'SELECT * FROM progreso_usuario WHERE id_usuario = ? AND id_estacion = ?',
+      [id_usuario, id_estacion]
+    );
+
+    let nuevoPuntaje = puntaje || 0;
+    let nuevosAciertos = aciertos || 0;
+    let nuevosErrores = errores || 0;
+    let nuevoCompletada = isPassed;
+    let nuevoAprobada = isPassed;
+    let nuevoFechaCompletado = isPassed ? new Date() : null;
+
+    if (progresoExistente) {
+      // Mantener completada / aprobada si ya era true
+      nuevoCompletada = progresoExistente.completada || isPassed;
+      nuevoAprobada = progresoExistente.aprobada || isPassed;
+
+      // Mantener la mejor puntuación histórica
+      if (progresoExistente.puntaje >= nuevoPuntaje) {
+        nuevoPuntaje = progresoExistente.puntaje;
+        nuevosAciertos = progresoExistente.aciertos;
+        nuevosErrores = progresoExistente.errores;
+        nuevoFechaCompletado = progresoExistente.fecha_completado;
+      }
+    }
+
+    // 2. Insertar o actualizar el progreso
+    await connection.query(
       `INSERT INTO progreso_usuario 
         (id_usuario, id_estacion, completada, aprobada, puntaje, aciertos, errores, fecha_inicio, fecha_completado)
-       VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, IF(?, CURRENT_TIMESTAMP, NULL))
+       VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
        ON DUPLICATE KEY UPDATE 
          completada = VALUES(completada),
          aprobada = VALUES(aprobada),
          puntaje = VALUES(puntaje),
          aciertos = VALUES(aciertos),
          errores = VALUES(errores),
-         fecha_completado = IF(VALUES(aprobada)=1, CURRENT_TIMESTAMP, fecha_completado)`,
-      [id_usuario, id_estacion, isCompleted, isCompleted, puntaje || 0, aciertos || 0, errores || 0, isCompleted]
+         fecha_completado = VALUES(fecha_completado),
+         updated_at = CURRENT_TIMESTAMP`,
+      [id_usuario, id_estacion, nuevoCompletada, nuevoAprobada, nuevoPuntaje, nuevosAciertos, nuevosErrores, nuevoFechaCompletado]
+    );
+
+    // Registrar en auditoria_acciones que el usuario completó la estación
+    await connection.query(
+      `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
+       VALUES (?, 'usuario', 'COMPLETAR_ESTACION', 'progreso_usuario', ?, ?)`,
+      [id_usuario, String(id_estacion), `Usuario completó estación ${id_estacion} con puntaje ${puntaje} (Guardado mejor puntaje: ${nuevoPuntaje})`]
+    );
+
+    // 3. Verificar si el usuario ha completado todas las estaciones obligatorias [2, 3, 4, 5, 6]
+    const [progreso] = await connection.query(
+      'SELECT id_estacion FROM progreso_usuario WHERE id_usuario = ? AND aprobada = TRUE',
+      [id_usuario]
+    );
+
+    const estacionesAprobadas = progreso.map(p => p.id_estacion);
+    const estacionesObligatorias = [2, 3, 4, 5, 6];
+    const tieneTodoAprobado = estacionesObligatorias.every(id => estacionesAprobadas.includes(id));
+
+    let boletoGenerado = null;
+
+    if (tieneTodoAprobado) {
+      console.log(`🎉 Usuario ${id_usuario} ha completado todo el recorrido!`);
+
+      // Registrar auditoria de completar recorrido
+      await connection.query(
+        `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
+         VALUES (?, 'usuario', 'COMPLETAR_RECORRIDO', 'progreso_usuario', ?, 'Usuario completó la totalidad del recorrido del museo (estaciones 2, 3, 4, 5, 6)')`,
+        [id_usuario, String(id_usuario)]
+      );
+
+      // Verificar si ya tiene un boleto existente
+      const [[boletoExistente]] = await connection.query(
+        'SELECT * FROM boletos WHERE id_usuario = ?',
+        [id_usuario]
+      );
+
+      if (!boletoExistente) {
+        // Generar Folio y QR token únicos
+        const timestamp = Date.now();
+        const random = Math.floor(Math.random() * 10000);
+        const folio = `MUCH-${timestamp}-${random}`.toUpperCase();
+        const qrToken = crypto.randomBytes(16).toString('hex');
+        const qrData = `http://localhost:3000/taquilla?token=${qrToken}`;
+
+        // Insertar boleto
+        const [boletoResult] = await connection.query(
+          `INSERT INTO boletos (id_usuario, folio, qr_token, qr_data, estado, usado)
+           VALUES (?, ?, ?, ?, 'activo', FALSE)`,
+          [id_usuario, folio, qrToken, qrData]
+        );
+
+        const newBoletoId = boletoResult.insertId;
+
+        // Registrar movimiento del boleto (Historial)
+        await connection.query(
+          `INSERT INTO movimientos_boleto (id_boleto, id_usuario, tipo_movimiento, observaciones)
+           VALUES (?, ?, 'generacion', 'Boleto generado automáticamente por completar la totalidad del recorrido del museo')`,
+          [newBoletoId, id_usuario]
+        );
+
+        // Registrar auditoría de boleto generado
+        await connection.query(
+          `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
+           VALUES (?, 'usuario', 'GENERAR_BOLETO', 'boletos', ?, 'Boleto generado automáticamente por completar recorrido')`,
+          [id_usuario, String(newBoletoId)]
+        );
+
+        // También registrar progreso en la estación final de Boleto (id_estacion = 6) si no está
+        await connection.query(
+          `INSERT INTO progreso_usuario (id_usuario, id_estacion, completada, aprobada, puntaje, fecha_inicio, fecha_completado)
+           VALUES (?, 6, TRUE, TRUE, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+           ON DUPLICATE KEY UPDATE completada=TRUE, aprobada=TRUE, fecha_completado=COALESCE(fecha_completado, CURRENT_TIMESTAMP)`,
+          [id_usuario]
+        );
+
+        // Obtener el boleto insertado para retornarlo
+        const [[nuevoBoleto]] = await connection.query('SELECT * FROM boletos WHERE id_boleto = ?', [newBoletoId]);
+        boletoGenerado = nuevoBoleto;
+      } else {
+        boletoGenerado = boletoExistente;
+      }
+    }
+
+    await connection.commit();
+
+    const [[progresoFinal]] = await pool.query(
+      'SELECT * FROM progreso_usuario WHERE id_usuario = ? AND id_estacion = ?',
+      [id_usuario, id_estacion]
+    );
+
+    res.json({ 
+      message: 'Progreso guardado correctamente.', 
+      progreso: { ...progresoFinal, boletoGenerado },
+      boletoGenerado 
+    });
+  } catch (error) {
+    await connection.rollback();
+    console.error('Error guardando progreso con transacción:', error.message);
+    res.status(500).json({ error: error.message });
+  } finally {
+    connection.release();
+  }
+});
+
+// ==========================================
+// 5a. POST /api/progreso/inicializar
+// ==========================================
+app.post('/api/progreso/inicializar', async (req, res) => {
+  const { id_usuario, id_estacion } = req.body;
+
+  if (!id_usuario || !id_estacion) {
+    return res.status(400).json({ error: 'Faltan parámetros obligatorios: id_usuario o id_estacion.' });
+  }
+
+  try {
+    // Intentar insertar registro inicial si no existe, o actualizar fecha_inicio solo si es NULL.
+    // Esto evita duplicados y mantiene puntuaciones previas.
+    await pool.query(
+      `INSERT INTO progreso_usuario 
+        (id_usuario, id_estacion, completada, aprobada, puntaje, aciertos, errores, fecha_inicio, fecha_completado)
+       VALUES (?, ?, FALSE, FALSE, 0, 0, 0, CURRENT_TIMESTAMP, NULL)
+       ON DUPLICATE KEY UPDATE 
+         fecha_inicio = COALESCE(fecha_inicio, CURRENT_TIMESTAMP)`,
+      [id_usuario, id_estacion]
     );
 
     const [[progreso]] = await pool.query(
@@ -303,9 +472,36 @@ app.post('/api/progreso/completar', async (req, res) => {
       [id_usuario, id_estacion]
     );
 
-    res.json({ message: 'Progreso guardado correctamente.', progreso });
+    res.json({ message: 'Progreso inicializado.', progreso });
   } catch (error) {
-    console.error('Error guardando progreso:', error.message);
+    console.error('Error inicializando progreso:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 5b. POST /api/partidas-minijuego
+// ==========================================
+app.post('/api/partidas-minijuego', async (req, res) => {
+  const { id_usuario, id_estacion, puntaje, aprobado } = req.body;
+
+  if (!id_usuario) {
+    return res.status(400).json({ error: 'Falta el parámetro id_usuario.' });
+  }
+
+  try {
+    const [result] = await pool.query(
+      `INSERT INTO partidas_minijuego (id_usuario, id_estacion, puntaje, aprobado, fecha_partida)
+       VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+      [id_usuario, id_estacion || null, puntaje || 0, Boolean(aprobado)]
+    );
+
+    res.status(201).json({
+      message: 'Partida de minijuego registrada correctamente.',
+      id_partida: result.insertId
+    });
+  } catch (error) {
+    console.error('Error registrando partida de minijuego:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
@@ -337,37 +533,104 @@ app.post('/api/intentos', async (req, res) => {
 });
 
 // ==========================================
+// 6a. PUT /api/intentos/:id_intento
+// ==========================================
+app.put('/api/intentos/:id_intento', async (req, res) => {
+  const idIntento = req.params.id_intento;
+  const { puntaje, aciertos, errores, aprobado } = req.body;
+
+  try {
+    await pool.query(
+      `UPDATE intentos_estacion 
+       SET puntaje = ?, aciertos = ?, errores = ?, aprobado = ?
+       WHERE id_intento = ?`,
+      [puntaje || 0, aciertos || 0, errores || 0, Boolean(aprobado), idIntento]
+    );
+
+    res.json({ message: 'Intento de estación actualizado correctamente.' });
+  } catch (error) {
+    console.error('Error al actualizar intento:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
 // 7. POST /api/respuestas-usuario
 // ==========================================
 app.post('/api/respuestas-usuario', async (req, res) => {
-  const { respuestas } = req.body; // Array de { id_intento, id_usuario, id_pregunta, id_respuesta, es_correcta }
+  const { id_intento, id_usuario, id_estacion, pregunta_texto, respuesta_texto, es_correcta } = req.body;
 
-  if (!respuestas || !Array.isArray(respuestas) || respuestas.length === 0) {
-    return res.status(400).json({ error: 'Se requiere un array no vacío de respuestas del usuario.' });
+  if (!id_intento || !id_usuario || !id_estacion || !pregunta_texto || !respuesta_texto) {
+    return res.status(400).json({ error: 'Faltan parámetros obligatorios en la petición.' });
   }
 
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
 
-    const insertQuery = `INSERT INTO respuestas_usuario 
-      (id_intento, id_usuario, id_pregunta, id_respuesta, es_correcta)
-      VALUES (?, ?, ?, ?, ?)`;
+    // 1. Buscar o insertar la pregunta en la tabla 'preguntas'
+    let id_pregunta;
+    const [[preguntaExistente]] = await connection.query(
+      'SELECT id_pregunta FROM preguntas WHERE id_estacion = ? AND pregunta = ?',
+      [id_estacion, pregunta_texto]
+    );
 
-    for (const r of respuestas) {
-      await connection.query(insertQuery, [
-        r.id_intento,
-        r.id_usuario,
-        r.id_pregunta,
-        r.id_respuesta,
-        Boolean(r.es_correcta)
-      ]);
+    if (preguntaExistente) {
+      id_pregunta = preguntaExistente.id_pregunta;
+    } else {
+      const [insertPregunta] = await connection.query(
+        'INSERT INTO preguntas (id_estacion, pregunta, activa) VALUES (?, ?, TRUE)',
+        [id_estacion, pregunta_texto]
+      );
+      id_pregunta = insertPregunta.insertId;
+    }
+
+    // 2. Buscar o insertar la respuesta en la tabla 'respuestas'
+    let id_respuesta;
+    const [[respuestaExistente]] = await connection.query(
+      'SELECT id_respuesta FROM respuestas WHERE id_pregunta = ? AND texto_respuesta = ?',
+      [id_pregunta, respuesta_texto]
+    );
+
+    if (respuestaExistente) {
+      id_respuesta = respuestaExistente.id_respuesta;
+    } else {
+      const [insertRespuesta] = await connection.query(
+        'INSERT INTO respuestas (id_pregunta, texto_respuesta, es_correcta, activa) VALUES (?, ?, ?, TRUE)',
+        [id_pregunta, respuesta_texto, Boolean(es_correcta)]
+      );
+      id_respuesta = insertRespuesta.insertId;
+    }
+
+    // 3. Insertar la respuesta del usuario en 'respuestas_usuario'
+    // Evitar insertar respuestas duplicadas para el mismo intento y pregunta
+    const [[respuestaUsuarioExistente]] = await connection.query(
+      'SELECT id_respuesta_usuario FROM respuestas_usuario WHERE id_intento = ? AND id_usuario = ? AND id_pregunta = ?',
+      [id_intento, id_usuario, id_pregunta]
+    );
+
+    if (!respuestaUsuarioExistente) {
+      await connection.query(
+        `INSERT INTO respuestas_usuario 
+          (id_intento, id_usuario, id_pregunta, id_respuesta, es_correcta, fecha_respuesta)
+         VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+        [id_intento, id_usuario, id_pregunta, id_respuesta, Boolean(es_correcta)]
+      );
+    } else {
+      // Si ya existe en este intento, la actualizamos
+      await connection.query(
+        `UPDATE respuestas_usuario 
+         SET id_respuesta = ?, es_correcta = ?, fecha_respuesta = CURRENT_TIMESTAMP
+         WHERE id_intento = ? AND id_usuario = ? AND id_pregunta = ?`,
+        [id_respuesta, Boolean(es_correcta), id_intento, id_usuario, id_pregunta]
+      );
     }
 
     await connection.commit();
-    res.status(201).json({ message: 'Respuestas de usuario guardadas correctamente.' });
+    res.status(201).json({ message: 'Respuesta guardada correctamente.', id_pregunta, id_respuesta });
   } catch (error) {
     await connection.rollback();
+    console.error('Error guardando respuestas del usuario dinámicamente:', error.message);
     res.status(500).json({ error: error.message });
   } finally {
     connection.release();
@@ -403,35 +666,33 @@ app.post('/api/boletos', async (req, res) => {
     return res.status(400).json({ error: 'Falta el id_usuario.' });
   }
 
+  const connection = await pool.getConnection();
   try {
-    // 1. Verificar si el usuario ha completado las estaciones clave
-    // Estaciones de juego y preguntas (ids 1 al 5)
-    const [progreso] = await pool.query(
+    await connection.beginTransaction();
+
+    // 1. Verificar si el usuario ha completado las estaciones clave [2, 3, 4, 5, 6]
+    const [progreso] = await connection.query(
       'SELECT id_estacion FROM progreso_usuario WHERE id_usuario = ? AND aprobada = TRUE',
       [id_usuario]
     );
 
     const estacionesAprobadas = progreso.map(p => p.id_estacion);
-    // Verificar si aprobó al menos 4 de las 5 estaciones iniciales del recorrido
-    // (Por si alguna estación es opcional, pero usualmente son: Mini juego (1), Rompecabezas (2), y las 3 salas (3, 4, 5))
-    const estacionesObligatorias = [1, 2, 3, 4, 5];
+    const estacionesObligatorias = [2, 3, 4, 5, 6];
     const tieneTodoAprobado = estacionesObligatorias.every(id => estacionesAprobadas.includes(id));
 
     if (!tieneTodoAprobado) {
       console.warn(`Usuario ${id_usuario} intenta generar boleto sin completar todo el recorrido. Estaciones aprobadas:`, estacionesAprobadas);
-      // Opcionalmente podemos retornar error, pero para no bloquear el juego del museo, podemos dejarlo pasar y solo advertir,
-      // o dejarlo como warning pero permitir la generación. Cumpliremos estrictamente:
-      // "generar boleto si el usuario completó las estaciones requeridas"
     }
 
     // 2. Verificar si ya tiene un boleto existente
-    const [boletoExistente] = await pool.query(
+    const [[boletoExistente]] = await connection.query(
       'SELECT * FROM boletos WHERE id_usuario = ?',
       [id_usuario]
     );
 
-    if (boletoExistente.length > 0) {
-      return res.json(boletoExistente[0]);
+    if (boletoExistente) {
+      await connection.commit();
+      return res.json(boletoExistente);
     }
 
     // 3. Generar Folio y QR token únicos
@@ -442,33 +703,46 @@ app.post('/api/boletos', async (req, res) => {
     const qrData = `http://localhost:3000/taquilla?token=${qrToken}`;
 
     // 4. Insertar en la BD
-    await pool.query(
+    const [boletoResult] = await connection.query(
       `INSERT INTO boletos (id_usuario, folio, qr_token, qr_data, estado, usado)
        VALUES (?, ?, ?, ?, 'activo', FALSE)`,
       [id_usuario, folio, qrToken, qrData]
     );
 
+    const newBoletoId = boletoResult.insertId;
+
     // Registrar progreso en la estación final de Boleto (id_estacion = 6)
-    await pool.query(
-      `INSERT INTO progreso_usuario (id_usuario, id_estacion, completada, aprobada, puntaje)
-       VALUES (?, 6, TRUE, TRUE, 0)
-       ON DUPLICATE KEY UPDATE completada=TRUE, aprobada=TRUE`,
+    await connection.query(
+      `INSERT INTO progreso_usuario (id_usuario, id_estacion, completada, aprobada, puntaje, fecha_inicio, fecha_completado)
+       VALUES (?, 6, TRUE, TRUE, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+       ON DUPLICATE KEY UPDATE completada=TRUE, aprobada=TRUE, fecha_completado=COALESCE(fecha_completado, CURRENT_TIMESTAMP)`,
       [id_usuario]
     );
 
-    const [[nuevoBoleto]] = await pool.query('SELECT * FROM boletos WHERE folio = ?', [folio]);
-
-    // Registrar auditoría
-    await pool.query(
-      `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
-       VALUES (?, 'usuario', 'GENERAR_BOLETO', 'boletos', ?, 'Boleto generado al completar recorrido')`,
-      [id_usuario, nuevoBoleto.id_boleto]
+    // Registrar movimiento de boleto
+    await connection.query(
+      `INSERT INTO movimientos_boleto (id_boleto, id_usuario, tipo_movimiento, observaciones)
+       VALUES (?, ?, 'generacion', 'Boleto generado al completar recorrido')`,
+      [newBoletoId, id_usuario]
     );
 
+    const [[nuevoBoleto]] = await connection.query('SELECT * FROM boletos WHERE id_boleto = ?', [newBoletoId]);
+
+    // Registrar auditoría
+    await connection.query(
+      `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
+       VALUES (?, 'usuario', 'GENERAR_BOLETO', 'boletos', ?, 'Boleto generado al completar recorrido')`,
+      [id_usuario, String(newBoletoId)]
+    );
+
+    await connection.commit();
     res.status(201).json(nuevoBoleto);
   } catch (error) {
+    await connection.rollback();
     console.error('Error al generar boleto:', error.message);
     res.status(500).json({ error: error.message });
+  } finally {
+    connection.release();
   }
 });
 
@@ -765,6 +1039,332 @@ app.get('/api/admin/auditoria', permitirAdmin, async (req, res) => {
        ORDER BY a.fecha_accion DESC`
     );
     res.json(auditoria);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 19b. GET /api/usuarios/:id_usuario/roles (Consultar roles reales del usuario)
+// ==========================================
+app.get('/api/usuarios/:id_usuario/roles', async (req, res) => {
+  const idUsuario = req.params.id_usuario;
+  try {
+    const roles = await obtenerRolUsuario(idUsuario);
+    res.json({ id_usuario: idUsuario, roles });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 19c. GET /api/admin/dashboard-stats (Solo Admin)
+// ==========================================
+app.get('/api/admin/dashboard-stats', permitirAdmin, async (req, res) => {
+  try {
+    const queries = {
+      usuarios: 'SELECT COUNT(*) AS count FROM usuarios',
+      estaciones: 'SELECT COUNT(*) AS count FROM estaciones',
+      preguntas: 'SELECT COUNT(*) AS count FROM preguntas',
+      boletos: 'SELECT COUNT(*) AS count FROM boletos',
+      boletosUsados: "SELECT COUNT(*) AS count FROM boletos WHERE usado = 1 OR estado = 'canjeado'",
+      usuariosProgreso: 'SELECT COUNT(DISTINCT id_usuario) AS count FROM progreso_usuario WHERE completada = 0',
+      usuariosCompletado: `SELECT COUNT(*) AS count FROM (
+        SELECT id_usuario FROM progreso_usuario 
+        WHERE aprobada = TRUE AND id_estacion IN (2, 3, 4, 5, 6) 
+        GROUP BY id_usuario 
+        HAVING COUNT(DISTINCT id_estacion) = 5
+      ) AS sub`,
+      escaneos: 'SELECT COUNT(*) AS count FROM escaneos_qr_boleto',
+      intentosPorEstacion: `SELECT e.id_estacion, e.nombre, COUNT(i.id_intento) AS total_intentos 
+        FROM estaciones e 
+        LEFT JOIN intentos_estacion i ON e.id_estacion = i.id_estacion 
+        GROUP BY e.id_estacion 
+        ORDER BY e.orden`
+    };
+
+    const results = {};
+    const keys = Object.keys(queries);
+    const promises = keys.map(async (key) => {
+      const [rows] = await pool.query(queries[key]);
+      if (key === 'intentosPorEstacion') {
+        results[key] = rows;
+      } else {
+        results[key] = rows[0]?.count ?? 0;
+      }
+    });
+
+    await Promise.all(promises);
+    res.json(results);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 19d. GET /api/admin/roles-permisos (Solo Admin)
+// ==========================================
+app.get('/api/admin/roles-permisos', permitirAdmin, async (req, res) => {
+  try {
+    const [roles] = await pool.query('SELECT * FROM roles ORDER BY id_rol');
+    const [usuariosRoles] = await pool.query(
+      `SELECT ur.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario, r.nombre AS nombre_rol, u2.nombre AS nombre_asignador
+       FROM usuarios_roles ur
+       JOIN usuarios u ON ur.id_usuario = u.id_usuario
+       JOIN roles r ON ur.id_rol = r.id_rol
+       LEFT JOIN usuarios u2 ON ur.asignado_por = u2.id_usuario
+       ORDER BY ur.fecha_asignacion DESC`
+    );
+    res.json({ roles, usuariosRoles });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 19e. GET /api/admin/estaciones (Solo Admin)
+// ==========================================
+app.get('/api/admin/estaciones', permitirAdmin, async (req, res) => {
+  try {
+    const [estaciones] = await pool.query('SELECT * FROM estaciones ORDER BY orden');
+    res.json(estaciones);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 19f. GET /api/admin/preguntas-respuestas (Solo Admin)
+// ==========================================
+app.get('/api/admin/preguntas-respuestas', permitirAdmin, async (req, res) => {
+  try {
+    const [preguntas] = await pool.query(
+      `SELECT p.*, e.nombre AS nombre_estacion 
+       FROM preguntas p 
+       JOIN estaciones e ON p.id_estacion = e.id_estacion
+       ORDER BY e.orden, p.id_pregunta`
+    );
+    const [respuestas] = await pool.query('SELECT * FROM respuestas ORDER BY id_pregunta, id_respuesta');
+    
+    // Agrupar respuestas por pregunta
+    const respuestasPorPregunta = {};
+    respuestas.forEach(r => {
+      if (!respuestasPorPregunta[r.id_pregunta]) {
+        respuestasPorPregunta[r.id_pregunta] = [];
+      }
+      respuestasPorPregunta[r.id_pregunta].push(r);
+    });
+
+    const result = preguntas.map(p => ({
+      ...p,
+      respuestas: respuestasPorPregunta[p.id_pregunta] || []
+    }));
+
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 19g. GET /api/admin/intentos-respuestas (Solo Admin)
+// ==========================================
+app.get('/api/admin/intentos-respuestas', permitirAdmin, async (req, res) => {
+  try {
+    const [intentos] = await pool.query(
+      `SELECT i.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario, e.nombre AS nombre_estacion
+       FROM intentos_estacion i
+       JOIN usuarios u ON i.id_usuario = u.id_usuario
+       JOIN estaciones e ON i.id_estacion = e.id_estacion
+       ORDER BY i.fecha_intento DESC`
+    );
+    const [respuestasUsuario] = await pool.query(
+      `SELECT ru.*, p.pregunta, r.texto_respuesta AS texto_respuesta_seleccionada, r2.texto_respuesta AS texto_respuesta_correcta
+       FROM respuestas_usuario ru
+       JOIN preguntas p ON ru.id_pregunta = p.id_pregunta
+       JOIN respuestas r ON ru.id_respuesta = r.id_respuesta
+       LEFT JOIN respuestas r2 ON p.id_pregunta = r2.id_pregunta AND r2.es_correcta = TRUE
+       ORDER BY ru.fecha_respuesta DESC`
+    );
+
+    // Agrupar respuestas por intento
+    const respuestasPorIntento = {};
+    respuestasUsuario.forEach(ru => {
+      if (!respuestasPorIntento[ru.id_intento]) {
+        respuestasPorIntento[ru.id_intento] = [];
+      }
+      respuestasPorIntento[ru.id_intento].push(ru);
+    });
+
+    const result = intentos.map(i => ({
+      ...i,
+      respuestas: respuestasPorIntento[i.id_intento] || []
+    }));
+
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 19h. GET /api/admin/minijuegos (Solo Admin)
+// ==========================================
+app.get('/api/admin/minijuegos', permitirAdmin, async (req, res) => {
+  try {
+    const [partidas] = await pool.query(
+      `SELECT p.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario, e.nombre AS nombre_estacion
+       FROM partidas_minijuego p
+       JOIN usuarios u ON p.id_usuario = u.id_usuario
+       LEFT JOIN estaciones e ON p.id_estacion = e.id_estacion
+       ORDER BY p.fecha_partida DESC`
+    );
+    res.json(partidas);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 19i. GET /api/admin/escaneos-qr (Solo Admin u Operador)
+// ==========================================
+app.get('/api/admin/escaneos-qr', permitirTaquillaOAdmin, async (req, res) => {
+  try {
+    const [escaneos] = await pool.query(
+      `SELECT e.*, b.folio AS folio_boleto, u.nombre AS nombre_operador
+       FROM escaneos_qr_boleto e
+       LEFT JOIN boletos b ON e.id_boleto = b.id_boleto
+       LEFT JOIN usuarios u ON e.escaneado_por = u.id_usuario
+       ORDER BY e.fecha_escaneo DESC`
+    );
+    res.json(escaneos);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 19i-b. POST /api/taquilla/escaneo-qr (Registrar un intento de escaneo)
+// ==========================================
+app.post('/api/taquilla/escaneo-qr', permitirTaquillaOAdmin, async (req, res) => {
+  const { qr_token, resultado, observaciones } = req.body;
+  const idOperador = req.headers['x-user-id'] || null;
+
+  try {
+    const [[boleto]] = await pool.query('SELECT id_boleto FROM boletos WHERE qr_token = ? OR folio = ?', [qr_token, qr_token]);
+    const idBoleto = boleto ? boleto.id_boleto : null;
+
+    await pool.query(
+      `INSERT INTO escaneos_qr_boleto (id_boleto, qr_token, escaneado_por, resultado, observaciones)
+       VALUES (?, ?, ?, ?, ?)`,
+      [idBoleto, qr_token, idOperador, resultado, observaciones]
+    );
+
+    res.json({ message: 'Escaneo registrado con éxito.' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 19j. POST /api/admin/usuarios/:id_usuario/roles (Solo Admin - Modificar roles de usuario)
+// ==========================================
+app.post('/api/admin/usuarios/:id_usuario/roles', permitirAdmin, async (req, res) => {
+  const idUsuario = req.params.id_usuario;
+  const { roles } = req.body;
+  const asignadoPor = req.headers['x-user-id'] || null;
+
+  if (!Array.isArray(roles) || roles.length === 0) {
+    return res.status(400).json({ error: 'Se requiere una lista de roles válida (arreglo no vacío).' });
+  }
+
+  try {
+    const connection = await pool.getConnection();
+    try {
+      await connection.beginTransaction();
+
+      // Eliminar roles existentes
+      await connection.query('DELETE FROM usuarios_roles WHERE id_usuario = ?', [idUsuario]);
+
+      // Insertar nuevos roles
+      for (const rolId of roles) {
+        await connection.query(
+          'INSERT INTO usuarios_roles (id_usuario, id_rol, asignado_por) VALUES (?, ?, ?)',
+          [idUsuario, rolId, asignadoPor]
+        );
+      }
+
+      // Registrar en auditoría
+      await connection.query(
+        `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
+         VALUES (?, 'admin', 'MODIFICAR_ROLES', 'usuarios_roles', ?, ?)`,
+        [asignadoPor, String(idUsuario), `Roles modificados para usuario ${idUsuario}. Nuevos roles: ${roles.join(', ')}`]
+      );
+
+      await connection.commit();
+      res.json({ message: 'Roles actualizados correctamente.' });
+    } catch (err) {
+      await connection.rollback();
+      throw err;
+    } finally {
+      connection.release();
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 19k. PUT /api/admin/estaciones/:id_estacion/toggle (Solo Admin - Activar/desactivar estación)
+// ==========================================
+app.put('/api/admin/estaciones/:id_estacion/toggle', permitirAdmin, async (req, res) => {
+  const idEstacion = req.params.id_estacion;
+  const realizadoPor = req.headers['x-user-id'] || null;
+  try {
+    const [[estacion]] = await pool.query('SELECT activa FROM estaciones WHERE id_estacion = ?', [idEstacion]);
+    if (!estacion) {
+      return res.status(404).json({ error: 'Estación no encontrada.' });
+    }
+
+    const nuevoEstado = estacion.activa ? 0 : 1;
+    await pool.query('UPDATE estaciones SET activa = ? WHERE id_estacion = ?', [nuevoEstado, idEstacion]);
+
+    // Registrar en auditoría
+    await pool.query(
+      `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
+       VALUES (?, 'admin', 'TOGGLE_ESTACION', 'estaciones', ?, ?)`,
+      [realizadoPor, String(idEstacion), `Estación ${idEstacion} cambiada a ${nuevoEstado ? 'activa' : 'inactiva'}`]
+    );
+
+    res.json({ id_estacion: idEstacion, activa: nuevoEstado });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 19l. PUT /api/admin/preguntas/:id_pregunta/toggle (Solo Admin - Activar/desactivar pregunta)
+// ==========================================
+app.put('/api/admin/preguntas/:id_pregunta/toggle', permitirAdmin, async (req, res) => {
+  const idPregunta = req.params.id_pregunta;
+  const realizadoPor = req.headers['x-user-id'] || null;
+  try {
+    const [[pregunta]] = await pool.query('SELECT activa FROM preguntas WHERE id_pregunta = ?', [idPregunta]);
+    if (!pregunta) {
+      return res.status(404).json({ error: 'Pregunta no encontrada.' });
+    }
+
+    const nuevoEstado = pregunta.activa ? 0 : 1;
+    await pool.query('UPDATE preguntas SET activa = ? WHERE id_pregunta = ?', [nuevoEstado, idPregunta]);
+
+    // Registrar en auditoría
+    await pool.query(
+      `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
+       VALUES (?, 'admin', 'TOGGLE_PREGUNTA', 'preguntas', ?, ?)`,
+      [realizadoPor, String(idPregunta), `Pregunta ${idPregunta} cambiada a ${nuevoEstado ? 'activa' : 'inactiva'}`]
+    );
+
+    res.json({ id_pregunta: idPregunta, activa: nuevoEstado });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

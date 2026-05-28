@@ -70,12 +70,12 @@ async function iniciarSesionConGoogle() {
           
           <div style="text-align: left; margin-bottom: 15px;">
             <label style="display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: #718096; margin-bottom: 5px;">Nombre Completo</label>
-            <input type="text" id="sim-google-name" value="Explorador MUCH" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d3748; background: #0c1024; color: white; outline: none; box-sizing: border-box;">
+            <input type="text" id="sim-google-name" placeholder="Tu nombre completo" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d3748; background: #0c1024; color: white; outline: none; box-sizing: border-box;">
           </div>
           
           <div style="text-align: left; margin-bottom: 20px;">
             <label style="display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: #718096; margin-bottom: 5px;">Correo de Google</label>
-            <input type="email" id="sim-google-email" value="explorador@gmail.com" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d3748; background: #0c1024; color: white; outline: none; box-sizing: border-box;">
+            <input type="email" id="sim-google-email" placeholder="ejemplo@gmail.com" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d3748; background: #0c1024; color: white; outline: none; box-sizing: border-box;">
           </div>
           
           <button id="sim-google-btn-submit" style="
@@ -173,10 +173,17 @@ async function iniciarSesionConGoogle() {
 }
 
 async function cerrarSesion() {
-  localStorage.removeItem('much_google_user');
-  localStorage.removeItem('much_selected_avatar');
-  localStorage.removeItem('much_current_view');
-  localStorage.removeItem('partida_id');
+  console.log('🚪 Cerrando sesión y limpiando datos del usuario...');
+  const lugarSeguro = localStorage.getItem('much_lugar_seguro');
+
+  // Limpiar completamente localStorage y sessionStorage para eliminar todo rastro del progreso anterior
+  localStorage.clear();
+  sessionStorage.clear();
+
+  // Conservar la ubicación QR para conveniencia del usuario en el museo
+  if (lugarSeguro) {
+    localStorage.setItem('much_lugar_seguro', lugarSeguro);
+  }
   
   // Recargar de inmediato para reiniciar estado
   window.location.reload();
@@ -241,6 +248,32 @@ async function guardarProgresoUsuario(estacionId, extra = {}) {
   }
 }
 
+// Inicializar progreso del usuario al entrar a una estación
+async function inicializarProgresoUsuario(estacionId) {
+  const user = obtenerUsuarioLocal();
+  if (!user) return null;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/progreso/inicializar`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': String(user.id)
+      },
+      body: JSON.stringify({
+        id_usuario: user.id,
+        id_estacion: Number(estacionId)
+      })
+    });
+
+    if (!res.ok) throw new Error('Error al inicializar progreso.');
+    return await res.json();
+  } catch (error) {
+    console.error('Error en inicializarProgresoUsuario:', error.message);
+    throw error;
+  }
+}
+
 // Guardar intento en una estación
 async function guardarIntentoEstacion(estacionId, intento = {}) {
   const user = obtenerUsuarioLocal();
@@ -271,15 +304,90 @@ async function guardarIntentoEstacion(estacionId, intento = {}) {
   }
 }
 
-// Guardar partida minijuego
+// Actualizar intento de estación existente
+async function actualizarIntentoEstacion(idIntento, intento = {}) {
+  const user = obtenerUsuarioLocal();
+  if (!user) throw new Error('No hay usuario autenticado en local.');
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/intentos/${idIntento}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': String(user.id)
+      },
+      body: JSON.stringify({
+        puntaje: Number(intento.puntaje || 0),
+        aciertos: Number(intento.aciertos || 0),
+        errores: Number(intento.errores || 0),
+        aprobado: Boolean(intento.aprobado)
+      })
+    });
+
+    if (!res.ok) throw new Error('Error al actualizar intento.');
+    return await res.json();
+  } catch (error) {
+    console.error('Error en actualizarIntentoEstacion:', error.message);
+    throw error;
+  }
+}
+
+// Guardar partida minijuego en partidas_minijuego
 async function guardarPartidaMinijuego(partida = {}) {
-  // En MySQL el minijuego corresponde a la estación id 1.
-  return await guardarIntentoEstacion(1, {
-    puntaje: partida.puntaje || 0,
-    aciertos: partida.puntaje || 0, // simulación
-    errores: 0,
-    aprobado: partida.aprobado
-  });
+  const user = obtenerUsuarioLocal();
+  if (!user) throw new Error('No hay usuario autenticado en local.');
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/partidas-minijuego`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': String(user.id)
+      },
+      body: JSON.stringify({
+        id_usuario: user.id,
+        id_estacion: 2, // Spinosaurio es la estación 2
+        puntaje: Number(partida.puntaje || 0),
+        aprobado: Boolean(partida.aprobado)
+      })
+    });
+
+    if (!res.ok) throw new Error('Error al registrar partida de minijuego.');
+    return await res.json();
+  } catch (error) {
+    console.error('Error en guardarPartidaMinijuego:', error.message);
+    throw error;
+  }
+}
+
+// Guardar respuesta del usuario individualmente
+async function guardarRespuestaUsuario(idIntento, estacionId, preguntaTexto, respuestaTexto, esCorrecta) {
+  const user = obtenerUsuarioLocal();
+  if (!user) return null;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/respuestas-usuario`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': String(user.id)
+      },
+      body: JSON.stringify({
+        id_intento: Number(idIntento),
+        id_usuario: user.id,
+        id_estacion: Number(estacionId),
+        pregunta_texto: preguntaTexto,
+        respuesta_texto: respuestaTexto,
+        es_correcta: Boolean(esCorrecta)
+      })
+    });
+
+    if (!res.ok) throw new Error('Error al guardar respuesta del usuario.');
+    return await res.json();
+  } catch (error) {
+    console.error('Error en guardarRespuestaUsuario:', error.message);
+    throw error;
+  }
 }
 
 // Generar boleto final
@@ -328,8 +436,11 @@ window.normalizarUsuarioSupabase = normalizarUsuarioSupabase;
 window.verificarUsuarioEnTabla = verificarUsuarioEnTabla;
 window.consultarEstaciones = consultarEstaciones;
 window.guardarProgresoUsuario = guardarProgresoUsuario;
+window.inicializarProgresoUsuario = inicializarProgresoUsuario;
 window.guardarIntentoEstacion = guardarIntentoEstacion;
+window.actualizarIntentoEstacion = actualizarIntentoEstacion;
 window.guardarPartidaMinijuego = guardarPartidaMinijuego;
+window.guardarRespuestaUsuario = guardarRespuestaUsuario;
 window.generarBoletoFinal = generarBoletoFinal;
 window.iniciarJuego = iniciarJuego;
 window.cargarPreguntas = cargarPreguntas;
@@ -345,8 +456,11 @@ export {
   verificarUsuarioEnTabla,
   consultarEstaciones,
   guardarProgresoUsuario,
+  inicializarProgresoUsuario,
   guardarIntentoEstacion,
+  actualizarIntentoEstacion,
   guardarPartidaMinijuego,
+  guardarRespuestaUsuario,
   generarBoletoFinal,
   iniciarJuego,
   cargarPreguntas,

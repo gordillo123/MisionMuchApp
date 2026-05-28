@@ -146,12 +146,7 @@ async function guardarSpinosaurioEnSupabase(puntajeFinal, aprobado) {
     const progreso = await import('../supabase-utils.js');
     await progreso.guardarPartidaMinijuego({
       puntaje: puntajeFinal,
-      aprobado,
-      metadata: {
-        estacion_id: Number(STATION_ID),
-        estacion: 'spinosaurio',
-        ubicacion: LUGAR_QR
-      }
+      aprobado
     });
 
     await progreso.guardarIntentoEstacion(STATION_ID, {
@@ -161,15 +156,13 @@ async function guardarSpinosaurioEnSupabase(puntajeFinal, aprobado) {
       aprobado
     });
 
-    if (aprobado) {
-      await progreso.guardarProgresoUsuario(STATION_ID, {
-        metadata: {
-          estacion: 'spinosaurio',
-          puntaje: puntajeFinal,
-          ubicacion: LUGAR_QR
-        }
-      });
-    }
+    // Enviar los campos al primer nivel para que guardarProgresoUsuario los reciba bien
+    await progreso.guardarProgresoUsuario(STATION_ID, {
+      puntaje: puntajeFinal,
+      aciertos: aprobado ? 1 : 0,
+      errores: aprobado ? 0 : 1,
+      aprobada: aprobado
+    });
   } catch (error) {
     console.error('[Supabase DB] No se pudo guardar Spinosaurio:', error);
   }
@@ -213,6 +206,16 @@ if (document.readyState === "complete" || document.readyState === "interactive")
   document.addEventListener("DOMContentLoaded", Init);
 }
 
+async function inicializarProgresoSpinosaurio() {
+  try {
+    const progreso = await import('../supabase-utils.js');
+    await progreso.inicializarProgresoUsuario(2);
+    console.log("Progreso de Spinosaurio inicializado en MySQL.");
+  } catch (error) {
+    console.error("Error al inicializar progreso de Spinosaurio:", error);
+  }
+}
+
 function Init() {
   updateOrientationGate();
   window.addEventListener("resize", updateOrientationGate, { passive: true });
@@ -222,6 +225,7 @@ function Init() {
 
   Start();
   ConfigurarPortada(); // Arranca escuchando el botón de la portada integrada
+  inicializarProgresoSpinosaurio();
 }
 
 function Loop() {

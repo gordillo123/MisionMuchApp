@@ -7591,6 +7591,53 @@
         }
       }
 
+      async function sincronizarProgresoDesdeBD() {
+        const user = JSON.parse(localStorage.getItem('much_google_user') || 'null');
+        if (!user || (!user.id_usuario && !user.id)) return;
+        const userId = user.id_usuario || user.id;
+
+        try {
+          console.log('[Sync] Sincronizando progreso desde base de datos MySQL para usuario:', userId);
+          const res = await fetch(`http://localhost:3000/api/progreso/${userId}`);
+          if (!res.ok) throw new Error('Error al consultar progreso de usuario');
+          const progreso = await res.json();
+          
+          // Mapear el array retornado a un objeto de estaciones completadas
+          const completedMap = {};
+          let maxStationId = 1;
+          
+          progreso.forEach(p => {
+            if (p.aprobada || p.completada) {
+              completedMap[String(p.id_estacion)] = true;
+              if (p.id_estacion >= maxStationId) {
+                maxStationId = p.id_estacion + 1;
+              }
+            }
+          });
+
+          console.log('[Sync] Progreso mapeado:', completedMap);
+          localStorage.setItem('much_completed_stations', JSON.stringify(completedMap));
+          
+          // Si la estación actual guardada es menor o no existe, actualizarla a la estación más alta alcanzada
+          const savedStation = localStorage.getItem('much_current_station');
+          if (!savedStation || Number(savedStation) < maxStationId) {
+            const nextStation = Math.min(6, maxStationId);
+            localStorage.setItem('much_current_station', String(nextStation));
+            currentStation = String(nextStation);
+          }
+          
+          // Actualizar visualmente el mapa
+          if (typeof updateCompletedStationsOnMap === 'function') {
+            updateCompletedStationsOnMap();
+          }
+          if (typeof updateRewardClaimUI === 'function') {
+            updateRewardClaimUI(completedMap);
+          }
+        } catch (error) {
+          console.error('[Sync] Error al sincronizar progreso:', error);
+        }
+      }
+
       async function sincronizarUsuarioSupabase() {
         const session = await window.obtenerSesionActual();
         console.log('[Login] Sesion actual:', session);
@@ -7605,6 +7652,8 @@
 
         try {
           await window.verificarUsuarioEnTabla();
+          // Sincronizar el progreso de la BD después de verificar el usuario
+          await sincronizarProgresoDesdeBD();
         } catch (error) {
           console.error('[Login] Error verificando public.usuarios:', error);
         }
@@ -8374,13 +8423,18 @@
       };
 
       // NUEVO: Lógica para manejar el regreso desde las estaciones y persistencia
-      function checkStatePersistence() {
+      async function checkStatePersistence() {
         const savedStation = localStorage.getItem('much_current_station');
 
         if (restoreSavedAvatar()) {
           // Redirigir SIEMPRE al mapa interactivo de estaciones si hay una sesión activa
           showView('viewPrep');
-          currentStation = savedStation ? String(savedStation) : '1';
+          
+          // Sincronizar el progreso desde la BD antes de calcular la estación actual
+          await sincronizarProgresoDesdeBD();
+          
+          const freshSavedStation = localStorage.getItem('much_current_station');
+          currentStation = freshSavedStation ? String(freshSavedStation) : '1';
           setTimeout(() => {
             moveToStation(currentStation);
             window.MuchStationCompletion?.showPendingMapNotice();

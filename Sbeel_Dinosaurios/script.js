@@ -41,6 +41,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function playBgMusic() { try { ensureBgMusic(); window.bgMusic.play().catch(()=>{}); } catch (e) {} }
     function pauseBgMusic() { try { if (window.bgMusic && !window.bgMusic.paused) window.bgMusic.pause(); } catch (e) {} }
 
+    async function inicializarSbeelProgreso() {
+        try {
+            const progreso = await import('../supabase-utils.js');
+            await progreso.inicializarProgresoUsuario(6);
+            console.log("Progreso de SBEEL inicializado en MySQL.");
+        } catch (error) {
+            console.error("Error al inicializar progreso de SBEEL:", error);
+        }
+    }
+
     /**
      * Inicializa el juego
      */
@@ -50,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderBoard();
         resetTimer();
         startTimer();
+        inicializarSbeelProgreso();
     }
 
     /**
@@ -235,20 +246,20 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const progreso = await import('../supabase-utils.js');
             const elapsedSeconds = TIME_LIMIT_SECONDS - timeRemaining;
+            const finalScore = Math.max(0, timeRemaining);
 
             await progreso.guardarIntentoEstacion(STATION_ID, {
                 aciertos: 1,
                 errores: 0,
-                puntaje: Math.max(0, timeRemaining),
+                puntaje: finalScore,
                 aprobado: true
             });
 
             await progreso.guardarProgresoUsuario(STATION_ID, {
-                metadata: {
-                    estacion: 'sbeel',
-                    tiempo_restante: timeRemaining,
-                    segundos_usados: elapsedSeconds
-                }
+                puntaje: finalScore,
+                aciertos: 1,
+                errores: 0,
+                aprobada: true
             });
         } catch (error) {
             console.error('[Supabase DB] No se pudo guardar SBEEL:', error);

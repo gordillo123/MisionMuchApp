@@ -4,38 +4,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Administrador de Folios</title>
-  <meta name="description" content="Panel interno para administrar registros y validar boletos.">
+  <title>Misión MUCH - Panel Administrativo</title>
+  <meta name="description" content="Panel administrativo y de control de taquilla para el museo Misión MUCH.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <style>
     :root {
-      --bg-main: #07111f;
-      --bg-panel: rgba(13, 22, 39, 0.88);
-      --bg-card: rgba(21, 33, 58, 0.94);
-      --border: rgba(255, 255, 255, 0.1);
+      --bg-main: #060c18;
+      --bg-sidebar: #0a1122;
+      --bg-panel: rgba(13, 22, 40, 0.9);
+      --bg-card: rgba(22, 35, 62, 0.95);
+      --border: rgba(255, 255, 255, 0.08);
       --text-main: #f7fbff;
       --text-soft: #a9bbd5;
       --text-dim: #6c829f;
       --accent: #49c6ff;
       --accent-2: #7a7dff;
-      --success: #22c55e;
+      --success: #10b981;
       --warning: #f59e0b;
-      --danger: #f87171;
+      --danger: #ef4444;
       --missing: #94a3b8;
-      --shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
-      --radius-xl: 28px;
-      --radius-lg: 22px;
-      --radius-md: 16px;
+      --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --sidebar-width: 280px;
     }
 
     * {
       box-sizing: border-box;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
     }
 
     html,
@@ -45,9 +46,10 @@
       font-family: 'Outfit', sans-serif;
       color: var(--text-main);
       background:
-        radial-gradient(circle at top left, rgba(73, 198, 255, 0.16) 0%, transparent 34%),
-        radial-gradient(circle at top right, rgba(122, 125, 255, 0.18) 0%, transparent 32%),
-        linear-gradient(180deg, #08111e 0%, #060d18 100%);
+        radial-gradient(circle at top left, rgba(73, 198, 255, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at bottom right, rgba(122, 125, 255, 0.12) 0%, transparent 40%),
+        linear-gradient(180deg, #070d19 0%, #040810 100%);
+      background-attachment: fixed;
     }
 
     body::before {
@@ -55,12 +57,13 @@
       position: fixed;
       inset: 0;
       pointer-events: none;
-      opacity: 0.24;
+      opacity: 0.15;
       background-image:
         linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      background-size: 34px 34px;
-      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.3));
+      background-size: 30px 30px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.2));
+      z-index: 0;
     }
 
     a {
@@ -70,371 +73,389 @@
 
     button,
     input,
-    select {
+    select,
+    textarea {
       font: inherit;
+      color: inherit;
     }
 
     [hidden] {
       display: none !important;
     }
 
+    /* Auth Screens Styles */
     .admin-auth-screen {
       min-height: 100vh;
       display: grid;
       place-items: center;
-      padding: 28px 20px;
+      padding: 24px;
       position: relative;
-      z-index: 1;
+      z-index: 10;
     }
 
     .admin-auth-card {
       width: min(100%, 460px);
-      background: rgba(12, 20, 36, 0.92);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 32px;
-      padding: 30px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 36px;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
+      backdrop-filter: blur(20px);
+      text-align: center;
       display: grid;
-      gap: 18px;
+      gap: 20px;
     }
 
     .admin-auth-badge {
-      width: 74px;
-      height: 74px;
+      width: 80px;
+      height: 80px;
       border-radius: 24px;
       display: grid;
       place-items: center;
-      font-size: 2rem;
-      background: linear-gradient(135deg, rgba(73, 198, 255, 0.95), rgba(122, 125, 255, 0.92));
-      box-shadow: 0 14px 30px rgba(73, 198, 255, 0.22);
+      font-size: 2.2rem;
+      margin: 0 auto;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 12px 28px rgba(73, 198, 255, 0.25);
     }
 
     .admin-auth-eyebrow {
-      margin: 0;
       color: var(--accent);
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.16em;
+      margin: 0;
     }
 
     .admin-auth-card h1 {
       margin: 0;
       font-family: 'Fredoka', sans-serif;
-      font-size: clamp(1.9rem, 5vw, 2.6rem);
-      line-height: 1.05;
+      font-size: 2.2rem;
+      line-height: 1.1;
     }
 
-    .admin-auth-copy,
-    .admin-auth-hint {
+    .admin-auth-copy {
+      color: var(--text-soft);
+      line-height: 1.6;
       margin: 0;
-      color: var(--text-soft);
-      line-height: 1.65;
-    }
-
-    .admin-auth-form {
-      display: grid;
-      gap: 14px;
-    }
-
-    .admin-auth-label {
-      color: var(--text-soft);
-      font-size: 0.78rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-    }
-
-    .admin-auth-input {
-      width: 100%;
-      min-height: 56px;
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-main);
-      padding: 0 16px;
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-      appearance: none;
-    }
-
-    .admin-auth-input:focus {
-      border-color: rgba(73, 198, 255, 0.42);
-      box-shadow: 0 0 0 3px rgba(73, 198, 255, 0.12);
     }
 
     .admin-auth-button {
       min-height: 56px;
       border: 0;
-      border-radius: 18px;
+      border-radius: 16px;
       color: white;
       font-weight: 800;
       cursor: pointer;
-      background: linear-gradient(135deg, rgba(73, 198, 255, 0.95), rgba(122, 125, 255, 0.95));
-      box-shadow: 0 16px 30px rgba(73, 198, 255, 0.22);
-      transition: transform 0.2s ease, opacity 0.2s ease;
+      font-size: 1.05rem;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      box-shadow: 0 12px 30px rgba(73, 198, 255, 0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
     }
 
     .admin-auth-button:hover {
-      transform: translateY(-1px);
-    }
-
-    .admin-auth-button:disabled {
-      cursor: not-allowed;
-      opacity: 0.65;
-      transform: none;
+      transform: translateY(-2px);
+      box-shadow: 0 16px 36px rgba(73, 198, 255, 0.35);
     }
 
     .admin-auth-message {
       margin: 0;
-      padding: 12px 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text-soft);
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 0.9rem;
       line-height: 1.5;
-      min-height: 48px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-soft);
     }
 
     .admin-auth-message.error {
-      color: #ffb4b4;
-      background: rgba(248, 113, 113, 0.12);
-      border-color: rgba(248, 113, 113, 0.18);
+      color: #ff9b9b;
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.18);
     }
 
     .admin-auth-message.success {
-      color: #9ce6b4;
-      background: rgba(34, 197, 94, 0.12);
-      border-color: rgba(34, 197, 94, 0.18);
+      color: #79f2c0;
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.18);
     }
 
-    .page-shell {
+    /* Layout Structure */
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
       position: relative;
       z-index: 1;
-      max-width: 1320px;
-      margin: 0 auto;
-      padding: 28px 20px 56px;
     }
 
+    /* Sidebar Navigation */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+      transition: width 0.3s ease;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding: 0 8px;
+    }
+
+    .sidebar-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      font-size: 1.3rem;
+      box-shadow: 0 8px 20px rgba(73, 198, 255, 0.2);
+    }
+
+    .sidebar-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.3rem;
+      margin: 0;
+      letter-spacing: 0.02em;
+    }
+
+    .sidebar-user {
+      padding: 16px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-md);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sidebar-user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      object-fit: cover;
+      background: var(--bg-card);
+    }
+
+    .sidebar-user-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .sidebar-user-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0 0 2px;
+    }
+
+    .sidebar-user-role {
+      font-size: 0.75rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+    }
+
+    .sidebar-nav {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      color: var(--text-soft);
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border: 1px solid transparent;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+      transform: translateX(2px);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(73, 198, 255, 0.12), rgba(122, 125, 255, 0.12));
+      border-color: rgba(73, 198, 255, 0.25);
+      color: var(--accent);
+      box-shadow: 0 6px 20px rgba(73, 198, 255, 0.05);
+    }
+
+    .nav-item-icon {
+      font-size: 1.15rem;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: grid;
+      gap: 10px;
+    }
+
+    /* Main Area */
+    .main-content {
+      flex: 1;
+      min-width: 0;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* Topbar Header */
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 18px;
-      margin-bottom: 24px;
+      gap: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 16px;
+    .topbar-title-wrap {
       min-width: 0;
     }
 
-    .brand-badge {
-      width: 58px;
-      height: 58px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(73, 198, 255, 0.95), rgba(122, 125, 255, 0.9));
-      box-shadow: 0 14px 32px rgba(73, 198, 255, 0.18);
-      display: grid;
-      place-items: center;
-      font-size: 1.55rem;
-    }
-
-    .brand-copy {
-      min-width: 0;
-    }
-
-    .brand-copy p {
-      margin: 0 0 6px;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      font-size: 0.78rem;
-      font-weight: 700;
-    }
-
-    .brand-copy h1 {
-      margin: 0;
+    .topbar-title-wrap h2 {
+      margin: 0 0 4px;
+      font-size: 1.8rem;
       font-family: 'Fredoka', sans-serif;
-      font-size: clamp(1.8rem, 2vw, 2.5rem);
-      line-height: 1;
       letter-spacing: 0.01em;
     }
 
-    .brand-copy span {
-      display: block;
-      margin-top: 8px;
+    .topbar-title-wrap p {
+      margin: 0;
       color: var(--text-soft);
-      font-size: 0.98rem;
+      font-size: 0.95rem;
     }
 
     .topbar-actions {
       display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .section-switch {
-      display: inline-flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .section-link.active {
-      background: linear-gradient(135deg, rgba(73, 198, 255, 0.95), rgba(122, 125, 255, 0.95));
-      color: white;
-      border-color: rgba(255, 255, 255, 0.18);
-      box-shadow: 0 12px 30px rgba(73, 198, 255, 0.2);
-    }
-
-    .admin-session-chip {
-      display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 12px 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(73, 198, 255, 0.18);
-      background: rgba(73, 198, 255, 0.08);
-      color: #9be5ff;
-      font-size: 0.85rem;
-      font-weight: 700;
+      gap: 12px;
     }
 
-    .ghost-link,
-    .soft-button,
-    .solid-button {
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 12px 18px;
+    /* Buttons */
+    .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 700;
       cursor: pointer;
-      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      white-space: nowrap;
     }
 
-    .ghost-link,
-    .soft-button {
-      background: rgba(255, 255, 255, 0.04);
+    .btn-solid {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      box-shadow: 0 8px 24px rgba(73, 198, 255, 0.18);
+    }
+
+    .btn-solid:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(73, 198, 255, 0.28);
+    }
+
+    .btn-soft {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--border);
       color: var(--text-main);
     }
 
-    .solid-button {
-      background: linear-gradient(135deg, rgba(73, 198, 255, 0.95), rgba(122, 125, 255, 0.95));
-      color: white;
-      border-color: rgba(255, 255, 255, 0.18);
-      box-shadow: 0 12px 30px rgba(73, 198, 255, 0.2);
+    .btn-soft:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
     }
 
-    .ghost-link:hover,
-    .soft-button:hover,
-    .solid-button:hover,
-    .filter-chip:hover {
-      transform: translateY(-1px);
-      border-color: rgba(255, 255, 255, 0.22);
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.2);
+      color: #ff8b8b;
     }
 
-    .hero-panel {
-      display: grid;
-      grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.9fr);
-      gap: 20px;
-      background: var(--bg-panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      padding: 28px;
-      backdrop-filter: blur(18px);
-      box-shadow: var(--shadow);
-      margin-bottom: 24px;
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.35);
     }
 
-    .hero-copy h2 {
-      margin: 0 0 12px;
-      font-size: clamp(1.45rem, 2vw, 2.15rem);
-      line-height: 1.1;
-    }
-
-    .hero-copy p {
-      margin: 0;
-      color: var(--text-soft);
-      line-height: 1.65;
-      max-width: 66ch;
-    }
-
-    .hero-side {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: var(--radius-lg);
-      padding: 22px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .hero-side .eyebrow {
-      font-size: 0.77rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    .hero-side strong {
-      font-size: 1.08rem;
-      display: block;
-      margin-top: 6px;
-    }
-
-    .hero-side p {
-      margin: 0;
-      color: var(--text-soft);
-      line-height: 1.55;
-    }
-
-    .sync-pill {
-      align-self: flex-start;
+    /* Sync Indicators */
+    .sync-indicator {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 9px 14px;
+      padding: 6px 12px;
       border-radius: 999px;
-      background: rgba(34, 197, 94, 0.12);
-      color: #8ff0ad;
-      border: 1px solid rgba(34, 197, 94, 0.18);
-      font-size: 0.82rem;
+      background: rgba(16, 185, 129, 0.08);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.15);
+      font-size: 0.8rem;
       font-weight: 700;
     }
 
-    .sync-pill::before {
+    .sync-indicator::before {
       content: "";
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background: currentColor;
-      box-shadow: 0 0 12px currentColor;
+      box-shadow: 0 0 8px currentColor;
     }
 
-    .sync-pill.error {
-      background: rgba(248, 113, 113, 0.14);
-      color: #ffb4b4;
-      border-color: rgba(248, 113, 113, 0.22);
+    .sync-indicator.syncing {
+      background: rgba(73, 198, 255, 0.08);
+      color: #9be0ff;
+      border-color: rgba(73, 198, 255, 0.15);
     }
 
+    /* Metrics Grid */
     .metrics-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 18px;
-      margin-bottom: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
     }
 
     .metric-card {
-      background: rgba(21, 33, 58, 0.94);
+      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: 22px;
@@ -443,72 +464,105 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 16px;
+      backdrop-filter: blur(10px);
+      transition: transform 0.2s ease;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .metric-card-info {
+      flex: 1;
     }
 
     .metric-card .label {
       display: block;
       color: var(--text-soft);
-      font-size: 0.92rem;
-      margin-bottom: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
     .metric-card .value {
       display: block;
-      font-size: clamp(1.9rem, 2.7vw, 2.55rem);
+      font-size: 2.2rem;
       font-weight: 800;
       line-height: 1;
+      font-family: 'Fredoka', sans-serif;
     }
 
     .metric-card .hint {
       display: block;
       margin-top: 10px;
       color: var(--text-dim);
-      font-size: 0.84rem;
+      font-size: 0.8rem;
     }
 
     .metric-icon {
-      width: 52px;
-      height: 52px;
+      width: 48px;
+      height: 48px;
       border-radius: var(--radius-md);
       display: grid;
       place-items: center;
-      font-size: 1.35rem;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 1.3rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .metric-card.valid .metric-icon {
-      color: #8ff0ad;
-      background: rgba(34, 197, 94, 0.12);
+    /* Content Panels */
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 26px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
     }
 
-    .metric-card.invalid .metric-icon {
-      color: #ffb4b4;
-      background: rgba(248, 113, 113, 0.14);
-    }
-
-    .toolbar {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto auto;
-      gap: 14px;
+    .panel-head {
+      display: flex;
       align-items: center;
-      margin-bottom: 16px;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .panel-title-wrap h3 {
+      margin: 0 0 4px;
+      font-size: 1.35rem;
+      font-family: 'Fredoka', sans-serif;
+    }
+
+    .panel-title-wrap p {
+      margin: 0;
+      color: var(--text-soft);
+      font-size: 0.9rem;
+    }
+
+    /* Toolbar Filter & Search Controls */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
     }
 
     .search-wrap {
       display: flex;
       align-items: center;
-      gap: 12px;
-      background: rgba(255, 255, 255, 0.05);
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--border);
-      border-radius: 18px;
+      border-radius: 14px;
       padding: 0 16px;
-      min-height: 58px;
-    }
-
-    .search-wrap span {
-      color: var(--text-soft);
-      font-size: 1.05rem;
+      min-height: 48px;
+      flex: 1;
+      max-width: 480px;
     }
 
     .search-wrap input {
@@ -518,18 +572,17 @@
       min-width: 0;
       background: transparent;
       color: var(--text-main);
-      font-size: 1rem;
+      font-size: 0.95rem;
     }
 
     .search-wrap input::placeholder {
       color: var(--text-dim);
     }
 
-    .filter-row {
+    .filter-chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 18px;
+      gap: 8px;
     }
 
     .filter-chip {
@@ -537,78 +590,246 @@
       background: rgba(255, 255, 255, 0.04);
       color: var(--text-soft);
       border-radius: 999px;
-      padding: 10px 16px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+      transition: all 0.2s ease;
+    }
+
+    .filter-chip:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      color: var(--text-main);
     }
 
     .filter-chip.active {
       color: white;
-      background: linear-gradient(135deg, rgba(73, 198, 255, 0.18), rgba(122, 125, 255, 0.2));
-      border-color: rgba(73, 198, 255, 0.4);
-      box-shadow: 0 10px 22px rgba(73, 198, 255, 0.14);
+      background: linear-gradient(135deg, rgba(73, 198, 255, 0.2), rgba(122, 125, 255, 0.2));
+      border-color: rgba(73, 198, 255, 0.45);
+      box-shadow: 0 6px 16px rgba(73, 198, 255, 0.1);
     }
 
-    .panel {
+    /* Table Design */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    thead th {
+      padding: 14px 18px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      background: rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      color: var(--text-main);
+      font-size: 0.92rem;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    tbody tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .table-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      vertical-align: middle;
+      margin-right: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Badge & Tags */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border: 1px solid transparent;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .tag-success {
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.15);
+    }
+
+    .tag-warning {
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.1);
+      border-color: rgba(245, 158, 11, 0.15);
+    }
+
+    .tag-danger {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.15);
+    }
+
+    .tag-info {
+      color: #3b82f6;
+      background: rgba(59, 130, 246, 0.1);
+      border-color: rgba(59, 130, 246, 0.15);
+    }
+
+    .tag-dark {
+      color: var(--text-soft);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--border);
+    }
+
+    /* Toggles & Switces */
+    .switch-btn {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      transition: all 0.2s ease;
+    }
+
+    .switch-btn.active {
+      color: #10b981;
+      border-color: rgba(16, 185, 129, 0.3);
+      background: rgba(16, 185, 129, 0.08);
+    }
+
+    .switch-btn.inactive {
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, 0.3);
+      background: rgba(239, 68, 68, 0.08);
+    }
+
+    /* Modal dialog */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 10, 20, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .modal-card {
       background: var(--bg-panel);
       border: 1px solid var(--border);
       border-radius: var(--radius-xl);
-      padding: 24px;
+      width: min(100%, 500px);
+      padding: 30px;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
+      display: grid;
+      gap: 20px;
     }
 
-    .panel-head {
+    .modal-head {
       display: flex;
-      align-items: flex-start;
       justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 18px;
+      align-items: center;
     }
 
-    .panel-head h2 {
-      margin: 0 0 8px;
-      font-size: 1.3rem;
-    }
-
-    .panel-head p,
-    .panel-head span {
+    .modal-head h3 {
       margin: 0;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.35rem;
+    }
+
+    .modal-body {
+      display: grid;
+      gap: 16px;
+    }
+
+    .modal-foot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    /* Form Elements */
+    .form-group {
+      display: grid;
+      gap: 8px;
+    }
+
+    .form-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
       color: var(--text-soft);
     }
 
+    .form-input {
+      width: 100%;
+      min-height: 48px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+      padding: 0 14px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus {
+      border-color: rgba(73, 198, 255, 0.4);
+      box-shadow: 0 0 0 3px rgba(73, 198, 255, 0.12);
+    }
+
+    /* Ticket QR Scanner Layout */
     .scanner-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.9fr);
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 24px;
+    }
+
+    .scanner-panel {
+      display: flex;
+      flex-direction: column;
       gap: 20px;
-      margin-bottom: 24px;
     }
 
-    .scanner-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.88fr);
-      gap: 18px;
-      align-items: start;
-    }
-
-    .scanner-stage,
-    .scanner-side,
-    .scan-result-shell,
-    .scan-result-card {
-      display: grid;
-      gap: 16px;
-    }
-
-    .scanner-reader {
-      position: relative;
+    .scanner-reader-box {
       min-height: 320px;
-      border-radius: 24px;
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background:
-        radial-gradient(circle at top, rgba(73, 198, 255, 0.16), transparent 42%),
-        rgba(4, 10, 20, 0.92);
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      background: rgba(4, 9, 18, 0.9);
+      position: relative;
     }
 
     #ticketReader {
@@ -616,18 +837,9 @@
       min-height: 320px;
     }
 
-    #ticketReader video,
-    #ticketReader canvas {
-      width: 100% !important;
-      height: auto !important;
-      border-radius: 24px;
-    }
-
-    #ticketReader__scan_region {
-      min-height: 320px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    #ticketReader video {
+      object-fit: cover !important;
+      border-radius: var(--radius-lg);
     }
 
     .scanner-placeholder {
@@ -635,782 +847,498 @@
       inset: 0;
       display: grid;
       place-items: center;
-      padding: 28px;
+      padding: 24px;
       text-align: center;
+      background: linear-gradient(135deg, rgba(10, 20, 40, 0.8), rgba(6, 12, 24, 0.95));
       color: var(--text-soft);
-      background:
-        linear-gradient(180deg, rgba(7, 17, 31, 0.44), rgba(7, 17, 31, 0.7)),
-        linear-gradient(135deg, rgba(73, 198, 255, 0.08), rgba(122, 125, 255, 0.12));
-      transition: opacity 0.2s ease, visibility 0.2s ease;
+      z-index: 2;
     }
 
     .scanner-placeholder.hidden {
       opacity: 0;
       visibility: hidden;
+      pointer-events: none;
     }
 
     .scanner-placeholder strong {
       display: block;
-      margin-bottom: 8px;
       color: var(--text-main);
-      font-size: 1.08rem;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
     }
 
-    .scanner-actions {
+    .scanner-details-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-lg);
+      padding: 24px;
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+      flex-direction: column;
+      gap: 16px;
     }
 
-    .scanner-actions>* {
-      flex: 1 1 160px;
-    }
-
-    .scanner-side-note,
-    .scanner-feedback,
-    .scanner-support {
-      margin: 0;
-      color: var(--text-soft);
-      line-height: 1.6;
-    }
-
-    .scanner-feedback.error,
-    .scanner-support.error {
-      color: #ffb4b4;
-    }
-
-    .scanner-feedback.success {
-      color: #9ce6b4;
-    }
-
-    .manual-label {
-      color: var(--text-soft);
-      font-size: 0.9rem;
-      font-weight: 700;
-    }
-
-    .manual-input {
-      width: 100%;
-      min-height: 56px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 0 16px;
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-main);
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .manual-input::placeholder {
-      color: var(--text-dim);
-    }
-
-    .manual-input:focus {
-      border-color: rgba(73, 198, 255, 0.42);
-      box-shadow: 0 0 0 3px rgba(73, 198, 255, 0.12);
-    }
-
-    .scan-result-placeholder {
-      min-height: 320px;
-      border-radius: 24px;
-      border: 1px dashed rgba(255, 255, 255, 0.14);
+    .scanner-meta-grid {
       display: grid;
-      place-items: center;
-      text-align: center;
-      padding: 28px;
-      color: var(--text-soft);
-      background: rgba(255, 255, 255, 0.03);
-    }
-
-    .scan-result-placeholder strong {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--text-main);
-      font-size: 1.05rem;
-    }
-
-    .scan-head {
-      display: grid;
-      gap: 10px;
-    }
-
-    .scan-head h3,
-    .scan-head p {
-      margin: 0;
-    }
-
-    .scan-head h3 {
-      font-size: 1.55rem;
-      line-height: 1.1;
-    }
-
-    .scan-head p {
-      color: var(--text-soft);
-      line-height: 1.6;
-    }
-
-    .scan-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: fit-content;
-      min-width: 132px;
-      padding: 11px 18px;
-      border-radius: 999px;
-      border: 1px solid transparent;
-      font-size: 0.84rem;
-      font-weight: 800;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-
-    .scan-badge.valid {
-      color: #8ff0ad;
-      background: rgba(34, 197, 94, 0.12);
-      border-color: rgba(34, 197, 94, 0.18);
-    }
-
-    .scan-badge.invalid {
-      color: #ffb4b4;
-      background: rgba(248, 113, 113, 0.14);
-      border-color: rgba(248, 113, 113, 0.22);
-    }
-
-    .scan-badge.warning {
-      color: #ffd38d;
-      background: rgba(245, 158, 11, 0.14);
-      border-color: rgba(245, 158, 11, 0.2);
-    }
-
-    .scan-folio {
-      display: inline-flex;
-      align-items: center;
-      width: fit-content;
-      min-height: 44px;
-      padding: 0 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(73, 198, 255, 0.14);
-      background: rgba(73, 198, 255, 0.08);
-      color: #8de0ff;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 0.95rem;
-      font-weight: 700;
-      word-break: break-word;
-    }
-
-    .scan-meta {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 14px;
     }
 
-    .scan-meta-item {
-      padding: 16px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .scan-meta-item span {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--text-dim);
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .scan-meta-item strong {
-      display: block;
-      line-height: 1.45;
-      font-size: 1rem;
-    }
-
-    .scan-raw {
-      padding: 14px 16px;
-      border-radius: 16px;
-      border: 1px dashed rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text-soft);
-      word-break: break-word;
-    }
-
-    .scan-raw span {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--text-dim);
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .table-wrap {
-      overflow: auto;
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
+    .scanner-meta-item {
+      padding: 12px 14px;
+      border-radius: 8px;
       background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 1480px;
-    }
-
-    thead th {
-      text-align: left;
-      padding: 16px 18px;
-      font-size: 0.8rem;
+    .scanner-meta-item span {
+      display: block;
+      font-size: 0.72rem;
       font-weight: 700;
-      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--text-soft);
-      background: rgba(255, 255, 255, 0.04);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-dim);
+      margin-bottom: 4px;
     }
 
-    tbody td {
-      padding: 18px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      vertical-align: middle;
+    .scanner-meta-item strong {
+      display: block;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Expandable rows */
+    .expandable-row-content {
+      background: rgba(255, 255, 255, 0.02);
+      border-left: 3px solid var(--accent);
+    }
+
+    .expandable-details-list {
+      padding: 14px 20px;
+      margin: 0;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .expandable-details-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      color: var(--text-soft);
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 8px;
+    }
+
+    .expandable-details-list strong {
       color: var(--text-main);
     }
 
-    tbody tr:last-child td {
-      border-bottom: 0;
+    /* Lock Screen Denied Access */
+    .denied-screen {
+      min-height: 80vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 24px;
     }
 
-    tbody tr:hover {
-      background: rgba(255, 255, 255, 0.03);
+    .denied-card {
+      max-width: 500px;
+      background: var(--bg-panel);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: var(--radius-xl);
+      padding: 44px 30px;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 20px;
     }
 
-    .participant-cell strong {
-      display: block;
-      font-size: 1rem;
-      margin-bottom: 6px;
+    .denied-badge {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      display: grid;
+      place-items: center;
+      font-size: 2.2rem;
+      margin: 0 auto;
+      color: #ff7676;
     }
 
-    .participant-cell span {
-      display: block;
+    .denied-card h2 {
+      margin: 0;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.8rem;
+    }
+
+    .denied-card p {
+      margin: 0;
       color: var(--text-soft);
-      font-size: 0.9rem;
-      line-height: 1.45;
+      line-height: 1.6;
     }
 
-    .folio-code {
-      display: inline-flex;
-      align-items: center;
-      min-height: 42px;
-      padding: 0 12px;
-      border-radius: 12px;
-      background: rgba(73, 198, 255, 0.08);
-      border: 1px solid rgba(73, 198, 255, 0.12);
-      color: #8de0ff;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 0.94rem;
-      font-weight: 700;
-    }
-
-    .folio-code.empty {
-      color: var(--text-dim);
-      background: rgba(255, 255, 255, 0.03);
-      border-color: rgba(255, 255, 255, 0.06);
-    }
-
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 104px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-size: 0.83rem;
-      font-weight: 800;
-      letter-spacing: 0.02em;
-      border: 1px solid transparent;
-    }
-
-    .tone-vigente {
-      color: #8ff0ad;
-      background: rgba(34, 197, 94, 0.12);
-      border-color: rgba(34, 197, 94, 0.18);
-    }
-
-    .tone-canjeado {
-      color: #ffd38d;
-      background: rgba(245, 158, 11, 0.14);
-      border-color: rgba(245, 158, 11, 0.2);
-    }
-
-    .tone-vencido {
-      color: #ffb0b0;
-      background: rgba(248, 113, 113, 0.14);
-      border-color: rgba(248, 113, 113, 0.22);
-    }
-
-    .tone-sin-folio {
-      color: #ced9ea;
-      background: rgba(148, 163, 184, 0.15);
-      border-color: rgba(148, 163, 184, 0.2);
-    }
-
-    .muted {
-      color: var(--text-soft);
-      font-size: 0.92rem;
-    }
-
+    /* Empty State */
     .empty-state {
       text-align: center;
-      padding: 44px 20px;
+      padding: 48px 24px;
       color: var(--text-soft);
+    }
+
+    .empty-state-icon {
+      font-size: 2.2rem;
+      margin-bottom: 12px;
+      display: block;
     }
 
     .empty-state strong {
       display: block;
       color: var(--text-main);
       font-size: 1.05rem;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
-    .empty-state::before {
-      display: none;
+    /* Question Accordion block */
+    .trivia-station-block {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 16px;
+      display: grid;
+      gap: 14px;
     }
 
-    .footer-note {
-      margin: 16px 4px 0;
-      color: var(--text-dim);
-      font-size: 0.9rem;
-      line-height: 1.55;
+    .trivia-station-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 10px;
     }
 
-    .loading {
-      opacity: 0.75;
-      pointer-events: none;
+    .trivia-station-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--accent);
     }
 
+    .trivia-question-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .trivia-question-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .trivia-answers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 8px;
+    }
+
+    .trivia-answer-option {
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .trivia-answer-option.correct {
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.08);
+      border-color: rgba(16, 185, 129, 0.25);
+      font-weight: 700;
+    }
+
+    /* Responsive adjustments */
     @media (max-width: 1080px) {
-      .hero-panel {
+      .scanner-grid {
         grid-template-columns: 1fr;
       }
+    }
 
-      .scanner-grid,
-      .scanner-layout {
-        grid-template-columns: 1fr;
+    @media (max-width: 992px) {
+      .admin-layout {
+        flex-direction: column;
       }
 
-      .toolbar {
-        grid-template-columns: 1fr;
+      .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 16px;
+      }
+
+      .sidebar-brand {
+        margin-bottom: 14px;
+      }
+
+      .sidebar-user {
+        margin-bottom: 14px;
+      }
+
+      .sidebar-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        gap: 8px;
+      }
+
+      .nav-item {
+        white-space: nowrap;
+        padding: 8px 12px;
+      }
+
+      .main-content {
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
       }
 
       .topbar-actions {
         width: 100%;
-      }
-    }
-
-    @media (max-width: 780px) {
-      .admin-auth-screen {
-        padding: 20px 14px 40px;
+        justify-content: space-between;
       }
 
-      .admin-auth-card {
-        padding: 24px 20px;
-        border-radius: 26px;
-      }
-
-      .page-shell {
-        padding: 20px 14px 40px;
-      }
-
-      .topbar {
+      .toolbar {
         flex-direction: column;
         align-items: stretch;
       }
 
-      .topbar-actions {
-        justify-content: stretch;
+      .search-wrap {
+        max-width: none;
       }
 
-      .topbar-actions>* {
-        flex: 1;
-      }
-
-      .admin-session-chip {
-        justify-content: center;
-      }
-
-      .metrics-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-panel,
-      .panel {
-        padding: 20px;
-      }
-
-      .scan-meta {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 680px) {
-
-      table,
-      thead,
-      tbody,
-      tr,
-      th,
-      td {
+      /* Stack tables on small screens */
+      .responsive-table-stack table,
+      .responsive-table-stack thead,
+      .responsive-table-stack tbody,
+      .responsive-table-stack tr,
+      .responsive-table-stack th,
+      .responsive-table-stack td {
         display: block;
       }
 
-      table {
-        min-width: 0;
-      }
-
-      thead {
+      .responsive-table-stack thead {
         display: none;
       }
 
-      .table-wrap {
-        background: transparent;
-        border: 0;
-      }
-
-      tbody {
-        display: grid;
-        gap: 14px;
-      }
-
-      tbody tr {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 20px;
+      .responsive-table-stack tbody tr {
+        margin-bottom: 16px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
         overflow: hidden;
       }
 
-      tbody td {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        padding: 14px 16px;
-        display: grid;
-        gap: 8px;
+      .responsive-table-stack tbody td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        text-align: right;
       }
 
-      tbody td:last-child {
-        border-bottom: 0;
-      }
-
-      tbody td::before {
+      .responsive-table-stack tbody td::before {
         content: attr(data-label);
-        color: var(--text-dim);
-        font-size: 0.76rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
         font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.72rem;
+        color: var(--text-dim);
+        float: left;
+        text-align: left;
+      }
+
+      .responsive-table-stack tbody td:last-child {
+        border-bottom: 0;
       }
     }
   </style>
 </head>
 
 <body>
+  <!-- Auth Barrier Screen -->
   <section class="admin-auth-screen" id="adminAuthScreen">
     <div class="admin-auth-card">
       <div class="admin-auth-badge">🛡️</div>
       <p class="admin-auth-eyebrow">Acceso administrativo</p>
-      <h1>Inicia sesión para entrar al panel</h1>
+      <h1>Iniciar sesión en el Panel</h1>
       <p class="admin-auth-copy">
-        Este acceso está conectado con Supabase Auth y solo permite las cuentas autorizadas del MUCH y Planetario.
+        Ingresa con tu cuenta institucional autorizada de Google para consultar y administrar la base de datos de Misión MUCH.
       </p>
-
-      <form class="admin-auth-form" id="adminLoginForm">
-        <label class="admin-auth-label" for="adminEmail">Correo autorizado</label>
-        <select class="admin-auth-input" id="adminEmail" autocomplete="username">
-          <option value="planetariotuxtla@gmail.com">planetariotuxtla@gmail.com</option>
-          <option value="muchtuxtla@gmail.com">muchtuxtla@gmail.com</option>
-        </select>
-
-        <label class="admin-auth-label" for="adminPassword">Contraseña</label>
-        <input class="admin-auth-input" id="adminPassword" type="password" autocomplete="current-password"
-          placeholder="Escribe la contraseña del administrador" required>
-
-        <button class="admin-auth-button" id="btnAdminLogin" type="submit">Entrar al administrador</button>
-
-        <p class="admin-auth-hint">
-          Cuentas permitidas: <strong>planetariotuxtla@gmail.com</strong> y <strong>muchtuxtla@gmail.com</strong>.
-        </p>
-        <p class="admin-auth-message" id="adminAuthMessage">Ingresa con una cuenta autorizada para consultar la BD.</p>
-      </form>
+      <button class="admin-auth-button" id="btnGoogleAuth" type="button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Iniciar sesión con Google
+      </button>
+      <p class="admin-auth-message" id="adminAuthMessage">Validando credenciales...</p>
     </div>
   </section>
 
-  <div class="page-shell" id="adminShell" hidden>
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-badge">🗂️</div>
-        <div class="brand-copy">
-          <p id="panelKicker">Panel interno</p>
-          <h1 id="panelTitle">Administrador de Folios</h1>
-          <span id="panelDescription">Consulta el registro de consultados en tiempo real y busca registros por texto o ID.</span>
-        </div>
-      </div>
-
-      <div class="topbar-actions">
-        <div class="section-switch" aria-label="Cambiar de seccion">
-          <a class="ghost-link section-link" id="btnSectionAdmin" href="./ADMINISTRADOR.html">Admin</a>
-          <a class="ghost-link section-link" id="btnSectionTaquilla" href="./ADMINISTRADOR.html?section=taquilla">Taquilla</a>
-        </div>
-        <span class="admin-session-chip" id="adminSessionChip" hidden>Administrador</span>
-        <a class="ghost-link" href="./index.html">← Volver al inicio</a>
-        <button class="solid-button" id="btnRefreshTop" type="button">Actualizar datos</button>
-        <button class="soft-button" id="btnLogoutAdmin" type="button" hidden>Cerrar sesión</button>
-      </div>
-    </header>
-
-    <section class="metrics-grid" id="adminMetrics" hidden>
-      <article class="metric-card">
-        <div>
-          <span class="label">Total folios</span>
-          <span class="value" id="metricTotal">0</span>
-          <span class="hint">Conteo de la vista actual</span>
-        </div>
-        <div class="metric-icon">🧾</div>
-      </article>
-
-      <article class="metric-card valid">
-        <div>
-          <span class="label">Folios validos</span>
-          <span class="value" id="metricValid">0</span>
-          <span class="hint">Vigentes y listos para uso</span>
-        </div>
-        <div class="metric-icon">✅</div>
-      </article>
-
-      <article class="metric-card invalid">
-        <div>
-          <span class="label">Folios invalidos</span>
-          <span class="value" id="metricInvalid">0</span>
-          <span class="hint">Canjeados, vencidos o incompletos</span>
-        </div>
-        <div class="metric-icon">⛔</div>
-      </article>
-    </section>
-
-    <section class="scanner-grid" id="taquillaView" hidden>
-      <section class="panel">
-        <div class="panel-head">
-          <div>
-            <h2>Escaner de boletos</h2>
-            <p>Escanea el QR del boleto o captura el folio/ID para consultar todos los datos del registro en tiempo real.</p>
-          </div>
-          <span class="scanner-support" id="scannerSupport">Camara detenida</span>
-        </div>
-
-        <div class="scanner-layout">
-          <div class="scanner-stage">
-            <div class="scanner-reader">
-              <div id="ticketReader"></div>
-              <div class="scanner-placeholder" id="scannerPlaceholder">
-                <div>
-                  <strong>Listo para escanear</strong>
-                  <span>Presiona "Iniciar escaner" y apunta al QR del boleto para leerlo al instante.</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="scanner-actions">
-              <button class="solid-button" id="btnStartScanner" type="button">Iniciar escaner</button>
-              <button class="soft-button" id="btnStopScanner" type="button" disabled>Detener camara</button>
-            </div>
-          </div>
-
-          <div class="scanner-side">
-            <p class="scanner-side-note">
-              El QR del boleto trae una URL con el folio. Si la camara no abre, pega aqui el folio, el ID o la URL del QR y el panel lo consultara contra la BD.
-            </p>
-
-            <label class="manual-label" for="manualTicketInput">Folio, ID o contenido del QR</label>
-            <input id="manualTicketInput" class="manual-input" type="text" autocomplete="off"
-              placeholder="Ejemplo: 125, MUCH-123456 o https://.../validar.html?folio=MUCH-123456">
-
-            <div class="scanner-actions">
-              <button class="soft-button" id="btnValidateManual" type="button">Validar boleto</button>
-            </div>
-
-            <p class="scanner-feedback" id="scannerFeedback">Esperando un boleto para validar.</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="panel-head">
-          <div>
-            <h2>Resultado del escaneo</h2>
-            <p>Revision inmediata con todos los campos registrados del boleto y su status actual.</p>
-          </div>
-          <span id="scanCheckedAt">Sin lectura</span>
-        </div>
-
-        <div class="scan-result-shell" id="scanResultBody">
-          <div class="scan-result-placeholder">
-            <div>
-              <strong>Aun no se ha validado un boleto.</strong>
-              <span>Cuando escanees un QR o pegues un folio/ID, aqui veras toda la informacion sincronizada desde la BD.</span>
-            </div>
-          </div>
-        </div>
-      </section>
-    </section>
-
-    <div id="adminRecordsView">
-    <section class="toolbar" id="toolbar">
-      <label class="search-wrap" for="searchInput">
-        <span>🔎</span>
-        <input id="searchInput" type="search" autocomplete="off" placeholder="Buscar por ID, folio, nombre, correo, telefono o tipo de entrada">
-      </label>
-      <button class="soft-button" id="btnClear" type="button">Limpiar</button>
-      <button class="soft-button" id="btnRefresh" type="button">Recargar</button>
-    </section>
-
-    <div class="filter-row" id="filterRow">
-      <button class="filter-chip active" type="button" data-filter="all">Todos</button>
-      <button class="filter-chip" type="button" data-filter="vigente">Vigentes</button>
-      <button class="filter-chip" type="button" data-filter="invalid">Invalidos</button>
-      <button class="filter-chip" type="button" data-filter="canjeado">Canjeados</button>
-      <button class="filter-chip" type="button" data-filter="vencido">Vencidos</button>
-      <button class="filter-chip" type="button" data-filter="sin_folio">Sin folio</button>
+  <!-- Lock screen Denied Access -->
+  <section class="denied-screen" id="deniedScreen" hidden>
+    <div class="denied-card">
+      <div class="denied-badge">🔐</div>
+      <h2>Acceso denegado</h2>
+      <p id="deniedMessage">
+        Esta cuenta no tiene permisos suficientes para acceder al panel de administración. Por favor, inicia sesión con una cuenta autorizada del MUCH o Planetario.
+      </p>
+      <button class="btn btn-solid" id="btnDeniedLogout" type="button" style="justify-self: center;">
+        ← Cerrar sesión e intentar con otra cuenta
+      </button>
     </div>
+  </section>
 
-    <section class="panel">
-      <div class="panel-head">
+  <!-- Core App Shell -->
+  <div class="admin-layout" id="adminShell" hidden>
+    <!-- Collapsible Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-logo">🗂️</div>
         <div>
-          <h2>Registros consultados</h2>
-          <p id="resultsHint">Consultando registros...</p>
+          <h1 class="sidebar-title">Misión MUCH</h1>
         </div>
-        <span id="updatedAt">Sin sincronizar</span>
       </div>
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Correo</th>
-              <th>Telefono</th>
-              <th>Folio</th>
-              <th>Tipo de entrada</th>
-              <th>Estatus BD</th>
-              <th>Status</th>
-              <th>Valido desde</th>
-              <th>Valido hasta</th>
-              <th>Fecha de registro</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            <tr>
-              <td colspan="11" class="empty-state">
-                <strong>Cargando informacion...</strong>
-                <span>Espera un momento mientras se consultan los folios.</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="sidebar-user">
+        <img class="sidebar-user-avatar" id="userAvatar" src="" alt="Avatar">
+        <div class="sidebar-user-info">
+          <p class="sidebar-user-name" id="userName">Cargando...</p>
+          <span class="sidebar-user-role" id="userRoleBadge">Usuario</span>
+        </div>
       </div>
-    </section>
 
-    <p class="footer-note">
-      La tabla se sincroniza con <strong>Ganadores</strong>, conserva los filtros activos y muestra el status actual de cada boleto consultado.
-    </p>
+      <nav class="sidebar-nav" id="sidebarNav">
+        <!-- Sidebar Navigation items populated dynamically -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="sync-indicator" id="syncStatusIndicator">Datos sincronizados</span>
+        <button class="btn btn-soft" id="btnLogoutAdmin" type="button">Cerrar sesión 🚪</button>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-title-wrap">
+          <h2 id="topbarTitle">Cargando...</h2>
+          <p id="topbarDescription">...</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-soft" id="btnRefreshTop" type="button">🔄 Actualizar</button>
+          <a class="btn btn-soft" href="./index.html">← Mapa Principal</a>
+        </div>
+      </header>
+
+      <!-- VIEW PANELS populates here -->
+      <div id="viewContainers">
+        <!-- Views rendered dynamically in Javascript -->
+      </div>
+    </main>
+  </div>
+
+  <!-- Interactive Role Assignment Modal -->
+  <div class="modal-backdrop" id="roleModal" hidden>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Asignar Roles a Usuario</h3>
+        <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.8rem;" onclick="window.closeRoleModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="admin-auth-copy" style="text-align: left;" id="roleModalUserInfo">
+          Modifica los roles del usuario seleccionado en la base de datos de MySQL.
+        </p>
+        <div class="form-group" style="gap: 12px;">
+          <label class="form-label">Roles permitidos:</label>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+              <input type="checkbox" id="chkRoleUsuario" value="1" style="width: 18px; height: 18px;">
+              <strong>Usuario Normal</strong> (Permisos de recorrido y juego estándar)
+            </label>
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+              <input type="checkbox" id="chkRoleAdmin" value="2" style="width: 18px; height: 18px;">
+              <strong>Administrador</strong> (Acceso total al panel y modificación)
+            </label>
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+              <input type="checkbox" id="chkRoleTaquilla" value="3" style="width: 18px; height: 18px;">
+              <strong>Operador de Taquilla</strong> (Escaneo QR, canje y búsqueda de boletos)
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-soft" onclick="window.closeRoleModal()">Cancelar</button>
+        <button class="btn btn-solid" id="btnSaveRoles">Guardar Cambios</button>
+      </div>
     </div>
   </div>
 
-  <script>
-    const ADMIN_VISUAL_ONLY = false;
-    const ADMIN_ALLOWED_EMAILS = [
-      'planetariotuxtla@gmail.com',
-      'muchtuxtla@gmail.com'
-    ];
-    const TICKET_SELECT_FIELDS = 'id,nombre,correo,telefono,folio,valido_desde,valido_hasta,estatus,tipo_entrada,created_at';
+  <script type="module" src="./supabase-client.js"></script>
+  <script type="module" src="./supabase-utils.js"></script>
+  <script type="module">
     const API_BASE_URL = 'http://localhost:3000';
 
-    function obtenerHeadersAutorizacion() {
-      const user = JSON.parse(localStorage.getItem('much_google_user') || '{}');
-      return {
-        'Content-Type': 'application/json',
-        'x-user-id': String(user.id_usuario || user.id || '1'),
-        'x-user-email': String(user.email || 'planetariotuxtla@gmail.com')
-      };
-    }
-
+    // State Variables
     const state = {
-      records: [],
-      query: '',
-      filter: 'all',
+      user: null,
+      roles: [],
+      isAdmin: false,
+      isTaquilla: false,
+      activeTab: 'dashboard',
+      stats: null,
+      records: [], // Tab records (boletos, usuarios, etc.)
+      queries: {}, // Searches per tab
+      filters: {}, // Active filter per tab
       syncedAt: null,
       loading: false,
-      error: ''
+      expandedAttempts: new Set(),
+      selectedUserIdForRoles: null
     };
 
-    const currentPanelView = (() => {
-      const section = new URLSearchParams(window.location.search).get('section');
-      return section === 'taquilla' ? 'taquilla' : 'admin';
-    })();
-
-    const PANEL_VIEW_COPY = {
-      admin: {
-        title: 'Administrador de Folios',
-        kicker: 'Panel interno',
-        description: 'Consulta el registro de consultados en tiempo real y busca registros por texto o ID.'
-      },
-      taquilla: {
-        title: 'Taquilla',
-        kicker: 'Validacion de boletos',
-        description: 'Escanea, lee o valida boletos desde una vista dedicada para el acceso en taquilla.'
-      }
-    };
-
-    const els = {
-      body: document.body,
-      adminShell: document.getElementById('adminShell'),
-      adminAuthScreen: document.getElementById('adminAuthScreen'),
-      panelKicker: document.getElementById('panelKicker'),
-      panelTitle: document.getElementById('panelTitle'),
-      panelDescription: document.getElementById('panelDescription'),
-      btnSectionAdmin: document.getElementById('btnSectionAdmin'),
-      btnSectionTaquilla: document.getElementById('btnSectionTaquilla'),
-      adminMetrics: document.getElementById('adminMetrics'),
-      adminRecordsView: document.getElementById('adminRecordsView'),
-      taquillaView: document.getElementById('taquillaView'),
-      adminLoginForm: document.getElementById('adminLoginForm'),
-      adminEmail: document.getElementById('adminEmail'),
-      adminPassword: document.getElementById('adminPassword'),
-      btnAdminLogin: document.getElementById('btnAdminLogin'),
-      adminAuthMessage: document.getElementById('adminAuthMessage'),
-      adminSessionChip: document.getElementById('adminSessionChip'),
-      btnLogoutAdmin: document.getElementById('btnLogoutAdmin'),
-      searchInput: document.getElementById('searchInput'),
-      btnClear: document.getElementById('btnClear'),
-      btnRefresh: document.getElementById('btnRefresh'),
-      btnRefreshTop: document.getElementById('btnRefreshTop'),
-      tableBody: document.getElementById('tableBody'),
-      resultsHint: document.getElementById('resultsHint'),
-      updatedAt: document.getElementById('updatedAt'),
-      metricTotal: document.getElementById('metricTotal'),
-      metricValid: document.getElementById('metricValid'),
-      metricInvalid: document.getElementById('metricInvalid'),
-      filterButtons: Array.from(document.querySelectorAll('.filter-chip')),
-      ticketReader: document.getElementById('ticketReader'),
-      scannerPlaceholder: document.getElementById('scannerPlaceholder'),
-      scannerSupport: document.getElementById('scannerSupport'),
-      scannerFeedback: document.getElementById('scannerFeedback'),
-      btnStartScanner: document.getElementById('btnStartScanner'),
-      btnStopScanner: document.getElementById('btnStopScanner'),
-      manualTicketInput: document.getElementById('manualTicketInput'),
-      btnValidateManual: document.getElementById('btnValidateManual'),
-      scanCheckedAt: document.getElementById('scanCheckedAt'),
-      scanResultBody: document.getElementById('scanResultBody')
-    };
+    const TABS_CONFIG = [
+      { id: 'dashboard', name: 'Dashboard', icon: '📊', desc: 'Resumen global del estado del museo y métricas.', adminOnly: true },
+      { id: 'usuarios', name: 'Usuarios', icon: '👥', desc: 'Listado completo de visitantes y control de accesos.', adminOnly: true },
+      { id: 'roles', name: 'Roles y Permisos', icon: '🔐', desc: 'Matriz de asignación de privilegios de usuario.', adminOnly: true },
+      { id: 'estaciones', name: 'Estaciones', icon: '🗺️', desc: 'Estado y configuración de las salas del museo.', adminOnly: true },
+      { id: 'preguntas', name: 'Preguntas y Trivia', icon: '❓', desc: 'Administración de preguntas por estación.', adminOnly: true },
+      { id: 'progreso', name: 'Progreso de Recorrido', icon: '📈', desc: 'Seguimiento del avance de los visitantes.', adminOnly: true },
+      { id: 'intentos', name: 'Intentos de Trivia', icon: '📝', desc: 'Respuestas enviadas por los usuarios en las trivias.', adminOnly: true },
+      { id: 'minijuegos', name: 'Minijuegos', icon: '🎮', desc: 'Registros de partidas del juego del dinosaurio.', adminOnly: true },
+      { id: 'boletos', name: 'Boletos Ganados', icon: '🎟️', desc: 'Control de folios generados para los visitantes.', adminOnly: true },
+      { id: 'movimientos', name: 'Movimientos de Boletos', icon: '🔄', desc: 'Log de auditoría específico para folios.', adminOnly: true },
+      { id: 'taquilla', name: 'Taquilla y Escaneos', icon: '🔍', desc: 'Validación manual, escaneo de códigos QR e historial de lecturas.', adminOnly: false },
+      { id: 'auditoria', name: 'Auditoría de Acciones', icon: '🛡️', desc: 'Logs de seguridad y cambios operacionales.', adminOnly: true }
+    ];
 
     const scannerState = {
       instance: null,
@@ -1420,23 +1348,16 @@
       lastScanAt: 0
     };
 
-    const adminState = {
-      authorized: false,
-      bootstrapped: false,
-      eventsBound: false,
-      realtimeChannel: null,
-      refreshIntervalId: null,
-      refreshQueued: false
-    };
+    // Date formatting helpers
+    const dateFormatter = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' });
+    const dateTimeFormatter = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' });
 
-    const dateFormatter = new Intl.DateTimeFormat('es-MX', {
-      dateStyle: 'medium'
-    });
-
-    const dateTimeFormatter = new Intl.DateTimeFormat('es-MX', {
-      dateStyle: 'medium',
-      timeStyle: 'short'
-    });
+    function formatDate(value, withTime = false) {
+      if (!value) return 'Sin fecha';
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) return 'Sin fecha';
+      return withTime ? dateTimeFormatter.format(parsed) : dateFormatter.format(parsed);
+    }
 
     function escapeHtml(value) {
       return String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -1448,1047 +1369,1537 @@
       }[char]));
     }
 
-    function normalizeText(value) {
-      return String(value ?? '')
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .trim();
-    }
-
-    function normalizeFolio(value) {
-      return String(value ?? '').trim().toUpperCase();
-    }
-
-    function parseDate(value) {
-      if (!value) return null;
-      const parsed = new Date(value);
-      return Number.isNaN(parsed.getTime()) ? null : parsed;
-    }
-
-    function formatDate(value, withTime = false) {
-      const parsed = parseDate(value);
-      if (!parsed) return 'Sin fecha';
-      return withTime ? dateTimeFormatter.format(parsed) : dateFormatter.format(parsed);
-    }
-
-    function normalizeAdminEmail(value) {
-      return String(value ?? '').trim().toLowerCase();
-    }
-
-    function isAllowedAdminEmail(value) {
-      return ADMIN_ALLOWED_EMAILS.includes(normalizeAdminEmail(value));
-    }
-
-    function applyPanelView() {
-      const viewCopy = PANEL_VIEW_COPY[currentPanelView];
-
-      document.title = viewCopy.title;
-      if (els.panelKicker) els.panelKicker.textContent = viewCopy.kicker;
-      if (els.panelTitle) els.panelTitle.textContent = viewCopy.title;
-      if (els.panelDescription) els.panelDescription.textContent = viewCopy.description;
-      if (els.adminMetrics) els.adminMetrics.hidden = true;
-      if (els.adminRecordsView) els.adminRecordsView.hidden = currentPanelView !== 'admin';
-      if (els.taquillaView) els.taquillaView.hidden = currentPanelView !== 'taquilla';
-      if (els.btnRefreshTop) els.btnRefreshTop.hidden = currentPanelView !== 'admin';
-
-      [
-        [els.btnSectionAdmin, 'admin'],
-        [els.btnSectionTaquilla, 'taquilla']
-      ].forEach(([button, section]) => {
-        if (!button) return;
-        const isActive = currentPanelView === section;
-        button.classList.toggle('active', isActive);
-        if (isActive) {
-          button.setAttribute('aria-current', 'page');
-        } else {
-          button.removeAttribute('aria-current');
-        }
-      });
-    }
-
-    function setAdminAuthMessage(message, tone = '') {
-      if (!els.adminAuthMessage) return;
-      els.adminAuthMessage.textContent = message;
-      els.adminAuthMessage.classList.toggle('error', tone === 'error');
-      els.adminAuthMessage.classList.toggle('success', tone === 'success');
-    }
-
-    function setAdminAuthLoading(isLoading) {
-      if (els.btnAdminLogin) els.btnAdminLogin.disabled = isLoading;
-      if (els.adminEmail) els.adminEmail.disabled = isLoading;
-      if (els.adminPassword) els.adminPassword.disabled = isLoading;
-    }
-
-    function renderAdminSession(user) {
-      if (!els.adminSessionChip || !els.btnLogoutAdmin) return;
-
-      if (!user?.email) {
-        els.adminSessionChip.hidden = true;
-        els.btnLogoutAdmin.hidden = true;
-        els.adminSessionChip.textContent = 'Administrador';
-        return;
-      }
-
-      els.adminSessionChip.hidden = false;
-      els.btnLogoutAdmin.hidden = false;
-      els.adminSessionChip.textContent = `Admin: ${user.email}`;
-    }
-
-    function showAdminShell(user) {
-      adminState.authorized = true;
-      els.adminAuthScreen.hidden = true;
-      els.adminShell.hidden = false;
-      renderAdminSession(user);
-      applyPanelView();
-    }
-
-    async function showAdminLogin(message = 'Ingresa con una cuenta autorizada para consultar la BD.', tone = '') {
-      adminState.authorized = false;
-      els.adminShell.hidden = true;
-      els.adminAuthScreen.hidden = false;
-      renderAdminSession(null);
-      setAdminAuthMessage(message, tone);
-      if (els.adminPassword) els.adminPassword.value = '';
-      stopTicketSync();
-
-      if (scannerState.active) {
-        await stopScanner();
-      }
-    }
-
-    async function bootstrapAdminDashboard() {
-      if (!adminState.bootstrapped) {
-        bindEvents();
-        if (currentPanelView === 'taquilla') {
-          initScannerState();
-        }
-        adminState.bootstrapped = true;
-      }
-
-      if (currentPanelView === 'admin') {
-        await loadRecords();
-      }
-    }    async function authorizeAdminSession(user) {
-      const email = normalizeAdminEmail(user?.email);
-
-      if (!user || !email || !isAllowedAdminEmail(email)) {
-        await showAdminLogin('Esta cuenta no tiene permiso para entrar al administrador.', 'error');
-        return false;
-      }
-
-      showAdminShell(user);
-      await bootstrapAdminDashboard();
-      if (currentPanelView === 'admin') {
-        startTicketSync();
-      } else {
-        stopTicketSync();
-      }
-      return true;
-    }
-
-    async function initializeAdminAccess() {
-      setAdminAuthLoading(true);
-      
-      try {
-        const user = JSON.parse(localStorage.getItem('much_google_user') || 'null');
-        if (user && isAllowedAdminEmail(user.email)) {
-          const authorized = await authorizeAdminSession(user);
-          if (authorized) {
-            setAdminAuthMessage(`Sesión iniciada como ${user.email}.`, 'success');
-          }
-        } else {
-          await showAdminLogin('Inicia sesión con Google para continuar.');
-        }
-      } catch (error) {
-        console.error('Error inicializando administrador:', error);
-        await showAdminLogin('No se pudo inicializar el administrador.', 'error');
-      } finally {
-        setAdminAuthLoading(false);
-      }
-    }
-
-    async function handleAdminLoginSubmit(event) {
-      event.preventDefault();
-      setAdminAuthLoading(true);
-      setAdminAuthMessage('Conectando con Google...');
-
-      try {
-        const user = await window.iniciarSesionConGoogle();
-        if (user) {
-          const authorized = await authorizeAdminSession(user);
-          if (authorized) {
-            setAdminAuthMessage(`Sesión iniciada como ${user.email}.`, 'success');
-          }
-        }
-      } catch (error) {
-        console.error('Error de login administrador:', error);
-        await showAdminLogin(error?.message || 'No se pudo iniciar sesión con Google.', 'error');
-      } finally {
-        setAdminAuthLoading(false);
-      }
-    }
-
-    async function logoutAdmin() {
-      if (scannerState.active) {
-        await stopScanner();
-      }
-      try {
-        await window.cerrarSesion();
-      } catch (error) {
-        console.error('Error cerrando sesión del administrador:', error);
-      }
-      await showAdminLogin('Sesión cerrada correctamente.');
-    }
-
-    function stopTicketSync() {
-      if (adminState.refreshIntervalId) {
-        window.clearInterval(adminState.refreshIntervalId);
-        adminState.refreshIntervalId = null;
-      }
-      adminState.refreshQueued = false;
-    }
-
-    function queueTicketRefresh() {
-      if (adminState.refreshQueued || !adminState.authorized) return;
-
-      adminState.refreshQueued = true;
-      window.setTimeout(async () => {
-        adminState.refreshQueued = false;
-        if (!adminState.authorized) return;
-        await loadRecords({ silent: true });
-      }, 250);
-    }
-
-    function startTicketSync() {
-      if (!adminState.refreshIntervalId) {
-        adminState.refreshIntervalId = window.setInterval(() => {
-          if (!adminState.authorized || state.loading) return;
-          loadRecords({ silent: true });
-        }, 30000);
-      }
-    }
-    function setScannerSupport(message, tone = '') {
-      if (!els.scannerSupport) return;
-      els.scannerSupport.textContent = message;
-      els.scannerSupport.classList.toggle('error', tone === 'error');
-    }
-
-    function setScannerFeedback(message, tone = '') {
-      if (!els.scannerFeedback) return;
-      els.scannerFeedback.textContent = message;
-      els.scannerFeedback.classList.toggle('error', tone === 'error');
-      els.scannerFeedback.classList.toggle('success', tone === 'success');
-    }
-
-    function updateScannerControls() {
-      if (els.btnStartScanner) els.btnStartScanner.disabled = scannerState.active;
-      if (els.btnStopScanner) els.btnStopScanner.disabled = !scannerState.active;
-      if (els.scannerPlaceholder) {
-        els.scannerPlaceholder.classList.toggle('hidden', scannerState.active);
-      }
-    }
-
-    function extractFolioFromScan(value) {
-      const raw = String(value ?? '').trim();
-      if (!raw) return '';
-
-      try {
-        const parsedUrl = new URL(raw);
-        const fromUrl = parsedUrl.searchParams.get('folio') || parsedUrl.searchParams.get('ticket');
-        if (fromUrl) return normalizeFolio(fromUrl);
-      } catch (error) {
-        // Ignorar: el contenido puede ser un folio plano.
-      }
-
-      const paramMatch = raw.match(/[?&](?:folio|ticket)=([^&#]+)/i);
-      if (paramMatch) return normalizeFolio(decodeURIComponent(paramMatch[1]));
-
-      return normalizeFolio(raw.replace(/^folio[:\s-]*/i, ''));
-    }
-
-    function getScanTone(statusInfo) {
-      if (statusInfo.key === 'canjeado') return 'warning';
-      return statusInfo.isValid ? 'valid' : 'invalid';
-    }
-
-    function getScanHeadline(statusInfo) {
-      if (statusInfo.isValid) return 'Boleto valido';
-      if (statusInfo.key === 'canjeado') return 'Boleto invalido por uso previo';
-      if (statusInfo.key === 'vencido') return 'Boleto invalido por vigencia vencida';
-      if (statusInfo.key === 'sin_folio') return 'Boleto invalido sin folio';
-      if (statusInfo.key === 'sin_estatus') return 'Boleto invalido por estatus incompleto';
-      return 'Boleto invalido';
-    }
-
-    function getScanDescription(record, statusInfo) {
-      if (statusInfo.isValid) {
-        return 'El boleto coincide con la BD y aparece vigente para acceso.';
-      }
-
-      if (statusInfo.key === 'canjeado') {
-        return 'Este boleto ya fue usado y aparece como canjeado en la base de datos.';
-      }
-
-      if (statusInfo.key === 'vencido') {
-        return `La vigencia termino el ${formatDate(record.valido_hasta)}.`;
-      }
-
-      if (statusInfo.key === 'sin_folio') {
-        return 'El registro existe, pero no tiene un folio valido para control de acceso.';
-      }
-
-      if (statusInfo.key === 'sin_estatus') {
-        return 'El registro existe, pero no tiene estatus en la base de datos.';
-      }
-
-      if (record?.estatus) {
-        return `El estatus almacenado en la base de datos es ${String(record.estatus).toLowerCase()}.`;
-      }
-
-      return 'No fue posible validar este boleto.';
-    }
-
-    function renderScanResultCard({
-      badgeLabel,
-      badgeTone,
-      title,
-      description,
-      recordId,
-      folio,
-      participant,
-      email,
-      phone,
-      ticketType,
-      dbStatus,
-      status,
-      validFrom,
-      validUntil,
-      createdAt,
-      rawValue
-    }) {
-      els.scanCheckedAt.textContent = `Leido: ${formatDate(new Date(), true)}`;
-      els.scanResultBody.innerHTML = `
-        <article class="scan-result-card">
-          <div class="scan-head">
-            <span class="scan-badge ${escapeHtml(badgeTone)}">${escapeHtml(badgeLabel)}</span>
-            <h3>${escapeHtml(title)}</h3>
-            <p>${escapeHtml(description)}</p>
-          </div>
-
-          <div class="scan-folio">${escapeHtml(folio || 'Sin folio')}</div>
-
-          <div class="scan-meta">
-            <div class="scan-meta-item">
-              <span>ID</span>
-              <strong>${escapeHtml(recordId || 'Sin ID')}</strong>
-            </div>
-            <div class="scan-meta-item">
-              <span>Nombre</span>
-              <strong>${escapeHtml(participant || 'Sin nombre')}</strong>
-            </div>
-            <div class="scan-meta-item">
-              <span>Correo</span>
-              <strong>${escapeHtml(email || 'Sin correo')}</strong>
-            </div>
-            <div class="scan-meta-item">
-              <span>Telefono</span>
-              <strong>${escapeHtml(phone || 'Sin telefono')}</strong>
-            </div>
-            <div class="scan-meta-item">
-              <span>Tipo de entrada</span>
-              <strong>${escapeHtml(ticketType || 'Sin tipo')}</strong>
-            </div>
-            <div class="scan-meta-item">
-              <span>Estatus BD</span>
-              <strong>${escapeHtml(dbStatus || 'Sin estatus')}</strong>
-            </div>
-            <div class="scan-meta-item">
-              <span>Status</span>
-              <strong>${escapeHtml(status || 'Sin status')}</strong>
-            </div>
-            <div class="scan-meta-item">
-              <span>Valido desde</span>
-              <strong>${escapeHtml(validFrom || 'Sin fecha')}</strong>
-            </div>
-            <div class="scan-meta-item">
-              <span>Valido hasta</span>
-              <strong>${escapeHtml(validUntil || 'Sin fecha')}</strong>
-            </div>
-            <div class="scan-meta-item">
-              <span>Fecha de registro</span>
-              <strong>${escapeHtml(createdAt || 'Sin fecha')}</strong>
-            </div>
-          </div>
-
-          ${rawValue ? `
-            <div class="scan-raw">
-              <span>Contenido leido</span>
-              ${escapeHtml(rawValue)}
-            </div>
-          ` : ''}
-
-          ${(recordId && recordId !== 'Sin ID') ? `
-            <div class="scan-actions" style="display: flex; gap: 15px; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-              ${(dbStatus === 'activo' || dbStatus === 'Vigente') ? `
-                <button class="solid-button" style="flex: 1; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer;" onclick="window.canjearBoletoTaquilla('${recordId}')">🎟️ Canjear Boleto</button>
-              ` : ''}
-              ${(dbStatus !== 'cancelado') ? `
-                <button class="soft-button" style="flex: 1; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer;" onclick="window.cancelarBoletoTaquilla('${recordId}')">🚫 Cancelar Boleto</button>
-              ` : ''}
-            </div>
-          ` : ''}
-        </article>
-      `;
-    }
-
-    window.canjearBoletoTaquilla = async function(idBoleto) {
-      if (!confirm('¿Estás seguro de que deseas MARCAR este boleto como CANJEADO?')) return;
-      setScannerFeedback('Procesando canje...');
-      try {
-        const user = JSON.parse(localStorage.getItem('much_google_user') || '{}');
-        const res = await fetch(`http://localhost:3000/api/taquilla/boletos/${idBoleto}/canjear`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-user-id': String(user.id_usuario || user.id || '1')
-          },
-          body: JSON.stringify({ observaciones: 'Canje manual desde panel de taquilla' })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'No se pudo canjear.');
-        setScannerFeedback('¡Boleto canjeado con éxito!', 'success');
-        // Recargar el boleto de forma automática
-        await validateTicket(scannerState.lastFolio);
-      } catch (error) {
-        setScannerFeedback(error.message, 'error');
-      }
-    };
-
-    window.cancelarBoletoTaquilla = async function(idBoleto) {
-      if (!confirm('¿Estás seguro de que deseas CANCELAR este boleto? Esta acción es irreversible.')) return;
-      setScannerFeedback('Procesando cancelación...');
-      try {
-        const user = JSON.parse(localStorage.getItem('much_google_user') || '{}');
-        const res = await fetch(`http://localhost:3000/api/taquilla/boletos/${idBoleto}/cancelar`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-user-id': String(user.id_usuario || user.id || '1')
-          },
-          body: JSON.stringify({ observaciones: 'Cancelación manual desde panel de taquilla' })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'No se pudo cancelar.');
-        setScannerFeedback('Boleto cancelado / dado de baja con éxito.', 'error');
-        await validateTicket(scannerState.lastFolio);
-      } catch (error) {
-        setScannerFeedback(error.message, 'error');
-      }
-    };
-
-    function normalizeTicketRecord(record) {
+    function getHeaders() {
       return {
-        id: record?.id_boleto ?? record?.id ?? null,
-        nombre: record?.nombre_usuario ?? record?.nombre ?? '',
-        correo: record?.correo_usuario ?? record?.correo ?? '',
-        telefono: record?.telefono ?? '',
-        folio: record?.folio || '',
-        valido_desde: record?.fecha_generacion ?? record?.valido_desde ?? null,
-        valido_hasta: record?.valido_hasta ?? null,
-        estatus: record?.estado ?? record?.estatus ?? '',
-        tipo_entrada: record?.tipo_entrada ?? 'Entrada General',
-        created_at: record?.fecha_generacion ?? record?.created_at ?? null
+        'Content-Type': 'application/json',
+        'x-user-id': String(state.user?.id_usuario || state.user?.id || '1'),
+        'x-user-email': String(state.user?.email || 'muchtuxtla@gmail.com')
       };
     }
 
-    function normalizeTicketRecords(records = []) {
-      return records
-        .map((record) => normalizeTicketRecord(record))
-        .sort((a, b) => {
-          const left = parseDate(a.created_at)?.getTime() || 0;
-          const right = parseDate(b.created_at)?.getTime() || 0;
-          return right - left;
-        });
-    }
-
-    function getStatusInfo(record) {
-      const folio = String(record.folio || '').trim();
-      const estatus = String(record.estatus || '').trim().toLowerCase();
-      const validUntil = parseDate(record.valido_hasta);
-
-      if (!folio) {
-        return { key: 'sin_folio', label: 'Sin folio', className: 'tone-sin-folio', isValid: false };
-      }
-
-      if (!estatus) {
-        return { key: 'sin_estatus', label: 'Sin estatus', className: 'tone-sin-folio', isValid: false };
-      }
-
-      if (estatus === 'canjeado') {
-        return { key: 'canjeado', label: 'Canjeado', className: 'tone-canjeado', isValid: false };
-      }
-
-      if (validUntil && Date.now() > validUntil.getTime()) {
-        return { key: 'vencido', label: 'Vencido', className: 'tone-vencido', isValid: false };
-      }
-
-      if (estatus !== 'activo') {
-        return { key: estatus, label: estatus.toUpperCase(), className: 'tone-sin-folio', isValid: false };
-      }
-
-      return { key: 'vigente', label: 'Vigente', className: 'tone-vigente', isValid: true };
-    }
-    async function fetchRecordByLookup(value) {
-      const lookup = String(value ?? '').trim();
-      if (!lookup) return null;
-
-      // Intentar extraer token de QR si el lookup es una URL
-      let qrToken = '';
+    // Core Auth Initialization
+    async function initAuth() {
+      const messageEl = document.getElementById('adminAuthMessage');
+      if (messageEl) messageEl.textContent = 'Iniciando validación de sesión institucional...';
+      
       try {
-        const parsedUrl = new URL(lookup);
-        qrToken = parsedUrl.searchParams.get('token') || '';
-      } catch (e) {
-        // No es una URL válida
-      }
-
-      // Si no es URL, pero tiene 32 caracteres hexadecimales, asumimos que es el token directo
-      if (!qrToken && /^[a-fA-F0-9]{32}$/.test(lookup)) {
-        qrToken = lookup;
-      }
-
-      const headers = obtenerHeadersAutorizacion();
-
-      if (qrToken) {
-        const res = await fetch(`http://localhost:3000/api/taquilla/boleto/qr/${qrToken}`, { headers });
-        if (res.ok) {
-          const data = await res.json();
-          return normalizeTicketRecord(data);
+        const localUser = JSON.parse(localStorage.getItem('much_google_user') || 'null');
+        if (!localUser) {
+          showAuthBarrier('Esperando inicio de sesión con Google.');
+          return;
         }
-      }
 
-      const extractedFolio = extractFolioFromScan(lookup) || lookup;
-      const res = await fetch(`http://localhost:3000/api/taquilla/boleto/folio/${extractedFolio}`, { headers });
-      if (res.ok) {
+        state.user = localUser;
+        // Verify real roles in the MySQL DB
+        const res = await fetch(`${API_BASE_URL}/api/usuarios/${localUser.id_usuario}/roles`);
+        if (!res.ok) throw new Error('No se pudieron consultar los roles del usuario.');
+        
         const data = await res.json();
-        return normalizeTicketRecord(data);
+        state.roles = data.roles || [];
+        state.isAdmin = state.roles.includes('admin');
+        state.isTaquilla = state.roles.includes('taquilla');
+
+        if (!state.isAdmin && !state.isTaquilla) {
+          showAccessDenied('Esta cuenta no cuenta con permisos de taquilla ni de administración en MySQL.');
+          return;
+        }
+
+        // Apply view restrictions
+        if (!state.isAdmin && state.isTaquilla) {
+          state.activeTab = 'taquilla';
+        }
+
+        setupUI();
+      } catch (error) {
+        console.error('Error al inicializar sesión:', error);
+        showAuthBarrier('Error al conectar con la base de datos o sesión caducada.');
+      }
+    }
+
+    function showAuthBarrier(msg) {
+      document.getElementById('adminAuthScreen').hidden = false;
+      document.getElementById('deniedScreen').hidden = true;
+      document.getElementById('adminShell').hidden = true;
+      document.getElementById('adminAuthMessage').textContent = msg;
+      document.getElementById('adminAuthMessage').className = 'admin-auth-message';
+    }
+
+    function showAccessDenied(msg) {
+      document.getElementById('adminAuthScreen').hidden = true;
+      document.getElementById('deniedScreen').hidden = false;
+      document.getElementById('adminShell').hidden = true;
+      document.getElementById('deniedMessage').textContent = msg;
+    }
+
+    function setupUI() {
+      document.getElementById('adminAuthScreen').hidden = true;
+      document.getElementById('deniedScreen').hidden = true;
+      document.getElementById('adminShell').hidden = false;
+
+      // User info
+      document.getElementById('userAvatar').src = state.user?.avatar_url || state.user?.picture || 'avatars/dino1.png';
+      document.getElementById('userName').textContent = state.user?.nombre || state.user?.name || 'Administrador';
+      
+      let roleLabel = 'Usuario';
+      if (state.isAdmin) roleLabel = 'Administrador';
+      else if (state.isTaquilla) roleLabel = 'Taquilla';
+      document.getElementById('userRoleBadge').textContent = roleLabel;
+
+      renderSidebar();
+      switchTab(state.activeTab);
+    }
+
+    function renderSidebar() {
+      const nav = document.getElementById('sidebarNav');
+      nav.innerHTML = '';
+
+      TABS_CONFIG.forEach(tab => {
+        // Hide admin tabs for non-admin operators
+        if (tab.adminOnly && !state.isAdmin) return;
+
+        const el = document.createElement('li');
+        el.className = `nav-item ${tab.id === state.activeTab ? 'active' : ''}`;
+        el.onclick = () => switchTab(tab.id);
+        el.innerHTML = `
+          <span class="nav-item-icon">${tab.icon}</span>
+          <span>${tab.name}</span>
+        `;
+        nav.appendChild(el);
+      });
+    }
+
+    function switchTab(tabId) {
+      // Force non-admins into taquilla view
+      if (!state.isAdmin && tabId !== 'taquilla') {
+        tabId = 'taquilla';
       }
 
-      return null;
+      state.activeTab = tabId;
+      renderSidebar();
+
+      const config = TABS_CONFIG.find(t => t.id === tabId);
+      document.getElementById('topbarTitle').textContent = config.name;
+      document.getElementById('topbarDescription').textContent = config.desc;
+
+      stopScanner(); // Automatically turn off camera if switching tabs
+      loadTabContent();
     }
+
+    // Load dynamic data from Backend based on active tab
+    async function loadTabContent(silent = false) {
+      if (state.loading) return;
+      if (!silent) showLoadingState();
+      
+      const indicator = document.getElementById('syncStatusIndicator');
+      indicator.textContent = 'Sincronizando...';
+      indicator.className = 'sync-indicator syncing';
+
+      try {
+        if (state.activeTab === 'dashboard') {
+          const res = await fetch(`${API_BASE_URL}/api/admin/dashboard-stats`, { headers: getHeaders() });
+          if (!res.ok) throw new Error('Error al cargar métricas del Dashboard.');
+          state.stats = await res.json();
+          renderDashboardView();
+        } else {
+          // General tables loading
+          let endpoint = '';
+          switch (state.activeTab) {
+            case 'usuarios': endpoint = '/api/admin/usuarios'; break;
+            case 'roles': endpoint = '/api/admin/roles-permisos'; break;
+            case 'estaciones': endpoint = '/api/admin/estaciones'; break;
+            case 'preguntas': endpoint = '/api/admin/preguntas-respuestas'; break;
+            case 'progreso': endpoint = '/api/admin/progreso'; break;
+            case 'intentos': endpoint = '/api/admin/intentos-respuestas'; break;
+            case 'minijuegos': endpoint = '/api/admin/minijuegos'; break;
+            case 'boletos': endpoint = '/api/admin/boletos'; break;
+            case 'movimientos': endpoint = '/api/admin/movimientos-boletos'; break;
+            case 'taquilla': endpoint = '/api/admin/escaneos-qr'; break;
+            case 'auditoria': endpoint = '/api/admin/auditoria'; break;
+          }
+
+          const res = await fetch(`${API_BASE_URL}${endpoint}`, { headers: getHeaders() });
+          if (!res.ok) throw new Error(`Error al cargar datos de ${state.activeTab}.`);
+          state.records = await res.json();
+          renderActiveView();
+        }
+
+        state.syncedAt = new Date();
+        indicator.textContent = `Actualizado: ${state.syncedAt.toLocaleTimeString()}`;
+        indicator.className = 'sync-indicator';
+      } catch (error) {
+        console.error(error);
+        indicator.textContent = 'Error al sincronizar';
+        indicator.className = 'sync-indicator error';
+        renderErrorView(error.message);
+      } finally {
+        state.loading = false;
+      }
+    }
+
+    function showLoadingState() {
+      state.loading = true;
+      const container = document.getElementById('viewContainers');
+      container.innerHTML = `
+        <div class="panel empty-state">
+          <span class="empty-state-icon">⏳</span>
+          <strong>Sincronizando información...</strong>
+          <span>Conectando con la base de datos de MySQL local en el puerto 3306.</span>
+        </div>
+      `;
+    }
+
+    function renderErrorView(msg) {
+      const container = document.getElementById('viewContainers');
+      container.innerHTML = `
+        <div class="panel empty-state" style="border-color: rgba(239,68,68,0.3)">
+          <span class="empty-state-icon" style="color: var(--danger)">⛔</span>
+          <strong>Error de conexión</strong>
+          <span>${escapeHtml(msg)}</span>
+          <button class="btn btn-solid" style="margin-top: 15px;" onclick="loadTabContent()">Reintentar conexión</button>
+        </div>
+      `;
+    }
+
+    // Tab Rendering Implementations
+    function renderDashboardView() {
+      const s = state.stats;
+      const container = document.getElementById('viewContainers');
+      
+      container.innerHTML = `
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-card-info">
+              <span class="label">Total Usuarios</span>
+              <span class="value">${s.usuarios.toLocaleString()}</span>
+              <span class="hint">Visitantes registrados en la BD</span>
+            </div>
+            <div class="metric-icon">👥</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-info">
+              <span class="label">Total Estaciones</span>
+              <span class="value">${s.estaciones.toLocaleString()}</span>
+              <span class="hint">Salas configuradas y activas</span>
+            </div>
+            <div class="metric-icon">🗺️</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-info">
+              <span class="label">Total Preguntas</span>
+              <span class="value">${s.preguntas.toLocaleString()}</span>
+              <span class="hint">Trivia activa en base de datos</span>
+            </div>
+            <div class="metric-icon">❓</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-info">
+              <span class="label">Boletos Generados</span>
+              <span class="value">${s.boletos.toLocaleString()}</span>
+              <span class="hint">Folios asignados por premios</span>
+            </div>
+            <div class="metric-icon">🎟️</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-info">
+              <span class="label">Boletos Canjeados</span>
+              <span class="value">${s.boletosUsados.toLocaleString()}</span>
+              <span class="hint">Boletos utilizados para accesos</span>
+            </div>
+            <div class="metric-icon">✅</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-info">
+              <span class="label">Usuarios en Recorrido</span>
+              <span class="value">${s.usuariosProgreso.toLocaleString()}</span>
+              <span class="hint">Visitantes activos actualmente</span>
+            </div>
+            <div class="metric-icon">📈</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-info">
+              <span class="label">Recorridos Completos</span>
+              <span class="value">${s.usuariosCompletado.toLocaleString()}</span>
+              <span class="hint">Completaron salas del juego</span>
+            </div>
+            <div class="metric-icon">🏆</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-info">
+              <span class="label">Total Escaneos QR</span>
+              <span class="value">${s.escaneos.toLocaleString()}</span>
+              <span class="hint">Lecturas ejecutadas en taquilla</span>
+            </div>
+            <div class="metric-icon">🔍</div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top: 24px;">
+          <div class="panel-head">
+            <div class="panel-title-wrap">
+              <h3>Intentos Realizados por Estación</h3>
+              <p>Métricas detalladas sobre la interactividad de los visitantes en cada sala del museo.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Estación</th>
+                  <th>Sala</th>
+                  <th>Intentos Totales</th>
+                  <th>Popularidad Relativa</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${s.intentosPorEstacion.map(row => {
+                  return `
+                    <tr>
+                      <td style="font-weight: 700;">Sala ${row.id_estacion}</td>
+                      <td>${escapeHtml(row.nombre)}</td>
+                      <td style="font-weight: 800; color: var(--accent);">${row.total_intentos.toLocaleString()}</td>
+                      <td>
+                        <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; width: 100px; display: inline-block; vertical-align: middle; margin-right: 10px;">
+                          <div style="background: var(--accent); height: 100%; width: ${Math.min(100, (row.total_intentos / (s.usuarios || 1)) * 100)}%;"></div>
+                        </div>
+                        <span style="font-size: 0.8rem; color: var(--text-dim);">${((row.total_intentos / (s.usuarios || 1)) * 100).toFixed(1)}%</span>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderActiveView() {
+      const container = document.getElementById('viewContainers');
+      
+      // Determine columns based on Active tab
+      let title = '';
+      let placeholder = 'Buscar registros...';
+      let actionsHTML = '';
+      let filterHTML = '';
+
+      const query = state.queries[state.activeTab] || '';
+      const filter = state.filters[state.activeTab] || 'all';
+
+      // Build specific search bar filters depending on the view
+      if (state.activeTab === 'usuarios') {
+        placeholder = 'Buscar por nombre, correo o ID...';
+      } else if (state.activeTab === 'boletos') {
+        placeholder = 'Buscar por folio, nombre, correo o estatus...';
+        filterHTML = `
+          <div class="filter-chips">
+            <button class="filter-chip ${filter === 'all' ? 'active' : ''}" onclick="setTabFilter('all')">Todos</button>
+            <button class="filter-chip ${filter === 'activo' ? 'active' : ''}" onclick="setTabFilter('activo')">Vigentes</button>
+            <button class="filter-chip ${filter === 'canjeado' ? 'active' : ''}" onclick="setTabFilter('canjeado')">Canjeados</button>
+            <button class="filter-chip ${filter === 'cancelado' ? 'active' : ''}" onclick="setTabFilter('cancelado')">Cancelados</button>
+          </div>
+        `;
+      } else if (state.activeTab === 'progreso') {
+        placeholder = 'Buscar por nombre de usuario o sala...';
+        filterHTML = `
+          <div class="filter-chips">
+            <button class="filter-chip ${filter === 'all' ? 'active' : ''}" onclick="setTabFilter('all')">Todos</button>
+            <button class="filter-chip ${filter === 'aprobada' ? 'active' : ''}" onclick="setTabFilter('aprobada')">Aprobadas</button>
+            <button class="filter-chip ${filter === 'pendiente' ? 'active' : ''}" onclick="setTabFilter('pendiente')">En Progreso</button>
+          </div>
+        `;
+      } else if (state.activeTab === 'intentos') {
+        placeholder = 'Buscar por usuario o estación...';
+        filterHTML = `
+          <div class="filter-chips">
+            <button class="filter-chip ${filter === 'all' ? 'active' : ''}" onclick="setTabFilter('all')">Todos</button>
+            <button class="filter-chip ${filter === 'aprobado' ? 'active' : ''}" onclick="setTabFilter('aprobado')">Aprobados</button>
+            <button class="filter-chip ${filter === 'reprobado' ? 'active' : ''}" onclick="setTabFilter('reprobado')">Reprobados</button>
+          </div>
+        `;
+      } else if (state.activeTab === 'taquilla') {
+        renderTaquillaView();
+        return;
+      }
+
+      const filteredRecords = getFilteredRecords();
+
+      container.innerHTML = `
+        <div class="panel">
+          <div class="toolbar">
+            <div class="search-wrap">
+              <span>🔎</span>
+              <input id="searchInput" type="search" placeholder="${placeholder}" value="${escapeHtml(query)}" oninput="handleSearch(this.value)">
+            </div>
+            ${filterHTML}
+          </div>
+
+          <div class="table-wrap responsive-table-stack">
+            ${renderSpecificTable(filteredRecords)}
+          </div>
+        </div>
+      `;
+    }
+
+    function getFilteredRecords() {
+      const records = state.records;
+      const query = (state.queries[state.activeTab] || '').toLowerCase().trim();
+      const filter = state.filters[state.activeTab] || 'all';
+
+      return records.filter(row => {
+        // Query filter
+        let matchesQuery = true;
+        if (query) {
+          const haystack = Object.values(row).map(v => String(v ?? '').toLowerCase()).join(' ');
+          matchesQuery = haystack.includes(query);
+        }
+
+        // Status filter
+        let matchesFilter = true;
+        if (state.activeTab === 'boletos') {
+          if (filter === 'activo') matchesFilter = row.estado === 'activo' || row.estado === 'Vigente';
+          else if (filter === 'canjeado') matchesFilter = row.estado === 'canjeado' || row.usado === 1;
+          else if (filter === 'cancelado') matchesFilter = row.estado === 'cancelado';
+        } else if (state.activeTab === 'progreso') {
+          if (filter === 'aprobada') matchesFilter = row.aprobada === 1 || row.completada === 1;
+          else if (filter === 'pendiente') matchesFilter = row.completada === 0;
+        } else if (state.activeTab === 'intentos') {
+          if (filter === 'aprobado') matchesFilter = row.aprobado === 1;
+          else if (filter === 'reprobado') matchesFilter = row.aprobado === 0;
+        }
+
+        return matchesQuery && matchesFilter;
+      });
+    }
+
+    function handleSearch(val) {
+      state.queries[state.activeTab] = val;
+      // Debounce render to keep typing smooth
+      clearTimeout(state.searchTimeout);
+      state.searchTimeout = setTimeout(() => {
+        if (state.activeTab === 'taquilla') {
+          renderTaquillaLogsTable();
+        } else {
+          const filtered = getFilteredRecords();
+          const tableWrap = document.querySelector('.table-wrap');
+          if (tableWrap) {
+            tableWrap.innerHTML = renderSpecificTable(filtered);
+          }
+        }
+      }, 150);
+    }
+
+    function setTabFilter(val) {
+      state.filters[state.activeTab] = val;
+      renderActiveView();
+    }
+
+    // Dynamic modular table templates mapping directly to MySQL schema
+    function renderSpecificTable(rows) {
+      if (rows.length === 0) {
+        return `
+          <div class="empty-state">
+            <span class="empty-state-icon">🔎</span>
+            <strong>Sin coincidencias</strong>
+            <span>No se encontraron registros activos en la base de datos local.</span>
+          </div>
+        `;
+      }
+
+      switch (state.activeTab) {
+        case 'usuarios':
+          return `
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Correo</th>
+                  <th>Fecha Registro</th>
+                  <th>Roles Asignados</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows.map(row => {
+                  const avatar = row.avatar_url || 'avatars/dino1.png';
+                  return `
+                    <tr>
+                      <td data-label="ID" style="font-family: monospace;">#${row.id_usuario}</td>
+                      <td data-label="Nombre">
+                        <img class="table-avatar" src="${escapeHtml(avatar)}" alt="Avatar">
+                        <strong>${escapeHtml(row.nombre)}</strong>
+                      </td>
+                      <td data-label="Correo" class="muted">${escapeHtml(row.correo)}</td>
+                      <td data-label="Fecha Registro">${formatDate(row.fecha_registro)}</td>
+                      <td data-label="Roles Asignados">
+                        ${(row.roles || 'usuario').split(', ').map(r => `<span class="tag tag-info" style="margin-right: 4px;">${escapeHtml(r)}</span>`).join('')}
+                      </td>
+                      <td data-label="Estado">
+                        <span class="tag ${row.activo ? 'tag-success' : 'tag-danger'}">${row.activo ? 'Activo' : 'Baja'}</span>
+                      </td>
+                      <td data-label="Acciones">
+                        <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.8rem;" onclick="window.openRoleModal(${row.id_usuario}, '${escapeHtml(row.nombre)}', '${escapeHtml(row.roles)}')">🔐 Gestionar Roles</button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          `;
+
+        case 'roles':
+          const rData = state.records; // Uses full config containing roles & user mappings
+          return `
+            <div style="display: grid; gap: 24px;">
+              <div>
+                <h4 style="margin: 0 0 10px;">Roles en la Base de Datos</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px;">
+                  ${rData.roles.map(r => {
+                    let badgeColor = 'tag-dark';
+                    if (r.nombre === 'admin') badgeColor = 'tag-danger';
+                    else if (r.nombre === 'taquilla') badgeColor = 'tag-warning';
+                    return `
+                      <div class="metric-card" style="flex-direction: column; align-items: stretch; padding: 18px; gap: 10px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                          <span class="tag ${badgeColor}">${escapeHtml(r.nombre)}</span>
+                          <span style="font-size: 0.72rem; color: var(--text-dim);">ID #${r.id_rol}</span>
+                        </div>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--text-soft); line-height: 1.5;">${escapeHtml(r.descripcion)}</p>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+
+              <div>
+                <h4 style="margin: 0 0 10px;">Asignaciones de Permisos Recientes</h4>
+                <table style="background: rgba(0,0,0,0.15)">
+                  <thead>
+                    <tr>
+                      <th>Usuario</th>
+                      <th>Rol Asignado</th>
+                      <th>Fecha Asignación</th>
+                      <th>Autorizado Por</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${rData.usuariosRoles.map(ur => {
+                      return `
+                        <tr>
+                          <td>
+                            <strong>${escapeHtml(ur.nombre_usuario)}</strong><br>
+                            <span style="font-size: 0.78rem; color: var(--text-dim);">${escapeHtml(ur.correo_usuario)}</span>
+                          </td>
+                          <td><span class="tag tag-info">${escapeHtml(ur.nombre_rol)}</span></td>
+                          <td>${formatDate(ur.fecha_asignacion, true)}</td>
+                          <td><strong style="color: var(--accent);">${escapeHtml(ur.nombre_asignador || 'Sistema / Auto')}</strong></td>
+                        </tr>
+                      `;
+                    }).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+
+        case 'estaciones':
+          return `
+            <table>
+              <thead>
+                <tr>
+                  <th>Orden</th>
+                  <th>ID</th>
+                  <th>Sala</th>
+                  <th>Tipo Dinámica</th>
+                  <th>Score Requerido</th>
+                  <th>Puntos Base</th>
+                  <th>Estado</th>
+                  <th>Control</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows.map(row => {
+                  return `
+                    <tr>
+                      <td data-label="Orden" style="font-weight: 800; font-size: 1.1rem; color: var(--accent);">#${row.orden}</td>
+                      <td data-label="ID" style="font-family: monospace;">#${row.id_estacion}</td>
+                      <td data-label="Sala">
+                        <strong>${escapeHtml(row.nombre)}</strong><br>
+                        <span style="font-size: 0.8rem; color: var(--text-soft);">${escapeHtml(row.descripcion)}</span>
+                      </td>
+                      <td data-label="Tipo Dinámica">
+                        <span class="tag tag-dark">${escapeHtml(row.tipo)}</span>
+                      </td>
+                      <td data-label="Score Requerido">${row.puntaje_minimo} pts</td>
+                      <td data-label="Puntos Base" style="font-weight: 700; color: var(--accent);">${row.puntos} pts</td>
+                      <td data-label="Estado">
+                        <span class="tag ${row.activa ? 'tag-success' : 'tag-danger'}">${row.activa ? 'Activa' : 'Desactivada'}</span>
+                      </td>
+                      <td data-label="Control">
+                        <button class="switch-btn ${row.activa ? 'active' : 'inactive'}" onclick="window.toggleEstacion(${row.id_estacion})">
+                          ${row.activa ? '🟢 Habilitada' : '🔴 Deshabilitada'}
+                        </button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          `;
+
+        case 'preguntas':
+          // Render grouped questions per station
+          const stations = {};
+          rows.forEach(q => {
+            if (!stations[q.id_estacion]) {
+              stations[q.id_estacion] = { name: q.nombre_estacion, list: [] };
+            }
+            stations[q.id_estacion].list.push(q);
+          });
+
+          return `
+            <div style="display: grid; gap: 20px;">
+              ${Object.keys(stations).map(estId => {
+                const s = stations[estId];
+                return `
+                  <div class="trivia-station-block">
+                    <div class="trivia-station-head">
+                      <span class="trivia-station-title">Sala ${estId}: ${escapeHtml(s.name)}</span>
+                      <span class="tag tag-dark">${s.list.length} preguntas trivia</span>
+                    </div>
+                    <div style="display: grid; gap: 14px;">
+                      ${s.list.map(q => {
+                        return `
+                          <div class="trivia-question-item">
+                            <div class="trivia-question-header">
+                              <strong style="font-size: 1rem;">ID #${q.id_pregunta}: ${escapeHtml(q.pregunta)}</strong>
+                              <button class="switch-btn ${q.activa ? 'active' : 'inactive'}" style="padding: 4px 8px; font-size: 0.72rem;" onclick="window.togglePregunta(${q.id_pregunta})">
+                                ${q.activa ? '🟢 Activa' : '🔴 Inactiva'}
+                              </button>
+                            </div>
+                            <div class="trivia-answers-grid">
+                              ${q.respuestas.map(r => {
+                                return `
+                                  <div class="trivia-answer-option ${r.es_correcta ? 'correct' : ''}">
+                                    <span>${r.es_correcta ? '✅' : '•'}</span>
+                                    <span>${escapeHtml(r.texto_respuesta)}</span>
+                                  </div>
+                                `;
+                              }).join('')}
+                            </div>
+                          </div>
+                        `;
+                      }).join('')}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `;
+
+        case 'progreso':
+          return `
+            <table>
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Estación</th>
+                  <th>Estatus</th>
+                  <th>Aprobada</th>
+                  <th>Puntuación</th>
+                  <th>Aciertos / Errores</th>
+                  <th>Última Actualización</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows.map(row => {
+                  const pct = Math.round((row.puntaje / 15) * 100); // Standard minijuego has 15 pts max.
+                  return `
+                    <tr>
+                      <td data-label="Usuario">
+                        <strong>${escapeHtml(row.nombre_usuario)}</strong><br>
+                        <span style="font-size: 0.8rem; color: var(--text-dim);">${escapeHtml(row.correo_usuario)}</span>
+                      </td>
+                      <td data-label="Estación">
+                        <strong>${escapeHtml(row.nombre_estacion)}</strong><br>
+                        <span style="font-size: 0.75rem; color: var(--text-dim);">ID #${row.id_estacion}</span>
+                      </td>
+                      <td data-label="Estatus">
+                        <span class="tag ${row.completada ? 'tag-success' : 'tag-warning'}">${row.completada ? 'Completada' : 'En Curso'}</span>
+                      </td>
+                      <td data-label="Aprobada">
+                        <span class="tag ${row.aprobada ? 'tag-success' : 'tag-danger'}">${row.aprobada ? 'Aprobada' : 'Sin Aprobar'}</span>
+                      </td>
+                      <td data-label="Puntuación" style="font-weight: 700; color: var(--accent);">${row.puntaje} pts</td>
+                      <td data-label="Aciertos / Errores">
+                        <span style="color: var(--success); font-weight: 700;">${row.aciertos} ✔</span> / 
+                        <span style="color: var(--danger); font-weight: 700;">${row.errores} ✕</span>
+                      </td>
+                      <td data-label="Última Actualización">${formatDate(row.updated_at, true)}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          `;
+
+        case 'intentos':
+          return `
+            <table>
+              <thead>
+                <tr>
+                  <th>Detalle</th>
+                  <th>Usuario</th>
+                  <th>Estación</th>
+                  <th>Resultado</th>
+                  <th>Puntaje Obtenido</th>
+                  <th>Aciertos / Errores</th>
+                  <th>Fecha Intento</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows.map(row => {
+                  const isExpanded = state.expandedAttempts.has(row.id_intento);
+                  return `
+                    <tr>
+                      <td data-label="Detalle">
+                        <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.78rem;" onclick="window.toggleIntentoDetalle(${row.id_intento})">
+                          ${isExpanded ? '▼ Ocultar' : '▶ Ver Respuestas'}
+                        </button>
+                      </td>
+                      <td data-label="Usuario">
+                        <strong>${escapeHtml(row.nombre_usuario)}</strong><br>
+                        <span style="font-size: 0.8rem; color: var(--text-dim);">${escapeHtml(row.correo_usuario)}</span>
+                      </td>
+                      <td data-label="Estación"><strong>${escapeHtml(row.nombre_estacion)}</strong></td>
+                      <td data-label="Resultado">
+                        <span class="tag ${row.aprobado ? 'tag-success' : 'tag-danger'}">${row.aprobado ? 'Aprobado' : 'Reprobado'}</span>
+                      </td>
+                      <td data-label="Puntaje Obtenido" style="font-weight: 800; color: var(--accent);">${row.puntaje} pts</td>
+                      <td data-label="Aciertos / Errores">
+                        <span style="color: var(--success); font-weight: 700;">${row.aciertos} ✔</span> / 
+                        <span style="color: var(--danger); font-weight: 700;">${row.errores} ✕</span>
+                      </td>
+                      <td data-label="Fecha Intento">${formatDate(row.fecha_intento, true)}</td>
+                    </tr>
+                    ${isExpanded ? `
+                      <tr class="expandable-row-content">
+                        <td colspan="7">
+                          <ul class="expandable-details-list">
+                            ${row.respuestas.length === 0 ? `
+                              <li style="justify-content: center; font-style: italic;">No hay respuestas registradas en detalle para esta estación (tipo minijuego o rompecabezas).</li>
+                            ` : row.respuestas.map(r => {
+                              return `
+                                <li>
+                                  <div style="text-align: left;">
+                                    <strong>¿${escapeHtml(r.pregunta)}?</strong><br>
+                                    <span style="color: ${r.es_correcta ? 'var(--success)' : 'var(--danger)'}; font-weight: 700;">
+                                      Seleccionada: ${escapeHtml(r.texto_respuesta_seleccionada)} (${r.es_correcta ? 'Correcta' : 'Incorrecta'})
+                                    </span>
+                                  </div>
+                                  <div>
+                                    ${!r.es_correcta ? `<span style="font-size: 0.8rem; color: var(--text-dim);">Correcta era: <strong>${escapeHtml(r.texto_respuesta_correcta)}</strong></span>` : ''}
+                                  </div>
+                                </li>
+                              `;
+                            }).join('')}
+                          </ul>
+                        </td>
+                      </tr>
+                    ` : ''}
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          `;
+
+        case 'minijuegos':
+          return `
+            <table>
+              <thead>
+                <tr>
+                  <th>Partida ID</th>
+                  <th>Usuario</th>
+                  <th>Estación</th>
+                  <th>Estatus</th>
+                  <th>Puntaje</th>
+                  <th>Fecha Partida</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows.map(row => {
+                  return `
+                    <tr>
+                      <td data-label="Partida ID" style="font-family: monospace;">#${row.id_partida}</td>
+                      <td data-label="Usuario">
+                        <strong>${escapeHtml(row.nombre_usuario)}</strong><br>
+                        <span style="font-size: 0.8rem; color: var(--text-dim);">${escapeHtml(row.correo_usuario)}</span>
+                      </td>
+                      <td data-label="Estación"><strong>${escapeHtml(row.nombre_estacion || 'Mini juego')}</strong></td>
+                      <td data-label="Estatus">
+                        <span class="tag ${row.aprobado ? 'tag-success' : 'tag-danger'}">${row.aprobado ? 'Aprobado' : 'No aprobado'}</span>
+                      </td>
+                      <td data-label="Puntaje" style="font-weight: 800; color: var(--accent);">${row.puntaje} pts</td>
+                      <td data-label="Fecha Partida">${formatDate(row.fecha_partida, true)}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          `;
+
+        case 'boletos':
+          return `
+            <table>
+              <thead>
+                <tr>
+                  <th>Folio</th>
+                  <th>Visitante</th>
+                  <th>Tipo Entrada</th>
+                  <th>Estatus Acceso</th>
+                  <th>Generación</th>
+                  <th>Uso / Canje</th>
+                  <th>Operador Canje</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows.map(row => {
+                  let statusTag = 'tag-success';
+                  if (row.estado === 'canjeado' || row.usado === 1) statusTag = 'tag-warning';
+                  else if (row.estado === 'cancelado') statusTag = 'tag-danger';
+
+                  const esVigente = row.estado === 'activo' || row.estado === 'Vigente';
+                  const esCanjeado = row.estado === 'canjeado' || row.usado === 1;
+
+                  return `
+                    <tr>
+                      <td data-label="Folio">
+                        <span class="folio-code" style="font-size: 0.9rem; padding: 4px 8px; border-radius: 8px;">${escapeHtml(row.folio)}</span>
+                      </td>
+                      <td data-label="Visitante">
+                        <strong>${escapeHtml(row.nombre_usuario)}</strong><br>
+                        <span style="font-size: 0.8rem; color: var(--text-dim);">${escapeHtml(row.correo_usuario)}</span>
+                      </td>
+                      <td data-label="Tipo Entrada">
+                        <span class="tag tag-dark">${escapeHtml(row.tipo_entrada || 'General')}</span>
+                      </td>
+                      <td data-label="Estatus Acceso">
+                        <span class="tag ${statusTag}">${esCanjeado ? 'Canjeado' : esVigente ? 'Vigente' : escapeHtml(row.estado)}</span>
+                      </td>
+                      <td data-label="Generación">${formatDate(row.fecha_generacion, true)}</td>
+                      <td data-label="Uso / Canje">${formatDate(row.fecha_uso || row.fecha_canje, true)}</td>
+                      <td data-label="Operador Canje">
+                        <strong style="color: var(--accent);">${escapeHtml(row.nombre_canjeador || 'Sin canjear')}</strong>
+                      </td>
+                      <td data-label="Acciones" style="display: flex; gap: 8px;">
+                        ${esVigente ? `
+                          <button class="btn btn-solid" style="padding: 6px 12px; font-size: 0.76rem; background: #10b981;" onclick="window.canjearBoletoTab(${row.id_boleto}, '${escapeHtml(row.folio)}')">🎟️ Canjear</button>
+                        ` : ''}
+                        ${row.estado !== 'cancelado' ? `
+                          <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.76rem;" onclick="window.cancelarBoletoTab(${row.id_boleto}, '${escapeHtml(row.folio)}')">🚫 Cancelar</button>
+                        ` : ''}
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          `;
+
+        case 'movimientos':
+          return `
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Folio Boleto</th>
+                  <th>Propietario</th>
+                  <th>Movimiento</th>
+                  <th>Fecha</th>
+                  <th>Operador Responsable</th>
+                  <th>Observaciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows.map(row => {
+                  return `
+                    <tr>
+                      <td data-label="ID" style="font-family: monospace;">#${row.id_movimiento}</td>
+                      <td data-label="Folio Boleto">
+                        <span class="folio-code" style="font-size: 0.82rem; padding: 2px 6px; border-radius: 6px;">${escapeHtml(row.folio_boleto)}</span>
+                      </td>
+                      <td data-label="Propietario"><strong>${escapeHtml(row.nombre_usuario)}</strong></td>
+                      <td data-label="Movimiento">
+                        <span class="tag tag-info">${escapeHtml(row.tipo_movimiento)}</span>
+                      </td>
+                      <td data-label="Fecha">${formatDate(row.fecha_movimiento, true)}</td>
+                      <td data-label="Operador Responsable">
+                        <strong style="color: var(--accent);">${escapeHtml(row.nombre_operador || 'Sistema')}</strong>
+                      </td>
+                      <td data-label="Observaciones" class="muted">${escapeHtml(row.observaciones || 'Ninguna')}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          `;
+
+        case 'auditoria':
+          return `
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Usuario</th>
+                  <th>Rol Acción</th>
+                  <th>Acción</th>
+                  <th>Tabla Afectada</th>
+                  <th>Registro Afectado</th>
+                  <th>Detalle Descripción</th>
+                  <th>Fecha y Hora</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows.map(row => {
+                  let badge = 'tag-dark';
+                  if (row.rol_accion === 'admin') badge = 'tag-danger';
+                  else if (row.rol_accion === 'taquilla') badge = 'tag-warning';
+                  else if (row.rol_accion === 'usuario') badge = 'tag-success';
+
+                  return `
+                    <tr>
+                      <td data-label="ID" style="font-family: monospace;">#${row.id_auditoria}</td>
+                      <td data-label="Usuario">
+                        <strong>${escapeHtml(row.nombre_usuario || 'Anónimo')}</strong><br>
+                        <span style="font-size: 0.78rem; color: var(--text-dim);">${escapeHtml(row.correo_usuario || 'Visita pública')}</span>
+                      </td>
+                      <td data-label="Rol Acción">
+                        <span class="tag ${badge}">${escapeHtml(row.rol_accion || 'Público')}</span>
+                      </td>
+                      <td data-label="Acción"><strong style="color: var(--accent);">${escapeHtml(row.accion)}</strong></td>
+                      <td data-label="Tabla Afectada" class="muted">${escapeHtml(row.tabla_afectada || 'General')}</td>
+                      <td data-label="Registro Afectado" style="font-family: monospace;">#${row.id_registro || 'N/A'}</td>
+                      <td data-label="Detalle Descripción">${escapeHtml(row.descripcion)}</td>
+                      <td data-label="Fecha y Hora">${formatDate(row.fecha_accion, true)}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          `;
+
+        default:
+          return `<div class="empty-state">No hay tabla definida para este módulo.</div>`;
+      }
+    }
+
+    // Expand / Collapse attempt trivia details lists
+    window.toggleIntentoDetalle = function(idIntento) {
+      if (state.expandedAttempts.has(idIntento)) {
+        state.expandedAttempts.delete(idIntento);
+      } else {
+        state.expandedAttempts.add(idIntento);
+      }
+      renderActiveView();
+    };
+
+    // Toggles for Stations and Questions (Real-time DB switches)
+    window.toggleEstacion = async function(idEstacion) {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/admin/estaciones/${idEstacion}/toggle`, {
+          method: 'PUT',
+          headers: getHeaders()
+        });
+        if (!res.ok) throw new Error('No se pudo modificar el estado de la estación.');
+        loadTabContent(true);
+      } catch (error) {
+        alert(error.message);
+      }
+    };
+
+    window.togglePregunta = async function(idPregunta) {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/admin/preguntas/${idPregunta}/toggle`, {
+          method: 'PUT',
+          headers: getHeaders()
+        });
+        if (!res.ok) throw new Error('No se pudo modificar el estado de la pregunta.');
+        loadTabContent(true);
+      } catch (error) {
+        alert(error.message);
+      }
+    };
+
+    // Open/Close Interactive Roles management modal
+    window.openRoleModal = function(idUsuario, nombre, rolesString) {
+      state.selectedUserIdForRoles = idUsuario;
+      document.getElementById('roleModalUserInfo').innerHTML = `Modificando los roles asignados en MySQL para <strong>${escapeHtml(nombre)}</strong> (ID #${idUsuario}).`;
+      
+      const rolesArray = (rolesString || '').split(', ');
+      document.getElementById('chkRoleUsuario').checked = rolesArray.includes('usuario');
+      document.getElementById('chkRoleAdmin').checked = rolesArray.includes('admin');
+      document.getElementById('chkRoleTaquilla').checked = rolesArray.includes('taquilla');
+
+      document.getElementById('roleModal').hidden = false;
+    };
+
+    window.closeRoleModal = function() {
+      document.getElementById('roleModal').hidden = true;
+    };
+
+    document.getElementById('btnSaveRoles').addEventListener('click', async () => {
+      const roles = [];
+      if (document.getElementById('chkRoleUsuario').checked) roles.push(1);
+      if (document.getElementById('chkRoleAdmin').checked) roles.push(2);
+      if (document.getElementById('chkRoleTaquilla').checked) roles.push(3);
+
+      if (roles.length === 0) {
+        alert('El usuario debe contar con al menos 1 rol asignado.');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/admin/usuarios/${state.selectedUserIdForRoles}/roles`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify({ roles })
+        });
+
+        if (!res.ok) throw new Error('No se pudieron guardar las modificaciones en la base de datos.');
+        window.closeRoleModal();
+        loadTabContent();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    // Boletos Quick Actions
+    window.canjearBoletoTab = async function(idBoleto, folio) {
+      if (!confirm(`¿Estás seguro de que deseas marcar como CANJEADO el boleto ${folio}?`)) return;
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/taquilla/boletos/${idBoleto}/canjear`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify({ observaciones: 'Canje rápido desde tabla de administrador' })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'No se pudo canjear el boleto.');
+        loadTabContent();
+      } catch (error) {
+        alert(error.message);
+      }
+    };
+
+    window.cancelarBoletoTab = async function(idBoleto, folio) {
+      if (!confirm(`¿Estás seguro de que deseas CANCELAR de forma permanente el boleto ${folio}? Esta acción no se puede deshacer.`)) return;
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/taquilla/boletos/${idBoleto}/cancelar`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify({ observaciones: 'Cancelación desde tabla de administrador' })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'No se pudo cancelar el boleto.');
+        loadTabContent();
+      } catch (error) {
+        alert(error.message);
+      }
+    };
+
+    // =========================================================================
+    // TAQUILLA & QR CODE SCANNING VIEW
+    // =========================================================================
+    function renderTaquillaView() {
+      const container = document.getElementById('viewContainers');
+      
+      container.innerHTML = `
+        <div class="scanner-grid">
+          <div class="scanner-panel">
+            <div class="panel">
+              <div class="panel-head" style="margin-bottom: 12px;">
+                <div class="panel-title-wrap">
+                  <h3>Cámara QR e Ingreso Manual</h3>
+                  <p>Escanea el QR de premio del visitante o escribe su folio manualmente.</p>
+                </div>
+                <span id="scannerHardwareStatus" style="font-size: 0.8rem; font-weight: 700; color: var(--text-dim);">Cámara inactiva</span>
+              </div>
+
+              <div class="scanner-reader-box">
+                <div id="ticketReader"></div>
+                <div class="scanner-placeholder" id="scannerPlaceholder">
+                  <div>
+                    <strong>Escáner apagado</strong>
+                    <span style="font-size: 0.85rem; display: block; margin-top: 5px; color: var(--text-soft)">
+                      Presiona "Iniciar escaneo" para activar la cámara web/móvil.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn btn-solid" id="btnStartScan" style="flex: 1;">📷 Iniciar escaneo</button>
+                <button class="btn btn-soft" id="btnStopScan" style="flex: 1;" disabled>✕ Detener cámara</button>
+              </div>
+
+              <div style="border-top: 1px solid var(--border); margin-top: 20px; padding-top: 20px; display: grid; gap: 12px;">
+                <div class="form-group">
+                  <label class="form-label" for="manualTicketInput">Ingreso manual de Folio o URL QR</label>
+                  <input class="form-input" id="manualTicketInput" type="text" placeholder="Ejemplo: MUCH-171690 o pegue la URL del QR">
+                </div>
+                <button class="btn btn-soft" id="btnValidateManual">🎟️ Validar Boleto</button>
+                <p id="scannerFeedback" style="margin: 0; font-size: 0.85rem; color: var(--text-soft); font-weight: 600;">Esperando lectura de boleto...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Real-time Scan Result Panel -->
+          <div class="scanner-panel">
+            <div class="panel" style="min-height: 100%;">
+              <div class="panel-head">
+                <div class="panel-title-wrap">
+                  <h3>Ficha de Validación</h3>
+                  <p>Detalle de validez obtenido directamente desde MySQL.</p>
+                </div>
+                <span id="scanCheckedAt" style="font-size: 0.8rem; color: var(--text-dim);">Sin consulta</span>
+              </div>
+
+              <div id="scanResultBody">
+                <div class="scanner-details-card" style="text-align: center; color: var(--text-soft); padding: 40px 20px;">
+                  <span style="font-size: 2.2rem; display: block; margin-bottom: 10px;">🧾</span>
+                  <strong>Ningún boleto consultado</strong>
+                  <span>Escanea un código QR o ingresa un folio para consultar la base de datos en tiempo real.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top: 24px;">
+          <div class="panel-head">
+            <div class="panel-title-wrap">
+              <h3>Historial de Escaneos QR Realizados</h3>
+              <p>Historial y respuestas registradas tras cada intento de acceso en taquilla.</p>
+            </div>
+          </div>
+          <div class="toolbar" style="margin-bottom: 14px;">
+            <div class="search-wrap" style="max-width: 360px;">
+              <span>🔎</span>
+              <input id="taquillaSearchInput" type="search" placeholder="Filtrar escaneos..." oninput="handleSearch(this.value)">
+            </div>
+          </div>
+          <div class="table-wrap responsive-table-stack" id="taquillaLogsTableWrap">
+            <!-- Rendered below -->
+          </div>
+        </div>
+      `;
+
+      // Bind dynamic actions
+      document.getElementById('btnStartScan').addEventListener('click', () => startScanner());
+      document.getElementById('btnStopScan').addEventListener('click', () => stopScanner());
+      document.getElementById('btnValidateManual').addEventListener('click', () => {
+        const val = document.getElementById('manualTicketInput').value;
+        validateTicket(val);
+      });
+      document.getElementById('manualTicketInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') validateTicket(e.target.value);
+      });
+
+      renderTaquillaLogsTable();
+    }
+
+    function renderTaquillaLogsTable() {
+      const query = (state.queries[state.activeTab] || '').toLowerCase().trim();
+      const filtered = state.records.filter(row => {
+        if (!query) return true;
+        const haystack = Object.values(row).map(v => String(v ?? '').toLowerCase()).join(' ');
+        return haystack.includes(query);
+      });
+
+      const tableWrap = document.getElementById('taquillaLogsTableWrap');
+      if (!tableWrap) return;
+
+      if (filtered.length === 0) {
+        tableWrap.innerHTML = `
+          <div class="empty-state">
+            <strong>No hay lecturas</strong>
+            <span>No se registran escaneos que coincidan con la búsqueda.</span>
+          </div>
+        `;
+        return;
+      }
+
+      tableWrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>ID Lectura</th>
+              <th>Boleto Folio</th>
+              <th>Operador</th>
+              <th>Resultado</th>
+              <th>Fecha y Hora</th>
+              <th>Observaciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filtered.map(row => {
+              const outcomeTag = row.resultado === 'EXITOSO' || row.resultado === 'valido' ? 'tag-success' : 'tag-danger';
+              return `
+                <tr>
+                  <td data-label="ID Lectura" style="font-family: monospace;">#${row.id_escaneo}</td>
+                  <td data-label="Boleto Folio">
+                    <span class="folio-code" style="font-size: 0.8rem; padding: 2px 6px; border-radius: 6px;">${escapeHtml(row.folio_boleto || 'Desconocido')}</span>
+                  </td>
+                  <td data-label="Operador"><strong style="color: var(--accent);">${escapeHtml(row.nombre_operador || 'Público / Auto')}</strong></td>
+                  <td data-label="Resultado"><span class="tag ${outcomeTag}">${escapeHtml(row.resultado)}</span></td>
+                  <td data-label="Fecha y Hora">${formatDate(row.fecha_escaneo, true)}</td>
+                  <td data-label="Observaciones" class="muted">${escapeHtml(row.observaciones || 'Ninguna')}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    // QR Decoding parser logic
+    function extractFolioFromScan(rawValue) {
+      const raw = String(rawValue ?? '').trim();
+      if (!raw) return '';
+
+      try {
+        const parsed = new URL(raw);
+        // Extracts from standard tickets query: ?folio=MUCH-123 or ?ticket=MUCH-123
+        const folio = parsed.searchParams.get('folio') || parsed.searchParams.get('ticket');
+        if (folio) return folio.toUpperCase().trim();
+      } catch (e) {
+        // Flat text scan
+      }
+
+      // Regex fallback
+      const match = raw.match(/[?&](?:folio|ticket)=([^&#]+)/i);
+      if (match) return decodeURIComponent(match[1]).toUpperCase().trim();
+
+      return raw.replace(/^folio[:\s-]*/i, '').toUpperCase().trim();
+    }
+
     async function validateTicket(rawValue) {
       const lookup = String(rawValue ?? '').trim();
       const folio = extractFolioFromScan(lookup);
       const lookupValue = folio || lookup;
-      const looksLikeId = /^\d+$/.test(lookupValue);
 
-      if (!lookupValue || (!folio && !looksLikeId)) {
-        setScannerFeedback('Ingresa un folio, un ID o el contenido del QR. Para texto libre usa el buscador superior.', 'error');
-        renderScanResultCard({
-          badgeLabel: 'Invalido',
-          badgeTone: 'invalid',
-          title: 'No se reconocio el boleto',
-          description: 'El contenido recibido no corresponde a un folio o ID valido.',
-          recordId: 'Sin ID',
-          folio: 'Sin folio',
-          participant: 'Sin coincidencia',
-          email: 'Sin correo',
-          phone: 'Sin telefono',
-          ticketType: 'Sin tipo',
-          dbStatus: 'Sin estatus',
-          status: 'Invalido',
-          validFrom: 'Sin fecha',
-          validUntil: 'Sin fecha',
-          createdAt: 'Sin fecha',
-          rawValue
-        });
+      if (!lookupValue) {
+        setScannerFeedback('Por favor, ingresa un folio o apunta la cámara a un código QR.', 'error');
         return;
       }
 
-      els.manualTicketInput.value = lookupValue;
-      scannerState.lastFolio = lookupValue;
-      setScannerFeedback(`Validando ${lookupValue}...`);
+      setScannerFeedback(`Validando boleto: ${lookupValue}...`);
+      
+      const scanResultBody = document.getElementById('scanResultBody');
+      const scanCheckedAt = document.getElementById('scanCheckedAt');
 
       try {
-        const record = await fetchRecordByLookup(lookupValue);
+        // Fetch ticket details from real endpoints
+        // 1. Try fetching by QR token direct
+        let ticketData = null;
+        let qrToken = '';
+        try {
+          const parsed = new URL(lookup);
+          qrToken = parsed.searchParams.get('token') || '';
+        } catch(e) {}
+        if (!qrToken && /^[a-fA-F0-9]{32}$/.test(lookupValue)) {
+          qrToken = lookupValue;
+        }
 
-        if (!record) {
-          setScannerFeedback(`No existe un boleto con el folio o ID ${lookupValue}.`, 'error');
-          renderScanResultCard({
-            badgeLabel: 'Invalido',
-            badgeTone: 'invalid',
-            title: 'Folio no encontrado',
-            description: 'No existe un boleto registrado con ese folio o ID.',
-            recordId: 'Sin ID',
-            folio: folio || lookupValue,
-            participant: 'Sin coincidencia',
-            email: 'Sin correo',
-            phone: 'Sin telefono',
-            ticketType: 'Sin tipo',
-            dbStatus: 'Sin estatus',
-            status: 'Invalido',
-            validFrom: 'Sin fecha',
-            validUntil: 'Sin fecha',
-            createdAt: 'Sin fecha',
-            rawValue
-          });
+        const headers = getHeaders();
+        if (qrToken) {
+          const res = await fetch(`${API_BASE_URL}/api/taquilla/boleto/qr/${qrToken}`, { headers });
+          if (res.ok) ticketData = await res.json();
+        }
+
+        if (!ticketData) {
+          // 2. Fetch by Folio fallback
+          const res = await fetch(`${API_BASE_URL}/api/taquilla/boleto/folio/${lookupValue}`, { headers });
+          if (res.ok) ticketData = await res.json();
+        }
+
+        if (!ticketData) {
+          setScannerFeedback(`El boleto ${lookupValue} no existe en la base de datos.`, 'error');
+          renderScanResultCard(null, lookupValue, 'No se encontró coincidencia.');
           return;
         }
 
-        const statusInfo = getStatusInfo(record);
+        // Validate ticket status
+        const state = ticketData.estado || ticketData.estatus || 'invalido';
+        const isVigente = state.toLowerCase() === 'activo' || state.toLowerCase() === 'vigente';
+        const isCanjeado = state.toLowerCase() === 'canjeado' || ticketData.usado === 1;
 
-        renderScanResultCard({
-          badgeLabel: statusInfo.isValid ? 'Valido' : 'Invalido',
-          badgeTone: getScanTone(statusInfo),
-          title: getScanHeadline(statusInfo),
-          description: getScanDescription(record, statusInfo),
-          recordId: String(record.id ?? 'Sin ID'),
-          folio: record.folio || lookupValue,
-          participant: record.nombre || 'Sin nombre',
-          email: record.correo || 'Sin correo',
-          phone: record.telefono || 'Sin telefono',
-          ticketType: record.tipo_entrada || 'Sin tipo',
-          dbStatus: record.estatus || 'Sin estatus',
-          status: statusInfo.label,
-          validFrom: record.valido_desde ? formatDate(record.valido_desde, true) : 'Sin fecha',
-          validUntil: record.valido_hasta ? formatDate(record.valido_hasta, true) : 'Sin fecha',
-          createdAt: record.created_at ? formatDate(record.created_at, true) : 'Sin fecha',
-          rawValue
+        let outcome = 'valido';
+        let feedbackMessage = `Boleto ${ticketData.folio} validado con éxito. Acceso Autorizado.`;
+        let feedbackTone = 'success';
+
+        if (isCanjeado) {
+          outcome = 'duplicado';
+          feedbackMessage = `Boleto ${ticketData.folio} ya fue canjeado previamente. Acceso Rechazado.`;
+          feedbackTone = 'error';
+        } else if (state.toLowerCase() === 'cancelado') {
+          outcome = 'cancelado';
+          feedbackMessage = `Boleto ${ticketData.folio} se encuentra cancelado. Acceso Rechazado.`;
+          feedbackTone = 'error';
+        }
+
+        // Register scan event in MySQL
+        await fetch(`${API_BASE_URL}/api/taquilla/escaneo-qr`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            qr_token: ticketData.qr_token || 'manual_entry',
+            resultado: outcome,
+            observaciones: `Validación por taquillero. Resultado: ${outcome}`
+          })
         });
 
-        setScannerFeedback(
-          statusInfo.isValid
-            ? `Boleto ${record.folio || lookupValue} valido y vigente.`
-            : `${getScanHeadline(statusInfo)}.`,
-          statusInfo.isValid ? 'success' : 'error'
-        );
+        setScannerFeedback(feedbackMessage, feedbackTone);
+        renderScanResultCard(ticketData, lookupValue, feedbackMessage);
+        
+        // Refresh logs table
+        loadTabContent(true);
       } catch (error) {
-        console.error('Error validando folio escaneado:', error);
-        setScannerFeedback('No se pudo consultar el boleto en este momento.', 'error');
-        renderScanResultCard({
-          badgeLabel: 'Invalido',
-          badgeTone: 'invalid',
-          title: 'Error de consulta',
-          description: error?.message || 'No fue posible consultar el boleto.',
-          recordId: 'Sin ID',
-          folio: lookupValue || 'Sin folio',
-          participant: 'Sin coincidencia',
-          email: 'Sin correo',
-          phone: 'Sin telefono',
-          ticketType: 'Sin tipo',
-          dbStatus: 'Sin estatus',
-          status: 'Invalido',
-          validFrom: 'Sin fecha',
-          validUntil: 'Sin fecha',
-          createdAt: 'Sin fecha',
-          rawValue
-        });
+        console.error(error);
+        setScannerFeedback('Error al consultar el boleto en el servidor local.', 'error');
+        renderScanResultCard(null, lookupValue, 'Error de conexión.');
       }
     }
 
-    async function handleDecodedText(decodedText) {
-      const now = Date.now();
-      if (decodedText === scannerState.lastPayload && now - scannerState.lastScanAt < 1800) {
+    function renderScanResultCard(ticket, rawInput, feedback) {
+      const scanResultBody = document.getElementById('scanResultBody');
+      const scanCheckedAt = document.getElementById('scanCheckedAt');
+      
+      scanCheckedAt.textContent = `Leído: ${new Date().toLocaleTimeString()}`;
+
+      if (!ticket) {
+        scanResultBody.innerHTML = `
+          <div class="scanner-details-card" style="border-color: rgba(239,68,68,0.25)">
+            <div style="text-align: center;">
+              <span class="tag tag-danger">No Válido</span>
+              <h4 style="margin: 12px 0 6px; font-family: Fredoka, sans-serif; font-size: 1.2rem;">Boleto Inválido o Inexistente</h4>
+              <p style="margin: 0; font-size: 0.85rem; color: var(--text-soft);">${escapeHtml(feedback)}</p>
+            </div>
+            <div class="folio-code" style="text-align: center; justify-content: center; background: rgba(239,68,68,0.06); border-color: rgba(239,68,68,0.12); color: #ff8b8b;">
+              ${escapeHtml(rawInput)}
+            </div>
+          </div>
+        `;
         return;
       }
 
-      scannerState.lastPayload = decodedText;
-      scannerState.lastScanAt = now;
-      await validateTicket(decodedText);
+      const isVigente = ticket.estado === 'activo' || ticket.estado === 'Vigente';
+      const isCanjeado = ticket.estado === 'canjeado' || ticket.usado === 1;
+
+      let badgeClass = 'tag-success';
+      let badgeLabel = 'Vigente - Autorizado';
+      if (isCanjeado) {
+        badgeClass = 'tag-warning';
+        badgeLabel = 'Canjeado - Rechazado';
+      } else if (ticket.estado === 'cancelado') {
+        badgeClass = 'tag-danger';
+        badgeLabel = 'Cancelado - Rechazado';
+      }
+
+      scanResultBody.innerHTML = `
+        <div class="scanner-details-card" style="border-color: ${isVigente ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}">
+          <div style="text-align: center; display: grid; gap: 8px;">
+            <span class="tag ${badgeClass}">${badgeLabel}</span>
+            <h4 style="margin: 6px 0 0; font-family: Fredoka, sans-serif; font-size: 1.25rem;">Premio Misión MUCH</h4>
+            <span style="font-size: 0.8rem; color: var(--text-dim);">${escapeHtml(feedback)}</span>
+          </div>
+
+          <div class="folio-code" style="text-align: center; justify-content: center; font-size: 1.1rem; padding: 8px;">
+            ${escapeHtml(ticket.folio)}
+          </div>
+
+          <div class="scanner-meta-grid">
+            <div class="scanner-meta-item">
+              <span>Visitante</span>
+              <strong>${escapeHtml(ticket.nombre_usuario || 'Anónimo')}</strong>
+            </div>
+            <div class="scanner-meta-item">
+              <span>Correo</span>
+              <strong>${escapeHtml(ticket.correo_usuario || 'Sin correo')}</strong>
+            </div>
+            <div class="scanner-meta-item">
+              <span>Generación</span>
+              <strong>${formatDate(ticket.fecha_generacion)}</strong>
+            </div>
+            <div class="scanner-meta-item">
+              <span>Tipo Entrada</span>
+              <strong>${escapeHtml(ticket.tipo_entrada || 'General')}</strong>
+            </div>
+          </div>
+
+          ${isVigente ? `
+            <button class="btn btn-solid" style="background: linear-gradient(135deg, #10b981, #059669); margin-top: 10px;" onclick="window.canjearBoletoTaquilla(${ticket.id_boleto}, '${escapeHtml(ticket.folio)}')">
+              🎟️ Canjear y Registrar Acceso
+            </button>
+          ` : ''}
+          ${ticket.estado !== 'cancelado' ? `
+            <button class="btn btn-danger" onclick="window.cancelarBoletoTaquilla(${ticket.id_boleto}, '${escapeHtml(ticket.folio)}')">
+              🚫 Cancelar Boleto permanente
+            </button>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    window.canjearBoletoTaquilla = async function(idBoleto, folio) {
+      if (!confirm(`¿Confirmas el canje e ingreso físico para el boleto ${folio}?`)) return;
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/taquilla/boletos/${idBoleto}/canjear`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify({ observaciones: 'Canje presencial en taquilla' })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error al canjear.');
+        setScannerFeedback(`Boleto ${folio} canjeado correctamente.`, 'success');
+        validateTicket(folio);
+      } catch (error) {
+        alert(error.message);
+      }
+    };
+
+    window.cancelarBoletoTaquilla = async function(idBoleto, folio) {
+      if (!confirm(`¿Confirmas la cancelación definitiva del boleto ${folio}?`)) return;
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/taquilla/boletos/${idBoleto}/cancelar`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify({ observaciones: 'Cancelación directa en módulo taquilla' })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error al cancelar.');
+        setScannerFeedback(`Boleto ${folio} cancelado con éxito.`, 'error');
+        validateTicket(folio);
+      } catch (error) {
+        alert(error.message);
+      }
+    };
+
+    function setScannerFeedback(msg, tone = '') {
+      const el = document.getElementById('scannerFeedback');
+      if (!el) return;
+      el.textContent = msg;
+      el.style.color = tone === 'success' ? '#10b981' : tone === 'error' ? '#ef4444' : 'var(--text-soft)';
     }
 
     async function startScanner() {
-      const hasSecureContext =
-        window.isSecureContext ||
-        window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1';
-
-      if (!hasSecureContext) {
-        setScannerSupport('La camara solo funciona en HTTPS o localhost.', 'error');
-        setScannerFeedback('Usa el campo manual si abriste esta pagina fuera de HTTPS.', 'error');
-        return;
-      }
-
-      if (typeof Html5Qrcode === 'undefined') {
-        setScannerSupport('No se pudo cargar la libreria del escaner.', 'error');
-        setScannerFeedback('Pega el folio manualmente para validar el boleto.', 'error');
+      const hasSecure = window.isSecureContext || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (!hasSecure) {
+        setScannerFeedback('El escaneo por cámara requiere conexión segura HTTPS o localhost.', 'error');
         return;
       }
 
       try {
+        document.getElementById('scannerHardwareStatus').textContent = 'Iniciando cámara...';
+        
         if (!scannerState.instance) {
           scannerState.instance = new Html5Qrcode('ticketReader');
         }
 
         await scannerState.instance.start(
           { facingMode: 'environment' },
-          {
-            fps: 10,
-            qrbox: { width: 220, height: 220 },
-            aspectRatio: 1
+          { fps: 10, qrbox: { width: 230, height: 230 }, aspectRatio: 1.0 },
+          async (decodedText) => {
+            const now = Date.now();
+            if (decodedText === scannerState.lastPayload && now - scannerState.lastScanAt < 2000) return;
+            
+            scannerState.lastPayload = decodedText;
+            scannerState.lastScanAt = now;
+            await validateTicket(decodedText);
           },
-          (decodedText) => {
-            handleDecodedText(decodedText);
-          },
-          () => {
-            // Ignorar errores intermedios de lectura.
-          }
+          () => {} // Ignorar lecturas vacías
         );
 
         scannerState.active = true;
-        updateScannerControls();
-        setScannerSupport('Camara activa');
-        setScannerFeedback('Escaner listo. Apunta al QR del boleto.');
+        document.getElementById('scannerPlaceholder').classList.add('hidden');
+        document.getElementById('btnStartScan').disabled = true;
+        document.getElementById('btnStopScan').disabled = false;
+        document.getElementById('scannerHardwareStatus').textContent = '🟢 Cámara Activa';
       } catch (error) {
-        console.error('No se pudo iniciar el escaner:', error);
-        scannerState.active = false;
-        updateScannerControls();
-        setScannerSupport('No se pudo abrir la camara.', 'error');
-        setScannerFeedback('Revisa permisos de camara o valida el folio manualmente.', 'error');
+        console.error(error);
+        document.getElementById('scannerHardwareStatus').textContent = 'Error cámara';
+        setScannerFeedback('No se pudo iniciar la cámara. Otorga permisos o escribe el folio manualmente.', 'error');
       }
     }
 
     async function stopScanner() {
-      if (!scannerState.instance || !scannerState.active) {
-        scannerState.active = false;
-        updateScannerControls();
-        setScannerSupport('Camara detenida');
-        return;
-      }
-
+      if (!scannerState.instance || !scannerState.active) return;
+      
       try {
         await scannerState.instance.stop();
-        await scannerState.instance.clear();
       } catch (error) {
-        console.warn('No se pudo detener el escaner limpiamente:', error);
+        console.warn(error);
       } finally {
         scannerState.active = false;
-        updateScannerControls();
-        setScannerSupport('Camara detenida');
+        document.getElementById('scannerPlaceholder').classList.remove('hidden');
+        document.getElementById('btnStartScan').disabled = false;
+        document.getElementById('btnStopScan').disabled = true;
+        document.getElementById('scannerHardwareStatus').textContent = 'Cámara apagada';
       }
     }
 
-    function initScannerState() {
-      const hasSecureContext =
-        window.isSecureContext ||
-        window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1';
-
-      updateScannerControls();
-
-      if (!hasSecureContext) {
-        setScannerSupport('La camara requiere HTTPS o localhost.', 'error');
-        setScannerFeedback('Tambien puedes validar el boleto pegando el folio manualmente.');
-        return;
-      }
-
-      setScannerSupport('Camara detenida');
-      setScannerFeedback('Esperando un boleto para validar.');
-    }
-
-    function matchesFilter(statusInfo) {
-      switch (state.filter) {
-        case 'vigente':
-          return statusInfo.key === 'vigente';
-        case 'invalid':
-          return !statusInfo.isValid;
-        case 'canjeado':
-          return statusInfo.key === 'canjeado';
-        case 'vencido':
-          return statusInfo.key === 'vencido';
-        case 'sin_folio':
-          return statusInfo.key === 'sin_folio';
-        default:
-          return true;
-      }
-    }
-
-    function matchesQuery(record) {
-      if (!state.query) return true;
-      const query = normalizeText(state.query);
-      const haystack = [
-        record.id,
-        record.nombre,
-        record.correo,
-        record.telefono,
-        record.folio,
-        record.tipo_entrada,
-        record.estatus,
-        record._status?.label,
-        record.valido_desde,
-        record.valido_hasta,
-        record.created_at
-      ].map(normalizeText).join(' ');
-
-      return haystack.includes(query);
-    }
-
-    function getVisibleRows() {
-      return state.records
-        .map((record) => ({ ...record, _status: getStatusInfo(record) }))
-        .filter((record) => matchesQuery(record) && matchesFilter(record._status));
-    }
-
-    function setLoading(isLoading) {
-      state.loading = isLoading;
-      els.body.classList.toggle('loading', isLoading);
-      els.btnRefresh.disabled = isLoading;
-      els.btnRefreshTop.disabled = isLoading;
-      els.btnClear.disabled = isLoading;
-
-      const syncPill = document.getElementById('syncPill');
-      if (!syncPill) return;
-
-      if (ADMIN_VISUAL_ONLY) {
-        syncPill.classList.remove('error');
-        syncPill.textContent = 'Modo visual activo';
-      } else if (isLoading) {
-        syncPill.classList.remove('error');
-        syncPill.textContent = 'Sincronizando datos...';
-      } else if (!state.error) {
-        syncPill.classList.remove('error');
-        syncPill.textContent = 'Datos sincronizados';
-      } else {
-        syncPill.classList.add('error');
-        syncPill.textContent = 'Error de sincronizacion';
-      }
-    }
-
-    function renderMetrics(rows) {
-      const validCount = rows.filter((row) => row._status.isValid).length;
-      const invalidCount = rows.length - validCount;
-
-      els.metricTotal.textContent = rows.length.toLocaleString('es-MX');
-      els.metricValid.textContent = validCount.toLocaleString('es-MX');
-      els.metricInvalid.textContent = invalidCount.toLocaleString('es-MX');
-    }
-
-    function renderRows(rows) {
-      if (state.error) {
-        els.tableBody.innerHTML = `
-          <tr>
-            <td colspan="11" class="empty-state">
-              <strong>No se pudieron cargar los folios.</strong>
-              <span>${escapeHtml(state.error)}</span>
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      if (!rows.length) {
-        const emptyCopy = ADMIN_VISUAL_ONLY
-          ? 'Todo esta listo visualmente. Los registros apareceran cuando se capture el primero.'
-          : state.records.length
-            ? 'No hay coincidencias con la busqueda o filtros actuales.'
-            : 'No hay boletos registrados en la BD todavia.';
-
-        els.tableBody.innerHTML = `
-          <tr>
-            <td colspan="11" class="empty-state">
-              <strong>Sin resultados</strong>
-              <span>${escapeHtml(emptyCopy)}</span>
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      els.tableBody.innerHTML = rows.map((row) => {
-        const rowId = row.id ?? 'Sin ID';
-        const participantName = row.nombre || 'Sin nombre';
-        const participantEmail = row.correo || 'Sin correo';
-        const participantPhone = row.telefono || 'Sin telefono';
-        const folio = row.folio ? escapeHtml(row.folio) : 'Sin folio';
-        const folioClass = row.folio ? 'folio-code' : 'folio-code empty';
-        const ticketType = row.tipo_entrada || 'Sin tipo';
-        const dbStatus = row.estatus || 'Sin estatus';
-        const validFrom = row.valido_desde ? formatDate(row.valido_desde, true) : 'Sin fecha';
-        const validUntil = row.valido_hasta ? formatDate(row.valido_hasta, true) : 'Sin fecha';
-        const createdAt = row.created_at ? formatDate(row.created_at, true) : 'Sin fecha';
-
-        return `
-          <tr>
-            <td data-label="ID" class="muted">${escapeHtml(String(rowId))}</td>
-            <td data-label="Nombre">${escapeHtml(participantName)}</td>
-            <td data-label="Correo" class="muted">${escapeHtml(participantEmail)}</td>
-            <td data-label="Telefono" class="muted">${escapeHtml(participantPhone)}</td>
-            <td data-label="Folio">
-              <span class="${folioClass}">${folio}</span>
-            </td>
-            <td data-label="Tipo de entrada" class="muted">${escapeHtml(ticketType)}</td>
-            <td data-label="Estatus BD" class="muted">${escapeHtml(dbStatus)}</td>
-            <td data-label="Status">
-              <span class="status-badge ${row._status.className}">${row._status.label}</span>
-            </td>
-            <td data-label="Valido desde" class="muted">${escapeHtml(validFrom)}</td>
-            <td data-label="Valido hasta" class="muted">${escapeHtml(validUntil)}</td>
-            <td data-label="Fecha de registro" class="muted">${escapeHtml(createdAt)}</td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function renderSummary(rows) {
-      const total = state.records.length;
-      const filtered = rows.length;
-      const hasSearch = Boolean(state.query.trim());
-      const hasFilter = state.filter !== 'all';
-
-      if (ADMIN_VISUAL_ONLY) {
-        els.resultsHint.textContent = 'Panel visual listo. Aun no se muestran registros.';
-        els.updatedAt.textContent = 'Esperando el primer registro';
-        return;
-      }
-
-      if (state.error) {
-        els.resultsHint.textContent = 'Error consultando la base de datos de boletos. Revisa conexion, permisos o sesion.';
-        els.updatedAt.textContent = 'Ultimo intento sin exito';
-        return;
-      }
-
-      if (!total && !hasSearch && !hasFilter) {
-        els.resultsHint.textContent = 'Esperando el primer boleto registrado en la BD.';
-        els.updatedAt.textContent = state.syncedAt
-          ? `Actualizado: ${dateTimeFormatter.format(state.syncedAt)}`
-          : 'Sin sincronizar';
-        return;
-      }
-
-      els.resultsHint.textContent = hasSearch || hasFilter
-        ? `Mostrando ${filtered} de ${total} boletos sincronizados.`
-        : `${filtered} boletos sincronizados desde la BD.`;
-
-      els.updatedAt.textContent = state.syncedAt
-        ? `Actualizado: ${dateTimeFormatter.format(state.syncedAt)}`
-        : 'Sin sincronizar';
-    }
-
-    function renderFilterState() {
-      els.filterButtons.forEach((button) => {
-        button.classList.toggle('active', button.dataset.filter === state.filter);
-      });
-    }
-
-    function render() {
-      const visibleRows = getVisibleRows();
-      renderFilterState();
-      renderMetrics(visibleRows);
-      renderSummary(visibleRows);
-      renderRows(visibleRows);
-    }
-
-    async function loadRecords(options = {}) {
-      if (!adminState.authorized) return;
-      if (state.loading) return;
-
-      const { silent = false } = options;
-
-      if (!silent) {
-        setLoading(true);
-        state.error = '';
-      }
-
-      if (ADMIN_VISUAL_ONLY) {
-        state.records = [];
-        state.syncedAt = null;
-        if (!silent) setLoading(false);
-        render();
-        return;
-      }
-
-      if (!silent) {
-        els.tableBody.innerHTML = `
-          <tr>
-            <td colspan="11" class="empty-state">
-              <strong>Cargando información...</strong>
-              <span>Se está consultando el backend de MySQL local.</span>
-            </td>
-          </tr>
-        `;
-      }
-
+    // Google Login Integrations
+    document.getElementById('btnGoogleAuth').addEventListener('click', async () => {
+      const messageEl = document.getElementById('adminAuthMessage');
+      messageEl.textContent = 'Abriendo modal seguro de Google Auth...';
+      
       try {
-        const res = await fetch('http://localhost:3000/api/admin/boletos', {
-          headers: obtenerHeadersAutorizacion()
-        });
-
-        if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.error || 'Error al consultar boletos.');
+        const user = await window.iniciarSesionConGoogle();
+        if (user) {
+          messageEl.className = 'admin-auth-message success';
+          messageEl.textContent = 'Acceso concedido. Sincronizando panel...';
+          // Reload view with session
+          initAuth();
         }
-
-        const data = await res.json();
-
-        state.records = normalizeTicketRecords(data || []);
-        state.syncedAt = new Date();
-        state.error = '';
       } catch (error) {
-        console.error('Error cargando boletos:', error);
-        if (!silent) {
-          state.records = [];
-          state.error = error?.message || 'No se pudo consultar los boletos.';
-        }
-      } finally {
-        if (!silent) setLoading(false);
-        render();
+        console.error(error);
+        messageEl.className = 'admin-auth-message error';
+        messageEl.textContent = error.message || 'Error al iniciar sesión con Google.';
       }
+    });
+
+    // Logging out
+    document.getElementById('btnLogoutAdmin').addEventListener('click', () => logoutFlow());
+    document.getElementById('btnDeniedLogout').addEventListener('click', () => logoutFlow());
+
+    async function logoutFlow() {
+      stopScanner();
+      try {
+        await window.cerrarSesion();
+      } catch (error) {
+        console.error(error);
+      }
+      localStorage.removeItem('much_google_user');
+      state.user = null;
+      state.roles = [];
+      state.isAdmin = false;
+      state.isTaquilla = false;
+      showAuthBarrier('Sesión institucional cerrada.');
     }
 
-    function bindEvents() {
-      if (adminState.eventsBound) return;
-      adminState.eventsBound = true;
+    document.getElementById('btnRefreshTop').addEventListener('click', () => loadTabContent());
 
-      els.adminLoginForm.addEventListener('submit', handleAdminLoginSubmit);
-      els.btnLogoutAdmin.addEventListener('click', () => logoutAdmin());
+    // Auto-turn off scanner if changing tab or window
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && scannerState.active) stopScanner();
+    });
+    window.addEventListener('beforeunload', () => {
+      if (scannerState.active) stopScanner();
+    });
 
-      els.searchInput.addEventListener('input', (event) => {
-        state.query = event.target.value;
-        render();
-      });
-
-      els.btnClear.addEventListener('click', () => {
-        state.query = '';
-        state.filter = 'all';
-        els.searchInput.value = '';
-        render();
-      });
-
-      els.btnRefresh.addEventListener('click', () => loadRecords());
-      els.btnRefreshTop.addEventListener('click', () => loadRecords());
-
-      els.filterButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-          state.filter = button.dataset.filter;
-          render();
-        });
-      });
-
-      els.btnStartScanner.addEventListener('click', () => startScanner());
-      els.btnStopScanner.addEventListener('click', () => stopScanner());
-      els.btnValidateManual.addEventListener('click', () => validateTicket(els.manualTicketInput.value));
-      els.manualTicketInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-          event.preventDefault();
-          validateTicket(els.manualTicketInput.value);
-        }
-      });
-
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden && scannerState.active) {
-          stopScanner();
-        }
-      });
-
-      window.addEventListener('beforeunload', () => {
-        if (scannerState.active) {
-          stopScanner();
-        }
-      });
-    }
-
-    bindEvents();
-    initializeAdminAccess();
+    // Run Initializations
+    initAuth();
   </script>
 </body>
 

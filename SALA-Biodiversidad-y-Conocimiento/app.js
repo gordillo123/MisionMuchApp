@@ -116,24 +116,23 @@ async function guardarResultadoEstacionSupabase({ puntaje_total, num_correctas, 
     const progreso = await import('../supabase-utils.js');
     const estacionId = 3;
 
-    await progreso.guardarIntentoEstacion(estacionId, {
-      aciertos: num_correctas,
-      errores: Math.max(0, num_preguntas - num_correctas),
-      puntaje: puntaje_total,
-      aprobado
-    });
-
-    if (aprobado) {
-      await progreso.guardarProgresoUsuario(estacionId, {
-        metadata: {
-          estacion: 'biodiversidad',
-          puntaje_total,
-          num_correctas,
-          num_preguntas,
-          ubicacion: LUGAR_QR
-        }
+    const attemptId = sessionStorage.getItem('much_current_attempt_id');
+    if (!attemptId) {
+      await progreso.guardarIntentoEstacion(estacionId, {
+        aciertos: num_correctas,
+        errores: Math.max(0, num_preguntas - num_correctas),
+        puntaje: puntaje_total,
+        aprobado
       });
     }
+
+    // Pasar parámetros al primer nivel directamente
+    await progreso.guardarProgresoUsuario(estacionId, {
+      puntaje: puntaje_total,
+      aciertos: num_correctas,
+      errores: Math.max(0, num_preguntas - num_correctas),
+      aprobada: aprobado
+    });
   } catch (error) {
     console.error('[Supabase DB] No se pudo guardar biodiversidad:', error);
   }
@@ -223,57 +222,35 @@ async function loadPreguntas() {
 // ------------------------------------------------------------
 
 async function startQuizInDB() {
-  if (quizIniciando) return sessionStorage.getItem('much_current_quiz_id');
+  if (quizIniciando) return sessionStorage.getItem('much_current_attempt_id');
   quizIniciando = true;
 
   try {
-    await initSupabase();
+    const progreso = await import('../supabase-utils.js');
+    const estacionId = 3; // Biodiversidad
 
-    sessionStorage.removeItem('much_current_quiz_id');
+    sessionStorage.removeItem('much_current_attempt_id');
     sessionStorage.removeItem('much_quiz_final_data');
 
-    // 🌟 SE OBTIENE EL ID DEL USUARIO DESDE EL LOCALSTORAGE
-    const savedUser = JSON.parse(localStorage.getItem('much_google_user') || '{}');
-    const ID_JUGADOR = savedUser.email || 365;
+    // 1. Inicializar progreso de usuario en MySQL
+    await progreso.inicializarProgresoUsuario(estacionId);
 
-    // Insertar nuevo intento
-    const payload = {
-      sala_id: SALA_ENTRADA_ID,
-      participante_id: ID_JUGADOR,
-      started_at: getMexicoTime(),
-      num_preguntas: NUM_QUESTIONS,
-      puntaje_total: 0,
-      num_correctas: 0,
-      estatus: 'activo',
-      ubicacion: LUGAR_QR // 🌟 SE MANDA LA MEMORIA PERMANENTE
-    };
+    // 2. Registrar el intento inicial en intentos_estacion
+    const result = await progreso.guardarIntentoEstacion(estacionId, {
+      puntaje: 0,
+      aciertos: 0,
+      errores: 0,
+      aprobado: false
+    });
 
-    console.log("Guardando intento en BD...");
-    const { data, error } = await supabase
-      .from('quizzes')
-      .insert(payload)
-      .select('id')
-      .single();
+    console.log("✅ Intento iniciado en MySQL. ID Intento:", result.id_intento);
 
-    if (error) {
-      console.error("❌ Error Supabase (Start):", error.message);
-      quizIniciando = false;
-      startQuizLocal();
-      return null;
-    }
-
-    console.log("✅ Intento iniciado. ID:", data.id);
-
-    sessionStorage.setItem('much_current_quiz_id', data.id);
-    localStorage.setItem('much_quiz_db_id', String(data.id));
-    localStorage.setItem('much_quiz_last_quiz_id', String(data.id));
-
-    return data.id;
+    sessionStorage.setItem('much_current_attempt_id', result.id_intento);
+    return result.id_intento;
 
   } catch (e) {
-    console.error("Excepción al iniciar quiz:", e);
+    console.error("Excepción al iniciar quiz en MySQL:", e);
     quizIniciando = false;
-    startQuizLocal();
     return null;
   }
 }
@@ -282,24 +259,24 @@ async function endQuizInDB({ puntaje_total, num_correctas, num_preguntas }) {
   saveQuizResultLocal({ puntaje_total, num_correctas, num_preguntas });
 
   try {
-    await initSupabase();
-    const quizId = sessionStorage.getItem('much_current_quiz_id');
-    if (!quizId) return;
+    const progreso = await import('../supabase-utils.js');
+    const attemptId = sessionStorage.getItem('much_current_attempt_id');
+    if (!attemptId) return;
 
-    console.log(`🏁 Finalizando intento ${quizId}...`);
+    console.log(`🏁 Finalizando intento ${attemptId} en MySQL...`);
 
-    const { error } = await supabase.from('quizzes').update({
-      puntaje_total: puntaje_total,
-      num_correctas: num_correctas,
-      num_preguntas: num_preguntas,
-      finished_at: getMexicoTime(),
-      estatus: 'finalizado'
-    }).eq('id', quizId);
+    const isPassed = num_correctas >= 7;
 
-    if (error) console.error("Error al finalizar (DB):", error.message);
-    else console.log("✅ Intento actualizado en BD al finalizar.");
+    await progreso.actualizarIntentoEstacion(attemptId, {
+      puntaje: puntaje_total,
+      aciertos: num_correctas,
+      errores: Math.max(0, num_preguntas - num_correctas),
+      aprobado: isPassed
+    });
 
-  } catch (e) { console.warn('Error endQuizInDB:', e); }
+    console.log("✅ Intento actualizado en MySQL al finalizar.");
+
+  } catch (e) { console.warn('Error endQuizInDB en MySQL:', e); }
 }
 
 // Fallback Functions
@@ -564,6 +541,19 @@ class UIManager {
     s.answers.push({ qIndex: s.idx, question: q.text, choice: null, correct: false, timeout: true });
     this.updateScoreboard();
 
+    // Guardar respuesta en la base de datos en tiempo real (Timeout)
+    (async () => {
+      try {
+        const attemptId = sessionStorage.getItem('much_current_attempt_id');
+        if (attemptId) {
+          const progreso = await import('../supabase-utils.js');
+          await progreso.guardarRespuestaUsuario(attemptId, 3, q.text, "Tiempo agotado", false);
+        }
+      } catch (err) {
+        console.error("Error al guardar respuesta de timeout en tiempo real:", err);
+      }
+    })();
+
     if (e.questionTimer) e.questionTimer.textContent = '⏳ 0s';
     this.sound.wrong();
 
@@ -798,6 +788,19 @@ class UIManager {
     }
     s.answers.push({ qIndex: s.idx, question: q.text, choice: q.options[i], correct: i === correctIdx });
     this.updateScoreboard();
+
+    // Guardar respuesta en la base de datos en tiempo real
+    (async () => {
+      try {
+        const attemptId = sessionStorage.getItem('much_current_attempt_id');
+        if (attemptId) {
+          const progreso = await import('../supabase-utils.js');
+          await progreso.guardarRespuestaUsuario(attemptId, 3, q.text, q.options[i], i === correctIdx);
+        }
+      } catch (err) {
+        console.error("Error al guardar respuesta en tiempo real:", err);
+      }
+    })();
 
     // Auto-advance after 3 seconds (3000ms)
     setTimeout(() => {
