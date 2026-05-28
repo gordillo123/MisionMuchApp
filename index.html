@@ -2081,6 +2081,7 @@
         width: min(86vw, 300px);
         gap: 0.65rem;
         padding: 4.85rem 0.75rem 1rem;
+        z-index: 1005;
       }
 
       .nav-btn {
@@ -2158,6 +2159,7 @@
         width: min(82vw, 300px);
         gap: 0.68rem;
         padding: 4.6rem 0.85rem 1rem;
+        z-index: 1005;
       }
 
       .nav-btn {
@@ -8664,6 +8666,12 @@
       const hamburger = document.getElementById('hamburgerBtn');
       const navLinks = document.querySelector('.nav-links');
       const mobileBackdrop = document.getElementById('mobileNavBackdrop');
+      const topNav = document.querySelector('.top-nav');
+
+      // Mover el backdrop de navegación móvil dentro de .top-nav para evitar problemas de stacking context en iOS/Android
+      if (mobileBackdrop && topNav) {
+        topNav.appendChild(mobileBackdrop);
+      }
 
       document.addEventListener('pointerup', handleNavButtonEvent, true);
       document.addEventListener('touchend', handleNavButtonEvent, { passive: false, capture: true });
