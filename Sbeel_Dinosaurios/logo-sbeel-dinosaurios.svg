@@ -1,39 +1,147 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 210" role="img" aria-labelledby="title desc">
-  <title id="title">SBEEL Dinosaurios</title>
-  <desc id="desc">Logo estilizado de SBEEL Dinosaurios para la barra superior.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" width="100%" height="100%">
   <defs>
-    <linearGradient id="leafA" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0" stop-color="#b7d64a"/>
-      <stop offset="1" stop-color="#71ad3d"/>
+    <!-- Gradients for Leaves -->
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#aed54b" />
+      <stop offset="100%" stop-color="#558a2f" />
     </linearGradient>
-    <linearGradient id="stone" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0" stop-color="#c7c7c7"/>
-      <stop offset="0.55" stop-color="#8d8d8d"/>
-      <stop offset="1" stop-color="#5f5f5f"/>
+    
+    <!-- Stone Text Gradient (SBEEL) -->
+    <linearGradient id="stoneGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#b0b5b8" />
+      <stop offset="50%" stop-color="#73797c" />
+      <stop offset="100%" stop-color="#494d50" />
     </linearGradient>
-    <linearGradient id="gold" x1="0" x2="0" y1="0" y2="1">
-      <stop offset="0" stop-color="#f7d51b"/>
-      <stop offset="1" stop-color="#e29a13"/>
+    
+    <!-- Gold Text Gradient (DinosaurioS) -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffe240" />
+      <stop offset="35%" stop-color="#e5ad19" />
+      <stop offset="100%" stop-color="#9a6003" />
     </linearGradient>
-    <filter id="shadow" x="-12%" y="-24%" width="124%" height="150%">
-      <feDropShadow dx="0" dy="7" stdDeviation="0" flood-color="#3e2b12" flood-opacity="1"/>
-      <feDropShadow dx="0" dy="14" stdDeviation="0" flood-color="#2b1c0d" flood-opacity="0.78"/>
+    
+    <!-- Thick Bevel Shadow Filter -->
+    <filter id="bevelShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="0" flood-color="#3c220f" flood-opacity="1" />
+      <feDropShadow dx="0" dy="16" stdDeviation="4" flood-color="#1e0f05" flood-opacity="0.6" />
     </filter>
   </defs>
-  <rect width="620" height="210" rx="20" fill="#211a16"/>
-  <g opacity="0.95">
-    <path d="M158 92c-26-28-48-38-77-42 18 32 38 55 70 68 2-9 4-17 7-26z" fill="url(#leafA)"/>
-    <path d="M238 76c-4-34-20-55-42-76-19 29-29 62-17 96 17-10 36-16 59-20z" fill="url(#leafA)"/>
-    <path d="M385 77c6-34 22-54 45-76 16 33 23 65 10 96-16-11-34-17-55-20z" fill="url(#leafA)"/>
-    <path d="M465 116c27-26 56-33 88-30-22 29-47 47-85 50 0-7-1-14-3-20z" fill="url(#leafA)"/>
+
+  <!-- BACKGROUND LEAVES -->
+  <g id="leaves" opacity="0.95">
+    <!-- Far Left Leaf -->
+    <path d="M 280 260 C 200 240, 180 180, 210 130 C 260 125, 330 180, 350 220 C 330 240, 300 255, 280 260 Z" fill="url(#leafGrad)" stroke="#335c14" stroke-width="4"/>
+    <path d="M 210 130 C 250 160, 290 200, 350 220" stroke="#7cb342" stroke-width="3" fill="none"/>
+    <path d="M 250 180 C 235 175, 220 178, 220 178" stroke="#7cb342" stroke-width="2" fill="none"/>
+    <path d="M 285 200 C 275 195, 260 198, 260 198" stroke="#7cb342" stroke-width="2" fill="none"/>
+
+    <!-- Middle Left Leaf -->
+    <path d="M 390 280 C 330 200, 340 100, 390 60 C 440 90, 470 200, 450 280 Z" fill="url(#leafGrad)" stroke="#335c14" stroke-width="4"/>
+    <path d="M 390 60 C 395 120, 420 200, 450 280" stroke="#7cb342" stroke-width="4" fill="none"/>
+    <path d="M 392 100 C 370 120, 360 140, 360 140" stroke="#7cb342" stroke-width="2" fill="none"/>
+    <path d="M 395 150 C 375 170, 365 190, 365 190" stroke="#7cb342" stroke-width="2" fill="none"/>
+    <path d="M 405 110 C 425 125, 435 145, 435 145" stroke="#7cb342" stroke-width="2" fill="none"/>
+    <path d="M 415 160 C 435 175, 445 195, 445 195" stroke="#7cb342" stroke-width="2" fill="none"/>
+
+    <!-- Middle Right Leaf -->
+    <path d="M 610 280 C 560 200, 590 90, 640 60 C 690 100, 700 200, 640 280 Z" fill="url(#leafGrad)" stroke="#335c14" stroke-width="4"/>
+    <path d="M 640 60 C 635 120, 610 200, 610 280" stroke="#7cb342" stroke-width="4" fill="none"/>
+    <path d="M 638 100 C 660 120, 670 140, 670 140" stroke="#7cb342" stroke-width="2" fill="none"/>
+    <path d="M 635 150 C 655 170, 665 190, 665 190" stroke="#7cb342" stroke-width="2" fill="none"/>
+    <path d="M 625 110 C 605 125, 595 145, 595 145" stroke="#7cb342" stroke-width="2" fill="none"/>
+    <path d="M 615 160 C 595 175, 585 195, 585 195" stroke="#7cb342" stroke-width="2" fill="none"/>
+
+    <!-- Far Right Leaf -->
+    <path d="M 720 260 C 800 240, 820 180, 790 130 C 740 125, 670 180, 650 220 C 670 240, 700 255, 720 260 Z" fill="url(#leafGrad)" stroke="#335c14" stroke-width="4"/>
+    <path d="M 790 130 C 750 160, 710 200, 650 220" stroke="#7cb342" stroke-width="3" fill="none"/>
+    <path d="M 750 180 C 765 175, 780 178, 780 178" stroke="#7cb342" stroke-width="2" fill="none"/>
+    <path d="M 715 200 C 725 195, 740 198, 740 198" stroke="#7cb342" stroke-width="2" fill="none"/>
   </g>
-  <g text-anchor="middle" font-family="Arial Black, Impact, sans-serif" filter="url(#shadow)">
-    <text x="310" y="92" font-size="58" fill="url(#stone)" stroke="#4b351c" stroke-width="8" paint-order="stroke">SBEEL</text>
-    <text x="310" y="165" font-size="86" fill="url(#gold)" stroke="#5b3b17" stroke-width="10" paint-order="stroke">Dinosaurios</text>
+
+  <!-- MUCH SUB-LOGO AT THE TOP -->
+  <g id="much-header" transform="translate(372, 75)">
+    <!-- MUCH colorful characters -->
+    <!-- M (Pink/magenta) -->
+    <path d="M 12 35 C 12 18, 22 10, 32 10 C 40 10, 46 16, 50 22 C 54 16, 60 10, 68 10 C 78 10, 88 18, 88 35 L 88 48 C 88 51, 86 53, 83 53 C 80 53, 78 51, 78 48 L 78 35 C 78 24, 73 20, 68 20 C 63 20, 58 24, 58 35 L 58 45 C 58 48, 56 50, 53 50 C 50 50, 48 48, 48 45 L 48 35 C 48 24, 43 20, 38 20 C 33 20, 28 24, 28 35 L 28 48 C 28 51, 26 53, 23 53 C 20 53, 18 51, 18 48 Z" fill="#b32454" stroke="#ffffff" stroke-width="1.5"/>
+    <circle cx="33" cy="28" r="3" fill="#ffffff"/>
+    <circle cx="67" cy="28" r="3" fill="#ffffff"/>
+
+    <!-- U (Orange/yellow) -->
+    <path d="M 98 12 L 98 32 C 98 44, 108 52, 120 52 C 132 52, 142 44, 142 32 L 142 12 C 142 9, 140 7, 137 7 C 134 7, 132 9, 132 12 L 132 32 C 132 38, 127 42, 120 42 C 113 42, 108 38, 108 32 L 108 12 C 108 9, 106 7, 103 7 C 100 7, 98 9, 98 12 Z" fill="#e07d10" stroke="#ffffff" stroke-width="1.5"/>
+    <circle cx="112" cy="26" r="3" fill="#ffffff"/>
+    <circle cx="128" cy="26" r="3" fill="#ffffff"/>
+    <path d="M 116 34 Q 120 37 124 34" stroke="#ffffff" stroke-width="1.5" fill="none"/>
+
+    <!-- C (Green) -->
+    <path d="M 194 22 C 190 12, 178 7, 166 7 C 152 7, 142 17, 142 30 C 142 43, 152 53, 166 53 C 178 53, 190 48, 194 38 C 196 35, 194 32, 191 32 C 188 32, 186 34, 185 36 C 182 42, 175 45, 166 45 C 158 45, 152 39, 152 30 C 152 21, 158 15, 166 15 C 175 15, 182 18, 185 24 C 186 26, 188 28, 191 28 C 194 28, 196 25, 194 22 Z" fill="#71ad3c" stroke="#ffffff" stroke-width="1.5"/>
+    <circle cx="166" cy="22" r="3" fill="#ffffff"/>
+
+    <!-- H (Purple) -->
+    <path d="M 206 12 L 206 48 C 206 51, 208 53, 211 53 C 214 53, 216 51, 216 48 L 216 34 L 236 34 L 236 48 C 236 51, 238 53, 241 53 C 244 53, 246 51, 246 48 L 246 12 C 246 9, 244 7, 241 7 C 238 7, 236 9, 236 12 L 236 24 L 216 24 L 216 12 C 216 9, 214 7, 211 7 C 208 7, 206 9, 206 12 Z" fill="#693b8f" stroke="#ffffff" stroke-width="1.5"/>
+    <circle cx="216" cy="18" r="3" fill="#ffffff"/>
+    <circle cx="236" cy="18" r="3" fill="#ffffff"/>
+
+    <!-- Tagline: Museo Chiapas de Ciencia y Tecnología -->
+    <text x="128" y="68" font-family="'Fredoka', 'Arial Black', sans-serif" font-weight="900" font-size="11.5" fill="#ffffff" text-anchor="middle" letter-spacing="0.2">MUSEO CHIAPAS</text>
+    <text x="128" y="79" font-family="'Fredoka', 'Arial Black', sans-serif" font-weight="900" font-size="8.5" fill="#a4d14b" text-anchor="middle" letter-spacing="0.1">de Ciencia y Tecnología</text>
   </g>
-  <g font-family="Arial Black, Impact, sans-serif" text-anchor="middle">
-    <text x="310" y="50" font-size="22" fill="#b94f70">MUCH</text>
-    <text x="310" y="69" font-size="14" fill="#f4f0e9">Museo Chiapas</text>
-    <text x="310" y="84" font-size="13" fill="#9bd6d4">de Ciencia y Tecnología</text>
+
+  <!-- MAIN SBEEL STONE TEXT -->
+  <g id="sbeel-text" filter="url(#bevelShadow)" transform="translate(500, 245)">
+    <!-- Border/Outline for SBEEL -->
+    <text x="0" y="0" font-family="'Fredoka', 'Arial Black', Impact, sans-serif" font-weight="900" font-size="82" fill="none" stroke="#412411" stroke-width="24" stroke-linejoin="round" text-anchor="middle">SBEEL</text>
+    <!-- Bevel Border -->
+    <text x="0" y="0" font-family="'Fredoka', 'Arial Black', Impact, sans-serif" font-weight="900" font-size="82" fill="none" stroke="#60371a" stroke-width="14" stroke-linejoin="round" text-anchor="middle">SBEEL</text>
+    <!-- Main Stone Textured Text -->
+    <text x="0" y="0" font-family="'Fredoka', 'Arial Black', Impact, sans-serif" font-weight="900" font-size="82" fill="url(#stoneGrad)" text-anchor="middle" letter-spacing="2">SBEEL</text>
+    
+    <!-- Subtle cracks inside SBEEL stone text -->
+    <path d="M -90 -45 L -80 -30 L -85 -10" stroke="#2a2e30" stroke-width="2.5" fill="none" opacity="0.6"/>
+    <path d="M 50 -50 L 55 -35 L 45 -20 L 50 0" stroke="#2a2e30" stroke-width="2" fill="none" opacity="0.6"/>
+    <path d="M -5 -50 L -10 -35 L 2 -25" stroke="#2a2e30" stroke-width="2" fill="none" opacity="0.6"/>
   </g>
+
+  <!-- DINOSAURIOS WRAP TEXT -->
+  <g id="dinosaurios-text" filter="url(#bevelShadow)">
+    
+    <!-- Outer thick dark brown outline (Dinosaurios) -->
+    <g font-family="'Fredoka', 'Arial Black', Impact, sans-serif" font-weight="900" stroke="#3a1e0b" stroke-width="28" stroke-linejoin="round" stroke-linecap="round">
+      <!-- Huge D -->
+      <text x="65" y="380" font-size="220" text-anchor="start">D</text>
+      <!-- inosaurio -->
+      <text x="500" y="360" font-size="124" text-anchor="middle" letter-spacing="-3">inosaurio</text>
+      <!-- Huge S -->
+      <text x="935" y="380" font-size="220" text-anchor="end">S</text>
+    </g>
+
+    <!-- Bevel outline (Dinosaurios) -->
+    <g font-family="'Fredoka', 'Arial Black', Impact, sans-serif" font-weight="900" stroke="#5d3517" stroke-width="16" stroke-linejoin="round" stroke-linecap="round">
+      <!-- Huge D -->
+      <text x="65" y="380" font-size="220" text-anchor="start">D</text>
+      <!-- inosaurio -->
+      <text x="500" y="360" font-size="124" text-anchor="middle" letter-spacing="-3">inosaurio</text>
+      <!-- Huge S -->
+      <text x="935" y="380" font-size="220" text-anchor="end">S</text>
+    </g>
+
+    <!-- Main Gold Stone Text (Dinosaurios) -->
+    <g font-family="'Fredoka', 'Arial Black', Impact, sans-serif" font-weight="900" fill="url(#goldGrad)">
+      <!-- Huge D -->
+      <text x="65" y="380" font-size="220" text-anchor="start">D</text>
+      <!-- inosaurio -->
+      <text x="500" y="360" font-size="124" text-anchor="middle" letter-spacing="-3">inosaurio</text>
+      <!-- Huge S -->
+      <text x="935" y="380" font-size="220" text-anchor="end">S</text>
+    </g>
+
+    <!-- Cracked Stone Textures inside DinosaurioS -->
+    <!-- D cracks -->
+    <path d="M 120 220 L 140 240 L 130 265 M 200 320 L 180 340 L 190 360" stroke="#523202" stroke-width="3" fill="none" opacity="0.65"/>
+    <!-- S cracks -->
+    <path d="M 880 220 L 860 235 L 870 250 M 800 320 L 820 335 L 810 355" stroke="#523202" stroke-width="3" fill="none" opacity="0.65"/>
+    <!-- middle text cracks -->
+    <path d="M 280 310 L 290 325 L 285 340" stroke="#523202" stroke-width="2.5" fill="none" opacity="0.65"/>
+    <path d="M 440 290 L 445 310 M 520 330 L 515 350 M 690 300 L 700 320" stroke="#523202" stroke-width="2.5" fill="none" opacity="0.65"/>
+  </g>
+
 </svg>

@@ -12,7 +12,7 @@ window.APP_MODULES = {
       <span class="nav-brand-logos" aria-label="Logos institucionales">
         <img src="entrada-much/logo-much.png" alt="MUCH · Museo Chiapas" class="nav-brand-logo nav-brand-logo-much">
         <img src="entrada-much/logo-sata.png" alt="SATA" class="nav-brand-logo nav-brand-logo-sata">
-        <img src="Sbeel_Dinosaurios/logo-sbeel-dinosaurios.svg" alt="SBEEL Dinosaurios" class="nav-brand-logo nav-brand-logo-sbeel">
+        <img src="Sbeel_Dinosaurios/logo-sbeel-dinosaurios.png" alt="SBEEL Dinosaurios" class="nav-brand-logo nav-brand-logo-sbeel">
         <img src="assets/logo-planetario-tuxtla.svg" alt="Planetario Tuxtla" class="nav-brand-logo nav-brand-logo-planetario">
         <img src="Juego_Spinosaurio/logo-agencia.png" alt="Agencia Digital Tecnológica del Estado" class="nav-brand-logo nav-brand-logo-agencia">
       </span>
@@ -153,13 +153,15 @@ window.APP_MODULES = {
   </div>
 
     <div class="map-col">
-    <div class="card" style="height: 100%; display: flex; flex-direction: column;">
+    <div class="card" style="height: 100%; display: flex; flex-direction: column; align-items: center;">
+      <div class="prep-agency-container">
+        <img src="Juego_Spinosaurio/logo-agencia.png" alt="Agencia Digital Tecnológica del Estado" class="prep-agency-standalone">
+      </div>
       <div class="prep-logo-strip" aria-label="Logos institucionales">
         <img src="entrada-much/logo-much.png" alt="MUCH · Museo Chiapas" class="prep-logo-much">
         <img src="entrada-much/logo-sata.png" alt="SATA">
-        <img src="Sbeel_Dinosaurios/logo-sbeel-dinosaurios.svg" alt="SBEEL Dinosaurios" class="prep-logo-sbeel">
+        <img src="Sbeel_Dinosaurios/logo-sbeel-dinosaurios.png" alt="SBEEL Dinosaurios" class="prep-logo-sbeel">
         <img src="assets/logo-planetario-tuxtla.svg" alt="Planetario Tuxtla" class="prep-logo-planetario">
-        <img src="Juego_Spinosaurio/logo-agencia.png" alt="Agencia Digital Tecnológica del Estado" class="prep-logo-agencia">
       </div>
       <h2 class="section-title">¿En qué estación estás?</h2>
       <div class="museum-map" id="museumMap">
