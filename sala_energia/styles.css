@@ -142,12 +142,12 @@ body {
 }
 
 .logo-left {
-  height: 42px;
+  height: 56px;
 }
 
 /* Adjust sizing closer to ref */
 .logo-right {
-  height: 32px;
+  height: 22px;
 }
 
 .app-title {

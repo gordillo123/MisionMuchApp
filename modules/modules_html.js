@@ -159,7 +159,7 @@ window.APP_MODULES = {
         <img src="entrada-much/logo-sata.png" alt="SATA">
         <img src="Sbeel_Dinosaurios/logo-sbeel-dinosaurios.svg" alt="SBEEL Dinosaurios" class="prep-logo-sbeel">
         <img src="assets/logo-planetario-tuxtla.svg" alt="Planetario Tuxtla" class="prep-logo-planetario">
-        <img src="Juego_Spinosaurio/logo-agencia.png" alt="Agencia Digital Tecnológica del Estado">
+        <img src="Juego_Spinosaurio/logo-agencia.png" alt="Agencia Digital Tecnológica del Estado" class="prep-logo-agencia">
       </div>
       <h2 class="section-title">¿En qué estación estás?</h2>
       <div class="museum-map" id="museumMap">

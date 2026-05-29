@@ -6,7 +6,8 @@
   --quiz-card-padding-y: clamp(0.6rem, 1.6vh, 1rem);
   --quiz-section-gap: clamp(0.35rem, 1vh, 0.8rem);
   --quiz-option-gap: clamp(0.45rem, 1.15vh, 0.85rem);
-  --quiz-option-min-height: clamp(3.4rem, 8.1vh, 5.3rem);
+  --quiz-option-min-height: clamp(3.6rem, 8.8vh, 5.6rem);
+  --quiz-option-font: clamp(1.45rem, max(7vw, 2.8vh), 2.15rem);
   --quiz-content-max-width: min(900px, 100%);
 }
 
@@ -90,17 +91,20 @@ body {
 }
 
 .logo-header {
-  height: clamp(22px, 4.8vh, 48px);
-  max-width: 44%;
+  height: clamp(18px, 3.6vh, 36px);
+  max-width: 38%;
   object-fit: contain;
 }
 
-.logo-left {
-  height: clamp(22px, 4.3vh, 42px);
+.logo-left,
+.logo-header.logo-agencia {
+  height: clamp(44px, 10.5vh, 88px) !important;
+  max-width: min(72%, 460px) !important;
 }
 
 .logo-right {
-  height: clamp(18px, 3.3vh, 32px);
+  height: clamp(11px, 2vh, 18px) !important;
+  max-width: 28% !important;
 }
 
 .app-title {
@@ -242,17 +246,19 @@ body {
 
 .option-btn,
 #options .option-btn {
+  position: relative;
   width: 100% !important;
   flex: 1 1 auto;
   height: 100%;
   min-height: var(--quiz-option-min-height) !important;
-  padding: clamp(0.65rem, 1.5vh, 1rem) clamp(0.9rem, 2vw, 1.35rem) !important;
-  font-size: clamp(0.92rem, 2vw, 1.22rem) !important;
-  line-height: 1.15 !important;
-  justify-content: flex-start !important;
+  padding: clamp(0.8rem, 2vh, 1.2rem) clamp(1rem, 3.2vw, 1.65rem) !important;
+  font-size: var(--quiz-option-font) !important;
+  font-weight: 800 !important;
+  line-height: 1.18 !important;
+  justify-content: center !important;
   align-items: center !important;
-  text-align: left !important;
-  gap: clamp(0.45rem, 1vw, 0.9rem);
+  text-align: center !important;
+  gap: 0;
   border-radius: clamp(14px, 1.8vw, 20px);
   white-space: normal;
   overflow-wrap: anywhere;
@@ -261,20 +267,33 @@ body {
 .option-btn .emoji,
 #options .emoji,
 #options .option-btn .emoji {
-  width: clamp(20px, 3.2vw, 32px) !important;
-  height: clamp(20px, 3.2vw, 32px) !important;
-  font-size: clamp(0.62rem, 1.1vw, 0.95rem) !important;
+  position: absolute;
+  left: clamp(0.75rem, 2.4vw, 1.15rem);
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(22px, 3.6vw, 30px) !important;
+  height: clamp(22px, 3.6vw, 30px) !important;
+  font-size: clamp(0.65rem, 1.2vw, 0.85rem) !important;
   border-radius: clamp(5px, 0.7vw, 8px);
   flex-shrink: 0;
 }
 
 .option-btn span:not(.emoji),
 #options .option-btn span:not(.emoji) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
   min-width: 0;
-  flex: 1;
-  text-align: left !important;
-  justify-content: flex-start !important;
+  flex: 1 1 auto;
+  padding-inline: clamp(1.75rem, 8vw, 3rem);
+  font-size: var(--quiz-option-font) !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+  line-height: 1.12 !important;
   overflow-wrap: anywhere;
+  text-wrap: balance;
+  letter-spacing: 0.01em;
 }
 
 .status-msg {
@@ -370,10 +389,19 @@ body {
     font-size: clamp(0.8rem, 4.2vw, 1.05rem) !important;
   }
 
+  :root {
+    --quiz-option-font: clamp(1.42rem, max(7.8vw, 3vh), 2.05rem);
+  }
+
   .option-btn,
   #options .option-btn {
-    min-height: clamp(3.25rem, 8.6vh, 4.45rem) !important;
-    font-size: clamp(0.9rem, 3.8vw, 1.08rem) !important;
+    min-height: clamp(3.35rem, 8.8vh, 4.65rem) !important;
+    font-size: var(--quiz-option-font) !important;
+  }
+
+  .option-btn span:not(.emoji),
+  #options .option-btn span:not(.emoji) {
+    font-size: var(--quiz-option-font) !important;
   }
 
   .points-pill,
@@ -389,15 +417,16 @@ body {
   }
 
   .logo-header {
-    height: clamp(20px, 4vh, 32px);
+    height: clamp(16px, 3.2vh, 26px);
   }
 
-  .logo-left {
-    height: clamp(20px, 3.6vh, 30px);
+  .logo-left,
+  .logo-header.logo-agencia {
+    height: clamp(36px, 8vh, 68px) !important;
   }
 
   .logo-right {
-    height: clamp(16px, 3vh, 24px);
+    height: clamp(10px, 1.8vh, 16px) !important;
   }
 
   .question-text {
@@ -410,10 +439,15 @@ body {
     gap: clamp(0.35rem, 0.9vh, 0.6rem) !important;
   }
 
+  :root {
+    --quiz-option-font: clamp(1.28rem, max(6.8vw, 2.6vh), 1.82rem);
+  }
+
   .option-btn,
   #options .option-btn {
-    min-height: clamp(3rem, 7.6vh, 4.15rem) !important;
-    padding: clamp(0.52rem, 1.15vh, 0.78rem) clamp(0.8rem, 1.65vw, 1rem) !important;
+    min-height: clamp(3.1rem, 7.8vh, 4.25rem) !important;
+    padding: clamp(0.6rem, 1.35vh, 0.85rem) clamp(0.85rem, 2vw, 1.1rem) !important;
+    font-size: var(--quiz-option-font) !important;
   }
 }
 
@@ -469,11 +503,21 @@ body {
     font-size: 0.74rem !important;
   }
 
+  :root {
+    --quiz-option-font: clamp(1.18rem, max(6.2vw, 2.4vh), 1.62rem);
+  }
+
   .option-btn,
   #options .option-btn {
-    min-height: clamp(2.7rem, 6.9vh, 3.7rem) !important;
-    font-size: clamp(0.82rem, 3.35vw, 0.96rem) !important;
-    padding: 0.45rem 0.72rem !important;
+    min-height: clamp(2.85rem, 7.2vh, 3.85rem) !important;
+    font-size: var(--quiz-option-font) !important;
+    padding: 0.55rem 0.85rem !important;
+  }
+
+  .option-btn span:not(.emoji),
+  #options .option-btn span:not(.emoji) {
+    font-size: var(--quiz-option-font) !important;
+    padding-inline: clamp(1.5rem, 6.5vw, 2.2rem);
   }
 
   .btn-action {
@@ -486,4 +530,25 @@ body {
     padding: 0.38rem 0.6rem !important;
     font-size: 0.72rem !important;
   }
+}
+
+/* Lock: large centered answer text in all quiz stations */
+#options .option-btn,
+#options.options-list .option-btn,
+.options-list .option-btn,
+.option-btn {
+  font-size: var(--quiz-option-font) !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+  justify-content: center !important;
+}
+
+#options .option-btn span:not(.emoji),
+#options.options-list .option-btn span:not(.emoji),
+.options-list .option-btn span:not(.emoji),
+.option-btn span:not(.emoji) {
+  text-align: center !important;
+  justify-content: center !important;
+  font-size: var(--quiz-option-font) !important;
+  font-weight: 800 !important;
 }
