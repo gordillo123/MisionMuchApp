@@ -3585,6 +3585,46 @@
       font-family: 'Outfit', 'Inter', sans-serif;
     }
 
+    .modal-close {
+      position: absolute;
+      top: 1.25rem;
+      left: 1.25rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      line-height: 1;
+      padding: 0;
+      padding-bottom: 4px;
+      z-index: 100;
+      outline: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .modal-close:hover {
+      background: rgba(239, 68, 68, 0.85);
+      border-color: rgba(239, 68, 68, 0.9);
+      color: #ffffff;
+      transform: scale(1.1) rotate(90deg);
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.45);
+    }
+
+    .modal-close:active {
+      transform: scale(0.92) rotate(90deg);
+      background: rgba(239, 68, 68, 0.98);
+      box-shadow: 0 3px 8px rgba(239, 68, 68, 0.25);
+    }
+
     .profile-layout {
       display: grid;
       grid-template-columns: 240px 1fr;
