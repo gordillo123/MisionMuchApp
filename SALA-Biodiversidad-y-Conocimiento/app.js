@@ -29,11 +29,11 @@ class ProgressManager {
 
   saveProgress(currentQuestionIndex) {
     const safeIndex = Number.isInteger(currentQuestionIndex) && currentQuestionIndex >= 0 ? currentQuestionIndex : 0;
-    localStorage.setItem(this.storageKey, String(safeIndex));
+    sessionStorage.setItem(this.storageKey, String(safeIndex));
   }
 
   loadProgress() {
-    const raw = localStorage.getItem(this.storageKey);
+    const raw = sessionStorage.getItem(this.storageKey);
     if (raw === null) return null;
     const parsed = Number.parseInt(raw, 10);
     if (Number.isNaN(parsed) || parsed < 0) return null;
@@ -41,7 +41,7 @@ class ProgressManager {
   }
 
   resetProgress() {
-    localStorage.removeItem(this.storageKey);
+    sessionStorage.removeItem(this.storageKey);
   }
 }
 
@@ -400,6 +400,8 @@ class UIManager {
     this.clock();
     this.startFocusDetection();
     document.addEventListener('visibilitychange', () => this.handleVisibilityChange());
+    window.addEventListener('pagehide', () => this.handlePageHide());
+    window.addEventListener('beforeunload', () => this.handlePageHide());
   }
 
   goBackToMap() {
@@ -447,17 +449,32 @@ class UIManager {
 
   handleVisibilityChange() {
     if (document.hidden) {
-      // Ventana oculta: pausar temporizador
+      // Ventana oculta: reiniciar progreso de sesión inmediatamente
       if (this.questionTimer) {
         clearTimeout(this.questionTimer);
         this.questionTimer = null;
       }
-    } else {
-      // Ventana visible nuevamente: reanudar temporizador
-      if (this.state.idx < QUESTIONS.length && !this.state.locked) {
-        this.startQuestionTimer();
-      }
+      this.progressManager.resetProgress();
+      this.state = { idx: 0, selected: null, points: 0, correct: 0, locked: false, answers: [] };
+      this.currentQuestionDeadline = null;
+      this.questionCountdown = QUESTION_SECONDS;
+      if (this.e && this.e.status) this.e.status.textContent = '';
+      if (this.e && this.e.options) this.e.options.innerHTML = '';
+      if (this.e && this.e.qIndex) this.e.qIndex.textContent = '1';
+      if (this.e && this.e.pointsEl) this.e.pointsEl.textContent = '0';
+      if (this.e && this.e.correctCount) this.e.correctCount.textContent = '0';
+      if (this.e && this.e.questionTimer) this.e.questionTimer.textContent = `⏳ ${this.questionCountdown}s`;
+      setTimeout(() => window.location.reload(), 100);
+      return;
     }
+
+    if (this.state.idx < QUESTIONS.length && !this.state.locked) {
+      this.startQuestionTimer();
+    }
+  }
+
+  handlePageHide() {
+    this.progressManager.resetProgress();
   }
 
   updateQuestionTimerDisplay() {
