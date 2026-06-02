@@ -1166,61 +1166,7 @@
         max-width: none;
       }
 
-      /* Stack tables on small screens */
-      .table-wrap table,
-      .table-wrap thead,
-      .table-wrap tbody,
-      .table-wrap tr,
-      .table-wrap th,
-      .table-wrap td,
-      .responsive-table-stack table,
-      .responsive-table-stack thead,
-      .responsive-table-stack tbody,
-      .responsive-table-stack tr,
-      .responsive-table-stack th,
-      .responsive-table-stack td {
-        display: block;
-      }
 
-      .table-wrap thead,
-      .responsive-table-stack thead {
-        display: none;
-      }
-
-      .table-wrap tbody tr,
-      .responsive-table-stack tbody tr {
-        margin-bottom: 16px;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
-        overflow: hidden;
-      }
-
-      .table-wrap tbody td,
-      .responsive-table-stack tbody td {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 16px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        text-align: right;
-      }
-
-      .table-wrap tbody td::before,
-      .responsive-table-stack tbody td::before {
-        content: attr(data-label);
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: 0.72rem;
-        color: var(--text-dim);
-        float: left;
-        text-align: left;
-      }
-
-      .table-wrap tbody td:last-child,
-      .responsive-table-stack tbody td:last-child {
-        border-bottom: 0;
-      }
     }
   </style>
 </head>
@@ -1290,6 +1236,7 @@
 
       <div class="sidebar-footer">
         <span class="sync-indicator" id="syncStatusIndicator">Datos sincronizados</span>
+        <a class="btn btn-solid" href="./index.html?view=landing" style="justify-content: center;">🏠 Regresar al Inicio</a>
         <button class="btn btn-soft" id="btnLogoutAdmin" type="button">Cerrar sesión 🚪</button>
       </div>
     </aside>
@@ -1308,13 +1255,20 @@
         </div>
         <div class="topbar-actions">
           <button class="btn btn-soft" id="btnRefreshTop" type="button">🔄 Actualizar</button>
-          <a class="btn btn-soft" href="./index.html">← Mapa Principal</a>
+          <a class="btn btn-soft" href="./index.html?view=landing">🏠 Regresar al Inicio</a>
         </div>
       </header>
 
       <!-- VIEW PANELS populates here -->
       <div id="viewContainers">
         <!-- Views rendered dynamically in Javascript -->
+      </div>
+
+      <!-- Botón de regreso al inicio en el pie del panel -->
+      <div class="main-footer-actions" style="margin-top: auto; display: flex; justify-content: center; padding-top: 24px; border-top: 1px solid var(--border);">
+        <a class="btn btn-solid" href="./index.html?view=landing" style="padding: 12px 28px; font-size: 0.95rem;">
+          🏠 Regresar al Inicio
+        </a>
       </div>
     </main>
   </div>
@@ -1374,18 +1328,20 @@
       syncedAt: null,
       loading: false,
       expandedAttempts: new Set(),
-      selectedUserIdForRoles: null
+      selectedUserIdForRoles: null,
+      currentPage: 1,
+      pageSize: 10
     };
 
     const TABS_CONFIG = [
       { id: 'dashboard', name: 'Dashboard', icon: '📊', desc: 'Resumen global del estado del museo y métricas.', adminOnly: true },
       { id: 'usuarios', name: 'Usuarios', icon: '👥', desc: 'Listado completo de visitantes y control de accesos.', adminOnly: true },
-      { id: 'roles', name: 'Roles y Permisos', icon: '🔐', desc: 'Matriz de asignación de privilegios de usuario.', adminOnly: true },
+      // { id: 'roles', name: 'Roles y Permisos', icon: '🔐', desc: 'Matriz de asignación de privilegios de usuario.', adminOnly: true },
       { id: 'estaciones', name: 'Estaciones', icon: '🗺️', desc: 'Estado y configuración de las salas del museo.', adminOnly: true },
-      { id: 'preguntas', name: 'Preguntas y Trivia', icon: '❓', desc: 'Administración de preguntas por estación.', adminOnly: true },
-      { id: 'progreso', name: 'Progreso de Recorrido', icon: '📈', desc: 'Seguimiento del avance de los visitantes.', adminOnly: true },
+      // { id: 'preguntas', name: 'Preguntas y Trivia', icon: '❓', desc: 'Administración de preguntas por estación.', adminOnly: true },
+      // { id: 'progreso', name: 'Progreso de Recorrido', icon: '📈', desc: 'Seguimiento del avance de los visitantes.', adminOnly: true },
       { id: 'intentos', name: 'Intentos de Trivia', icon: '📝', desc: 'Respuestas enviadas por los usuarios en las trivias.', adminOnly: true },
-      { id: 'minijuegos', name: 'Minijuegos', icon: '🎮', desc: 'Registros de partidas del juego del dinosaurio.', adminOnly: true },
+      // { id: 'minijuegos', name: 'Minijuegos', icon: '🎮', desc: 'Registros de partidas del juego del dinosaurio.', adminOnly: true },
       { id: 'boletos', name: 'Boletos Ganados', icon: '🎟️', desc: 'Control de folios generados para los visitantes.', adminOnly: true },
       { id: 'movimientos', name: 'Movimientos de Boletos', icon: '🔄', desc: 'Log de auditoría específico para folios.', adminOnly: true },
       { id: 'taquilla', name: 'Taquilla y Escaneos', icon: '🔍', desc: 'Validación manual, escaneo de códigos QR e historial de lecturas.', adminOnly: false },
@@ -1397,7 +1353,8 @@
       active: false,
       lastPayload: '',
       lastFolio: '',
-      lastScanAt: 0
+      lastScanAt: 0,
+      isValidating: false
     };
 
     // Date formatting helpers
@@ -1527,6 +1484,7 @@
       }
 
       state.activeTab = tabId;
+      state.currentPage = 1; // Reset page number on tab switch
       renderSidebar();
 
       const config = TABS_CONFIG.find(t => t.id === tabId);
@@ -1572,7 +1530,11 @@
           const res = await fetch(`${API_BASE_URL}${endpoint}`, { headers: getHeaders() });
           if (!res.ok) throw new Error(`Error al cargar datos de ${state.activeTab}.`);
           state.records = await res.json();
-          renderActiveView();
+          if (state.activeTab === 'taquilla' && document.getElementById('ticketReader')) {
+            renderTaquillaLogsTable();
+          } else {
+            renderActiveView();
+          }
         }
 
         state.syncedAt = new Date();
@@ -1635,14 +1597,7 @@
             </div>
             <div class="metric-icon">🗺️</div>
           </div>
-          <div class="metric-card">
-            <div class="metric-card-info">
-              <span class="label">Total Preguntas</span>
-              <span class="value">${s.preguntas.toLocaleString()}</span>
-              <span class="hint">Trivia activa en base de datos</span>
-            </div>
-            <div class="metric-icon">❓</div>
-          </div>
+
           <div class="metric-card">
             <div class="metric-card-info">
               <span class="label">Boletos Generados</span>
@@ -1768,12 +1723,30 @@
             <button class="filter-chip ${filter === 'reprobado' ? 'active' : ''}" onclick="setTabFilter('reprobado')">Reprobados</button>
           </div>
         `;
+      } else if (state.activeTab === 'auditoria') {
+        placeholder = 'Buscar en logs de auditoría...';
+        filterHTML = `
+          <div class="filter-chips">
+            <button class="filter-chip ${filter === 'all' ? 'active' : ''}" onclick="setTabFilter('all')">Todos</button>
+            <button class="filter-chip ${filter === 'admin' ? 'active' : ''}" onclick="setTabFilter('admin')">Admin</button>
+            <button class="filter-chip ${filter === 'taquilla' ? 'active' : ''}" onclick="setTabFilter('taquilla')">Taquilla</button>
+            <button class="filter-chip ${filter === 'usuario' ? 'active' : ''}" onclick="setTabFilter('usuario')">Usuario</button>
+          </div>
+        `;
       } else if (state.activeTab === 'taquilla') {
         renderTaquillaView();
         return;
       }
 
       const filteredRecords = getFilteredRecords();
+      const totalRecords = filteredRecords.length;
+
+      let paginatedRecords = filteredRecords;
+      if (state.activeTab !== 'roles') {
+        const start = (state.currentPage - 1) * state.pageSize;
+        const end = start + state.pageSize;
+        paginatedRecords = filteredRecords.slice(start, end);
+      }
 
       container.innerHTML = `
         <div class="panel">
@@ -1786,14 +1759,45 @@
           </div>
 
           <div class="table-wrap responsive-table-stack">
-            ${renderSpecificTable(filteredRecords)}
+            ${renderSpecificTable(paginatedRecords)}
+          </div>
+
+          <div id="paginationControlsContainer">
+            ${renderPaginationControls(totalRecords)}
           </div>
         </div>
       `;
     }
 
+    function renderPaginationControls(totalRecords) {
+      if (totalRecords <= state.pageSize || state.activeTab === 'roles') {
+        return '';
+      }
+      const start = (state.currentPage - 1) * state.pageSize;
+      const end = start + state.pageSize;
+      const totalPages = Math.ceil(totalRecords / state.pageSize);
+      return `
+        <div class="pagination-controls" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-top: 1px solid var(--border);">
+          <span style="font-size: 0.88rem; color: var(--text-soft);">Mostrando ${start + 1} - ${Math.min(end, totalRecords)} de ${totalRecords} registros</span>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.82rem; cursor: pointer;" ${state.currentPage === 1 ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''} onclick="window.changePage(${state.currentPage - 1})">← Anterior</button>
+            <span style="font-size: 0.88rem; color: var(--text-main); font-weight: 700; align-self: center; padding: 0 8px;">Pág. ${state.currentPage} / ${totalPages}</span>
+            <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.82rem; cursor: pointer;" ${state.currentPage === totalPages ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''} onclick="window.changePage(${state.currentPage + 1})">Siguiente →</button>
+          </div>
+        </div>
+      `;
+    }
+
+    window.changePage = function(pageNum) {
+      state.currentPage = pageNum;
+      renderActiveView();
+    };
+
     function getFilteredRecords() {
       const records = state.records;
+      if (state.activeTab === 'roles') {
+        return records;
+      }
       const query = (state.queries[state.activeTab] || '').toLowerCase().trim();
       const filter = state.filters[state.activeTab] || 'all';
 
@@ -1817,6 +1821,10 @@
         } else if (state.activeTab === 'intentos') {
           if (filter === 'aprobado') matchesFilter = row.aprobado === 1;
           else if (filter === 'reprobado') matchesFilter = row.aprobado === 0;
+        } else if (state.activeTab === 'auditoria') {
+          if (filter === 'admin') matchesFilter = String(row.rol_accion || '').toLowerCase() === 'admin';
+          else if (filter === 'taquilla') matchesFilter = String(row.rol_accion || '').toLowerCase() === 'taquilla';
+          else if (filter === 'usuario') matchesFilter = String(row.rol_accion || '').toLowerCase() === 'usuario';
         }
 
         return matchesQuery && matchesFilter;
@@ -1825,6 +1833,7 @@
 
     function handleSearch(val) {
       state.queries[state.activeTab] = val;
+      state.currentPage = 1; // Reset to page 1 on search
       // Debounce render to keep typing smooth
       clearTimeout(state.searchTimeout);
       state.searchTimeout = setTimeout(() => {
@@ -1832,9 +1841,14 @@
           renderTaquillaLogsTable();
         } else {
           const filtered = getFilteredRecords();
+          const paginated = filtered.slice(0, state.pageSize);
           const tableWrap = document.querySelector('.table-wrap');
           if (tableWrap) {
-            tableWrap.innerHTML = renderSpecificTable(filtered);
+            tableWrap.innerHTML = renderSpecificTable(paginated);
+          }
+          const paginationContainer = document.getElementById('paginationControlsContainer');
+          if (paginationContainer) {
+            paginationContainer.innerHTML = renderPaginationControls(filtered.length);
           }
         }
       }, 150);
@@ -1842,6 +1856,7 @@
 
     function setTabFilter(val) {
       state.filters[state.activeTab] = val;
+      state.currentPage = 1; // Reset to page 1 on filter change
       renderActiveView();
     }
 
@@ -1891,7 +1906,15 @@
                         <span class="tag ${row.activo ? 'tag-success' : 'tag-danger'}">${row.activo ? 'Activo' : 'Baja'}</span>
                       </td>
                       <td data-label="Acciones">
-                        <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.8rem;" onclick="window.openRoleModal(${row.id_usuario}, '${escapeHtml(row.nombre)}', '${escapeHtml(row.roles)}')">🔐 Gestionar Roles</button>
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                          <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.78rem;" onclick="window.openRoleModal(${row.id_usuario}, '${escapeHtml(row.nombre)}', '${escapeHtml(row.roles)}')">🔐 Roles</button>
+                          ${row.activo ? `
+                            <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.78rem; border-color: rgba(234, 88, 12, 0.4); color: #ff9d6c; background: rgba(234, 88, 12, 0.1);" onclick="window.toggleActivoUsuario(${row.id_usuario}, '${escapeHtml(row.nombre)}', false)">🚫 Desactivar</button>
+                          ` : `
+                            <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.78rem; border-color: rgba(37, 99, 235, 0.4); color: #7cb3ff; background: rgba(37, 99, 235, 0.1);" onclick="window.toggleActivoUsuario(${row.id_usuario}, '${escapeHtml(row.nombre)}', true)">🔄 Activar</button>
+                          `}
+                          <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.78rem;" onclick="window.eliminarUsuario(${row.id_usuario}, '${escapeHtml(row.nombre)}')">🗑️ Quitar</button>
+                        </div>
                       </td>
                     </tr>
                   `;
@@ -2101,7 +2124,6 @@
             <table>
               <thead>
                 <tr>
-                  <th>Detalle</th>
                   <th>Usuario</th>
                   <th>Estación</th>
                   <th>Resultado</th>
@@ -2112,14 +2134,8 @@
               </thead>
               <tbody>
                 ${rows.map(row => {
-                  const isExpanded = state.expandedAttempts.has(row.id_intento);
                   return `
                     <tr>
-                      <td data-label="Detalle">
-                        <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.78rem;" onclick="window.toggleIntentoDetalle(${row.id_intento})">
-                          ${isExpanded ? '▼ Ocultar' : '▶ Ver Respuestas'}
-                        </button>
-                      </td>
                       <td data-label="Usuario">
                         <strong>${escapeHtml(row.nombre_usuario)}</strong><br>
                         <span style="font-size: 0.8rem; color: var(--text-dim);">${escapeHtml(row.correo_usuario)}</span>
@@ -2135,31 +2151,6 @@
                       </td>
                       <td data-label="Fecha Intento">${formatDate(row.fecha_intento, true)}</td>
                     </tr>
-                    ${isExpanded ? `
-                      <tr class="expandable-row-content">
-                        <td colspan="7">
-                          <ul class="expandable-details-list">
-                            ${row.respuestas.length === 0 ? `
-                              <li style="justify-content: center; font-style: italic;">No hay respuestas registradas en detalle para esta estación (tipo minijuego o rompecabezas).</li>
-                            ` : row.respuestas.map(r => {
-                              return `
-                                <li>
-                                  <div style="text-align: left;">
-                                    <strong>¿${escapeHtml(r.pregunta)}?</strong><br>
-                                    <span style="color: ${r.es_correcta ? 'var(--success)' : 'var(--danger)'}; font-weight: 700;">
-                                      Seleccionada: ${escapeHtml(r.texto_respuesta_seleccionada)} (${r.es_correcta ? 'Correcta' : 'Incorrecta'})
-                                    </span>
-                                  </div>
-                                  <div>
-                                    ${!r.es_correcta ? `<span style="font-size: 0.8rem; color: var(--text-dim);">Correcta era: <strong>${escapeHtml(r.texto_respuesta_correcta)}</strong></span>` : ''}
-                                  </div>
-                                </li>
-                              `;
-                            }).join('')}
-                          </ul>
-                        </td>
-                      </tr>
-                    ` : ''}
                   `;
                 }).join('')}
               </tbody>
@@ -2245,13 +2236,16 @@
                       <td data-label="Operador Canje">
                         <strong style="color: var(--accent);">${escapeHtml(row.nombre_canjeador || 'Sin canjear')}</strong>
                       </td>
-                      <td data-label="Acciones" style="display: flex; gap: 8px;">
+                      <td data-label="Acciones" style="display: flex; gap: 8px; flex-wrap: wrap;">
                         ${esVigente ? `
                           <button class="btn btn-solid" style="padding: 6px 12px; font-size: 0.76rem; background: #10b981;" onclick="window.canjearBoletoTab(${row.id_boleto}, '${escapeHtml(row.folio)}')">🎟️ Canjear</button>
                         ` : ''}
                         ${row.estado !== 'cancelado' ? `
-                          <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.76rem;" onclick="window.cancelarBoletoTab(${row.id_boleto}, '${escapeHtml(row.folio)}')">🚫 Cancelar</button>
-                        ` : ''}
+                          <button class="btn btn-solid" style="padding: 6px 12px; font-size: 0.76rem; background: #ea580c; color: white;" onclick="window.cancelarBoletoTab(${row.id_boleto}, '${escapeHtml(row.folio)}')">🚫 Desactivar</button>
+                        ` : `
+                          <button class="btn btn-solid" style="padding: 6px 12px; font-size: 0.76rem; background: #2563eb; color: white;" onclick="window.activarBoletoTab(${row.id_boleto}, '${escapeHtml(row.folio)}')">🔄 Activar</button>
+                        `}
+                        <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.76rem; background: #dc2626; color: white;" onclick="window.eliminarBoletoTab(${row.id_boleto}, '${escapeHtml(row.folio)}')">🗑️ Borrar</button>
                       </td>
                     </tr>
                   `;
@@ -2427,6 +2421,45 @@
       }
     });
 
+    // Usuarios Quick Actions
+    window.toggleActivoUsuario = async function(idUsuario, nombre, nuevoEstado) {
+      const accionStr = nuevoEstado ? 'ACTIVAR' : 'DESACTIVAR';
+      if (!confirm(`¿Estás seguro de que deseas ${accionStr} la cuenta de ${nombre}?`)) return;
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/admin/usuarios/${idUsuario}/toggle-activo`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify({ activo: nuevoEstado })
+        });
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || 'No se pudo cambiar el estado del usuario.');
+        }
+        alert(`Usuario ${nuevoEstado ? 'activado' : 'desactivado'} correctamente.`);
+        loadTabContent();
+      } catch (error) {
+        alert(error.message);
+      }
+    };
+
+    window.eliminarUsuario = async function(idUsuario, nombre) {
+      if (!confirm(`⚠️ ¡ATENCIÓN! ¿Estás seguro de que deseas ELIMINAR permanentemente la cuenta de ${nombre}? Esta acción no se puede deshacer y borrará todo su progreso, intentos de trivias, boletos e historial.`)) return;
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/admin/usuarios/${idUsuario}`, {
+          method: 'DELETE',
+          headers: getHeaders()
+        });
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || 'No se pudo eliminar el usuario.');
+        }
+        alert('Usuario eliminado permanentemente.');
+        loadTabContent();
+      } catch (error) {
+        alert(error.message);
+      }
+    };
+
     // Boletos Quick Actions
     window.canjearBoletoTab = async function(idBoleto, folio) {
       if (!confirm(`¿Estás seguro de que deseas marcar como CANJEADO el boleto ${folio}?`)) return;
@@ -2445,15 +2478,46 @@
     };
 
     window.cancelarBoletoTab = async function(idBoleto, folio) {
-      if (!confirm(`¿Estás seguro de que deseas CANCELAR de forma permanente el boleto ${folio}? Esta acción no se puede deshacer.`)) return;
+      if (!confirm(`¿Estás seguro de que deseas DESACTIVAR el boleto ${folio}?`)) return;
       try {
         const res = await fetch(`${API_BASE_URL}/api/taquilla/boletos/${idBoleto}/cancelar`, {
           method: 'POST',
           headers: getHeaders(),
-          body: JSON.stringify({ observaciones: 'Cancelación desde tabla de administrador' })
+          body: JSON.stringify({ observaciones: 'Desactivación desde tabla de administrador' })
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'No se pudo cancelar el boleto.');
+        if (!res.ok) throw new Error(data.error || 'No se pudo desactivar el boleto.');
+        loadTabContent();
+      } catch (error) {
+        alert(error.message);
+      }
+    };
+
+    window.activarBoletoTab = async function(idBoleto, folio) {
+      if (!confirm(`¿Estás seguro de que deseas ACTIVAR el boleto ${folio}?`)) return;
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/admin/boletos/${idBoleto}/activar`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify({ observaciones: 'Activación desde tabla de administrador' })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'No se pudo activar el boleto.');
+        loadTabContent();
+      } catch (error) {
+        alert(error.message);
+      }
+    };
+
+    window.eliminarBoletoTab = async function(idBoleto, folio) {
+      if (!confirm(`¿Estás seguro de que deseas ELIMINAR permanentemente el boleto ${folio}? Esta acción borrará todo su historial y no se puede deshacer.`)) return;
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/admin/boletos/${idBoleto}`, {
+          method: 'DELETE',
+          headers: getHeaders()
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'No se pudo eliminar el boleto.');
         loadTabContent();
       } catch (error) {
         alert(error.message);
@@ -2552,10 +2616,10 @@
       document.getElementById('btnStopScan').addEventListener('click', () => stopScanner());
       document.getElementById('btnValidateManual').addEventListener('click', () => {
         const val = document.getElementById('manualTicketInput').value;
-        validateTicket(val);
+        validateTicket(val, true);
       });
       document.getElementById('manualTicketInput').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') validateTicket(e.target.value);
+        if (e.key === 'Enter') validateTicket(e.target.value, true);
       });
 
       renderTaquillaLogsTable();
@@ -2636,7 +2700,9 @@
       return raw.replace(/^folio[:\s-]*/i, '').toUpperCase().trim();
     }
 
-    async function validateTicket(rawValue) {
+    async function validateTicket(rawValue, isManual = false) {
+      if (scannerState.isValidating) return;
+
       const lookup = String(rawValue ?? '').trim();
       const folio = extractFolioFromScan(lookup);
       const lookupValue = folio || lookup;
@@ -2646,6 +2712,12 @@
         return;
       }
 
+      if (!isManual && scannerState.lastFolio === lookupValue) {
+        console.log('[SCANNER] El boleto ya se encuentra en pantalla. Ignorando escaneo duplicado.');
+        return;
+      }
+
+      scannerState.isValidating = true;
       setScannerFeedback(`Validando boleto: ${lookupValue}...`);
       
       const scanResultBody = document.getElementById('scanResultBody');
@@ -2677,25 +2749,55 @@
         }
 
         if (!ticketData) {
+          scannerState.lastFolio = lookupValue;
           setScannerFeedback(`El boleto ${lookupValue} no existe en la base de datos.`, 'error');
           renderScanResultCard(null, lookupValue, 'No se encontró coincidencia.');
           return;
         }
 
+        // Guardamos el folio validado para evitar escaneos duplicados por la cámara
+        scannerState.lastFolio = ticketData.folio || lookupValue;
+
         // Validate ticket status
-        const state = ticketData.estado || ticketData.estatus || 'invalido';
-        const isVigente = state.toLowerCase() === 'activo' || state.toLowerCase() === 'vigente';
-        const isCanjeado = state.toLowerCase() === 'canjeado' || ticketData.usado === 1;
+        let stateVal = ticketData.estado || ticketData.estatus || 'invalido';
+        let isVigente = stateVal.toLowerCase() === 'activo' || stateVal.toLowerCase() === 'vigente';
+        let isCanjeado = stateVal.toLowerCase() === 'canjeado' || ticketData.usado === 1;
+        let wasJustRedeemed = false;
 
         let outcome = 'valido';
         let feedbackMessage = `Boleto ${ticketData.folio} validado con éxito. Acceso Autorizado.`;
         let feedbackTone = 'success';
 
-        if (isCanjeado) {
+        // AUTOMATIC CANJE (Redeem immediately if active/vigente and not yet redeemed)
+        if (isVigente && !isCanjeado && stateVal.toLowerCase() !== 'cancelado') {
+          try {
+            const canjearRes = await fetch(`${API_BASE_URL}/api/taquilla/boletos/${ticketData.id_boleto}/canjear`, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({ observaciones: 'Canje automático al escanear QR en taquilla' })
+            });
+            if (canjearRes.ok) {
+              ticketData.estado = 'canjeado';
+              ticketData.usado = 1;
+              stateVal = 'canjeado';
+              isVigente = false;
+              isCanjeado = true;
+              wasJustRedeemed = true;
+              feedbackMessage = `Boleto ${ticketData.folio} validado y canjeado con éxito. Acceso Autorizado.`;
+            } else {
+              const errData = await canjearRes.json();
+              console.warn('[SCANNER] Falló canje automático:', errData.error);
+            }
+          } catch (eCanje) {
+            console.error('[SCANNER] Error en petición de canje automático:', eCanje);
+          }
+        }
+
+        if (isCanjeado && !wasJustRedeemed) {
           outcome = 'duplicado';
           feedbackMessage = `Boleto ${ticketData.folio} ya fue canjeado previamente. Acceso Rechazado.`;
           feedbackTone = 'error';
-        } else if (state.toLowerCase() === 'cancelado') {
+        } else if (stateVal.toLowerCase() === 'cancelado') {
           outcome = 'cancelado';
           feedbackMessage = `Boleto ${ticketData.folio} se encuentra cancelado. Acceso Rechazado.`;
           feedbackTone = 'error';
@@ -2713,7 +2815,7 @@
         });
 
         setScannerFeedback(feedbackMessage, feedbackTone);
-        renderScanResultCard(ticketData, lookupValue, feedbackMessage);
+        renderScanResultCard(ticketData, lookupValue, feedbackMessage, wasJustRedeemed);
         
         // Refresh logs table
         loadTabContent(true);
@@ -2721,10 +2823,12 @@
         console.error(error);
         setScannerFeedback('Error al consultar el boleto en el servidor local.', 'error');
         renderScanResultCard(null, lookupValue, 'Error de conexión.');
+      } finally {
+        scannerState.isValidating = false;
       }
     }
 
-    function renderScanResultCard(ticket, rawInput, feedback) {
+    function renderScanResultCard(ticket, rawInput, feedback, wasJustRedeemed = false) {
       const scanResultBody = document.getElementById('scanResultBody');
       const scanCheckedAt = document.getElementById('scanCheckedAt');
       
@@ -2751,7 +2855,10 @@
 
       let badgeClass = 'tag-success';
       let badgeLabel = 'Vigente - Autorizado';
-      if (isCanjeado) {
+      if (wasJustRedeemed) {
+        badgeClass = 'tag-success';
+        badgeLabel = 'Canjeado con Éxito - Autorizado';
+      } else if (isCanjeado) {
         badgeClass = 'tag-warning';
         badgeLabel = 'Canjeado - Rechazado';
       } else if (ticket.estado === 'cancelado') {
@@ -2760,7 +2867,7 @@
       }
 
       scanResultBody.innerHTML = `
-        <div class="scanner-details-card" style="border-color: ${isVigente ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}">
+        <div class="scanner-details-card" style="border-color: ${(isVigente || wasJustRedeemed) ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}">
           <div style="text-align: center; display: grid; gap: 8px;">
             <span class="tag ${badgeClass}">${badgeLabel}</span>
             <h4 style="margin: 6px 0 0; font-family: Fredoka, sans-serif; font-size: 1.25rem;">Premio Misión MUCH</h4>
@@ -2815,7 +2922,7 @@
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Error al canjear.');
         setScannerFeedback(`Boleto ${folio} canjeado correctamente.`, 'success');
-        validateTicket(folio);
+        validateTicket(folio, true);
       } catch (error) {
         alert(error.message);
       }
@@ -2832,7 +2939,7 @@
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Error al cancelar.');
         setScannerFeedback(`Boleto ${folio} cancelado con éxito.`, 'error');
-        validateTicket(folio);
+        validateTicket(folio, true);
       } catch (error) {
         alert(error.message);
       }

@@ -9394,6 +9394,12 @@
       // NUEVO: Lógica para manejar el regreso desde las estaciones y persistencia
       async function checkStatePersistence() {
         const savedStation = localStorage.getItem('much_current_station');
+        const urlParams = new URLSearchParams(window.location.search);
+
+        if (urlParams.get('view') === 'landing') {
+          showView('viewLanding');
+          return;
+        }
 
         if (restoreSavedAvatar()) {
           // Redirigir SIEMPRE al mapa interactivo de estaciones si hay una sesión activa

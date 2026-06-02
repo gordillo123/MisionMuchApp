@@ -251,6 +251,12 @@
       border: 2px solid #e2e8f0;
     }
 
+    .btn-download {
+      background: linear-gradient(135deg, var(--turquesa), #0891b2);
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(6, 182, 212, 0.3);
+    }
+
     .btn-whatsapp {
       background: var(--whatsapp);
       color: #fff;
@@ -336,6 +342,7 @@
     </div>
 
     <div class="actions">
+      <button id="btnDownloadImage" class="btn btn-download">📥 Descargar Boleto (Imagen)</button>
       <button id="btnShareImage" class="btn btn-whatsapp">📤 Compartir Boleto (Imagen)</button>
       <button class="btn btn-print" onclick="window.print()">🖨️ Imprimir</button>
       <a class="btn btn-link" href="../index.html">🏠 Inicio</a>
@@ -400,7 +407,7 @@
         container.innerHTML = '<span style="font-size:0.75rem;color:#94a3b8;">Código no disponible</span>';
       }
 
-      // 2. COMPARTIR IMAGEN (Lógica intacta)
+      // 2. COMPARTIR IMAGEN
       const btnShare = document.getElementById('btnShareImage');
       if (btnShare) {
         btnShare.addEventListener('click', async () => {
@@ -447,6 +454,46 @@
           } catch (err) {
             console.error(err); alert("Error al crear imagen.");
             btnShare.textContent = originalText; btnShare.disabled = false;
+          }
+        });
+      }
+
+      // 3. DESCARGAR IMAGEN DIRECTAMENTE
+      const btnDownload = document.getElementById('btnDownloadImage');
+      if (btnDownload) {
+        btnDownload.addEventListener('click', async () => {
+          const originalText = btnDownload.textContent;
+          btnDownload.textContent = 'Generando descarga... 📥';
+          btnDownload.disabled = true;
+          try {
+            const element = document.getElementById('boletoCaptura');
+
+            // ── Forzar ancho fijo para que la captura salga "cuadradita" ──
+            const origWidth = element.style.width;
+            const origMaxW = element.style.maxWidth;
+            element.style.width = '600px';
+            element.style.maxWidth = '600px';
+
+            const canvas = await html2canvas(element, {
+              scale: 3,
+              backgroundColor: '#ffffff',
+              useCORS: true,
+              windowWidth: 600
+            });
+
+            // ── Restaurar estilos originales ──
+            element.style.width = origWidth;
+            element.style.maxWidth = origMaxW;
+
+            canvas.toBlob((blob) => {
+              const fileName = `Boleto_MUCH_${folio || Date.now()}.png`;
+              downloadImage(blob, fileName);
+              btnDownload.textContent = '¡Descargado! 📥';
+              setTimeout(() => { btnDownload.textContent = originalText; btnDownload.disabled = false; }, 2000);
+            }, 'image/png');
+          } catch (err) {
+            console.error(err); alert("Error al descargar imagen.");
+            btnDownload.textContent = originalText; btnDownload.disabled = false;
           }
         });
       }

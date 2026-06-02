@@ -90,7 +90,7 @@
 
         // Lógica de validación (Semáforo)
         if (data.estado === 'canjeado' || data.usado) {
-          statusBox.textContent = '⚠️ YA USADO';
+          statusBox.textContent = 'YA USADO';
           statusBox.className = 'status used';
           details.innerHTML += `<p style="color:#f59e0b; font-weight:bold; margin-top:10px; border-top:1px solid #333; padding-top:10px">Este boleto ya fue validado antes.</p>`;
           btnCanjear.style.display = 'none';
@@ -108,17 +108,9 @@
           btnCanjear.style.display = 'none';
           
         } else {
-          statusBox.textContent = '✅ ACTIVO';
+          // CANJE AUTOMÁTICO AL CARGAR LA PÁGINA
+          statusBox.textContent = 'Cargando...';
           statusBox.className = 'status valid';
-          btnCanjear.style.display = 'block';
-        }
-
-        // Evento del botón de Validar Entrada
-        btnCanjear.onclick = async () => {
-          if (!confirm(`¿Confirmar acceso para ${data.nombre_usuario || 'Participante'}?`)) return;
-          
-          btnCanjear.disabled = true;
-          btnCanjear.textContent = "Registrando...";
           
           try {
             // Simulamos x-user-id como 1 (Administrador) para fines de validación rápida
@@ -128,7 +120,7 @@
                 'Content-Type': 'application/json',
                 'x-user-id': '1' // ID de administrador o taquilla por defecto para el log
               },
-              body: JSON.stringify({ observaciones: 'Canje automático vía validador rápido de entrada' })
+              body: JSON.stringify({ observaciones: 'Canje automático vía escaneo QR rápido' })
             });
 
             if (!updateRes.ok) {
@@ -136,14 +128,16 @@
               throw new Error(errData.error || 'Error de canje en el backend.');
             }
 
-            alert("¡Entrada validada con éxito!");
-            window.location.reload();
+            statusBox.textContent = '✅ VALIDADO';
+            statusBox.className = 'status valid';
+            details.innerHTML += `<p style="color:#22c55e; font-weight:bold; margin-top:10px; border-top:1px solid #333; padding-top:10px">¡Entrada canjeada con éxito!</p>`;
           } catch (err) {
-            alert("Error al validar entrada: " + err.message);
-            btnCanjear.disabled = false;
-            btnCanjear.textContent = "✅ VALIDAR ENTRADA";
+            statusBox.textContent = '❌ ERROR';
+            statusBox.className = 'status invalid';
+            details.innerHTML += `<p style="color:#ef4444; font-weight:bold; margin-top:10px;">Error al canjear: ${err.message}</p>`;
           }
-        };
+          btnCanjear.style.display = 'none';
+        }
 
       } catch (e) {
         loader.textContent = "Error de conexión local";
