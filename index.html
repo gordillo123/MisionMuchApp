@@ -1601,9 +1601,9 @@
     .map-marker {
       position: absolute;
       width: max-content;
-      min-width: 88px;
-      min-height: 68px;
-      padding: 0;
+      min-width: 94px;
+      min-height: 76px;
+      padding: 6px 8px 0;
       background: transparent;
       border: 0;
       border-radius: 0;
@@ -1612,6 +1612,7 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
+      overflow: visible;
       font-weight: 900;
       font-size: 1.2rem;
       color: var(--bg-deep);
@@ -1635,6 +1636,31 @@
       line-height: 1;
       flex-shrink: 0;
       transition: inherit;
+    }
+
+    .map-marker-check {
+      position: absolute;
+      top: -4px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1ed6a6 0%, #0da678 100%);
+      border: 3px solid rgba(255, 255, 255, 0.96);
+      box-shadow:
+        0 10px 18px rgba(0, 180, 135, 0.35),
+        0 0 0 3px rgba(26, 28, 44, 0.3);
+      color: #ffffff;
+      font-size: 0.95rem;
+      line-height: 1;
+      opacity: 0;
+      transform: scale(0.45);
+      transform-origin: center;
+      transition: opacity 0.24s ease, transform 0.24s ease;
+      pointer-events: none;
     }
 
     .map-marker-label {
@@ -1672,6 +1698,18 @@
       color: #ffffff !important;
       box-shadow: 0 0 15px rgba(0, 180, 135, 0.8) !important;
       animation: completePulse 2s infinite alternate;
+    }
+
+    .map-marker.completed .map-marker-check {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .map-marker.completed .map-marker-label {
+      border-color: rgba(0, 180, 135, 0.9);
+      box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.2),
+        0 0 0 3px rgba(0, 180, 135, 0.12);
     }
 
     @keyframes completePulse {
@@ -1942,8 +1980,8 @@
       }
 
       .map-marker {
-        min-width: 74px;
-        min-height: 58px;
+        min-width: 80px;
+        min-height: 64px;
         border-width: 3px;
         font-size: .9rem;
       }
@@ -1952,6 +1990,15 @@
         width: 32px;
         height: 32px;
         border-width: 3px;
+      }
+
+      .map-marker-check {
+        top: -2px;
+        right: 6px;
+        width: 24px;
+        height: 24px;
+        border-width: 2px;
+        font-size: 0.78rem;
       }
 
       .map-marker-label {
@@ -2269,8 +2316,8 @@
       }
 
       .map-marker {
-        min-width: 66px;
-        min-height: 52px;
+        min-width: 72px;
+        min-height: 58px;
         font-size: .8rem;
       }
 
@@ -2278,6 +2325,15 @@
         width: 28px;
         height: 28px;
         border-width: 3px;
+      }
+
+      .map-marker-check {
+        top: -2px;
+        right: 5px;
+        width: 21px;
+        height: 21px;
+        border-width: 2px;
+        font-size: 0.72rem;
       }
 
       .map-marker-label {
@@ -3927,20 +3983,27 @@
     }
 
     .station-row-card {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
       align-items: center;
+      gap: 0.85rem;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.06);
       padding: 0.75rem 1.1rem;
       border-radius: 16px;
-      transition: transform 0.2s, background 0.2s;
+      transition: transform 0.2s, background 0.2s, border-color 0.2s;
     }
 
     .station-row-card:hover {
       transform: translateX(4px);
       background: rgba(255, 255, 255, 0.05);
       border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .station-row-card.completed {
+      background:
+        linear-gradient(135deg, rgba(12, 88, 71, 0.16), rgba(255, 255, 255, 0.04));
+      border-color: rgba(0, 180, 135, 0.28);
     }
 
     .station-row-card.pending {
@@ -3954,12 +4017,53 @@
       gap: 0.25rem;
       align-items: flex-start;
       text-align: left;
+      min-width: 0;
     }
 
     .station-name {
       font-size: 0.88rem;
       font-weight: 750;
       color: white;
+    }
+
+    .station-row-check-slot {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+      flex-shrink: 0;
+    }
+
+    .station-row-check {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1bd5a5 0%, #0da678 100%);
+      box-shadow: 0 8px 16px rgba(0, 180, 135, 0.26);
+      color: #ffffff;
+      font-size: 0.84rem;
+      font-weight: 900;
+      opacity: 0;
+      transform: scale(0.7);
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+
+    .station-row-card.completed .station-row-check-slot {
+      background: rgba(0, 180, 135, 0.14);
+      border-style: solid;
+      border-color: rgba(110, 255, 214, 0.28);
+    }
+
+    .station-row-card.completed .station-row-check {
+      opacity: 1;
+      transform: scale(1);
     }
 
     .station-points-pill {
@@ -3984,6 +4088,7 @@
       flex-direction: column;
       align-items: flex-end;
       gap: 0.1rem;
+      min-width: 64px;
     }
 
     .score-badge-val {
@@ -3999,6 +4104,29 @@
     .score-badge-lbl {
       font-size: 0.65rem;
       color: #A0A4B8;
+    }
+
+    @media (max-width: 640px) {
+      .station-row-card {
+        grid-template-columns: minmax(0, 1fr) 30px auto;
+        gap: 0.6rem;
+        padding: 0.7rem 0.85rem;
+      }
+
+      .station-row-check-slot {
+        width: 30px;
+        height: 30px;
+      }
+
+      .station-row-check {
+        width: 22px;
+        height: 22px;
+        font-size: 0.78rem;
+      }
+
+      .score-badge-val {
+        font-size: 0.82rem;
+      }
     }
 
     /* HISTORIAL BOLETOS */
@@ -7549,6 +7677,24 @@
         }
       }
 
+      function buildStationProgressCard({ stationName, pointsBase, completed, detail, isSpino }) {
+        return `
+          <div class="station-row-card ${completed ? 'completed' : 'pending'}">
+            <div class="station-info">
+              <span class="station-name">${stationName}</span>
+              <span class="station-points-pill ${isSpino ? 'espinosaurio' : ''}">${pointsBase} pts</span>
+            </div>
+            <div class="station-row-check-slot" aria-hidden="true">
+              <span class="station-row-check">&#10003;</span>
+            </div>
+            <div class="station-score-badge">
+              <span class="score-badge-val ${completed ? '' : 'pending'}">${completed ? `+${pointsBase}` : '0'}</span>
+              <span class="score-badge-lbl">${detail}</span>
+            </div>
+          </div>
+        `;
+      }
+
       async function openProfile() {
         if (!googleUser && !selectedAvatar) {
           startGameFlow();
@@ -7624,18 +7770,13 @@
               firstPending = true;
             }
 
-            gridHtml += `
-              <div class="station-row-card ${completada ? '' : 'pending'}">
-                <div class="station-info">
-                  <span class="station-name">${est.nombre}</span>
-                  <span class="station-points-pill ${est.id === 2 ? 'espinosaurio' : ''}">${est.puntos_base} pts</span>
-                </div>
-                <div class="station-score-badge">
-                  <span class="score-badge-val ${completada ? '' : 'pending'}">${completada ? `+${est.puntos_base}` : '0'}</span>
-                  <span class="score-badge-lbl">${completada ? 'Completado' : 'Pendiente'}</span>
-                </div>
-              </div>
-            `;
+            gridHtml += buildStationProgressCard({
+              stationName: est.nombre,
+              pointsBase: est.puntos_base,
+              completed: completada,
+              detail: completada ? 'Completado' : 'Pendiente',
+              isSpino: est.id === 2
+            });
           });
 
           const totalEst = estaciones.length;
@@ -7704,18 +7845,13 @@
             // Estaciones Grid
             let stationsHtml = '';
             pts.estaciones.forEach(est => {
-              stationsHtml += `
-                <div class="station-row-card ${est.completada ? '' : 'pending'}">
-                  <div class="station-info">
-                    <span class="station-name">${est.nombre}</span>
-                    <span class="station-points-pill ${est.id_estacion === 2 ? 'espinosaurio' : ''}">${est.puntos_base} pts</span>
-                  </div>
-                  <div class="station-score-badge">
-                    <span class="score-badge-val ${est.completada ? '' : 'pending'}">${est.completada ? `+${est.puntos_base}` : '0'}</span>
-                    <span class="score-badge-lbl">${est.detalle}</span>
-                  </div>
-                </div>
-              `;
+              stationsHtml += buildStationProgressCard({
+                stationName: est.nombre,
+                pointsBase: est.puntos_base,
+                completed: Boolean(est.completada),
+                detail: est.detalle || (est.completada ? 'Completado' : 'Pendiente'),
+                isSpino: est.id_estacion === 2
+              });
             });
             if (stationsGridEl) stationsGridEl.innerHTML = stationsHtml;
 
@@ -8735,7 +8871,6 @@
           currentStation = freshSavedStation ? String(freshSavedStation) : '1';
           setTimeout(() => {
             moveToStation(currentStation);
-            window.MuchStationCompletion?.showPendingMapNotice();
           }, 500);
         } else {
           showView('viewLanding');
@@ -8799,7 +8934,13 @@
       function claimMissionReward() {
         const completed = getCompletedStations();
         if (!areAllRewardStationsCompleted(completed)) {
-          alert('Completa todas las estaciones para desbloquear tu boleto gratis.');
+          window.MuchStationCompletion?.showFloatingNotice({
+            badge: 'Mision en progreso',
+            title: 'Tu recompensa aun no esta lista',
+            body: 'Sigue explorando y completa todas las estaciones obligatorias para desbloquear tu boleto gratis y celebrar tu mision cientifica.',
+            detailLabel: 'Meta actual',
+            detailValue: 'Terminar el recorrido'
+          });
           return;
         }
 
@@ -8808,7 +8949,21 @@
         window.location.href = 'Boleto_Digital/registro.html?sala=mision-much&premio=entrada-gratis';
       }
 
-      function updateCompletedStationsOnMap() {
+      function ensureMapMarkerCheckSlot(marker) {
+        if (!marker) return null;
+
+        let checkEl = marker.querySelector('.map-marker-check');
+        if (checkEl) return checkEl;
+
+        checkEl = document.createElement('span');
+        checkEl.className = 'map-marker-check';
+        checkEl.setAttribute('aria-hidden', 'true');
+        checkEl.innerHTML = '&#10003;';
+        marker.appendChild(checkEl);
+        return checkEl;
+      }
+
+      function updateCompletedStationsOnMapLegacy() {
         try {
           const completed = getCompletedStations();
           document.querySelectorAll('.map-marker').forEach(marker => {
@@ -8826,6 +8981,34 @@
               marker.classList.remove('completed');
               marker.innerHTML = stationId;
             }
+          });
+          updateRewardClaimUI(completed);
+        } catch (e) {
+          console.warn('Error rendering completed stations on map:', e);
+        }
+      }
+
+      function updateCompletedStationsOnMap() {
+        try {
+          const completed = getCompletedStations();
+          document.querySelectorAll('.map-marker').forEach(marker => {
+            const stationId = marker.dataset.station;
+            const numberEl = marker.querySelector('.map-marker-number');
+            const isCompleted = Boolean(completed[stationId]);
+
+            ensureMapMarkerCheckSlot(marker);
+            marker.classList.toggle('completed', isCompleted);
+
+            if (numberEl) {
+              numberEl.textContent = stationId;
+            }
+
+            marker.setAttribute(
+              'title',
+              isCompleted
+                ? `Estacion ${stationId} completada`
+                : `Estacion ${stationId} pendiente`
+            );
           });
           updateRewardClaimUI(completed);
         } catch (e) {
@@ -8939,13 +9122,25 @@
           return;
         }
 
-        alert('Coloca tu avatar en la estación correspondiente para entrar al juego.');
+        window.MuchStationCompletion?.showFloatingNotice({
+          badge: 'Aventura en espera',
+          title: 'Coloca tu avatar en la estacion correcta',
+          body: 'Tu avatar aun no esta en esta estacion. Muevelo al marcador indicado en el mapa y despues presiona comenzar para entrar a la aventura.',
+          detailLabel: 'Consejo',
+          detailValue: 'Busca el punto iluminado'
+        });
       }
 
       document.getElementById('btnComenzar').onclick = () => {
         const completed = getCompletedStations();
         if (completed[currentStation]) {
-          alert('¡Esta estación ya ha sido completada! Por favor, continúa con la siguiente.');
+          window.MuchStationCompletion?.showFloatingNotice({
+            badge: 'Estacion ya completada',
+            title: 'Excelente trabajo, explorador',
+            body: 'Esta estacion ya fue completada con exito. Continua con la siguiente aventura para seguir avanzando en tu mision cientifica.',
+            detailLabel: 'Siguiente paso',
+            detailValue: 'Avanza a otra estacion'
+          });
           return;
         }
 

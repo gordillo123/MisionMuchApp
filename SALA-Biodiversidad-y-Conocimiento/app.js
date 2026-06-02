@@ -724,13 +724,16 @@ class UIManager {
       e.finalTotal.textContent = QUESTIONS.length.toString();
 
       if (isPassed) {
-        const completionData = window.MuchStationCompletion?.renderInline(e.finalMsg, {
+        window.MuchStationCompletion?.renderInline(e.finalMsg, {
           stationId: '3',
-          nextStationId: '4'
-        });
-        window.MuchStationCompletion?.queueMapNotice({
-          stationId: '3',
-          nextStationId: '4'
+          nextStationId: '4',
+          onDismiss: () => {
+            e.giftRow.classList.remove('d-none');
+            if (e.nextStationBtn) {
+              e.nextStationBtn.textContent = 'Volver al mapa y continuar';
+              try { e.nextStationBtn.focus(); } catch (error) {}
+            }
+          }
         });
         e.finalTitle.classList.add('visually-hidden');
         e.giftRow.classList.add('d-none');
@@ -738,8 +741,6 @@ class UIManager {
         this.sound.victory();
         this.playCompletionSound();
         try { playBgMusic(); } catch (e) {}
-        this.startAutoTransition('Regresando al mapa para continuar en', 4, () => this.goBackToMap());
-
         // Avanzar avatar en el mapa
         localStorage.setItem('much_current_station', '4');
         let completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
@@ -747,15 +748,14 @@ class UIManager {
         localStorage.setItem('much_completed_stations', JSON.stringify(completed));
       } else {
         e.finalTitle.classList.remove('visually-hidden');
-        e.finalTitle.textContent = 'Buen intento 👀';
+        e.finalTitle.textContent = 'Sigue explorando ✨';
         window.MuchStationCompletion?.clearInline(
           e.finalMsg,
-          `Lograste un ${Math.round(s.correct / QUESTIONS.length * 100)}%. Necesitas al menos 70% de aciertos para completar la estación y avanzar.`
+          `Lograste un ${Math.round(s.correct / QUESTIONS.length * 100)}%. Aun no completas esta estacion, pero cada intento te acerca mas. Presiona "Intentar de nuevo" cuando quieras seguir explorando.`
         );
         e.giftRow.classList.add('d-none');
-        e.retryRow.classList.add('d-none');
+        e.retryRow.classList.remove('d-none');
         this.playIncorrectSound();
-        this.startAutoTransition('Preparando un nuevo intento en', 4, () => location.reload(), 'retry');
       }
       return;
     }

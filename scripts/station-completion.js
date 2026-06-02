@@ -8,6 +8,38 @@
     '5': 'Desarrollo Sustentable',
     '6': 'Sbeel Dinosaurios'
   };
+  var STATION_MESSAGES = {
+    '1': {
+      badge: 'Aventura iniciada',
+      title: 'Tu mision cientifica ya comenzo',
+      body: 'Excelente trabajo, explorador. Ya entraste al recorrido del MUCH y estas listo para descubrir estaciones, dinosaurios y nuevas aventuras.'
+    },
+    '2': {
+      badge: 'Estacion completada',
+      title: 'Excelente trabajo, explorador',
+      body: 'Has completado <strong>Espinosaurio</strong> y sigues avanzando en tu mision cientifica. Sigue aprendiendo y descubriendo nuevas aventuras.'
+    },
+    '3': {
+      badge: 'Estacion completada',
+      title: 'Excelente trabajo, explorador',
+      body: 'Has completado <strong>Biodiversidad y Conocimiento</strong> y tu aventura cientifica sigue creciendo. Cada respuesta te acerca a un nuevo descubrimiento.'
+    },
+    '4': {
+      badge: 'Estacion completada',
+      title: 'Excelente trabajo, explorador',
+      body: 'Has completado <strong>Sala de Energia</strong> y sigues iluminando tu mision cientifica. Continua explorando para descubrir mas sorpresas del museo.'
+    },
+    '5': {
+      badge: 'Estacion completada',
+      title: 'Excelente trabajo, explorador',
+      body: 'Has completado <strong>Desarrollo Sustentable</strong> y estas cada vez mas cerca de terminar tu aventura cientifica. Sigue aprendiendo con entusiasmo.'
+    },
+    '6': {
+      badge: 'Mision completada',
+      title: 'Excelente trabajo, explorador',
+      body: 'Has completado <strong>Sbeel Dinosaurios</strong> y cerraste tu mision cientifica con gran talento. Sigue celebrando todo lo que descubriste en el museo.'
+    }
+  };
 
   function getStationName(stationId, fallback) {
     var key = stationId == null ? '' : String(stationId);
@@ -17,7 +49,9 @@
   function buildPayload(options) {
     options = options || {};
 
+    var stationId = String(options.stationId || '');
     var stationName = getStationName(options.stationId, options.stationName);
+    var stationCopy = STATION_MESSAGES[stationId] || null;
     var nextStationName = options.nextStationId
       ? getStationName(options.nextStationId, options.nextStationName)
       : (options.nextStationName || '');
@@ -26,25 +60,27 @@
 
     if (isFinalStation) {
       payload = {
-        badge: 'Mision completada',
-        title: 'Tu aventura en el MUCH ya esta completa',
-        body: 'Completaste <strong>' + stationName + '</strong>. Cerraste todo el recorrido con exito y tu recompensa ya esta lista para reclamarse en el mapa.',
-        detailLabel: 'Premio desbloqueado',
-        detailValue: 'Listo para reclamarse',
-        ctaLabel: 'Volver al mapa y reclamar'
+        badge: (stationCopy && stationCopy.badge) || 'Mision completada',
+        title: (stationCopy && stationCopy.title) || 'Excelente trabajo, explorador',
+        body: (stationCopy && stationCopy.body) || ('Has completado <strong>' + stationName + '</strong> y cerraste tu mision cientifica con exito. Tu recompensa final ya esta lista para reclamarse.'),
+        detailLabel: 'Tu siguiente paso',
+        detailValue: 'Regresa al mapa para reclamar',
+        ctaLabel: 'Volver al mapa y reclamar',
+        dismissLabel: 'Cerrar mensaje'
       };
     } else {
       payload = {
-        badge: 'Estacion superada',
-        title: 'Lo lograste, tu aventura continua',
-        body: 'Completaste <strong>' + stationName + '</strong>. Tu avatar ya puede avanzar a <strong>' + nextStationName + '</strong>, asi que celebra este logro y sigue descubriendo el museo.',
-        detailLabel: 'Siguiente sala',
-        detailValue: nextStationName,
-        ctaLabel: 'Volver al mapa y continuar'
+        badge: (stationCopy && stationCopy.badge) || 'Estacion completada',
+        title: (stationCopy && stationCopy.title) || 'Excelente trabajo, explorador',
+        body: (stationCopy && stationCopy.body) || ('Has completado <strong>' + stationName + '</strong> y sigues avanzando en tu mision cientifica. Sigue aprendiendo y descubriendo nuevas aventuras.'),
+        detailLabel: 'Siguiente aventura',
+        detailValue: nextStationName || 'Continua explorando',
+        ctaLabel: 'Volver al mapa y continuar',
+        dismissLabel: 'Cerrar mensaje'
       };
     }
 
-    ['badge', 'title', 'body', 'detailLabel', 'detailValue', 'ctaLabel'].forEach(function (key) {
+    ['badge', 'title', 'body', 'detailLabel', 'detailValue', 'ctaLabel', 'dismissLabel'].forEach(function (key) {
       if (typeof options[key] === 'string' && options[key].trim() !== '') {
         payload[key] = options[key];
       }
@@ -53,11 +89,14 @@
     return payload;
   }
 
-  function buildCardHtml(payload) {
+  function buildCardHtml(payload, dismissible) {
     return [
-      '<div class="station-completion-card">',
+      '<div class="station-completion-card' + (dismissible ? ' station-completion-card--dismissible' : '') + '">',
+      dismissible
+        ? '<button type="button" class="station-completion-card__close" aria-label="' + payload.dismissLabel + '">&times;</button>'
+        : '',
       '<div class="station-completion-card__head">',
-      '<div class="station-completion-card__seal" aria-hidden="true">✓</div>',
+      '<div class="station-completion-card__seal" aria-hidden="true">&#10003;</div>',
       '<div class="station-completion-card__intro">',
       '<div class="station-completion-card__kicker">' + payload.badge + '</div>',
       '<h3 class="station-completion-card__title">' + payload.title + '</h3>',
@@ -72,11 +111,26 @@
     ].join('');
   }
 
+  function bindCloseAction(scope, payload, onClose) {
+    if (!scope || typeof onClose !== 'function') return;
+    var closeButton = scope.querySelector('.station-completion-card__close');
+    if (!closeButton) return;
+    closeButton.addEventListener('click', function () {
+      onClose(payload);
+    });
+  }
+
   function renderInline(target, options) {
     var payload = buildPayload(options);
     if (!target) return payload;
     target.classList.add('station-completion-host');
-    target.innerHTML = buildCardHtml(payload);
+    target.innerHTML = buildCardHtml(payload, true);
+    bindCloseAction(target, payload, function () {
+      clearInline(target);
+      if (options && typeof options.onDismiss === 'function') {
+        options.onDismiss(payload, target);
+      }
+    });
     return payload;
   }
 
@@ -90,11 +144,8 @@
   }
 
   function queueMapNotice(options) {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(buildPayload(options)));
-    } catch (error) {
-      console.warn('No se pudo guardar el aviso de estacion completada:', error);
-    }
+    clearPendingNotice();
+    return buildPayload(options);
   }
 
   function clearPendingNotice() {
@@ -102,18 +153,6 @@
       localStorage.removeItem(STORAGE_KEY);
     } catch (error) {
       console.warn('No se pudo limpiar el aviso pendiente:', error);
-    }
-  }
-
-  function readPendingNotice() {
-    try {
-      var raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return null;
-      localStorage.removeItem(STORAGE_KEY);
-      return JSON.parse(raw);
-    } catch (error) {
-      console.warn('No se pudo leer el aviso de estacion completada:', error);
-      return null;
     }
   }
 
@@ -128,37 +167,36 @@
   }
 
   function showPendingMapNotice() {
-    var payload = readPendingNotice();
-    if (!payload || !document.body) return;
+    clearPendingNotice();
+    return null;
+  }
 
+  function showFloatingNotice(options) {
+    if (!document.body) return null;
+
+    var payload = buildPayload(options);
     var activeNotice = document.querySelector('.station-map-toast');
     if (activeNotice) {
-      activeNotice.remove();
+      dismissMapNotice(activeNotice);
     }
 
     var toast = document.createElement('aside');
     toast.className = 'station-map-toast';
     toast.setAttribute('aria-live', 'polite');
-    toast.innerHTML = [
-      '<button type="button" class="station-map-toast__close" aria-label="Cerrar aviso">x</button>',
-      buildCardHtml(payload)
-    ].join('');
-
-    var closeButton = toast.querySelector('.station-map-toast__close');
-    if (closeButton) {
-      closeButton.addEventListener('click', function () {
-        dismissMapNotice(toast);
-      });
-    }
+    toast.innerHTML = buildCardHtml(payload, true);
+    bindCloseAction(toast, payload, function () {
+      dismissMapNotice(toast);
+      if (options && typeof options.onDismiss === 'function') {
+        options.onDismiss(payload, toast);
+      }
+    });
 
     document.body.appendChild(toast);
     window.requestAnimationFrame(function () {
       toast.classList.add('show');
     });
 
-    window.setTimeout(function () {
-      dismissMapNotice(toast);
-    }, 5200);
+    return payload;
   }
 
   window.MuchStationCompletion = {
@@ -167,6 +205,7 @@
     getStationName: getStationName,
     queueMapNotice: queueMapNotice,
     renderInline: renderInline,
+    showFloatingNotice: showFloatingNotice,
     showPendingMapNotice: showPendingMapNotice
   };
 })();

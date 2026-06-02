@@ -47,6 +47,24 @@ async function obtenerRolUsuario(idUsuario) {
   }
 }
 
+async function obtenerOCrearRolId(nombreRol, descripcion = '') {
+  const [[rolExistente]] = await pool.query(
+    'SELECT id_rol FROM roles WHERE nombre = ? LIMIT 1',
+    [nombreRol]
+  );
+
+  if (rolExistente?.id_rol) {
+    return rolExistente.id_rol;
+  }
+
+  const [insertResult] = await pool.query(
+    'INSERT INTO roles (nombre, descripcion) VALUES (?, ?)',
+    [nombreRol, descripcion]
+  );
+
+  return insertResult.insertId;
+}
+
 async function esAdmin(idUsuario) {
   const roles = await obtenerRolUsuario(idUsuario);
   return roles.includes('admin');
@@ -167,42 +185,67 @@ app.post('/api/auth/google', async (req, res) => {
     );
 
     if (rolesExistentes.length === 0) {
-      // Por defecto asignamos rol 'usuario' (id_rol = 1)
+      const usuarioRoleId = await obtenerOCrearRolId(
+        'usuario',
+        'Usuario regular que juega las estaciones del recorrido'
+      );
       await pool.query(
-        'INSERT INTO usuarios_roles (id_usuario, id_rol) VALUES (?, 1)',
-        [idUsuario]
+        'INSERT INTO usuarios_roles (id_usuario, id_rol) VALUES (?, ?)',
+        [idUsuario, usuarioRoleId]
       );
     }
 
     // Para cuentas especiales, auto-asignar rol admin si el correo es planetariotuxtla@gmail.com, muchtuxtla@gmail.com o luceroynn@gmail.com
     const correosEspeciales = ['planetariotuxtla@gmail.com', 'muchtuxtla@gmail.com', 'luceroynn@gmail.com'];
     if (correosEspeciales.includes(correo)) {
-      // Verificar si ya tiene el rol admin (id_rol = 2) y taquilla (id_rol = 3)
+      const adminRoleId = await obtenerOCrearRolId(
+        'admin',
+        'Administrador general del sistema con acceso completo a metricas y registros'
+      );
+      const taquillaRoleId = await obtenerOCrearRolId(
+        'taquilla',
+        'Operador de taquilla encargado de validar, escanear y canjear boletos'
+      );
+
+      // Verificar si ya tiene el rol admin y taquilla.
       const [adminRoleCheck] = await pool.query(
-        'SELECT 1 FROM usuarios_roles WHERE id_usuario = ? AND id_rol = 2',
-        [idUsuario]
+        'SELECT 1 FROM usuarios_roles WHERE id_usuario = ? AND id_rol = ?',
+        [idUsuario, adminRoleId]
       );
       if (adminRoleCheck.length === 0) {
-        await pool.query('INSERT INTO usuarios_roles (id_usuario, id_rol) VALUES (?, 2)', [idUsuario]);
+        await pool.query(
+          'INSERT INTO usuarios_roles (id_usuario, id_rol) VALUES (?, ?)',
+          [idUsuario, adminRoleId]
+        );
       }
       const [taquillaRoleCheck] = await pool.query(
-        'SELECT 1 FROM usuarios_roles WHERE id_usuario = ? AND id_rol = 3',
-        [idUsuario]
+        'SELECT 1 FROM usuarios_roles WHERE id_usuario = ? AND id_rol = ?',
+        [idUsuario, taquillaRoleId]
       );
       if (taquillaRoleCheck.length === 0) {
-        await pool.query('INSERT INTO usuarios_roles (id_usuario, id_rol) VALUES (?, 3)', [idUsuario]);
+        await pool.query(
+          'INSERT INTO usuarios_roles (id_usuario, id_rol) VALUES (?, ?)',
+          [idUsuario, taquillaRoleId]
+        );
       }
     }
 
     // Para operadores de taquilla especiales, auto-asignar rol taquilla
     const correosTaquilla = ['yadiran0514@gmail.com'];
     if (correosTaquilla.includes(correo)) {
+      const taquillaRoleId = await obtenerOCrearRolId(
+        'taquilla',
+        'Operador de taquilla encargado de validar, escanear y canjear boletos'
+      );
       const [taquillaRoleCheck] = await pool.query(
-        'SELECT 1 FROM usuarios_roles WHERE id_usuario = ? AND id_rol = 3',
-        [idUsuario]
+        'SELECT 1 FROM usuarios_roles WHERE id_usuario = ? AND id_rol = ?',
+        [idUsuario, taquillaRoleId]
       );
       if (taquillaRoleCheck.length === 0) {
-        await pool.query('INSERT INTO usuarios_roles (id_usuario, id_rol) VALUES (?, 3)', [idUsuario]);
+        await pool.query(
+          'INSERT INTO usuarios_roles (id_usuario, id_rol) VALUES (?, ?)',
+          [idUsuario, taquillaRoleId]
+        );
       }
     }
 

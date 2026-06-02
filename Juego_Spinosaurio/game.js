@@ -668,13 +668,23 @@ async function validarQuiz() {
   }
 
   if (Number(sel.value) === quizAnswerIndex) {
+    var btnNext = null;
+    try {
+      btnNext = document.getElementById('btnQuizNext');
+      if (btnNext) {
+        btnNext.style.display = 'none';
+      }
+    } catch (e) {}
+
     var completionData = window.MuchStationCompletion?.renderInline(msg, {
       stationId: '2',
-      nextStationId: '3'
-    });
-    window.MuchStationCompletion?.queueMapNotice({
-      stationId: '2',
-      nextStationId: '3'
+      nextStationId: '3',
+      onDismiss: function () {
+        if (!btnNext) return;
+        btnNext.textContent = completionData?.ctaLabel || 'Volver al mapa y continuar';
+        btnNext.style.display = 'inline-block';
+        try { btnNext.focus(); } catch (error) {}
+      }
     });
     msg.className = "quiz-msg ok station-completion-host";
     playVictoryMusic();
@@ -696,11 +706,7 @@ async function validarQuiz() {
     try { playBgMusic(); } catch (e) {}
 
     // Mostrar botón Siguiente para que el usuario avance cuando quiera
-    try {
-      const btnNext = document.getElementById('btnQuizNext');
-      btnNext.textContent = completionData?.ctaLabel || 'Volver al mapa y continuar';
-      btnNext.style.display = 'inline-block';
-    } catch (e) {}
+
     btnOk.style.display = "none";
   } else {
     window.MuchStationCompletion?.clearInline(msg, "Incorrecto. ¡Vuelve a jugar!");

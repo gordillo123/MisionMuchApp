@@ -1,0 +1,27 @@
+node:events:497
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at Function.listen (C:\ESTADIA\MisionMuchApp\node_modules\express\lib\application.js:635:24)
+    at Object.<anonymous> (C:\ESTADIA\MisionMuchApp\backend\server.js:1586:5)
+    at Module._compile (node:internal/modules/cjs/loader:1706:14)
+    at Object..js (node:internal/modules/cjs/loader:1839:10)
+    at Module.load (node:internal/modules/cjs/loader:1441:32)
+    at Function._load (node:internal/modules/cjs/loader:1263:12)
+    at TracingChanError al iniciar sesión con Google: Error: Cannot add or update a child row: a foreign key constraint fails (`mision_much`.`usuarios_roles`, CONSTRAINT `fk_ur_rol` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`) ON DELETE CASCADE)
+    at C:\ESTADIA\MisionMuchApp\backend\server.js:171:18
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+  code: 'ER_NO_REFERENCED_ROW_2',
+  errno: 1452,
+  sqlState: '23000',
+  sqlMessage: 'Cannot add or update a child row: a foreign key constraint fails (`mision_much`.`usuarios_roles`, CONSTRAINT `fk_ur_rol` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`) ON DELETE CASCADE)',
+  sql: 'INSERT INTO usuarios_roles (id_usuario, id_rol) VALUES (1, 1)'
+}
+Error inicializando progreso: Cannot add or update a child row: a foreign key constraint fails (`mision_much`.`progreso_usuario`, CONSTRAINT `fk_progreso_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE)
+Error inicializando progreso: Cannot add or update a child row: a foreign key constraint fails (`mision_much`.`progreso_usuario`, CONSTRAINT `fk_progreso_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE)
+Error registrando partida de minijuego: Cannot add or update a child row: a foreign key constraint fails (`mision_much`.`partidas_minijuego`, CONSTRAINT `fk_pm_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE)
+Error inicializando progreso: Cannot add or update a child row: a foreign key constraint fails (`mision_much`.`progreso_usuario`, CONSTRAINT `fk_progreso_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE)

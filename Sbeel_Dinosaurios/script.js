@@ -14,9 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModalBtn = document.getElementById('close-modal');
     const backBtn = document.getElementById('btn-back');
     let successMessageHost = null;
-    let successAutoNote = null;
-    let successAutoTimer = null;
-    let successAutoInterval = null;
 
     const size = 3; // 3x3
     const TIME_LIMIT_SECONDS = 120;
@@ -268,15 +265,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function showSuccess() {
         stopTimer();
-        if (successAutoTimer) {
-            clearTimeout(successAutoTimer);
-            successAutoTimer = null;
-        }
-        if (successAutoInterval) {
-            clearInterval(successAutoInterval);
-            successAutoInterval = null;
-        }
-
         const retryModalBtn = document.getElementById('retry-modal-btn');
         if (timeRemaining > 0) {
             solvedOnTime = true;
@@ -291,61 +279,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     successText.parentNode.insertBefore(successMessageHost, successText);
                 }
                 successText.style.display = 'none';
-                const completionData = window.MuchStationCompletion?.renderInline(successMessageHost, {
-                    stationId: '6',
-                    isFinalStation: true,
-                    badge: 'Estacion completada',
-                    title: 'Sbeel Dinosaurios completada',
-                    body: 'Completaste <strong>Sbeel Dinosaurios</strong>. Gracias por resolver el rompecabezas y demostrar tu mirada de explorador del pasado.',
-                    detailLabel: 'Logro',
-                    detailValue: 'Rompecabezas resuelto',
-                    ctaLabel: 'Volver al mapa'
-                });
-                window.MuchStationCompletion?.queueMapNotice({
-                    stationId: '6',
-                    isFinalStation: true,
-                    badge: 'Estacion completada',
-                    title: 'Sbeel Dinosaurios completada',
-                    body: 'Completaste <strong>Sbeel Dinosaurios</strong>. Gracias por resolver el rompecabezas y demostrar tu mirada de explorador del pasado.',
-                    detailLabel: 'Logro',
-                    detailValue: 'Rompecabezas resuelto',
-                    ctaLabel: 'Volver al mapa'
-                });
                 closeModalBtn.style.display = 'none';
                 if (retryModalBtn) retryModalBtn.style.display = 'none';
-                if (!successAutoNote) {
-                    successAutoNote = document.createElement('div');
-                    successAutoNote.className = 'station-auto-note';
-                    successMessageHost.parentNode.insertBefore(successAutoNote, closeModalBtn);
-                }
-
-                let remaining = 4;
-                const updateLabel = () => {
-                    successAutoNote.innerHTML = 'Volviendo al mapa en <strong>' + remaining + 's</strong>';
-                };
-
-                updateLabel();
-                successAutoInterval = setInterval(() => {
-                    remaining -= 1;
-                    if (remaining <= 0) {
-                        clearInterval(successAutoInterval);
-                        successAutoInterval = null;
-                        return;
+                window.MuchStationCompletion?.renderInline(successMessageHost, {
+                    stationId: '6',
+                    isFinalStation: true,
+                    onDismiss: () => {
+                        closeModalBtn.style.display = '';
+                        closeModalBtn.textContent = 'Volver al mapa y continuar';
+                        if (retryModalBtn) retryModalBtn.style.display = '';
+                        try { closeModalBtn.focus(); } catch (error) {}
                     }
-                    updateLabel();
-                }, 1000);
-
-                successAutoTimer = setTimeout(() => {
-                    window.location.href = '../index.html?view=prep';
-                }, 4000);
+                });
             }
         } else {
             if (successMessageHost) {
-                successMessageHost.innerHTML = '';
-            }
-            if (successAutoNote) {
-                successAutoNote.remove();
-                successAutoNote = null;
+                window.MuchStationCompletion?.clearInline(successMessageHost);
             }
             if (successHeading) {
                 successHeading.style.display = '';
@@ -423,8 +372,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 stopTimer();
                 timerBox.classList.add('time-end');
                 setTimeout(() => {
-                    alert('Se terminó el tiempo. El rompecabezas se reinicia para intentarlo de nuevo.');
-                    resetGame();
+                    window.MuchStationCompletion?.showFloatingNotice({
+                        stationId: '6',
+                        badge: 'Nuevo intento',
+                        title: 'Sigue explorando, vas muy bien',
+                        body: 'El tiempo se terminó esta vez, pero ya tienes otra oportunidad para completar el reto. Respira, observa con calma y vuelve a intentarlo.',
+                        nextStationName: 'Nuevo intento',
+                        detailLabel: 'Tu siguiente paso',
+                        detailValue: 'Cierra este mensaje para volver a intentarlo',
+                        onDismiss: () => {
+                            resetGame();
+                        }
+                    });
                 }, 100);
             }
         }, 1000);
