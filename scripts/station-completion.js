@@ -80,6 +80,9 @@
       };
     }
 
+    // estado de aprobación/paso: por defecto true, si options.passed === false entonces marcar como no completado
+    payload.passed = !(options && options.passed === false);
+
     ['badge', 'title', 'body', 'detailLabel', 'detailValue', 'ctaLabel', 'dismissLabel'].forEach(function (key) {
       if (typeof options[key] === 'string' && options[key].trim() !== '') {
         payload[key] = options[key];
@@ -90,13 +93,20 @@
   }
 
   function buildCardHtml(payload, dismissible) {
+    var sealClass = 'station-completion-card__seal';
+    var sealContent = '&#10003;';
+    if (payload && payload.passed === false) {
+      sealClass += ' station-completion-card__seal--fail';
+      sealContent = '&#10005;';
+    }
+
     return [
       '<div class="station-completion-card' + (dismissible ? ' station-completion-card--dismissible' : '') + '">',
       dismissible
         ? '<button type="button" class="station-completion-card__close" aria-label="' + payload.dismissLabel + '">&times;</button>'
         : '',
       '<div class="station-completion-card__head">',
-      '<div class="station-completion-card__seal" aria-hidden="true">&#10003;</div>',
+      '<div class="' + sealClass + '" aria-hidden="true">' + sealContent + '</div>',
       '<div class="station-completion-card__intro">',
       '<div class="station-completion-card__kicker">' + payload.badge + '</div>',
       '<h3 class="station-completion-card__title">' + payload.title + '</h3>',
@@ -106,6 +116,9 @@
       '<div class="station-completion-card__detail">',
       '<span class="station-completion-card__detail-label">' + payload.detailLabel + '</span>',
       '<strong class="station-completion-card__detail-value">' + payload.detailValue + '</strong>',
+      '</div>',
+      '<div class="station-completion-card__actions">',
+      '<button type="button" class="station-completion-cta">Regresar al mapa</button>',
       '</div>',
       '</div>'
     ].join('');
@@ -131,6 +144,24 @@
         options.onDismiss(payload, target);
       }
     });
+    // Bind CTA in inline mode
+    try {
+      var ctaElInline = target.querySelector('.station-completion-cta');
+      if (ctaElInline) {
+        ctaElInline.addEventListener('click', function () {
+          if (options && typeof options.onReturnToMap === 'function') {
+            options.onReturnToMap(payload, target);
+          } else if (typeof window.showView === 'function') {
+            window.showView('viewPrep');
+          } else {
+            window.dispatchEvent(new CustomEvent('much:returnToMap', { detail: payload }));
+          }
+          clearInline(target);
+        });
+      }
+    } catch (e) {
+      console.warn('Error binding inline CTA:', e);
+    }
     return payload;
   }
 
@@ -156,6 +187,7 @@
     }
   }
 
+
   function dismissMapNotice(node) {
     if (!node) return;
     node.classList.remove('show');
@@ -173,8 +205,8 @@
 
   function showFloatingNotice(options) {
     if (!document.body) return null;
-
     var payload = buildPayload(options);
+
     var activeNotice = document.querySelector('.station-map-toast');
     if (activeNotice) {
       dismissMapNotice(activeNotice);
@@ -190,6 +222,33 @@
         options.onDismiss(payload, toast);
       }
     });
+
+    // Bind CTA inside floating notice
+    try {
+      var ctaEl = toast.querySelector('.station-completion-cta');
+      if (ctaEl) {
+        ctaEl.addEventListener('click', function () {
+          if (options && typeof options.onReturnToMap === 'function') {
+            options.onReturnToMap(payload, toast);
+          } else if (typeof window.showView === 'function') {
+            window.showView('viewPrep');
+          } else {
+            window.dispatchEvent(new CustomEvent('much:returnToMap', { detail: payload }));
+            try {
+              var mapParams = new URLSearchParams(window.location.search);
+              mapParams.set('view', 'prep');
+              window.location.href = '../index.html?' + mapParams.toString();
+            } catch (e) {}
+          }
+          dismissMapNotice(toast);
+          if (options && typeof options.onDismiss === 'function') {
+            options.onDismiss(payload, toast);
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('Error binding CTA for station completion:', e);
+    }
 
     document.body.appendChild(toast);
     window.requestAnimationFrame(function () {

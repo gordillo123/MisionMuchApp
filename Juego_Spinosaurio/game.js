@@ -71,6 +71,15 @@ function markStationCompleted() {
   }
 }
 
+function isStationCompleted(stationId) {
+  try {
+    const completed = JSON.parse(localStorage.getItem(COMPLETED_STATIONS_KEY) || '{}');
+    return Boolean(completed[String(stationId)]);
+  } catch (e) {
+    return false;
+  }
+}
+
 // Background music control
 function ensureBgMusic() {
   try {
@@ -254,6 +263,15 @@ function Start() {
 
   document.getElementById("btnRetry").addEventListener("click", function () { location.reload(); });
   document.getElementById("btnQuizOk").addEventListener("click", validarQuiz);
+
+  var btnExit = document.getElementById("btnExitToMap");
+  if (btnExit) {
+    btnExit.addEventListener("click", function () {
+      const mapParams = new URLSearchParams(window.location.search);
+      mapParams.set('view', 'prep');
+      window.location.href = '../index.html?' + mapParams.toString();
+    });
+  }
 
   // Nuevo: botón 'Siguiente' que aparece después de responder
   try {
@@ -676,48 +694,64 @@ async function validarQuiz() {
       }
     } catch (e) {}
 
-    var completionData = window.MuchStationCompletion?.renderInline(msg, {
-      stationId: '2',
-      nextStationId: '3',
-      onDismiss: function () {
-        if (!btnNext) return;
-        btnNext.textContent = completionData?.ctaLabel || 'Volver al mapa y continuar';
-        btnNext.style.display = 'inline-block';
-        try { btnNext.focus(); } catch (error) {}
-      }
-    });
-    msg.className = "quiz-msg ok station-completion-host";
-    playVictoryMusic();
+    // Mostrar aviso flotante de estación completada y cerrar la pregunta
+    try {
+      window.MuchStationCompletion?.showFloatingNotice({
+        stationId: '2',
+        passed: true,
+        onReturnToMap: function () {
+          const mapParams = new URLSearchParams(window.location.search);
+          mapParams.set('view', 'prep');
+          window.location.href = '../index.html?' + mapParams.toString();
+        }
+      });
+    } catch (e) { console.warn('No se pudo mostrar aviso flotante:', e); }
 
-    navigatingToRegistro = true; 
+    playVictoryMusic();
+    navigatingToRegistro = true;
     quizVisible = false;
+    // Cerrar overlay de pregunta
+    try { document.getElementById('quizOverlay').classList.remove('show'); } catch (e) {}
+    document.body.classList.remove('quiz-mode');
 
     // Deshabilitar radio buttons para evitar cambios
     var inputs = document.querySelectorAll('input[name="q1"]');
     inputs.forEach(inp => inp.disabled = true);
 
-    // Marcar completado y avanzar avatar
-    markStationCompleted();
+    // Marcar completado y avanzar avatar, guardando solo una vez por estación
+    var alreadyCompleted = isStationCompleted(STATION_ID);
+    if (!alreadyCompleted) {
+      markStationCompleted();
+      await guardarSpinosaurioEnSupabase(Number(score), true);
+      await registrarQuizEnSupabase(Number(score));
+    }
     playCompletionSound();
     localStorage.setItem('much_current_station', '3');
-
-    await guardarSpinosaurioEnSupabase(Number(score), true);
-    await registrarQuizEnSupabase(Number(score));
     try { playBgMusic(); } catch (e) {}
-
-    // Mostrar botón Siguiente para que el usuario avance cuando quiera
-
-    btnOk.style.display = "none";
   } else {
-    window.MuchStationCompletion?.clearInline(msg, "Incorrecto. ¡Vuelve a jugar!");
+    // Mostrar aviso flotante de respuesta incorrecta y cerrar la pregunta
+    try {
+      window.MuchStationCompletion?.showFloatingNotice({
+        stationId: '2',
+        passed: false,
+        onReturnToMap: function () {
+          const mapParams = new URLSearchParams(window.location.search);
+          mapParams.set('view', 'prep');
+          window.location.href = '../index.html?' + mapParams.toString();
+        }
+      });
+    } catch (e) { console.warn('No se pudo mostrar aviso flotante:', e); }
     msg.className = "quiz-msg err";
     playIncorrectSound();
 
     var inputs = document.querySelectorAll('input[name="q1"]');
     inputs.forEach(inp => inp.disabled = true);
 
-    // Mostrar botón Siguiente incluso en incorrecto para permitir navegación/recarga
-    try { document.getElementById('btnQuizNext').style.display = 'none'; } catch (e) {}
+    // Cerrar overlay de pregunta
+    try { document.getElementById('quizOverlay').classList.remove('show'); } catch (e) {}
+    document.body.classList.remove('quiz-mode');
+
+    // Convertir el botón confirmar en 'Volver a jugar' en caso de que quieran intentarlo
     btnOk.textContent = "Volver a jugar";
   }
 }
