@@ -7625,6 +7625,557 @@
       }
     }
 
+    /* Estaciones con 6 reglas: mantenerlas completas en 2 columnas x 3 filas. */
+    @media (min-width: 521px) {
+      #rulesOverlay.spino-station-rules-mode .rules-content,
+      #rulesOverlay.sbeel-station-rules-mode .rules-content {
+        overflow: hidden;
+      }
+
+      #rulesOverlay.spino-station-rules-mode .rules-stage,
+      #rulesOverlay.sbeel-station-rules-mode .rules-stage {
+        display: block;
+        height: 100%;
+        min-height: 0;
+      }
+
+      #rulesOverlay.spino-station-rules-mode .rules-board,
+      #rulesOverlay.sbeel-station-rules-mode .rules-board {
+        height: 100%;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+        grid-auto-rows: minmax(0, 1fr);
+        align-content: stretch;
+        align-items: stretch;
+        overflow: hidden;
+      }
+
+      #rulesOverlay.spino-station-rules-mode .rules-board > .rule-card,
+      #rulesOverlay.sbeel-station-rules-mode .rules-board > .rule-card {
+        min-height: 0;
+        height: 100%;
+        padding: clamp(0.58rem, 0.9vw, 0.82rem);
+        overflow: hidden;
+      }
+
+      #rulesOverlay.spino-station-rules-mode .rule-card-head,
+      #rulesOverlay.sbeel-station-rules-mode .rule-card-head {
+        margin-bottom: 0.2rem;
+      }
+
+      #rulesOverlay.spino-station-rules-mode .rule-card-icon,
+      #rulesOverlay.sbeel-station-rules-mode .rule-card-icon {
+        width: clamp(32px, 3vw, 40px);
+        height: clamp(32px, 3vw, 40px);
+        font-size: clamp(0.9rem, 1.2vw, 1.08rem);
+      }
+
+      #rulesOverlay.spino-station-rules-mode .rule-card-title,
+      #rulesOverlay.sbeel-station-rules-mode .rule-card-title {
+        margin-bottom: 0.18rem;
+        font-size: clamp(0.86rem, 1vw, 1.02rem);
+        line-height: 1.12;
+      }
+
+      #rulesOverlay.spino-station-rules-mode .rule-card-copy,
+      #rulesOverlay.sbeel-station-rules-mode .rule-card-copy {
+        font-size: clamp(0.72rem, 0.82vw, 0.84rem);
+        line-height: 1.24;
+      }
+    }
+
+    /* Ajuste puntual para que el texto de cada regla quepa dentro de su cuadro en celular. */
+    @media (max-width: 520px) {
+      #rulesOverlay .rules-modal,
+      #rulesOverlay.start-rules-mode .rules-modal {
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        height: 100dvh;
+        max-height: 100dvh;
+        overflow: hidden;
+      }
+
+      #rulesOverlay .rules-header,
+      #rulesOverlay.start-rules-mode .rules-header {
+        padding:
+          max(3.55rem, calc(env(safe-area-inset-top) + 3.4rem))
+          max(3.1rem, env(safe-area-inset-right))
+          0.12rem
+          max(0.75rem, env(safe-area-inset-left));
+      }
+
+      #rulesOverlay .rules-chip,
+      #rulesOverlay.start-rules-mode .rules-chip,
+      #rulesOverlay .rules-header p,
+      #rulesOverlay.start-rules-mode .rules-header p {
+        display: none;
+      }
+
+      #rulesOverlay .rules-modal .modal-title,
+      #rulesOverlay.start-rules-mode .rules-modal .modal-title {
+        max-width: 12ch;
+        font-size: clamp(1.36rem, 6vw, 1.86rem);
+        line-height: 0.96;
+      }
+
+      #rulesOverlay .rules-footer,
+      #rulesOverlay.start-rules-mode .rules-footer {
+        padding:
+          0.26rem
+          max(0.65rem, env(safe-area-inset-right))
+          max(0.44rem, env(safe-area-inset-bottom))
+          max(0.65rem, env(safe-area-inset-left));
+      }
+
+      #rulesOverlay .rules-confirm,
+      #rulesOverlay.start-rules-mode .rules-confirm {
+        min-height: 0;
+        padding: 0.48rem 1rem;
+        font-size: 0.82rem;
+        box-shadow: 0 5px 0 #1f2937;
+      }
+
+      #rulesOverlay .rules-content,
+      #rulesOverlay.start-rules-mode .rules-content {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+        padding-block: 0.18rem 0.24rem;
+        padding-inline:
+          max(0.5rem, env(safe-area-inset-left))
+          max(0.5rem, env(safe-area-inset-right));
+      }
+
+      #rulesOverlay .rules-stage,
+      #rulesOverlay.start-rules-mode .rules-stage {
+        display: flex;
+        flex: 1 1 auto;
+        min-height: 0;
+        width: 100%;
+      }
+
+      #rulesOverlay .rules-board,
+      #rulesOverlay.start-rules-mode .rules-board,
+      #rulesOverlay.spino-station-rules-mode .rules-board,
+      #rulesOverlay.sbeel-station-rules-mode .rules-board,
+      #rulesOverlay.biodiversity-station-rules-mode .rules-board.biodiversity-rules-board,
+      #rulesOverlay.energy-station-rules-mode .rules-board.energy-rules-board,
+      #rulesOverlay.sustainable-station-rules-mode .rules-board.sustainable-rules-board {
+        --rules-grid-gap: 0.28rem;
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: 100%;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+        grid-auto-rows: minmax(0, 1fr);
+        align-content: stretch;
+        align-items: stretch;
+        height: 100%;
+        overflow-x: hidden;
+        overflow-y: hidden;
+        padding-right: 0;
+      }
+
+      #rulesOverlay .rules-board > .rule-card,
+      #rulesOverlay.start-rules-mode .rules-board > .rule-card,
+      #rulesOverlay.spino-station-rules-mode .rules-board > .rule-card,
+      #rulesOverlay.sbeel-station-rules-mode .rules-board > .rule-card,
+      #rulesOverlay.biodiversity-station-rules-mode .rules-board.biodiversity-rules-board > .rule-card,
+      #rulesOverlay.energy-station-rules-mode .rules-board.energy-rules-board > .rule-card,
+      #rulesOverlay.sustainable-station-rules-mode .rules-board.sustainable-rules-board > .rule-card {
+        min-height: 0;
+        height: 100%;
+        padding: 0.4rem 0.34rem 0.34rem;
+        gap: 0.04rem;
+        justify-content: flex-start;
+        align-self: stretch;
+        overflow: hidden;
+      }
+
+      #rulesOverlay.biodiversity-station-rules-mode .rule-card::before,
+      #rulesOverlay.energy-station-rules-mode .rule-card::before,
+      #rulesOverlay.sustainable-station-rules-mode .rule-card::before {
+        display: none;
+      }
+
+      #rulesOverlay .rule-card-head,
+      #rulesOverlay.start-rules-mode .rule-card-head {
+        margin-bottom: 0.08rem;
+      }
+
+      #rulesOverlay .rule-card-icon,
+      #rulesOverlay.start-rules-mode .rule-card-icon {
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
+        font-size: 0.78rem;
+        border-radius: 8px;
+      }
+
+      #rulesOverlay .rule-card-step,
+      #rulesOverlay.start-rules-mode .rule-card-step {
+        min-width: 22px;
+        padding: 0.1rem 0.24rem;
+        font-size: 0.46rem;
+        letter-spacing: 0.06em;
+      }
+
+      #rulesOverlay .rule-card-title,
+      #rulesOverlay.start-rules-mode .rule-card-title,
+      #rulesOverlay.spino-station-rules-mode .rule-card-title,
+      #rulesOverlay.sbeel-station-rules-mode .rule-card-title,
+      #rulesOverlay.biodiversity-station-rules-mode .rule-card-title,
+      #rulesOverlay.energy-station-rules-mode .rule-card-title,
+      #rulesOverlay.sustainable-station-rules-mode .rule-card-title {
+        margin-bottom: 0.08rem;
+        font-size: clamp(0.66rem, 2.5vw, 0.88rem);
+        line-height: 1.06;
+        overflow-wrap: anywhere;
+        text-wrap: auto;
+      }
+
+      #rulesOverlay .rule-card-copy,
+      #rulesOverlay.start-rules-mode .rule-card-copy,
+      #rulesOverlay.spino-station-rules-mode .rule-card-copy,
+      #rulesOverlay.sbeel-station-rules-mode .rule-card-copy,
+      #rulesOverlay.biodiversity-station-rules-mode .rule-card-copy,
+      #rulesOverlay.energy-station-rules-mode .rule-card-copy,
+      #rulesOverlay.sustainable-station-rules-mode .rule-card-copy {
+        font-size: clamp(0.5rem, 1.9vw, 0.72rem);
+        line-height: 1.13;
+        overflow-wrap: anywhere;
+      }
+    }
+
+    @media (max-width: 380px) {
+      #rulesOverlay .rules-modal .modal-title,
+      #rulesOverlay.start-rules-mode .rules-modal .modal-title {
+        font-size: clamp(1.3rem, 6vw, 1.7rem);
+      }
+
+      #rulesOverlay .rule-card-title,
+      #rulesOverlay.start-rules-mode .rule-card-title,
+      #rulesOverlay.spino-station-rules-mode .rule-card-title,
+      #rulesOverlay.sbeel-station-rules-mode .rule-card-title,
+      #rulesOverlay.biodiversity-station-rules-mode .rule-card-title,
+      #rulesOverlay.energy-station-rules-mode .rule-card-title,
+      #rulesOverlay.sustainable-station-rules-mode .rule-card-title {
+        font-size: clamp(0.58rem, 2.35vw, 0.72rem);
+      }
+
+      #rulesOverlay .rule-card-copy,
+      #rulesOverlay.start-rules-mode .rule-card-copy,
+      #rulesOverlay.spino-station-rules-mode .rule-card-copy,
+      #rulesOverlay.sbeel-station-rules-mode .rule-card-copy,
+      #rulesOverlay.biodiversity-station-rules-mode .rule-card-copy,
+      #rulesOverlay.energy-station-rules-mode .rule-card-copy,
+      #rulesOverlay.sustainable-station-rules-mode .rule-card-copy {
+        font-size: clamp(0.44rem, 1.78vw, 0.58rem);
+        line-height: 1.1;
+      }
+    }
+
+    @media (max-width: 280px) {
+      #rulesOverlay .rules-modal .modal-title,
+      #rulesOverlay.start-rules-mode .rules-modal .modal-title {
+        font-size: clamp(1rem, 5vw, 1.24rem);
+      }
+
+      #rulesOverlay .rules-board > .rule-card,
+      #rulesOverlay.start-rules-mode .rules-board > .rule-card,
+      #rulesOverlay.spino-station-rules-mode .rules-board > .rule-card,
+      #rulesOverlay.sbeel-station-rules-mode .rules-board > .rule-card,
+      #rulesOverlay.biodiversity-station-rules-mode .rules-board.biodiversity-rules-board > .rule-card,
+      #rulesOverlay.energy-station-rules-mode .rules-board.energy-rules-board > .rule-card,
+      #rulesOverlay.sustainable-station-rules-mode .rules-board.sustainable-rules-board > .rule-card {
+        padding: 0.24rem 0.2rem 0.2rem;
+      }
+
+      #rulesOverlay .rule-card-icon,
+      #rulesOverlay.start-rules-mode .rule-card-icon {
+        width: 22px;
+        height: 22px;
+        min-width: 22px;
+        font-size: 0.68rem;
+      }
+
+      #rulesOverlay .rule-card-step,
+      #rulesOverlay.start-rules-mode .rule-card-step {
+        min-width: 18px;
+        padding: 0.08rem 0.18rem;
+        font-size: 0.4rem;
+      }
+
+      #rulesOverlay .rule-card-title,
+      #rulesOverlay.start-rules-mode .rule-card-title,
+      #rulesOverlay.spino-station-rules-mode .rule-card-title,
+      #rulesOverlay.sbeel-station-rules-mode .rule-card-title,
+      #rulesOverlay.biodiversity-station-rules-mode .rule-card-title,
+      #rulesOverlay.energy-station-rules-mode .rule-card-title,
+      #rulesOverlay.sustainable-station-rules-mode .rule-card-title {
+        font-size: clamp(0.42rem, 1.8vw, 0.54rem);
+        line-height: 1.04;
+      }
+
+      #rulesOverlay .rule-card-copy,
+      #rulesOverlay.start-rules-mode .rule-card-copy,
+      #rulesOverlay.spino-station-rules-mode .rule-card-copy,
+      #rulesOverlay.sbeel-station-rules-mode .rule-card-copy,
+      #rulesOverlay.biodiversity-station-rules-mode .rule-card-copy,
+      #rulesOverlay.energy-station-rules-mode .rule-card-copy,
+      #rulesOverlay.sustainable-station-rules-mode .rule-card-copy {
+        font-size: clamp(0.32rem, 1.35vw, 0.42rem);
+        line-height: 1.06;
+      }
+    }
+
+    /* Mejora final: tarjetas mas legibles con scroll interno por descripcion. */
+    #rulesOverlay.avatar-overlay.open {
+      overflow: hidden;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-modal {
+      width: min(1120px, 96vw);
+      height: min(92dvh, 820px);
+      max-height: 92dvh;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-content {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+      padding: clamp(0.72rem, 1.2vw, 1rem) clamp(1rem, 2.2vw, 1.6rem) clamp(0.82rem, 1.3vw, 1.05rem);
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-stage {
+      display: flex;
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100%;
+      align-items: stretch;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-board {
+      --rules-grid-gap: clamp(0.72rem, 1.15vw, 1rem);
+      display: grid;
+      flex: 1 1 auto;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(3, minmax(0, 1fr));
+      grid-auto-rows: minmax(0, 1fr);
+      gap: var(--rules-grid-gap);
+      height: 100%;
+      min-height: 0;
+      align-content: stretch;
+      align-items: stretch;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-board > .rule-card {
+      min-width: 0;
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: clamp(0.18rem, 0.45vw, 0.34rem);
+      padding: clamp(0.86rem, 1.35vw, 1.12rem);
+      overflow: hidden;
+    }
+
+    #rulesOverlay.avatar-overlay.open.biodiversity-station-rules-mode .rule-card::before,
+    #rulesOverlay.avatar-overlay.open.energy-station-rules-mode .rule-card::before,
+    #rulesOverlay.avatar-overlay.open.sustainable-station-rules-mode .rule-card::before {
+      inset: auto 0 0 auto;
+      transform: translate(24%, 24%);
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-board > .rule-card:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+      width: calc((100% - var(--rules-grid-gap)) / 2);
+      max-width: 100%;
+      justify-self: center;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rule-card-head {
+      flex: 0 0 auto;
+      margin-bottom: clamp(0.2rem, 0.5vw, 0.36rem);
+    }
+
+    #rulesOverlay.avatar-overlay.open .rule-card-icon {
+      width: clamp(38px, 4.5vw, 50px);
+      height: clamp(38px, 4.5vw, 50px);
+      min-width: clamp(38px, 4.5vw, 50px);
+      font-size: clamp(1.02rem, 1.55vw, 1.35rem);
+    }
+
+    #rulesOverlay.avatar-overlay.open .rule-card-step {
+      min-width: clamp(34px, 4vw, 44px);
+      font-size: clamp(0.62rem, 0.9vw, 0.74rem);
+      padding: 0.2rem 0.46rem;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rule-card-title {
+      flex: 0 0 auto;
+      margin-bottom: clamp(0.12rem, 0.35vw, 0.24rem);
+      font-size: clamp(1rem, 1.35vw, 1.24rem);
+      line-height: 1.12;
+      overflow-wrap: anywhere;
+      text-wrap: balance;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rule-card-copy {
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: 100%;
+      padding-right: 0.18rem;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-gutter: stable;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(84, 73, 52, 0.38) transparent;
+      font-size: clamp(0.88rem, 1.08vw, 1.02rem);
+      line-height: 1.32;
+      overflow-wrap: anywhere;
+      text-wrap: pretty;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rule-card-copy::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rule-card-copy::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rule-card-copy::-webkit-scrollbar-thumb {
+      background: rgba(84, 73, 52, 0.28);
+      border-radius: 999px;
+    }
+
+    @media (max-width: 760px) {
+      #rulesOverlay.avatar-overlay.open {
+        padding: 0;
+        align-items: stretch;
+        justify-content: stretch;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rules-modal {
+        width: 100vw;
+        height: 100dvh;
+        max-height: 100dvh;
+        border-radius: 0;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rules-header {
+        padding:
+          max(3.55rem, calc(env(safe-area-inset-top) + 3.25rem))
+          max(3.15rem, env(safe-area-inset-right))
+          0.24rem
+          max(0.85rem, env(safe-area-inset-left));
+      }
+
+      #rulesOverlay.avatar-overlay.open .rules-chip,
+      #rulesOverlay.avatar-overlay.open .rules-header p {
+        display: none;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rules-modal .modal-title {
+        max-width: 13ch;
+        font-size: clamp(1.55rem, 6.4vw, 2.1rem);
+        line-height: 0.98;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rules-content {
+        padding:
+          0.26rem
+          max(0.62rem, env(safe-area-inset-right))
+          0.38rem
+          max(0.62rem, env(safe-area-inset-left));
+      }
+
+      #rulesOverlay.avatar-overlay.open .rules-board {
+        --rules-grid-gap: clamp(0.36rem, 1.35vw, 0.56rem);
+      }
+
+      #rulesOverlay.avatar-overlay.open .rules-board > .rule-card {
+        padding: clamp(0.48rem, 1.7vw, 0.72rem);
+        gap: clamp(0.08rem, 0.45vw, 0.18rem);
+      }
+
+      #rulesOverlay.avatar-overlay.open .rule-card-head {
+        margin-bottom: 0.1rem;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rule-card-icon {
+        width: clamp(28px, 8vw, 38px);
+        height: clamp(28px, 8vw, 38px);
+        min-width: clamp(28px, 8vw, 38px);
+        border-radius: 10px;
+        font-size: clamp(0.82rem, 2.9vw, 1.06rem);
+      }
+
+      #rulesOverlay.avatar-overlay.open .rule-card-step {
+        min-width: clamp(24px, 7vw, 34px);
+        padding: 0.12rem 0.3rem;
+        font-size: clamp(0.5rem, 1.9vw, 0.64rem);
+      }
+
+      #rulesOverlay.avatar-overlay.open .rule-card-title {
+        margin-bottom: 0.08rem;
+        font-size: clamp(0.86rem, 3.1vw, 1.08rem);
+        line-height: 1.08;
+        text-wrap: auto;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rule-card-copy {
+        padding-right: 0.12rem;
+        font-size: clamp(0.72rem, 2.65vw, 0.9rem);
+        line-height: 1.22;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rules-footer {
+        padding:
+          0.34rem
+          max(0.74rem, env(safe-area-inset-right))
+          max(0.58rem, env(safe-area-inset-bottom))
+          max(0.74rem, env(safe-area-inset-left));
+      }
+
+      #rulesOverlay.avatar-overlay.open .rules-confirm {
+        width: min(100%, 24rem);
+        min-width: 0;
+        padding: 0.56rem 1rem;
+        font-size: clamp(0.82rem, 3vw, 0.95rem);
+      }
+    }
+
+    @media (max-width: 380px) {
+      #rulesOverlay.avatar-overlay.open .rules-board {
+        --rules-grid-gap: 0.34rem;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rules-board > .rule-card {
+        padding: 0.42rem 0.34rem 0.38rem;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rule-card-title {
+        font-size: clamp(0.78rem, 3vw, 0.92rem);
+      }
+
+      #rulesOverlay.avatar-overlay.open .rule-card-copy {
+        font-size: clamp(0.66rem, 2.55vw, 0.78rem);
+        line-height: 1.18;
+      }
+    }
+
   </style>
 </head>
 
@@ -8779,64 +9330,76 @@
         {
           icon: '&#129430;',
           step: '01',
+          title: '&iexcl;Conoce al Espinosaurio!',
+          copy: 'Antes de comenzar, observa con atenci&oacute;n a este gran dinosaurio y prep&aacute;rate para ayudarlo en su aventura.'
+        },
+        {
+          icon: '&#127775;',
+          step: '02',
           title: '&iexcl;Prep&aacute;rate, peque&ntilde;o explorador!',
-          copy: 'Ayuda al Espinosaurio a comenzar su gran aventura.'
+          copy: 'Ayuda al Espinosaurio a comenzar su gran reto.'
         },
         {
           icon: '&#11014;',
-          step: '02',
+          step: '03',
           title: '&iexcl;Salta, salta, salta!',
           copy: 'Haz que el dinosaurio brinque hasta completar <strong>15 saltos</strong>.'
         },
         {
           icon: '&#9888;',
-          step: '03',
+          step: '04',
           title: '&iexcl;Cuidado con el camino!',
           copy: 'Mantente atento y no dejes que el Espinosaurio pierda el ritmo.'
         },
         {
           icon: '&#10067;',
-          step: '04',
+          step: '05',
           title: '&iexcl;Responde la pregunta secreta!',
-          copy: 'Despues de los 15 saltos, contesta una pregunta especial.'
+          copy: 'Despu&eacute;s de los <strong>15 saltos</strong>, contesta una pregunta especial.'
         },
         {
           icon: '&#127942;',
-          step: '05',
-          title: '&iexcl;Gana tus puntos de campeon!',
+          step: '06',
+          title: '&iexcl;Gana tus puntos de campe&oacute;n!',
           copy: 'Si respondes bien, ganas los <strong>15 puntos</strong> del reto del Espinosaurio.'
         }
       ];
 
       const station6SbeelRules = [
         {
-          icon: '&#127775;',
+          icon: '&#129513;',
           step: '01',
+          title: '&iexcl;Conoce el reto de Sbeel!',
+          copy: 'Antes de comenzar, observa el rompecabezas y prep&aacute;rate para armarlo con mucha atenci&oacute;n.'
+        },
+        {
+          icon: '&#127775;',
+          step: '02',
           title: '&iexcl;Bienvenido al reto de Sbeel!',
-          copy: 'Prep&aacute;rate para armar un rompecabezas lleno de aventura y aprendizaje.'
+          copy: 'Prep&aacute;rate para vivir una aventura divertida mientras completas el rompecabezas.'
         },
         {
           icon: '&#129513;',
-          step: '02',
+          step: '03',
           title: '&iexcl;Encuentra cada pieza!',
           copy: 'Observa bien las formas y coloca cada pieza en su lugar correcto.'
         },
         {
           icon: '&#9201;',
-          step: '03',
+          step: '04',
           title: '&iexcl;El tiempo corre!',
           copy: 'Tienes <strong>2 minutos</strong> para completar todo el rompecabezas.'
         },
         {
           icon: '&#128170;',
-          step: '04',
+          step: '05',
           title: '&iexcl;No te rindas, explorador!',
           copy: 'Si una pieza no queda bien, int&eacute;ntalo de nuevo hasta encontrar su lugar.'
         },
         {
           icon: '&#127942;',
-          step: '05',
-          title: 'Completa el reto y gana',
+          step: '06',
+          title: '&iexcl;Completa el reto y gana!',
           copy: 'Si armas el rompecabezas antes de que termine el tiempo, completas la estaci&oacute;n de Sbeel y ganas tus puntos del reto.'
         }
       ];
