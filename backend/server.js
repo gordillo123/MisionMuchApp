@@ -451,13 +451,7 @@ app.post('/api/progreso/completar', async (req, res) => {
           [id_usuario, String(newBoletoId)]
         );
 
-        // También registrar progreso en la estación final de Boleto (id_estacion = 6) si no está
-        await connection.query(
-          `INSERT INTO progreso_usuario (id_usuario, id_estacion, completada, aprobada, puntaje, fecha_inicio, fecha_completado)
-           VALUES (?, 6, TRUE, TRUE, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-           ON DUPLICATE KEY UPDATE completada=TRUE, aprobada=TRUE, fecha_completado=COALESCE(fecha_completado, CURRENT_TIMESTAMP)`,
-          [id_usuario]
-        );
+
 
         // Obtener el boleto insertado para retornarlo
         const [[nuevoBoleto]] = await connection.query('SELECT * FROM boletos WHERE id_boleto = ?', [newBoletoId]);
@@ -754,13 +748,7 @@ app.post('/api/boletos', async (req, res) => {
 
     const newBoletoId = boletoResult.insertId;
 
-    // Registrar progreso en la estación final de Boleto (id_estacion = 6)
-    await connection.query(
-      `INSERT INTO progreso_usuario (id_usuario, id_estacion, completada, aprobada, puntaje, fecha_inicio, fecha_completado)
-       VALUES (?, 6, TRUE, TRUE, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-       ON DUPLICATE KEY UPDATE completada=TRUE, aprobada=TRUE, fecha_completado=COALESCE(fecha_completado, CURRENT_TIMESTAMP)`,
-      [id_usuario]
-    );
+
 
     // Registrar movimiento de boleto
     await connection.query(
@@ -991,6 +979,77 @@ app.post('/api/taquilla/boletos/:id_boleto/cancelar', permitirTaquillaOAdmin, as
     );
 
     res.json({ message: 'Boleto cancelado correctamente.' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 14b. POST /api/admin/boletos/:id_boleto/activar (Solo Admin/Taquilla - Reactivar boleto)
+// ==========================================
+app.post('/api/admin/boletos/:id_boleto/activar', permitirTaquillaOAdmin, async (req, res) => {
+  const idBoleto = req.params.id_boleto;
+  const idOperador = req.headers['x-user-id'];
+  const { observaciones } = req.body;
+
+  try {
+    const [[boleto]] = await pool.query('SELECT * FROM boletos WHERE id_boleto = ?', [idBoleto]);
+
+    if (!boleto) {
+      return res.status(404).json({ error: 'Boleto no encontrado.' });
+    }
+
+    // Actualizar estado a activo y usado a FALSE
+    await pool.query(
+      "UPDATE boletos SET estado = 'activo', usado = FALSE, fecha_uso = NULL, fecha_canje = NULL, canjeado_por = NULL WHERE id_boleto = ?",
+      [idBoleto]
+    );
+
+    // Registrar movimiento reactivacion
+    await pool.query(
+      `INSERT INTO movimientos_boleto (id_boleto, id_usuario, realizado_por, tipo_movimiento, observaciones)
+       VALUES (?, ?, ?, 'reactivacion', ?)`,
+      [idBoleto, boleto.id_usuario, idOperador, observaciones || 'Boleto reactivado / activado']
+    );
+
+    // Registrar auditoría
+    await pool.query(
+      `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
+       VALUES (?, 'taquilla', 'REACTIVAR_BOLETO', 'boletos', ?, 'Boleto reactivado por operador')`,
+      [idOperador, idBoleto]
+    );
+
+    res.json({ message: 'Boleto reactivado correctamente.' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 14c. DELETE /api/admin/boletos/:id_boleto (Solo Admin/Taquilla - Eliminar boleto permanentemente)
+// ==========================================
+app.delete('/api/admin/boletos/:id_boleto', permitirTaquillaOAdmin, async (req, res) => {
+  const idBoleto = req.params.id_boleto;
+  const idOperador = req.headers['x-user-id'];
+
+  try {
+    const [[boleto]] = await pool.query('SELECT * FROM boletos WHERE id_boleto = ?', [idBoleto]);
+
+    if (!boleto) {
+      return res.status(404).json({ error: 'Boleto no encontrado.' });
+    }
+
+    // Eliminar boleto (las relaciones cascade se encargan de movimientos y escaneos asociados)
+    await pool.query('DELETE FROM boletos WHERE id_boleto = ?', [idBoleto]);
+
+    // Registrar auditoría
+    await pool.query(
+      `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
+       VALUES (?, 'taquilla', 'ELIMINAR_BOLETO', 'boletos', ?, ?)`,
+      [idOperador, String(idBoleto), `Boleto folio ${boleto.folio} eliminado permanentemente por operador`]
+    );
+
+    res.json({ message: 'Boleto eliminado correctamente.' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -1352,6 +1411,68 @@ app.post('/api/admin/usuarios/:id_usuario/roles', permitirAdmin, async (req, res
     } finally {
       connection.release();
     }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 19j-b. POST /api/admin/usuarios/:id_usuario/toggle-activo (Solo Admin - Activar/Desactivar cuenta de usuario)
+// ==========================================
+app.post('/api/admin/usuarios/:id_usuario/toggle-activo', permitirAdmin, async (req, res) => {
+  const idUsuario = req.params.id_usuario;
+  const { activo } = req.body;
+  const realizadoPor = req.headers['x-user-id'] || null;
+
+  try {
+    const [[usuario]] = await pool.query('SELECT * FROM usuarios WHERE id_usuario = ?', [idUsuario]);
+
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado.' });
+    }
+
+    await pool.query('UPDATE usuarios SET activo = ? WHERE id_usuario = ?', [Boolean(activo), idUsuario]);
+
+    // Registrar en auditoría
+    const accion = activo ? 'ACTIVAR_USUARIO' : 'DESACTIVAR_USUARIO';
+    const desc = `El usuario ${idUsuario} fue ${activo ? 'activado' : 'desactivado'} por administrador`;
+    await pool.query(
+      `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
+       VALUES (?, 'admin', ?, 'usuarios', ?, ?)`,
+      [realizadoPor, accion, String(idUsuario), desc]
+    );
+
+    res.json({ message: `Usuario ${activo ? 'activado' : 'desactivado'} correctamente.` });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 19j-c. DELETE /api/admin/usuarios/:id_usuario (Solo Admin - Eliminar usuario)
+// ==========================================
+app.delete('/api/admin/usuarios/:id_usuario', permitirAdmin, async (req, res) => {
+  const idUsuario = req.params.id_usuario;
+  const realizadoPor = req.headers['x-user-id'] || null;
+
+  try {
+    const [[usuario]] = await pool.query('SELECT * FROM usuarios WHERE id_usuario = ?', [idUsuario]);
+
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado.' });
+    }
+
+    // Eliminar usuario (las relaciones cascade se encargan de eliminar dependencias en usuarios_roles, progreso_usuario, boletos etc.)
+    await pool.query('DELETE FROM usuarios WHERE id_usuario = ?', [idUsuario]);
+
+    // Registrar en auditoría
+    await pool.query(
+      `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
+       VALUES (?, 'admin', 'ELIMINAR_USUARIO', 'usuarios', ?, ?)`,
+      [realizadoPor, String(idUsuario), `Usuario ${usuario.nombre} (ID ${idUsuario}) eliminado permanentemente por administrador`]
+    );
+
+    res.json({ message: 'Usuario eliminado permanentemente.' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -473,8 +473,8 @@
     }
 
     .nav-brand-logo-agencia {
-      height: 108px;
-      max-width: min(480px, 52vw);
+      height: 76px;
+      max-width: min(336px, 36vw);
       padding: 0;
       flex-shrink: 0;
       background: transparent;
@@ -603,8 +603,8 @@
       }
 
       .nav-brand-logo-agencia {
-        height: 52px;
-        max-width: min(140px, 34vw);
+        height: 36px;
+        max-width: min(98px, 24vw);
         padding: 0;
         background: transparent;
         box-shadow: none;
@@ -1112,8 +1112,8 @@
       }
 
       .nav-brand-logo-agencia {
-        height: 42px;
-        max-width: min(115px, 28vw);
+        height: 29px;
+        max-width: min(80px, 20vw);
         padding: 0;
         background: transparent;
         box-shadow: none;
@@ -2263,8 +2263,8 @@
       }
 
       .nav-brand-logo-agencia {
-        height: 44px;
-        max-width: min(115px, 30vw);
+        height: 31px;
+        max-width: min(80px, 21vw);
         padding: 0;
         background: transparent;
         box-shadow: none;
@@ -2338,8 +2338,8 @@
       }
 
       .nav-brand-logo-agencia {
-        height: 44px;
-        max-width: min(115px, 30vw);
+        height: 31px;
+        max-width: min(80px, 21vw);
         padding: 0;
         background: transparent;
         box-shadow: none;
@@ -3329,16 +3329,33 @@
       .rules-board {
         position: relative;
         z-index: 1;
-        padding-left: 4.1rem;
+        padding-left: 0;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        grid-template-rows: repeat(3, minmax(0, 1fr));
-        gap: 0.46rem;
+        grid-template-rows: none;
+        gap: 0.38rem;
       }
 
       .rule-card,
       .start-rules-mode .rule-card {
         min-height: 0;
-        padding: 0.62rem 0.62rem 0.58rem;
+        height: auto;
+        padding: 0.56rem 0.58rem 0.52rem;
+      }
+
+      .rules-illustration,
+      .start-rules-mode .rules-illustration {
+        display: none;
+      }
+
+      .rules-modal,
+      .start-rules-mode .rules-modal {
+        height: min(100vh, 100%);
+        max-height: 100vh;
+      }
+
+      .rules-content,
+      .start-rules-mode .rules-content {
+        overflow: visible;
       }
 
       .rule-card-wide {
@@ -3379,7 +3396,7 @@
 
     @media (max-width: 480px) {
       .rules-header {
-        padding: 0.9rem 3.3rem 0.05rem;
+        padding: 0.9rem 1.2rem 0.05rem;
       }
 
       .rules-modal .modal-title {
@@ -3388,7 +3405,7 @@
 
       .rules-header p {
         font-size: 0.73rem;
-        max-width: 290px;
+        max-width: 100%;
       }
 
       .rules-chip {
@@ -3396,23 +3413,19 @@
       }
 
       .rules-illustration,
-      .start-rules-mode .rules-illustration {
-        width: 118px;
-        height: 150px;
-        left: -0.2rem;
-      }
-
+      .start-rules-mode .rules-illustration,
       .rules-dino-art {
-        width: 126px;
+        display: none;
       }
 
       .rules-board {
-        padding-left: 3.55rem;
-        gap: 0.4rem;
+        padding-left: 1rem;
+        gap: 0.35rem;
       }
 
       .rule-card {
-        padding: 0.54rem 0.52rem 0.5rem;
+        height: auto;
+        padding: 0.5rem 0.5rem 0.45rem;
       }
 
       .rule-card-title {
@@ -3432,6 +3445,51 @@
         width: 100%;
         min-width: 0;
         font-size: 0.9rem;
+      }
+
+      .rules-modal,
+      .start-rules-mode .rules-modal,
+      #rulesOverlay .rules-modal,
+      #rulesOverlay.start-rules-mode .rules-modal {
+        min-height: 0;
+        height: auto;
+        max-height: 100vh;
+        overflow: visible;
+      }
+
+      .rules-header {
+        padding: 0.9rem 1rem 0.05rem !important;
+      }
+
+      .rules-header p {
+        max-width: 100%;
+      }
+
+      .rules-illustration,
+      .start-rules-mode .rules-illustration,
+      #rulesOverlay .rules-illustration,
+      #rulesOverlay.start-rules-mode .rules-illustration,
+      .rules-dino-art,
+      #rulesOverlay .rules-dino-art,
+      #rulesOverlay.start-rules-mode .rules-dino-art {
+        display: none !important;
+      }
+
+      .rules-board,
+      .start-rules-mode .rules-board,
+      #rulesOverlay .rules-board,
+      #rulesOverlay.start-rules-mode .rules-board {
+        padding-left: 0;
+        grid-template-rows: none;
+        gap: 0.4rem;
+      }
+
+      .rule-card,
+      .start-rules-mode .rule-card,
+      #rulesOverlay .rule-card,
+      #rulesOverlay.start-rules-mode .rule-card {
+        height: auto;
+        padding: 0.45rem 0.5rem 0.5rem !important;
       }
     }
 
@@ -3569,8 +3627,8 @@
 
     .prep-agency-standalone {
       display: block;
-      height: clamp(62px, 13vw, 92px);
-      max-width: clamp(200px, 50vw, 360px);
+      height: clamp(82px, 16vw, 128px);
+      max-width: clamp(260px, 62vw, 480px);
       object-fit: contain;
       background: transparent !important;
       border: none !important;
@@ -3620,8 +3678,8 @@
       }
 
       .prep-agency-standalone {
-        height: 52px;
-        max-width: 220px;
+        height: 72px;
+        max-width: 300px;
       }
     }
 
@@ -4082,6 +4140,11 @@
       align-items: center;
       gap: 0.5rem;
       text-align: left;
+    }
+
+    .intro-container .map-col .section-title {
+      color: #111827;
+      text-shadow: none;
     }
 
     .profile-stats-summary {
@@ -9956,23 +10019,23 @@
 
       // NUEVO: Lógica para manejar el regreso desde las estaciones y persistencia
       async function checkStatePersistence() {
-        const savedStation = localStorage.getItem('much_current_station');
+        const urlParams = new URLSearchParams(window.location.search);
 
-        if (restoreSavedAvatar()) {
-          // Redirigir SIEMPRE al mapa interactivo de estaciones si hay una sesión activa
-          showView('viewPrep');
-          
-          // Sincronizar el progreso desde la BD antes de calcular la estación actual
-          await sincronizarProgresoDesdeBD();
-          
-          const freshSavedStation = localStorage.getItem('much_current_station');
-          currentStation = freshSavedStation ? String(freshSavedStation) : '1';
-          setTimeout(() => {
-            moveToStation(currentStation);
-          }, 500);
-        } else {
-          showView('viewLanding');
+        if (urlParams.get('view') === 'prep') {
+          if (restoreSavedAvatar()) {
+            await sincronizarProgresoDesdeBD();
+            const freshSavedStation = localStorage.getItem('much_current_station');
+            currentStation = freshSavedStation ? String(freshSavedStation) : '1';
+            showView('viewPrep');
+            setTimeout(() => {
+              moveToStation(currentStation);
+            }, 500);
+            return;
+          }
         }
+
+        // Por defecto al refrescar, mostrar el menú principal.
+        showView('viewLanding');
       }
 
       checkStatePersistence();

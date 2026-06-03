@@ -7,7 +7,7 @@
   --quiz-section-gap: clamp(0.35rem, 1vh, 0.8rem);
   --quiz-option-gap: clamp(0.45rem, 1.15vh, 0.85rem);
   --quiz-option-min-height: clamp(3.6rem, 8.8vh, 5.6rem);
-  --quiz-option-font: clamp(1.45rem, max(7vw, 2.8vh), 2.15rem);
+  --quiz-option-font: clamp(1.18rem, max(5.7vw, 2.25vh), 1.74rem);
   --quiz-content-max-width: min(900px, 100%);
 }
 
@@ -151,11 +151,11 @@ body {
 }
 
 .sala-pill {
-  max-width: min(58%, 22rem);
-  min-width: 0;
-  height: clamp(26px, 4vh, 36px);
-  padding: 0 clamp(0.65rem, 1.2vw, 1rem);
-  font-size: clamp(0.62rem, 0.95vw, 0.9rem);
+  max-width: min(70%, 28rem);
+  min-width: clamp(7rem, 18vw, 10rem);
+  height: clamp(32px, 4.8vh, 44px);
+  padding: 0 clamp(0.95rem, 1.7vw, 1.35rem);
+  font-size: clamp(0.78rem, 1.15vw, 1rem);
   justify-content: center;
   white-space: nowrap;
   overflow: hidden;
@@ -196,24 +196,29 @@ body {
 }
 
 .badge-question {
-  font-size: clamp(0.56rem, 0.9vw, 0.78rem);
-  padding: clamp(0.22rem, 0.7vh, 0.45rem) clamp(0.55rem, 1.35vw, 0.95rem);
+  font-size: clamp(0.68rem, 1.05vw, 0.9rem);
+  padding: clamp(0.32rem, 0.9vh, 0.56rem) clamp(0.72rem, 1.55vw, 1.12rem);
   border-radius: 999px;
 }
 
 .question-text {
   max-width: var(--quiz-content-max-width);
   margin-inline: auto !important;
-  font-size: clamp(1rem, 2.55vw, 1.75rem) !important;
+  font-size: clamp(1.12rem, 2.85vw, 1.95rem) !important;
   line-height: 1.1 !important;
   text-wrap: balance;
 }
 
 .question-timer {
+  justify-self: center;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
   min-width: clamp(78px, 11vw, 126px) !important;
   padding: clamp(0.24rem, 0.95vh, 0.62rem) clamp(0.75rem, 1.9vw, 1.1rem) !important;
   font-size: clamp(0.86rem, 2.15vw, 1.3rem) !important;
   line-height: 1 !important;
+  text-align: center;
 }
 
 #quizView .question-container {
@@ -297,12 +302,12 @@ body {
 }
 
 .status-msg {
-  min-height: clamp(0.8rem, 1.4vh, 1.1rem);
+  min-height: clamp(1.2rem, 2.1vh, 1.6rem);
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-size: clamp(0.75rem, 1.45vw, 0.95rem) !important;
+  font-size: clamp(1.08rem, 2.05vw, 1.34rem) !important;
   line-height: 1.1 !important;
 }
 
@@ -328,15 +333,15 @@ body {
 .score-stat {
   width: 100%;
   min-width: 0 !important;
-  padding: clamp(0.42rem, 1.05vh, 0.72rem) clamp(0.7rem, 1.55vw, 1rem) !important;
-  font-size: clamp(0.8rem, 1.65vw, 1rem) !important;
+  padding: clamp(0.52rem, 1.25vh, 0.84rem) clamp(0.85rem, 1.75vw, 1.18rem) !important;
+  font-size: clamp(0.94rem, 1.85vw, 1.16rem) !important;
   line-height: 1.1;
   justify-content: center;
 }
 
 #hint {
   grid-column: 1 / -1;
-  font-size: clamp(0.66rem, 1.25vw, 0.8rem);
+  font-size: clamp(0.78rem, 1.4vw, 0.94rem);
   line-height: 1.12;
   color: #64748b !important;
 }
@@ -376,11 +381,12 @@ body {
   }
 
   .sala-pill {
-    max-width: 56%;
+    max-width: 64%;
+    min-width: 8rem;
   }
 
   .question-text {
-    font-size: clamp(0.98rem, 4.7vw, 1.28rem) !important;
+    font-size: clamp(1.08rem, 5vw, 1.42rem) !important;
   }
 
   .question-timer {
@@ -390,7 +396,7 @@ body {
   }
 
   :root {
-    --quiz-option-font: clamp(1.42rem, max(7.8vw, 3vh), 2.05rem);
+    --quiz-option-font: clamp(1.12rem, max(6.25vw, 2.4vh), 1.64rem);
   }
 
   .option-btn,
@@ -406,7 +412,7 @@ body {
 
   .points-pill,
   .score-stat {
-    font-size: clamp(0.76rem, 3.05vw, 0.9rem) !important;
+    font-size: clamp(0.9rem, 3.5vw, 1.06rem) !important;
   }
 }
 
@@ -430,7 +436,7 @@ body {
   }
 
   .question-text {
-    font-size: clamp(0.94rem, 2.2vw, 1.32rem) !important;
+    font-size: clamp(1.04rem, 2.45vw, 1.46rem) !important;
   }
 
   #options,
@@ -440,7 +446,7 @@ body {
   }
 
   :root {
-    --quiz-option-font: clamp(1.28rem, max(6.8vw, 2.6vh), 1.82rem);
+    --quiz-option-font: clamp(1.04rem, max(5.45vw, 2.15vh), 1.46rem);
   }
 
   .option-btn,
@@ -485,16 +491,18 @@ body {
   }
 
   .sala-pill {
-    height: 25px;
-    font-size: 0.6rem;
+    height: 32px;
+    min-width: 7.5rem;
+    padding-inline: 0.85rem;
+    font-size: 0.76rem;
   }
 
   .badge-question {
-    font-size: 0.52rem;
+    font-size: 0.64rem;
   }
 
   .question-text {
-    font-size: clamp(0.88rem, 4vw, 1.08rem) !important;
+    font-size: clamp(0.96rem, 4.4vw, 1.2rem) !important;
   }
 
   .question-timer {
@@ -504,7 +512,7 @@ body {
   }
 
   :root {
-    --quiz-option-font: clamp(1.18rem, max(6.2vw, 2.4vh), 1.62rem);
+    --quiz-option-font: clamp(0.98rem, max(5.05vw, 1.9vh), 1.32rem);
   }
 
   .option-btn,
@@ -527,8 +535,8 @@ body {
 
   .points-pill,
   .score-stat {
-    padding: 0.38rem 0.6rem !important;
-    font-size: 0.72rem !important;
+    padding: 0.48rem 0.72rem !important;
+    font-size: 0.84rem !important;
   }
 }
 

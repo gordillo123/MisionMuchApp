@@ -656,12 +656,11 @@
           prizeData
         );
       } catch (err) {
-        console.error('Error guardando en Supabase:', err);
-        alert('No se pudo guardar el ganador en la base de datos.\n\n' + (err?.message || err));
-        submitting = false;
-        $('submitBtn').removeAttribute('disabled');
-        $('submitBtn').textContent = 'Obtener mi Boleto';
-        return;
+        console.warn('[REGISTRO] Error guardando en base de datos. Se procederá localmente:', err);
+        // Fallback local: Generamos folio local
+        if (!prizeData.folio) {
+          prizeData.folio = generatePrizeFolio(prizeData);
+        }
       }
 
       // Parámetros para boleto.html
