@@ -8322,7 +8322,7 @@
     #rulesOverlay.avatar-overlay.open .rule-card-title {
       flex: 0 0 auto;
       margin-bottom: clamp(0.12rem, 0.35vw, 0.24rem);
-      font-size: clamp(1rem, 1.35vw, 1.24rem);
+      font-size: 1.12rem;
       line-height: 1.12;
       overflow-wrap: anywhere;
       text-wrap: balance;
@@ -8340,7 +8340,7 @@
       scrollbar-gutter: stable;
       scrollbar-width: thin;
       scrollbar-color: rgba(84, 73, 52, 0.38) transparent;
-      font-size: clamp(0.88rem, 1.08vw, 1.02rem);
+      font-size: 0.98rem;
       line-height: 1.32;
       overflow-wrap: anywhere;
       text-wrap: pretty;
@@ -8429,15 +8429,15 @@
 
       #rulesOverlay.avatar-overlay.open .rule-card-title {
         margin-bottom: 0.08rem;
-        font-size: clamp(0.86rem, 3.1vw, 1.08rem);
+        font-size: 0.95rem;
         line-height: 1.08;
         text-wrap: auto;
       }
 
       #rulesOverlay.avatar-overlay.open .rule-card-copy {
         padding-right: 0.12rem;
-        font-size: clamp(0.72rem, 2.65vw, 0.9rem);
-        line-height: 1.22;
+        font-size: 0.8rem;
+        line-height: 1.24;
       }
 
       #rulesOverlay.avatar-overlay.open .rules-footer {
@@ -8466,12 +8466,12 @@
       }
 
       #rulesOverlay.avatar-overlay.open .rule-card-title {
-        font-size: clamp(0.78rem, 3vw, 0.92rem);
+        font-size: 0.86rem;
       }
 
       #rulesOverlay.avatar-overlay.open .rule-card-copy {
-        font-size: clamp(0.66rem, 2.55vw, 0.78rem);
-        line-height: 1.18;
+        font-size: 0.72rem;
+        line-height: 1.2;
       }
     }
 
@@ -9401,16 +9401,19 @@
           if (!res.ok) throw new Error('Error al consultar progreso de usuario');
           const progreso = await res.json();
           
-          // Mapear el array retornado a un objeto de estaciones completadas
-          const completedMap = {};
-          let maxStationId = 1;
+          // Mapear la BD y fusionarla con el estado local para no perder marcas recien completadas.
+          const completedMap = getCompletedStations();
           
           progreso.forEach(p => {
             if (p.aprobada || p.completada) {
               completedMap[String(p.id_estacion)] = true;
-              if (p.id_estacion >= maxStationId) {
-                maxStationId = p.id_estacion + 1;
-              }
+            }
+          });
+
+          let maxStationId = 1;
+          Object.keys(completedMap).forEach(stationId => {
+            if (completedMap[stationId] && Number(stationId) >= maxStationId) {
+              maxStationId = Number(stationId) + 1;
             }
           });
 
@@ -10508,6 +10511,11 @@
       window.addEventListener('much:returnToMap', function (ev) {
         if (typeof showView === 'function') {
           showView('viewPrep');
+          updateCompletedStationsOnMap();
+          const savedStation = localStorage.getItem('much_current_station') || currentStation || '1';
+          window.setTimeout(function () {
+            moveToStation(savedStation);
+          }, 80);
         }
       });
 

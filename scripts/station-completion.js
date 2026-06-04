@@ -46,6 +46,37 @@
     return STATION_NAMES[key] || fallback || 'esta estacion';
   }
 
+  function getCompletedStations() {
+    try {
+      return JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function markCompletedLocally(options) {
+    if (!options || options.passed === false || !options.stationId) return;
+
+    try {
+      var stationId = String(options.stationId);
+      var completed = getCompletedStations();
+      completed[stationId] = true;
+      localStorage.setItem('much_completed_stations', JSON.stringify(completed));
+
+      var nextStationId = options.nextStationId ? String(options.nextStationId) : '';
+      var stationNumber = Number(stationId);
+      if (!nextStationId && Number.isFinite(stationNumber)) {
+        nextStationId = String(Math.min(6, stationNumber + 1));
+      }
+
+      if (nextStationId) {
+        localStorage.setItem('much_current_station', nextStationId);
+      }
+    } catch (error) {
+      console.warn('No se pudo marcar la estacion como completada localmente:', error);
+    }
+  }
+
   function buildPayload(options) {
     options = options || {};
 
@@ -134,6 +165,7 @@
   }
 
   function renderInline(target, options) {
+    markCompletedLocally(options);
     var payload = buildPayload(options);
     if (!target) return payload;
     target.classList.add('station-completion-host');
@@ -213,6 +245,7 @@
 
   function showFloatingNotice(options) {
     if (!document.body) return null;
+    markCompletedLocally(options);
     var payload = buildPayload(options);
 
     var activeNotice = document.querySelector('.station-map-toast');
@@ -271,6 +304,7 @@
     clearInline: clearInline,
     clearPendingNotice: clearPendingNotice,
     getStationName: getStationName,
+    markCompletedLocally: markCompletedLocally,
     queueMapNotice: queueMapNotice,
     renderInline: renderInline,
     showFloatingNotice: showFloatingNotice,

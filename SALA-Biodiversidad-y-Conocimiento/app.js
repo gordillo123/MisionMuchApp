@@ -17,6 +17,44 @@ const QUESTION_SECONDS = 10;
 // Función para mezclar arrays
 const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
 
+function buildCorrectPositionPlan(count) {
+  return shuffle(Array.from({ length: count }, (_, index) => index % 4));
+}
+
+function shuffleQuestionOptions(question, preferredCorrectIndex) {
+  let sourceCorrectIndex = Number(question.correctIndex);
+  const optionItems = (question.options || []).map((label, index) => ({
+    label,
+    isCorrect: index === sourceCorrectIndex
+  }));
+  if (optionItems.length < 2) return question;
+  if (!Number.isInteger(sourceCorrectIndex) || sourceCorrectIndex < 0 || sourceCorrectIndex >= optionItems.length) {
+    sourceCorrectIndex = 0;
+    optionItems[0].isCorrect = true;
+  }
+
+  const mixed = shuffle(optionItems);
+  let correctIndex = mixed.findIndex(item => item.isCorrect);
+  const targetIndex = preferredCorrectIndex % mixed.length;
+
+  if (correctIndex >= 0 && correctIndex !== targetIndex) {
+    const [correctItem] = mixed.splice(correctIndex, 1);
+    mixed.splice(targetIndex, 0, correctItem);
+    correctIndex = targetIndex;
+  }
+
+  return {
+    ...question,
+    options: mixed.map(item => item.label),
+    correctIndex
+  };
+}
+
+function distributeQuestionOptions(questions) {
+  const positionPlan = buildCorrectPositionPlan(questions.length);
+  return questions.map((question, index) => shuffleQuestionOptions(question, positionPlan[index]));
+}
+
 // Placeholder: Se llenará desde el JSON
 let QUESTIONS = [];
 // 🔒 BANDERA DE SEGURIDAD (Evita dobles registros al dar clic rápido)
@@ -205,7 +243,7 @@ async function loadPreguntas() {
     );
 
     const pool = filtered.length ? filtered : bank;
-    QUESTIONS = shuffle(pool.map(normalize)).slice(0, NUM_QUESTIONS);
+    QUESTIONS = distributeQuestionOptions(shuffle(pool.map(normalize)).slice(0, NUM_QUESTIONS));
     
     console.log('[loadPreguntas] Finalizado. Preguntas seleccionadas:', QUESTIONS.length);
     return QUESTIONS;

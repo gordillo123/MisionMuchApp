@@ -180,6 +180,7 @@ async function guardarSpinosaurioEnSupabase(puntajeFinal, aprobado) {
 // 🛑 Variables de la cuenta regresiva y estado del juego
 var countdownActive = false;
 var gameStarted = false;
+var restartingGame = false;
 var loopRequestId;
 var orientationBlocked = false;
 
@@ -261,7 +262,7 @@ function Start() {
   }, { passive: false });
   window.addEventListener("pointerdown", GlobalTap, { passive: false });
 
-  document.getElementById("btnRetry").addEventListener("click", function () { location.reload(); });
+  document.getElementById("btnRetry").addEventListener("click", restartGameInPlace);
   document.getElementById("btnQuizOk").addEventListener("click", validarQuiz);
 
   var btnExit = document.getElementById("btnExitToMap");
@@ -404,6 +405,89 @@ async function runCountdown() {
   }, 1000);
 }
 
+function removeGameElements(list) {
+  for (var i = list.length - 1; i >= 0; i--) {
+    if (list[i] && list[i].parentNode) list[i].parentNode.removeChild(list[i]);
+  }
+  list.length = 0;
+}
+
+function resetGameState() {
+  stopQuestionTimer();
+
+  parado = false;
+  saltando = false;
+  countdownActive = false;
+  quizVisible = false;
+  navigatingToRegistro = false;
+  gameStarted = true;
+
+  dinoPosX = 24;
+  dinoPosY = sueloY;
+  velY = 0;
+  sueloX = 0;
+  gameVel = 1;
+  score = 0;
+  tiempoHastaObstaculo = 2;
+  tiempoHastaNube = 0.5;
+  quizWarningShown = false;
+
+  removeGameElements(obstaculos);
+  removeGameElements(nubes);
+
+  if (textoScore) textoScore.innerText = "0";
+  if (suelo) suelo.style.left = "0px";
+  if (dino) {
+    dino.style.bottom = sueloY + "px";
+    dino.classList.remove("dino-estrellado");
+    dino.classList.add("dino-corriendo");
+  }
+  if (contenedor) contenedor.classList.remove("mediodia", "tarde", "noche");
+  if (gameOver) gameOver.style.display = "none";
+
+  var wrap = document.getElementById("retryWrap");
+  if (wrap) wrap.classList.remove("show");
+
+  var quizOverlay = document.getElementById("quizOverlay");
+  if (quizOverlay) quizOverlay.classList.remove("show");
+  document.body.classList.remove("quiz-mode");
+
+  var warning = document.getElementById("quizWarning");
+  if (warning) warning.classList.remove("show");
+
+  var portada = document.getElementById("portadaOverlay");
+  if (portada) portada.classList.remove("show");
+
+  time = new Date();
+}
+
+async function restartGameInPlace(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  if (restartingGame) return;
+  if (!canStartLandscapeGame()) return;
+
+  restartingGame = true;
+  try {
+    resetGameState();
+    parado = true;
+    gameStarted = false;
+    try { sessionStorage.removeItem("ultimo_intento_id"); } catch (err) {}
+    try { pauseBgMusic(); } catch (err) {}
+    await registrarIntentoInicial();
+  } finally {
+    parado = false;
+    gameStarted = true;
+    restartingGame = false;
+    time = new Date();
+
+    if (!loopRequestId) Loop();
+  }
+}
+
 /* ===== QUIZ JSON ===== */
 async function cargarQuizJSON() {
   try {
@@ -414,6 +498,43 @@ async function cargarQuizJSON() {
   } catch (e) {
     quizData = null;
   }
+}
+
+function shuffleQuizOptionItems(items) {
+  var mixed = items.slice();
+  for (var i = mixed.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = mixed[i];
+    mixed[i] = mixed[j];
+    mixed[j] = tmp;
+  }
+  return mixed;
+}
+
+function prepareQuizOptions(data) {
+  if (!data) return data;
+
+  var options = Array.isArray(data.options) ? data.options : [];
+  var answerIndex = Number(data.answerIndex);
+  if (!Number.isInteger(answerIndex) || answerIndex < 0 || answerIndex >= options.length) {
+    answerIndex = 0;
+  }
+  if (options.length < 2) {
+    return { ...data, options: options.slice(), answerIndex: answerIndex };
+  }
+
+  var mixed = shuffleQuizOptionItems(options.map(function (text, index) {
+    return { text: text, isCorrect: index === answerIndex };
+  }));
+  var newAnswerIndex = mixed.findIndex(function (item) {
+    return item.isCorrect;
+  });
+
+  return {
+    ...data,
+    options: mixed.map(function (item) { return item.text; }),
+    answerIndex: newAnswerIndex >= 0 ? newAnswerIndex : 0
+  };
 }
 
 /* ===== CONTROLES ===== */
@@ -636,14 +757,16 @@ function mostrarQuiz() {
     };
   }
 
-  document.getElementById("quizTitle").textContent = quizData.title || "Pregunta final";
-  document.getElementById("quizSub").textContent = quizData.subtitle || "";
-  document.getElementById("quizQuestion").textContent = quizData.question || "";
+  var preparedQuiz = prepareQuizOptions(quizData);
+
+  document.getElementById("quizTitle").textContent = preparedQuiz.title || "Pregunta final";
+  document.getElementById("quizSub").textContent = preparedQuiz.subtitle || "";
+  document.getElementById("quizQuestion").textContent = preparedQuiz.question || "";
 
   var box = document.getElementById("quizOptions"); box.innerHTML = "";
-  quizAnswerIndex = Number(quizData.answerIndex) || 0;
+  quizAnswerIndex = Number(preparedQuiz.answerIndex) || 0;
 
-  (quizData.options || []).forEach(function (txt, i) {
+  (preparedQuiz.options || []).forEach(function (txt, i) {
     var label = document.createElement("label"); label.className = "quiz-opt";
     label.innerHTML = '<input type="radio" name="q1" value="' + i + '"> <span>' + txt + "</span>";
     box.appendChild(label);
@@ -787,7 +910,7 @@ async function registrarIntentoInicial() {
       },
       body: JSON.stringify({
         id_usuario: user.id_usuario || user.id,
-        id_estacion: 1, // estación minijuego
+        id_estacion: Number(STATION_ID),
         puntaje: 0,
         aciertos: 0,
         errores: 0,
@@ -809,22 +932,51 @@ async function registrarQuizEnSupabase(puntajeFinal) {
   try {
     const user = JSON.parse(localStorage.getItem('much_google_user') || '{}');
     if (!user || (!user.id_usuario && !user.id)) return;
-    
-    await fetch(`${API_BASE_URL}/api/intentos`, {
+    const userId = user.id_usuario || user.id;
+    const puntaje = Number(puntajeFinal);
+    const aprobado = puntaje >= WIN_SCORE;
+    const payload = {
+      puntaje,
+      aciertos: puntaje,
+      errores: aprobado ? 0 : 1,
+      aprobado
+    };
+    const intentoId = sessionStorage.getItem("ultimo_intento_id");
+    let intentoGuardado = false;
+
+    if (intentoId) {
+      const updateRes = await fetch(`${API_BASE_URL}/api/intentos/${encodeURIComponent(intentoId)}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': String(userId)
+        },
+        body: JSON.stringify(payload)
+      });
+      intentoGuardado = updateRes.ok;
+      if (!intentoGuardado) {
+        try { sessionStorage.removeItem("ultimo_intento_id"); } catch (e) {}
+      }
+    }
+
+    if (intentoGuardado) return;
+
+    const res = await fetch(`${API_BASE_URL}/api/intentos`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-user-id': String(user.id_usuario || user.id)
+        'x-user-id': String(userId)
       },
       body: JSON.stringify({
-        id_usuario: user.id_usuario || user.id,
-        id_estacion: 1,
-        puntaje: Number(puntajeFinal),
-        aciertos: Number(puntajeFinal),
-        errores: 0,
-        aprobado: Number(puntajeFinal) >= WIN_SCORE
+        id_usuario: userId,
+        id_estacion: Number(STATION_ID),
+        ...payload
       })
     });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.id_intento) sessionStorage.setItem("ultimo_intento_id", String(data.id_intento));
+    }
   } catch (error) {
     console.error('Error al registrar quiz en MySQL:', error);
   }
