@@ -266,6 +266,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function showSuccess() {
         stopTimer();
         const retryModalBtn = document.getElementById('retry-modal-btn');
+        const modalContent = successModal ? successModal.querySelector('.modal-content') : null;
+        
         if (timeRemaining > 0) {
             solvedOnTime = true;
             markStationCompleted();
@@ -281,10 +283,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 successText.style.display = 'none';
                 closeModalBtn.style.display = 'none';
                 if (retryModalBtn) retryModalBtn.style.display = 'none';
+                
+                if (modalContent) {
+                    modalContent.classList.add('modal-content--success-card');
+                }
+                
                 window.MuchStationCompletion?.renderInline(successMessageHost, {
                     stationId: '6',
                     isFinalStation: true,
+                    onReturnToMap: () => {
+                        window.location.href = '../index.html?view=prep';
+                    },
                     onDismiss: () => {
+                        if (modalContent) {
+                            modalContent.classList.remove('modal-content--success-card');
+                        }
                         closeModalBtn.style.display = '';
                         closeModalBtn.textContent = 'Volver al mapa y continuar';
                         if (retryModalBtn) retryModalBtn.style.display = '';
@@ -293,6 +306,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         } else {
+            if (modalContent) {
+                modalContent.classList.remove('modal-content--success-card');
+            }
             if (successMessageHost) {
                 window.MuchStationCompletion?.clearInline(successMessageHost);
             }

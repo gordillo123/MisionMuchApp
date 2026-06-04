@@ -39,7 +39,7 @@
   </div>
 
   <script>
-    const API_BASE_URL = 'http://localhost:3000';
+    const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
 
     const loader = document.getElementById('loader');
     const resultArea = document.getElementById('resultArea');

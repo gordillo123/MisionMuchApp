@@ -298,6 +298,17 @@ header h1 {
     text-align: center;
 }
 
+/* Quitar fondo, bordes y padding de la caja contenedora cuando muestra la tarjeta de éxito responsiva */
+.modal-content:has(.station-completion-card),
+.modal-content.modal-content--success-card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: 540px !important;
+    width: 95% !important;
+}
+
 .modal-content h2 {
     font-family: var(--font-title);
     font-size: 3.5rem;
@@ -332,6 +343,11 @@ header h1 {
     .puzzle-board {
         gap: 8px;
         padding: 8px;
+    }
+
+    .modal-content {
+        padding: 1.75rem 1.25rem;
+        border-radius: 24px;
     }
 
     .btn-back-map {

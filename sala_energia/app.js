@@ -728,6 +728,9 @@ class UIManager {
         window.MuchStationCompletion?.renderInline(e.finalMsg, {
           stationId: '4',
           nextStationId: '5',
+          onReturnToMap: () => {
+            window.location.href = '../index.html?view=prep';
+          },
           onDismiss: () => {
             e.giftRow.classList.remove('d-none');
             if (e.nextStationBtn) {

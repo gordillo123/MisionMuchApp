@@ -2,7 +2,7 @@
 // Utilidades de comunicación del frontend con el Backend Express + MySQL
 // Reemplaza por completo el uso directo de Supabase por llamadas fetch al backend.
 
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
 
 async function initSupabase() {
   // Función placeholder para compatibilidad
@@ -159,7 +159,7 @@ async function iniciarSesionConGoogle() {
         window.location.reload();
         resolve(data);
       } catch (error) {
-        alert('No se pudo establecer conexión con el backend Express. Asegúrate de que esté corriendo en http://localhost:3000');
+        alert(`No se pudo establecer conexión con el backend Express. Asegúrate de que esté corriendo en ${API_BASE_URL}`);
         console.error(error);
         reject(error);
       }
@@ -270,6 +270,32 @@ async function inicializarProgresoUsuario(estacionId) {
     return await res.json();
   } catch (error) {
     console.error('Error en inicializarProgresoUsuario:', error.message);
+    throw error;
+  }
+}
+
+// Reiniciar todo el progreso del usuario en la base de datos MySQL
+async function reiniciarProgresoUsuario() {
+  const user = obtenerUsuarioLocal();
+  if (!user) return null;
+  const userId = user.id_usuario || user.id;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/progreso/reset`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': String(userId)
+      },
+      body: JSON.stringify({
+        id_usuario: userId
+      })
+    });
+
+    if (!res.ok) throw new Error('Error al reiniciar progreso.');
+    return await res.json();
+  } catch (error) {
+    console.error('Error en reiniciarProgresoUsuario:', error.message);
     throw error;
   }
 }
@@ -441,6 +467,7 @@ window.guardarIntentoEstacion = guardarIntentoEstacion;
 window.actualizarIntentoEstacion = actualizarIntentoEstacion;
 window.guardarPartidaMinijuego = guardarPartidaMinijuego;
 window.guardarRespuestaUsuario = guardarRespuestaUsuario;
+window.reiniciarProgresoUsuario = reiniciarProgresoUsuario;
 window.generarBoletoFinal = generarBoletoFinal;
 window.iniciarJuego = iniciarJuego;
 window.cargarPreguntas = cargarPreguntas;
@@ -461,6 +488,7 @@ export {
   actualizarIntentoEstacion,
   guardarPartidaMinijuego,
   guardarRespuestaUsuario,
+  reiniciarProgresoUsuario,
   generarBoletoFinal,
   iniciarJuego,
   cargarPreguntas,

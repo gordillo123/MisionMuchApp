@@ -205,9 +205,9 @@ window.APP_MODULES = {
           <div id="mapAvatarImgCont" style="width: 100%; height: 100%;"></div>
         </div>
       </div>
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem; margin-top: 1.5rem;">
-        <button class="btn-play large" id="btnComenzar" style="width: max-content; min-width: 280px;">🚀 ¡COMENZAR!</button>
-        <div id="rewardClaimBox" class="reward-claim-box is-hidden" aria-live="polite">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem; margin-top: 1.5rem; width: 100%; box-sizing: border-box;">
+        <button class="btn-play large" id="btnComenzar" style="width: 100%; max-width: 340px; box-sizing: border-box;">🚀 ¡COMENZAR!</button>
+        <div id="rewardClaimBox" class="reward-claim-box is-hidden" aria-live="polite" style="width: 100%; max-width: 340px; box-sizing: border-box;">
           <div class="reward-claim-copy">
             <span class="reward-claim-kicker">Misión completada</span>
             <strong>Entrada gratis al museo desbloqueada</strong>

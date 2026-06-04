@@ -1,4 +1,4 @@
-[
+window.MUCH_PREGUNTAS_ENTRADA = [
   {
     "text": "📅 ¿En qué año se inauguró el Museo Chiapas (MUCH)?",
     "options": ["1994", "2003", "2010", "2015"],
@@ -47,4 +47,4 @@
     "correctIndex": 0,
     "points": 10
   }
-]
+];

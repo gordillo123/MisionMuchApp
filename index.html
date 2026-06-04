@@ -917,6 +917,8 @@
       text-transform: uppercase;
       letter-spacing: 1px;
       width: 100%;
+      white-space: normal;
+      text-align: center;
     }
 
     .btn-play:hover {
@@ -3741,6 +3743,8 @@
       cursor: pointer;
       box-shadow: 0 8px 16px rgba(50, 200, 232, 0.28);
       transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+      white-space: normal;
+      text-align: center;
     }
 
     .btn-claim-reward:hover {
@@ -8515,6 +8519,8 @@
     /* ────────────────────────────────────────────────
        MISIÓN MUCH — LOGIC (TODO EN UNO)
     ────────────────────────────────────────────────── */
+    const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
+
     const avatars = [
       { id: 'humano1', name: 'Explorador', cat: 'human' },
       { id: 'humana2', name: 'Curadora', cat: 'human' },
@@ -8537,7 +8543,7 @@
       { id: 'robot2', name: 'Cyborg', cat: 'space' }
     ];
 
-    let currentStation = '3';
+    let currentStation = '1';
     let selectedAvatar = null;
 
     function includeHTML() {
@@ -8810,7 +8816,7 @@
           // Lógica remota (Usuario Google)
           try {
             const userId = googleUser.id_usuario || googleUser.id;
-            const res = await fetch(`http://localhost:3000/api/usuarios/${userId}/perfil`);
+            const res = await fetch(`${API_BASE_URL}/api/usuarios/${userId}/perfil`);
             
             if (!res.ok) {
               throw new Error('No se pudo obtener el perfil del servidor.');
@@ -8996,7 +9002,7 @@
         scoresListContainer.innerHTML = '<div class="score-row"><div class="score-info"><div class="score-name">Cargando puntajes...</div></div></div>';
 
         try {
-          const res = await fetch('http://localhost:3000/api/leaderboard');
+          const res = await fetch(`${API_BASE_URL}/api/leaderboard`);
           if (!res.ok) throw new Error('Error al conectar con la API de puntajes.');
           const leaderboard = await res.json();
 
@@ -9064,7 +9070,7 @@
 
         try {
           console.log('[Sync] Sincronizando progreso desde base de datos MySQL para usuario:', userId);
-          const res = await fetch(`http://localhost:3000/api/progreso/${userId}`);
+          const res = await fetch(`${API_BASE_URL}/api/progreso/${userId}`);
           if (!res.ok) throw new Error('Error al consultar progreso de usuario');
           const progreso = await res.json();
           
@@ -9120,6 +9126,7 @@
           await window.verificarUsuarioEnTabla();
           // Sincronizar el progreso de la BD después de verificar el usuario
           await sincronizarProgresoDesdeBD();
+          await actualizarVisibilidadMenuRoles();
         } catch (error) {
           console.error('[Login] Error verificando public.usuarios:', error);
         }
@@ -9243,6 +9250,7 @@
           adminButton.href = labels.btnAdmin[2];
           adminButton.className = 'nav-btn';
           adminButton.id = 'btnAdmin';
+          adminButton.style.setProperty('display', 'none', 'important');
           adminButton.innerHTML = `<span class="nav-icon">${labels.btnAdmin[0]}</span><span class="nav-label">${labels.btnAdmin[1]}</span>`;
           const profileButton = document.getElementById('btnPerfil');
           menu.insertBefore(adminButton, profileButton || null);
@@ -9253,6 +9261,7 @@
           taquillaButton.href = labels.btnTaquilla[2];
           taquillaButton.className = 'nav-btn';
           taquillaButton.id = 'btnTaquilla';
+          taquillaButton.style.setProperty('display', 'none', 'important');
           taquillaButton.innerHTML = `<span class="nav-icon">${labels.btnTaquilla[0]}</span><span class="nav-label">${labels.btnTaquilla[1]}</span>`;
           const profileButton = document.getElementById('btnPerfil');
           menu.insertBefore(taquillaButton, profileButton || null);
@@ -9282,6 +9291,60 @@
           if (label) label.textContent = 'Perfil';
         }
       }
+
+      async function actualizarVisibilidadMenuRoles() {
+        const adminBtn = document.getElementById('btnAdmin');
+        const taquillaBtn = document.getElementById('btnTaquilla');
+
+        const user = JSON.parse(localStorage.getItem('much_google_user') || 'null');
+        if (!user) {
+          if (adminBtn) adminBtn.style.setProperty('display', 'none', 'important');
+          if (taquillaBtn) taquillaBtn.style.setProperty('display', 'none', 'important');
+          return;
+        }
+
+        const userId = user.id_usuario || user.id;
+        const email = user.email || '';
+
+        // Fallback local por correo
+        const localAllowedEmails = [
+          'planetariotuxtla@gmail.com',
+          'muchtuxtla@gmail.com',
+          'luceroynn@gmail.com'
+        ];
+        const isLocalAdmin = localAllowedEmails.includes(email.toLowerCase());
+        const isLocalTaquilla = isLocalAdmin || email.toLowerCase().includes('taquilla');
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/usuarios/${userId}/roles`);
+          if (!res.ok) throw new Error('Error al consultar roles');
+          const data = await res.json();
+          const roles = data.roles || [];
+
+          const isAdmin = roles.includes('admin') || isLocalAdmin;
+          const isTaquilla = roles.includes('taquilla') || roles.includes('admin') || isLocalTaquilla;
+
+          if (adminBtn) {
+            if (isAdmin) adminBtn.style.removeProperty('display');
+            else adminBtn.style.setProperty('display', 'none', 'important');
+          }
+          if (taquillaBtn) {
+            if (isTaquilla) taquillaBtn.style.removeProperty('display');
+            else taquillaBtn.style.setProperty('display', 'none', 'important');
+          }
+        } catch (error) {
+          console.warn('[Roles] Fallo consulta API, usando fallback de correo:', error);
+          if (adminBtn) {
+            if (isLocalAdmin) adminBtn.style.removeProperty('display');
+            else adminBtn.style.setProperty('display', 'none', 'important');
+          }
+          if (taquillaBtn) {
+            if (isLocalTaquilla) taquillaBtn.style.removeProperty('display');
+            else taquillaBtn.style.setProperty('display', 'none', 'important');
+          }
+        }
+      }
+      window.actualizarVisibilidadMenuRoles = actualizarVisibilidadMenuRoles;
 
       function handleNavButtonAction(buttonId) {
         closeMobileMenu();
@@ -9341,6 +9404,7 @@
       }
 
       ensureMobileNavMenu();
+      actualizarVisibilidadMenuRoles();
       window.handleMobileNavButton = handleNavButtonAction;
 
       const btnInicio = document.getElementById('btnInicio');
@@ -9367,7 +9431,7 @@
 
         // 3. Si ya hay ambos, ir al mapa directamente
         showView('viewPrep');
-        setTimeout(() => moveToStation(currentStation || 3), 500);
+        setTimeout(() => moveToStation(currentStation || 1), 500);
       };
 
       loginOverlay.onclick = (e) => { if (e.target === loginOverlay) loginOverlay.classList.remove('open'); };
@@ -10223,7 +10287,7 @@
       }
 
       let lastResetPromptAt = 0;
-      function resetStationProgress(e) {
+      async function resetStationProgress(e) {
         if (e) {
           e.preventDefault();
           e.stopPropagation();
@@ -10234,6 +10298,7 @@
         lastResetPromptAt = now;
 
         if (confirm('¿Estás seguro de que deseas reiniciar el progreso de todas las estaciones? Las palomitas verdes se desmarcarán.')) {
+          // Limpiar localmente de inmediato para dar feedback instantáneo
           localStorage.setItem('much_completed_stations', '{}');
           localStorage.removeItem('much_quiz_prize');
           localStorage.removeItem('much_mission_reward_claimed');
@@ -10243,6 +10308,16 @@
           updateCompletedStationsOnMap();
           updateRewardClaimUI({});
           moveToStation('1');
+
+          // Limpiar en base de datos si hay sesión activa
+          try {
+            if (typeof window.reiniciarProgresoUsuario === 'function') {
+              await window.reiniciarProgresoUsuario();
+              console.log('[Sync] Progreso de base de datos reiniciado con éxito.');
+            }
+          } catch (err) {
+            console.error('Error al reiniciar progreso en la base de datos:', err);
+          }
         }
       }
 
@@ -10266,6 +10341,7 @@
       });
 
       function getCurrentStationGameUrl() {
+        if (currentStation === '1') return 'entrada-much/index.html?from=portada&sala=entrada';
         if (currentStation === '2') return 'Juego_Spinosaurio/index.html';
         if (currentStation === '3') return 'SALA-Biodiversidad-y-Conocimiento/index.html?from=portada&sala=biodiversidad';
         if (currentStation === '4') return 'sala_energia/index.html?from=portada&sala=energia';

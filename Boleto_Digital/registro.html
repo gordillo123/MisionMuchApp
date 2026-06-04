@@ -328,6 +328,7 @@
   </div>
 
   <script>
+    const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
     document.getElementById('btnBackRegistro')?.addEventListener('click', () => {
       if (window.history.length > 1) {
         window.history.back();
@@ -554,7 +555,7 @@
 
     async function guardarEnSupabase(nombre, correo, telefono, prizeData) {
       // 1. Registrar o iniciar sesión del usuario participante en MySQL
-      const authRes = await fetch('http://localhost:3000/api/auth/google', {
+      const authRes = await fetch(`${API_BASE_URL}/api/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -576,7 +577,7 @@
       const idUsuario = user.id_usuario;
 
       // 2. Generar el boleto final en MySQL
-      const ticketRes = await fetch('http://localhost:3000/api/boletos', {
+      const ticketRes = await fetch(`${API_BASE_URL}/api/boletos`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

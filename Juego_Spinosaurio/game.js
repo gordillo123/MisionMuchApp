@@ -770,6 +770,8 @@ function blockShortcutsDuringQuiz(e) {
 }
 
 /* ===== BACKEND EXPRESS/MYSQL LOGIC ===== */
+const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
+
 async function registrarIntentoInicial() {
   try {
     const user = JSON.parse(localStorage.getItem('much_google_user') || '{}');
@@ -777,7 +779,7 @@ async function registrarIntentoInicial() {
       console.warn("⚠️ No hay usuario autenticado para registrar intento.");
       return null;
     }
-    const res = await fetch('http://localhost:3000/api/intentos', {
+    const res = await fetch(`${API_BASE_URL}/api/intentos`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -808,7 +810,7 @@ async function registrarQuizEnSupabase(puntajeFinal) {
     const user = JSON.parse(localStorage.getItem('much_google_user') || '{}');
     if (!user || (!user.id_usuario && !user.id)) return;
     
-    await fetch('http://localhost:3000/api/intentos', {
+    await fetch(`${API_BASE_URL}/api/intentos`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

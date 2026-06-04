@@ -1,6 +1,7 @@
 /* =================== Datos de Configuración =================== */
 const params = new URLSearchParams(location.search);
 const SALA = params.get('sala') || 'Entrada';
+const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
 
 // 🛡️ BLINDAJE NIVEL DIOS: Guardar en memoria PERMANENTE
 const LUGAR_EN_URL = params.get('lugar');
@@ -14,6 +15,7 @@ if (LUGAR_EN_URL && LUGAR_EN_URL.trim() !== "") {
 const LUGAR_QR = localStorage.getItem('much_lugar_seguro') || 'Sin Especificar';
 
 const NUM_QUESTIONS = 6;
+const QUESTION_SECONDS = 10;
 function getPrizeDescriptor(prizeData) {
   return [
     prizeData?.key,
@@ -83,46 +85,15 @@ class ProgressManager {
 }
 
 /* ================================================================= */
-/* ==== SUPABASE: CONEXIÓN Y LÓGICA DE BASE DE DATOS =========== */
+/* ==== LOCAL DB & SERVER INTEGRATION ============================== */
 /* ================================================================= */
 
-const SUPABASE_URL = 'https://qwgaeorsymfispmtsbut.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3Z2Flb3JzeW1maXNwbXRzYnV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzODcyODUsImV4cCI6MjA3Nzk2MzI4NX0.FThZIIpz3daC9u8QaKyRTpxUeW0v4QHs5sHX2s1U1eo';
-const SUPABASE_PUBLIC_OPTIONS = {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-    detectSessionInUrl: false
-  }
-};
 const DAILY_TICKET_LIMIT = 50;
-
-// 🔒 MAPEADO DE IDs DE SALAS (Obtenidos de Supabase)
-const SALA_MAP = {
-  'energia': '08a6cc96-5323-42e0-89df-77a8c36e9705',
-  'spinosaurio': '0b4f04b0-5196-473d-8689-55d5f315df55',
-  'desarrollo_sustentable': '17fd001d-f6c5-4f98-ab25-d81624227bc2',
-  'biodiversidad': '4bdffb5f-1a55-4952-be0c-9d487550fb0c',
-  'entrada': '6d66b495-cf43-42c1-b7f8-627ceb6fe33d'
-};
-
-const SALA_ENTRADA_ID = '6d66b495-cf43-42c1-b7f8-627ceb6fe33d';
-const CURRENT_SALA_ID = SALA_MAP[SALA.toLowerCase()] || SALA_ENTRADA_ID;
-
-let supabase = null;
 
 // Background music helpers
 function ensureBgMusic() { try { if (!window.bgMusic) { window.bgMusic = new Audio('../Sonidos/musica fondo.mp3'); window.bgMusic.loop = true; window.bgMusic.volume = 0.18; window.bgMusic.preload = 'auto'; } } catch (e) {} }
 function playBgMusic() { try { ensureBgMusic(); window.bgMusic.play().catch(()=>{}); } catch (e) {} }
 function pauseBgMusic() { try { if (window.bgMusic && !window.bgMusic.paused) window.bgMusic.pause(); } catch (e) {} }
-
-// Inicializa la librería
-async function initSupabase() {
-  if (supabase) return supabase;
-  const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
-  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_PUBLIC_OPTIONS);
-  return supabase;
-}
 
 // ⏰ FUNCIÓN CRÍTICA: Obtener hora exacta de México
 function getMexicoTime() {
@@ -136,23 +107,31 @@ function getMexicoTime() {
 // 1. CARGAR PREGUNTAS DESDE ARCHIVO JSON
 // ------------------------------------------------------------
 async function loadPreguntas() {
+  console.log('[loadPreguntas] Iniciando carga...');
   try {
-    const resp = await fetch('preguntas.json', { cache: 'no-store' });
-    if (!resp.ok) throw new Error('No se pudo cargar preguntas.json: ' + resp.status);
-    let bank = await resp.json();
-
-    if (!Array.isArray(bank)) {
-      const keys = Object.keys(bank || {});
-      if (keys.length && bank[SALA]) {
-        bank = bank[SALA];
-      } else if (keys.length) {
-        const firstKey = keys.find(k => Array.isArray(bank[k]));
-        if (firstKey) bank = bank[firstKey];
+    let bank = [];
+    
+    // 1. Intentar Banco Local (preguntas-local.js) primero
+    if (window.MUCH_PREGUNTAS_ENTRADA && Array.isArray(window.MUCH_PREGUNTAS_ENTRADA)) {
+      bank = window.MUCH_PREGUNTAS_ENTRADA;
+      console.log('[loadPreguntas] Usando banco local (preguntas-local.js). Total:', bank.length);
+    } else {
+      console.log('[loadPreguntas] Banco local no detectado, intentando fetch...');
+      try {
+        const resp = await fetch('preguntas.json', { cache: 'no-store' });
+        if (resp.ok) {
+          bank = await resp.json();
+          console.log('[loadPreguntas] Fetch exitoso. Total:', bank.length);
+        }
+      } catch (fErr) {
+        console.warn('[loadPreguntas] Fetch falló (CORS o Red):', fErr);
       }
     }
 
-    if (!Array.isArray(bank) || bank.length === 0)
-      throw new Error('preguntas.json no contiene un array de preguntas');
+    if (!Array.isArray(bank) || bank.length === 0) {
+      console.error('[loadPreguntas] No se encontraron preguntas en ninguna fuente.');
+      throw new Error('Sin preguntas disponibles');
+    }
 
     const normalize = (it) => {
       const text = it.text ?? it.pregunta ?? it.enunciado ?? 'Pregunta sin texto';
@@ -211,54 +190,34 @@ async function loadPreguntas() {
 // ------------------------------------------------------------
 
 async function startQuizInDB() {
-  if (quizIniciando) return sessionStorage.getItem('much_current_quiz_id');
+  if (quizIniciando) return sessionStorage.getItem('much_current_attempt_id');
   quizIniciando = true;
 
   try {
-    await initSupabase();
+    const progreso = await import('../supabase-utils.js');
+    const estacionId = 1; // Station 1 (Entrada MUCH)
 
-    sessionStorage.removeItem('much_current_quiz_id');
+    sessionStorage.removeItem('much_current_attempt_id');
     sessionStorage.removeItem('much_quiz_final_data');
 
-    // 🌟 SE ESTABLECE EL ID MANUALMENTE
-    const ID_JUGADOR = 365;
+    // 1. Inicializar progreso de usuario en MySQL
+    await progreso.inicializarProgresoUsuario(estacionId);
 
-    // Insertar nuevo intento
-    const payload = {
-      sala_id: CURRENT_SALA_ID,
-      participante_id: ID_JUGADOR,
-      started_at: getMexicoTime(),
-      num_preguntas: NUM_QUESTIONS,
-      puntaje_total: 0,
-      num_correctas: 0,
-      estatus: 'activo',
-      ubicacion: LUGAR_QR // 🌟 SE MANDA LA MEMORIA PERMANENTE
-    };
+    // 2. Registrar el intento inicial en intentos_estacion
+    const result = await progreso.guardarIntentoEstacion(estacionId, {
+      puntaje: 0,
+      aciertos: 0,
+      errores: 0,
+      aprobado: false
+    });
 
-    console.log("Guardando intento en BD...");
-    const { data, error } = await supabase
-      .from('quizzes')
-      .insert(payload)
-      .select('id')
-      .single();
+    console.log("✅ Intento iniciado en MySQL. ID Intento:", result.id_intento);
 
-    if (error) {
-      console.error("❌ Error Supabase (Start):", error.message);
-      quizIniciando = false;
-      startQuizLocal();
-      return null;
-    }
-
-    console.log("✅ Intento iniciado. ID:", data.id);
-
-    sessionStorage.setItem('much_current_quiz_id', data.id);
-    localStorage.setItem('much_quiz_db_id', String(data.id));
-    localStorage.setItem('much_quiz_last_quiz_id', String(data.id));
-
-    return data.id;
+    sessionStorage.setItem('much_current_attempt_id', result.id_intento);
+    return result.id_intento;
 
   } catch (e) {
-    console.error("Excepción al iniciar quiz:", e);
+    console.error("Excepción al iniciar quiz en MySQL:", e);
     quizIniciando = false;
     startQuizLocal();
     return null;
@@ -269,24 +228,24 @@ async function endQuizInDB({ puntaje_total, num_correctas, num_preguntas }) {
   saveQuizResultLocal({ puntaje_total, num_correctas, num_preguntas });
 
   try {
-    await initSupabase();
-    const quizId = sessionStorage.getItem('much_current_quiz_id');
-    if (!quizId) return;
+    const progreso = await import('../supabase-utils.js');
+    const attemptId = sessionStorage.getItem('much_current_attempt_id');
+    if (!attemptId) return;
 
-    console.log(`🏁 Finalizando intento ${quizId}...`);
+    console.log(`🏁 Finalizando intento ${attemptId} en MySQL...`);
 
-    const { error } = await supabase.from('quizzes').update({
-      puntaje_total: puntaje_total,
-      num_correctas: num_correctas,
-      num_preguntas: num_preguntas,
-      finished_at: getMexicoTime(),
-      estatus: 'finalizado'
-    }).eq('id', quizId);
+    const isPassed = num_correctas === num_preguntas; // 6/6 correct to pass in Entrada MUCH
 
-    if (error) console.error("Error al finalizar (DB):", error.message);
-    else console.log("✅ Intento actualizado en BD al finalizar.");
+    await progreso.actualizarIntentoEstacion(attemptId, {
+      puntaje: puntaje_total,
+      aciertos: num_correctas,
+      errores: Math.max(0, num_preguntas - num_correctas),
+      aprobado: isPassed
+    });
 
-  } catch (e) { console.warn('Error endQuizInDB:', e); }
+    console.log("✅ Intento actualizado en MySQL al finalizar.");
+
+  } catch (e) { console.warn('Error endQuizInDB en MySQL:', e); }
 }
 
 // ------------------------------------------------------------
@@ -294,32 +253,12 @@ async function endQuizInDB({ puntaje_total, num_correctas, num_preguntas }) {
 // ------------------------------------------------------------
 async function checkLimiteBoletos() {
   try {
-    await initSupabase();
-
-    const hoy = new Date();
-    const offsetMexico = hoy.getTimezoneOffset() * 60000;
-    const localTime = new Date(hoy.getTime() - offsetMexico);
-    const fechaHoyStr = localTime.toISOString().split('T')[0];
-
-    const inicioDia = `${fechaHoyStr}T00:00:00.000Z`;
-    const finDia = `${fechaHoyStr}T23:59:59.999Z`;
-
-    const { count, error } = await supabase
-      .from('quizzes')
-      .select('*', { count: 'exact', head: true })
-      .eq('sala_id', CURRENT_SALA_ID)
-      .gte('finished_at', inicioDia)
-      .lte('finished_at', finDia)
-      .eq('num_correctas', NUM_QUESTIONS);
-
-    if (error) {
-      console.error("Error al checar límite de boletos:", error);
-      return false;
-    }
-
-    console.log(`Boletos entregados hoy en esta sala: ${count}`);
+    const resp = await fetch(`${API_BASE_URL}/api/boletos/count-today`);
+    if (!resp.ok) throw new Error('Error al consultar boletos de hoy.');
+    const data = await resp.json();
+    const count = data.count || 0;
+    console.log(`Boletos entregados hoy en el museo: ${count}`);
     return count >= DAILY_TICKET_LIMIT;
-
   } catch (e) {
     console.error("Excepción en checkLimiteBoletos:", e);
     return false;
@@ -335,11 +274,11 @@ function startQuizLocal() {
 
 function saveQuizResultLocal(data) {
   const startTime = sessionStorage.getItem('much_quiz_start') || getMexicoTime();
-  const quizData = { ...data, sala_id: CURRENT_SALA_ID, started_at: startTime, finished_at: getMexicoTime() };
+  const quizData = { ...data, started_at: startTime, finished_at: getMexicoTime() };
 
   localStorage.setItem('much_quiz_final_data', JSON.stringify(quizData));
 
-  const dbId = sessionStorage.getItem('much_current_quiz_id');
+  const dbId = sessionStorage.getItem('much_current_attempt_id');
   if (dbId) {
     localStorage.setItem('much_quiz_db_id', dbId);
     localStorage.setItem('much_quiz_last_quiz_id', dbId);
@@ -438,6 +377,7 @@ class UIManager {
     this.e = elements; this.sound = sound; this.confetti = confetti; this.prizeMgr = prizeMgr;
     this.progressManager = new ProgressManager(`much_quiz_progress_${SALA}`);
     this.state = { idx: 0, selected: null, points: 0, correct: 0, locked: false, answers: [] };
+    this.currentQuestionDeadline = null;
     const savedIndex = this.progressManager.loadProgress();
     if (savedIndex > 0 && savedIndex < QUESTIONS.length) {
       this.state.idx = savedIndex;
@@ -445,61 +385,34 @@ class UIManager {
       this.progressManager.resetProgress();
     }
     this.currentPrize = null;
+    this.questionTimer = null;
+    this.questionCountdown = QUESTION_SECONDS;
 
+    if (this.e.nextBtn) this.e.nextBtn.classList.add('d-none');
     if (this.e.pillSala) this.e.pillSala.textContent = `Sala: ${SALA}`;
     if (this.e.qTotal) this.e.qTotal.textContent = QUESTIONS.length.toString();
+    if (this.e.correctTotal) this.e.correctTotal.textContent = QUESTIONS.length.toString();
     this.bind();
     this.render();
     this.clock();
     this.startFocusDetection();
-  }
-
-  startFocusDetection() {
-    // Anti-trampas desactivado: el juego simplemente se pausa y reanuda sin penalizaciones
-  }
-
-  playCompletionSound() {
-    try {
-      const audio = new Audio('./Sonidos/Estacion completada.mp3');
-      audio.play().catch(e => console.warn('No se pudo reproducir audio de completado:', e));
-    } catch (e) {
-      console.warn('Error al reproducir audio:', e);
-    }
-  }
-
-  playIncorrectSound() {
-    try {
-      const audio = new Audio('./Sonidos/respuesta incorrecta.mp3');
-      audio.play().catch(e => console.warn('No se pudo reproducir audio de incorrecto:', e));
-    } catch (e) {
-      console.warn('Error al reproducir audio:', e);
-    }
-  }
-
-
-  bind() {
-    this.e.nextBtn.addEventListener('click', () => this.next());
-    this.e.nextStationBtn.addEventListener('click', () => this.goBackToMap());
-    this.e.playAgainBtn1.addEventListener('click', () => {
-      this.progressManager.resetProgress();
-      location.reload();
-    });
-    this.e.playAgainBtn2.addEventListener('click', () => {
-      this.progressManager.resetProgress();
-      location.reload();
-    });
-  }
-
-  clock() {
-    const tick = () => {
-      const t = new Date(), hh = String(t.getHours()).padStart(2, '0'), mm = String(t.getMinutes()).padStart(2, '0');
-      if (this.e.timer) this.e.timer.textContent = `⏰ ${hh}:${mm}`;
-      setTimeout(tick, 10_000);
-    }; tick();
+    document.addEventListener('visibilitychange', () => this.handleVisibilityChange());
+    window.addEventListener('pagehide', () => this.handlePageHide());
+    window.addEventListener('beforeunload', () => this.handlePageHide());
   }
 
   goBackToMap() {
-    window.location.href = '../index.html?view=prep';
+    try {
+      if (this.e && this.e.returnBtn) {
+        this.e.returnBtn.classList.add('pressed');
+        setTimeout(() => this.e.returnBtn.classList.remove('pressed'), 160);
+      }
+      if (this.sound && typeof this.sound.beep === 'function') this.sound.beep(640, 0.06, 'sine', 0.06);
+    } catch (e) { }
+
+    setTimeout(() => {
+      window.location.href = '../index.html?view=prep';
+    }, 180);
   }
 
   redirectToRegistration(nextUrl, delay = 3000) {
@@ -518,6 +431,195 @@ class UIManager {
     window.location.href = '../Boleto_Digital/registro.html' + window.location.search;
   }
 
+  updateScoreboard() {
+    const s = this.state;
+    if (this.e.pointsEl) this.e.pointsEl.textContent = s.points.toString();
+    if (this.e.correctCount) this.e.correctCount.textContent = s.correct.toString();
+    if (this.e.correctTotal) this.e.correctTotal.textContent = QUESTIONS.length.toString();
+  }
+
+  playCompletionSound() {
+    try {
+      const audio = new Audio('../Sonidos/Estacion completada.mp3');
+      audio.play().catch(e => console.warn('No se pudo reproducir audio de completado:', e));
+    } catch (e) {
+      console.warn('Error al reproducir audio:', e);
+    }
+  }
+
+  playIncorrectSound() {
+    try {
+      const audio = new Audio('../Sonidos/respuesta incorrecta.mp3');
+      audio.play().catch(e => console.warn('No se pudo reproducir audio de incorrecto:', e));
+    } catch (e) {
+      console.warn('Error al reproducir audio:', e);
+    }
+  }
+
+  startFocusDetection() {
+    // Anti-trampas desactivado: no invalidamos la ronda al cambiar de pestaña.
+  }
+
+  handleVisibilityChange() {
+    if (document.hidden) {
+      // Ventana oculta: reiniciar progreso de sesión inmediatamente
+      if (this.questionTimer) {
+        clearTimeout(this.questionTimer);
+        this.questionTimer = null;
+      }
+      this.progressManager.resetProgress();
+      this.state = { idx: 0, selected: null, points: 0, correct: 0, locked: false, answers: [] };
+      this.currentQuestionDeadline = null;
+      this.questionCountdown = QUESTION_SECONDS;
+      if (this.e && this.e.status) this.e.status.textContent = '';
+      if (this.e && this.e.options) this.e.options.innerHTML = '';
+      if (this.e && this.e.qIndex) this.e.qIndex.textContent = '1';
+      if (this.e && this.e.pointsEl) this.e.pointsEl.textContent = '0';
+      if (this.e && this.e.correctCount) this.e.correctCount.textContent = '0';
+      if (this.e && this.e.questionTimer) this.e.questionTimer.textContent = `⏳ ${this.questionCountdown}s`;
+      setTimeout(() => window.location.reload(), 100);
+      return;
+    }
+
+    if (this.state.idx < QUESTIONS.length && !this.state.locked) {
+      this.startQuestionTimer();
+    }
+  }
+
+  handlePageHide() {
+    this.progressManager.resetProgress();
+  }
+
+  updateQuestionTimerDisplay() {
+    if (!this.e.questionTimer) return;
+    this.e.questionTimer.textContent = `⏳ ${this.questionCountdown}s`;
+    this.e.questionTimer.classList.toggle('low', this.questionCountdown <= 5 && this.questionCountdown > 3);
+    this.e.questionTimer.classList.toggle('urgent', this.questionCountdown <= 3);
+  }
+
+  stopQuestionTimer() {
+    if (this.questionTimer) {
+      clearTimeout(this.questionTimer);
+      this.questionTimer = null;
+    }
+  }
+
+  persistCurrentQuestionProgress() {
+    this.progressManager.saveProgress(this.state.idx);
+  }
+
+  createQuestionDeadline() {
+    // Siempre crear un nuevo deadline desde cero (10 segundos)
+    this.currentQuestionDeadline = Date.now() + (QUESTION_SECONDS * 1000);
+    this.persistCurrentQuestionProgress();
+  }
+
+  startQuestionTimer() {
+    this.stopQuestionTimer();
+    // Siempre crear un nuevo deadline al iniciar el timer
+    this.createQuestionDeadline();
+
+    const tick = () => {
+      const remainingMs = this.currentQuestionDeadline - Date.now();
+      const remainingSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
+      this.questionCountdown = remainingSeconds;
+      this.updateQuestionTimerDisplay();
+
+      if (remainingMs <= 0) {
+        this.handleQuestionTimeout();
+        return;
+      }
+      this.questionTimer = setTimeout(tick, 250);
+    };
+
+    tick();
+  }
+
+  advanceToNextQuestion() {
+    const s = this.state;
+    s.idx += 1;
+    if (s.idx >= QUESTIONS.length) {
+      this.currentQuestionDeadline = null;
+      this.progressManager.resetProgress();
+      this.render();
+      return;
+    }
+    // El nuevo deadline se creará en render() cuando se llame startQuestionTimer()
+    this.render();
+  }
+
+  handleQuestionTimeout() {
+    const s = this.state, { e } = this;
+    if (s.locked || s.idx >= QUESTIONS.length) return;
+    this.stopQuestionTimer();
+
+    s.locked = true;
+    s.selected = null;
+
+    if (e.status) e.status.textContent = '⏰ Se acabó el tiempo. Respuesta incorrecta.';
+    [...e.options.querySelectorAll('.option-btn')].forEach((btn, idx) => {
+      btn.disabled = true;
+      const correctIdx = QUESTIONS[s.idx].correctIndex;
+      if (idx === correctIdx) {
+        btn.classList.add('option-btn--correct');
+      } else {
+        btn.classList.add('option-btn--incorrect');
+      }
+    });
+
+    const q = QUESTIONS[s.idx];
+    s.answers.push({ qIndex: s.idx, question: q.text, choice: null, correct: false, timeout: true });
+    this.updateScoreboard();
+
+    // Guardar respuesta en la base de datos en tiempo real (Timeout)
+    (async () => {
+      try {
+        const attemptId = sessionStorage.getItem('much_current_attempt_id');
+        if (attemptId) {
+          const progreso = await import('../supabase-utils.js');
+          await progreso.guardarRespuestaUsuario(attemptId, 1, q.text, "Tiempo agotado", false);
+        }
+      } catch (err) {
+        console.error("Error al guardar respuesta de timeout en tiempo real en MySQL:", err);
+      }
+    })();
+
+    if (e.questionTimer) e.questionTimer.textContent = '⏳ 0s';
+    this.sound.wrong();
+
+    setTimeout(() => {
+      this.advanceToNextQuestion();
+    }, 1400);
+  }
+
+  bind() {
+    this.e.nextBtn.addEventListener('click', () => this.next());
+    this.e.returnBtn.addEventListener('click', () => this.goBackToMap());
+    this.e.nextStationBtn.addEventListener('click', () => {
+      if (this.currentPrize) {
+        this.redirectToRegistration();
+      } else {
+        this.goBackToMap();
+      }
+    });
+    this.e.playAgainBtn1.addEventListener('click', () => {
+      this.progressManager.resetProgress();
+      location.reload();
+    });
+    this.e.playAgainBtn2.addEventListener('click', () => {
+      this.progressManager.resetProgress();
+      location.reload();
+    });
+  }
+
+  clock() {
+    const tick = () => {
+      const t = new Date(), hh = String(t.getHours()).padStart(2, '0'), mm = String(t.getMinutes()).padStart(2, '0');
+      if (this.e.timer) this.e.timer.textContent = `⏰ ${hh}:${mm}`;
+      setTimeout(tick, 10_000);
+    }; tick();
+  }
+
   async render() {
     const s = this.state, { e } = this;
     const pct = Math.min(100, (s.idx / QUESTIONS.length * 100));
@@ -531,6 +633,7 @@ class UIManager {
 
     if (s.idx >= QUESTIONS.length) {
       this.progressManager.resetProgress();
+      this.stopQuestionTimer();
       e.quizView.classList.add('d-none');
       e.finalView.classList.remove('d-none');
       e.finalTitle.textContent = 'Verificando resultados...';
@@ -570,11 +673,36 @@ class UIManager {
 
           e.finalTitle.textContent = '¡Felicidades!';
           e.finalMsg.textContent = '¡Has ganado un boleto! Presiona "Ver mi boleto" 🎟️';
+          if (e.nextStationBtn) {
+            e.nextStationBtn.textContent = 'Ver mi boleto 🎟️';
+          }
           e.giftRow.classList.remove('d-none');
           this.sound.victory();
           this.playCompletionSound();
           try { playBgMusic(); } catch (e) {}
           this.confetti.launch(120);
+
+          // Avanzar progreso y marcar estación 1 completada en local storage
+          localStorage.setItem('much_current_station', '2');
+          let completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
+          completed['1'] = true;
+          localStorage.setItem('much_completed_stations', JSON.stringify(completed));
+
+          // Guardar progreso en el backend
+          (async () => {
+            try {
+              const progreso = await import('../supabase-utils.js');
+              await progreso.guardarProgresoUsuario(1, {
+                puntaje: puntajeFinal,
+                aciertos: s.correct,
+                errores: 0,
+                aprobada: true
+              });
+              console.log("✅ Progreso de Estación 1 guardado exitosamente en MySQL.");
+            } catch (err) {
+              console.error("Error al guardar progreso de Estación 1:", err);
+            }
+          })();
         }
         return;
       } else {
@@ -605,14 +733,16 @@ class UIManager {
     });
 
     e.nextBtn.textContent = s.idx === QUESTIONS.length - 1 ? 'Finalizar 🎉' : 'Siguiente ➡️';
-    if (e.pointsEl) e.pointsEl.textContent = s.points.toString();
+    this.updateScoreboard();
     if (e.hint) e.hint.textContent = 'Tip: solo puedes elegir una respuesta';
+    this.startQuestionTimer();
   }
 
   choose(i) {
     const s = this.state, { e } = this;
     if (s.locked) return;
 
+    this.stopQuestionTimer();
     s.locked = true; s.selected = i;
     const q = QUESTIONS[s.idx], correctIdx = q.correctIndex;
     [...e.options.querySelectorAll('.option-btn')].forEach((btn, idx) => {
@@ -629,15 +759,32 @@ class UIManager {
       this.sound.wrong();
     }
     s.answers.push({ qIndex: s.idx, question: q.text, choice: q.options[i], correct: i === correctIdx });
+    this.updateScoreboard();
+
+    // Guardar respuesta en la base de datos en tiempo real
+    (async () => {
+      try {
+        const attemptId = sessionStorage.getItem('much_current_attempt_id');
+        if (attemptId) {
+          const progreso = await import('../supabase-utils.js');
+          await progreso.guardarRespuestaUsuario(attemptId, 1, q.text, q.options[i], i === correctIdx);
+        }
+      } catch (err) {
+        console.error("Error al guardar respuesta en tiempo real en MySQL:", err);
+      }
+    })();
+
+    // Auto-advance after 3 seconds (3000ms)
+    setTimeout(() => {
+      this.advanceToNextQuestion();
+    }, 3000);
   }
 
   next() {
     const s = this.state, { e } = this;
     if (s.selected === null) { if (e.status) e.status.textContent = '⚠️ Selecciona una respuesta.'; return; }
     e.nextBtn.disabled = true; setTimeout(() => { e.nextBtn.disabled = false; }, 180);
-    s.idx += 1;
-    this.progressManager.saveProgress(s.idx);
-    this.render();
+    this.advanceToNextQuestion();
   }
 }
 
@@ -652,19 +799,24 @@ const elements = {
   qTotal: document.getElementById('qTotal'),
   qText: document.getElementById('qText'),
   qDesc: document.getElementById('qDesc'),
+  questionTimer: document.getElementById('questionTimer'),
   options: document.getElementById('options'),
   status: document.getElementById('status'),
   nextBtn: document.getElementById('nextBtn'),
   pointsEl: document.getElementById('points'),
+  correctCount: document.getElementById('correctCount'),
+  correctTotal: document.getElementById('correctTotal'),
   hint: document.getElementById('hint'),
   finalTitle: document.getElementById('finalTitle'),
   finalMsg: document.getElementById('finalMsg'),
   finalPoints: document.getElementById('finalPoints'),
   finalCorrect: document.getElementById('finalCorrect'),
   finalTotal: document.getElementById('finalTotal'),
+  finalAutoNote: document.getElementById('finalAutoNote'),
   giftRow: document.getElementById('giftRow'),
   retryRow: document.getElementById('retryRow'),
   nextStationBtn: document.getElementById('nextStationBtn'),
+  returnBtn: document.getElementById('returnBtn'),
   playAgainBtn1: document.getElementById('playAgainBtn1'),
   playAgainBtn2: document.getElementById('playAgainBtn2'),
   soundToggle: document.getElementById('soundToggle'),

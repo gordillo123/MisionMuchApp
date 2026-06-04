@@ -155,6 +155,11 @@
             window.showView('viewPrep');
           } else {
             window.dispatchEvent(new CustomEvent('much:returnToMap', { detail: payload }));
+            try {
+              var mapParams = new URLSearchParams(window.location.search);
+              mapParams.set('view', 'prep');
+              window.location.href = '../index.html?' + mapParams.toString();
+            } catch (e) {}
           }
           clearInline(target);
         });

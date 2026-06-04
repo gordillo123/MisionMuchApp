@@ -10,7 +10,7 @@ ON DUPLICATE KEY UPDATE nombre=nombre;
 
 -- 2. Insertar Estaciones de la Misión
 INSERT INTO estaciones (id_estacion, nombre, descripcion, orden, puntos, puntaje_minimo, tipo, activa) VALUES
-(1, 'Mini juego', 'Mini juego de saltos tipo dinosaurio', 1, 15, 10, 'minijuego', 1),
+(1, 'Entrada MUCH', 'Preguntas de bienvenida al museo', 1, 10, 6, 'preguntas', 1),
 (2, 'SBEEL / Rompecabezas', 'Armado del rompecabezas SBEEL de dinosaurios', 2, 10, 10, 'rompecabezas', 1),
 (3, 'Sala de desarrollo sustentable', 'Preguntas sobre desarrollo sustentable y ecotecnias', 3, 10, 7, 'preguntas', 1),
 (4, 'Sala de energía', 'Preguntas sobre fuentes y tipos de energía', 4, 10, 7, 'preguntas', 1),

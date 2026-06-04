@@ -426,7 +426,8 @@ app.post('/api/progreso/completar', async (req, res) => {
         const random = Math.floor(Math.random() * 10000);
         const folio = `MUCH-${timestamp}-${random}`.toUpperCase();
         const qrToken = crypto.randomBytes(16).toString('hex');
-        const qrData = `http://localhost:3000/taquilla?token=${qrToken}`;
+        const host = req.get('host') || 'localhost:3000';
+        const qrData = `http://${host}/taquilla?token=${qrToken}`;
 
         // Insertar boleto
         const [boletoResult] = await connection.query(
@@ -513,6 +514,44 @@ app.post('/api/progreso/inicializar', async (req, res) => {
   } catch (error) {
     console.error('Error inicializando progreso:', error.message);
     res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 5a-1. POST /api/progreso/reset
+// ==========================================
+app.post('/api/progreso/reset', async (req, res) => {
+  const { id_usuario } = req.body;
+
+  if (!id_usuario) {
+    return res.status(400).json({ error: 'Falta el parámetro id_usuario.' });
+  }
+
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    // Eliminar todo el progreso e historial asociado al usuario
+    await connection.query('DELETE FROM progreso_usuario WHERE id_usuario = ?', [id_usuario]);
+    await connection.query('DELETE FROM intentos_estacion WHERE id_usuario = ?', [id_usuario]);
+    await connection.query('DELETE FROM partidas_minijuego WHERE id_usuario = ?', [id_usuario]);
+    await connection.query('DELETE FROM boletos WHERE id_usuario = ?', [id_usuario]);
+
+    // Registrar en auditoria_acciones
+    await connection.query(
+      `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
+       VALUES (?, 'usuario', 'REINICIAR_PROGRESO', 'progreso_usuario', ?, 'Usuario reinició todo su progreso de estaciones y boletos')`,
+      [id_usuario, String(id_usuario)]
+    );
+
+    await connection.commit();
+    res.json({ message: 'Progreso reiniciado correctamente en la base de datos.' });
+  } catch (error) {
+    await connection.rollback();
+    console.error('Error al reiniciar progreso:', error.message);
+    res.status(500).json({ error: error.message });
+  } finally {
+    connection.release();
   }
 });
 
@@ -737,7 +776,8 @@ app.post('/api/boletos', async (req, res) => {
     const random = Math.floor(Math.random() * 10000);
     const folio = `MUCH-${timestamp}-${random}`.toUpperCase();
     const qrToken = crypto.randomBytes(16).toString('hex');
-    const qrData = `http://localhost:3000/taquilla?token=${qrToken}`;
+    const host = req.get('host') || 'localhost:3000';
+    const qrData = `http://${host}/taquilla?token=${qrToken}`;
 
     // 4. Insertar en la BD
     const [boletoResult] = await connection.query(
@@ -774,6 +814,23 @@ app.post('/api/boletos', async (req, res) => {
     res.status(500).json({ error: error.message });
   } finally {
     connection.release();
+  }
+});
+
+// ==========================================
+// 9b. GET /api/boletos/count-today
+// ==========================================
+app.get('/api/boletos/count-today', async (req, res) => {
+  try {
+    const [[result]] = await pool.query(
+      `SELECT COUNT(*) AS count 
+       FROM boletos 
+       WHERE DATE(fecha_generacion) = CURDATE()`
+    );
+    res.json({ count: result.count || 0 });
+  } catch (error) {
+    console.error('Error al contar boletos de hoy:', error.message);
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -1704,6 +1761,6 @@ app.get('/api/usuarios/:id_usuario/perfil', async (req, res) => {
 app.use(express.static(path.join(__dirname, '../')));
 
 // Iniciar servidor local
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor de Misión MUCH corriendo en http://localhost:${PORT}`);
 });

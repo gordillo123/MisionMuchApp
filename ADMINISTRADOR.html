@@ -1312,7 +1312,7 @@
   <script type="module" src="./supabase-client.js"></script>
   <script type="module" src="./supabase-utils.js"></script>
   <script type="module">
-    const API_BASE_URL = 'http://localhost:3000';
+    const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
 
     // State Variables
     const state = {
