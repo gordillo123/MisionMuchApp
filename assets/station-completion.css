@@ -1,11 +1,15 @@
 .station-completion-host {
   width: 100%;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .station-completion-card {
   position: relative;
   overflow: hidden;
   width: 100%;
+  max-width: 100%;
   padding: 1.5rem 1.4rem;
   border-radius: 30px;
   background:
@@ -19,8 +23,16 @@
   animation: station-completion-rise 0.42s ease both;
 }
 
+.station-completion-card,
+.station-completion-card * {
+  box-sizing: border-box;
+}
+
 /* Centrar todo el contenido del mensaje para mejor lectura */
 .station-completion-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
 }
 
@@ -59,6 +71,7 @@
   gap: 1rem;
   align-items: center;
   justify-items: center;
+  width: 100%;
 }
 
 .station-completion-card__close {
@@ -121,6 +134,7 @@
 
 .station-completion-card__intro {
   min-width: 0;
+  width: 100%;
 }
 
 .station-completion-card__kicker {
@@ -135,6 +149,9 @@
   font-weight: 800;
   letter-spacing: 0.09em;
   text-transform: uppercase;
+  max-width: 100%;
+  text-align: center;
+  white-space: normal;
 }
 
 .station-completion-card__kicker::before {
@@ -153,6 +170,7 @@
   font-weight: 800;
   line-height: 1.04;
   color: #ffffff;
+  overflow-wrap: anywhere;
 }
 
 .station-completion-card__body {
@@ -160,6 +178,8 @@
   font-size: clamp(1rem, 2.5vw, 1.08rem);
   line-height: 1.68;
   color: rgba(255, 255, 255, 0.9);
+  width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .station-completion-card__body strong {
@@ -178,6 +198,8 @@
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
   border: 1px solid rgba(255, 255, 255, 0.08);
   justify-content: center;
+  width: 100%;
+  min-width: 0;
 }
 
 .station-completion-card__actions {
@@ -185,6 +207,9 @@
   display: flex;
   gap: 0.75rem;
   align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
 }
 
 .station-completion-cta {
@@ -201,6 +226,14 @@
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
   flex: 1 1 auto;
   text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  max-width: 100%;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .station-completion-cta:hover {
@@ -223,6 +256,8 @@
   color: #fff5b7;
   font-size: 1rem;
   font-weight: 800;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .station-auto-note {
@@ -282,6 +317,7 @@
   left: 50%;
   bottom: 24px;
   z-index: 99999;
+  box-sizing: border-box;
   width: min(580px, calc(100vw - 24px));
   opacity: 0;
   transform: translate(-50%, 20px);
@@ -310,34 +346,81 @@
 }
 
 @media (max-width: 640px) {
+  .station-completion-host {
+    align-items: center;
+    padding-inline: 0;
+  }
+
   .station-completion-card {
-    padding: 1.2rem 1rem;
+    width: min(100%, 420px);
+    max-height: min(88vh, 680px);
+    max-height: min(88dvh, 680px);
+    padding: 1rem;
     border-radius: 24px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
 
   .station-completion-card--dismissible {
-    padding-right: 3.95rem;
+    padding: 0.85rem 1rem 1rem;
   }
 
   .station-completion-card__close {
-    top: 0.85rem;
-    right: 0.85rem;
+    position: sticky;
+    top: 0;
+    right: auto;
+    align-self: flex-end;
+    flex: 0 0 auto;
+    margin: 0 0 0.2rem auto;
     width: 48px;
     height: 48px;
     font-size: 1.65rem;
+    min-width: 48px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #12314a;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 10px 20px rgba(8, 15, 30, 0.18);
   }
 
   .station-completion-card__head {
     grid-template-columns: 1fr;
+    gap: 0.8rem;
     justify-items: center;
     text-align: center;
   }
 
+  .station-completion-card__seal {
+    width: 66px;
+    height: 66px;
+    border-radius: 20px;
+    font-size: 1.75rem;
+  }
+
+  .station-completion-card__kicker {
+    justify-content: center;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.7rem;
+  }
+
+  .station-completion-card__title {
+    margin-top: 0.65rem;
+    font-size: clamp(1.35rem, 8vw, 1.85rem);
+    line-height: 1.08;
+  }
+
   .station-completion-card__body {
+    margin-top: 0.85rem;
     text-align: center;
+    font-size: 1rem;
+    line-height: 1.5;
   }
 
   .station-completion-card__detail {
+    margin-top: 0.85rem;
+    padding: 0.78rem 0.85rem;
+    border-radius: 18px;
     justify-content: center;
     text-align: center;
   }
@@ -348,11 +431,36 @@
   }
 
   .station-map-toast {
-    bottom: 14px;
-    width: min(96vw, 560px);
+    inset: 0;
+    left: 0;
+    bottom: auto;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    background: rgba(8, 15, 30, 0.36);
+    backdrop-filter: blur(6px);
+    overflow: hidden;
+    transform: translateY(12px) scale(0.98);
+  }
+
+  .station-map-toast.show {
+    transform: translateY(0) scale(1);
+  }
+
+  .station-map-toast .station-completion-card {
+    width: min(100%, 420px);
+    max-height: calc(100vh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   }
 
   .station-completion-card__actions {
+    margin-top: 0.9rem;
     width: 100%;
     justify-content: center;
   }
@@ -363,5 +471,73 @@
     border-radius: 12px;
     width: 100%;
     max-width: 100%;
+  }
+
+  .station-map-toast-open {
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 380px), (max-width: 640px) and (max-height: 560px) {
+  .station-completion-card {
+    width: 100%;
+    max-height: calc(100vh - 16px);
+    max-height: calc(100dvh - 16px);
+    padding: 0.85rem;
+    border-radius: 20px;
+  }
+
+  .station-completion-card--dismissible {
+    padding: 0.7rem 0.85rem 0.85rem;
+  }
+
+  .station-completion-card__close {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    font-size: 1.5rem;
+  }
+
+  .station-completion-card__seal {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    font-size: 1.55rem;
+  }
+
+  .station-completion-card__title {
+    font-size: 1.28rem;
+  }
+
+  .station-completion-card__body {
+    font-size: 0.95rem;
+    line-height: 1.42;
+  }
+
+  .station-completion-card__detail {
+    padding: 0.7rem 0.75rem;
+  }
+
+  .station-completion-card__detail-label {
+    font-size: 0.76rem;
+  }
+
+  .station-completion-card__detail-value,
+  .station-completion-cta {
+    font-size: 0.95rem;
+  }
+
+  .station-completion-cta {
+    min-height: 46px;
+    padding: 0.85rem 0.9rem;
+  }
+
+  .station-map-toast {
+    padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+
+  .station-map-toast .station-completion-card {
+    max-height: calc(100vh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    max-height: calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   }
 }

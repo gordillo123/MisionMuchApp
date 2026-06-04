@@ -64,8 +64,8 @@
         title: (stationCopy && stationCopy.title) || 'Excelente trabajo, explorador',
         body: (stationCopy && stationCopy.body) || ('Has completado <strong>' + stationName + '</strong> y cerraste tu mision cientifica con exito. Tu recompensa final ya esta lista para reclamarse.'),
         detailLabel: 'Tu siguiente paso',
-        detailValue: 'Regresa al mapa para reclamar',
-        ctaLabel: 'Volver al mapa y reclamar',
+        detailValue: 'Regresa al mapa',
+        ctaLabel: 'Volver al mapa',
         dismissLabel: 'Cerrar mensaje'
       };
     } else {
@@ -118,7 +118,7 @@
       '<strong class="station-completion-card__detail-value">' + payload.detailValue + '</strong>',
       '</div>',
       '<div class="station-completion-card__actions">',
-      '<button type="button" class="station-completion-cta">Regresar al mapa</button>',
+      '<button type="button" class="station-completion-cta">' + payload.ctaLabel + '</button>',
       '</div>',
       '</div>'
     ].join('');
@@ -200,6 +200,9 @@
       if (node.parentNode) {
         node.parentNode.removeChild(node);
       }
+      if (document.body && !document.querySelector('.station-map-toast')) {
+        document.body.classList.remove('station-map-toast-open');
+      }
     }, 220);
   }
 
@@ -256,6 +259,7 @@
     }
 
     document.body.appendChild(toast);
+    document.body.classList.add('station-map-toast-open');
     window.requestAnimationFrame(function () {
       toast.classList.add('show');
     });

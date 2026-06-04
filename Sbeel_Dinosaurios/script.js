@@ -1,6 +1,6 @@
 /**
  * Sbeel Dinosaurios - Puzzle Script
- * Lógica para un rompecabezas de 3x3 usando Drag and Drop.
+ * Rompecabezas 3x3 con imagen aleatoria y arrastre por mouse/touch.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,43 +15,81 @@ document.addEventListener('DOMContentLoaded', () => {
     const backBtn = document.getElementById('btn-back');
     let successMessageHost = null;
 
-    const size = 3; // 3x3
+    const size = 3;
     const TIME_LIMIT_SECONDS = 120;
     const COMPLETED_STATIONS_KEY = 'much_completed_stations';
     const STATION_ID = '6';
+    const DRAG_START_THRESHOLD = 8;
+    const PUZZLE_IMAGES = [
+        {
+            src: 'dino.png',
+            label: 'Dinosaurio de Sbeel'
+        },
+        {
+            src: 'sbeel-valle-dinosaurios.png',
+            label: 'Valle de dinosaurios de Sbeel'
+        },
+        {
+            src: 'sbeel-triceratops.png',
+            label: 'Triceratops de Sbeel'
+        },
+        {
+            src: 'sbeel-sauropodo.png',
+            label: 'Sauropodo de Sbeel'
+        }
+    ];
 
     let pieces = [];
-    let draggedPiece = null;
+    let selectedPuzzleImage = PUZZLE_IMAGES[0];
+    let pointerState = null;
+    let currentDropTarget = null;
+    let firstSelection = null;
     let timeRemaining = TIME_LIMIT_SECONDS;
     let timerInterval = null;
     let solvedOnTime = false;
+    let completionQueued = false;
+    let completionTimeout = null;
 
-    // Background music helpers
     function ensureBgMusic() {
         try {
             if (!window.bgMusic) {
                 window.bgMusic = new Audio('../Sonidos/musica fondo.mp3');
-                window.bgMusic.loop = true; window.bgMusic.volume = 0.18; window.bgMusic.preload = 'auto';
+                window.bgMusic.loop = true;
+                window.bgMusic.volume = 0.18;
+                window.bgMusic.preload = 'auto';
             }
-        } catch (e) { }
+        } catch (e) {}
     }
-    function playBgMusic() { try { ensureBgMusic(); window.bgMusic.play().catch(()=>{}); } catch (e) {} }
-    function pauseBgMusic() { try { if (window.bgMusic && !window.bgMusic.paused) window.bgMusic.pause(); } catch (e) {} }
+
+    function playBgMusic() {
+        try {
+            ensureBgMusic();
+            window.bgMusic.play().catch(() => {});
+        } catch (e) {}
+    }
+
+    function pauseBgMusic() {
+        try {
+            if (window.bgMusic && !window.bgMusic.paused) {
+                window.bgMusic.pause();
+            }
+        } catch (e) {}
+    }
 
     async function inicializarSbeelProgreso() {
         try {
             const progreso = await import('../supabase-utils.js');
             await progreso.inicializarProgresoUsuario(6);
-            console.log("Progreso de SBEEL inicializado en MySQL.");
+            console.log('Progreso de SBEEL inicializado en MySQL.');
         } catch (error) {
-            console.error("Error al inicializar progreso de SBEEL:", error);
+            console.error('Error al inicializar progreso de SBEEL:', error);
         }
     }
 
-    /**
-     * Inicializa el juego
-     */
-    function initGame() {
+    async function initGame() {
+        selectedPuzzleImage = selectRandomPuzzleImage();
+        applyPuzzleImage(selectedPuzzleImage.src);
+        await preloadPuzzleImage(selectedPuzzleImage.src);
         createPieces();
         shufflePieces();
         renderBoard();
@@ -60,153 +98,313 @@ document.addEventListener('DOMContentLoaded', () => {
         inicializarSbeelProgreso();
     }
 
-    /**
-     * Crea los objetos de las piezas con sus posiciones correctas
-     */
+    function selectRandomPuzzleImage() {
+        const imageIndex = Math.floor(Math.random() * PUZZLE_IMAGES.length);
+        return PUZZLE_IMAGES[imageIndex] || PUZZLE_IMAGES[0];
+    }
+
+    function applyPuzzleImage(src) {
+        puzzleBoard.style.setProperty('--puzzle-image', `url("${src}")`);
+    }
+
+    function preloadPuzzleImage(src) {
+        return new Promise(resolve => {
+            const image = new Image();
+            image.onload = () => resolve(true);
+            image.onerror = () => {
+                console.warn('No se pudo cargar la imagen del rompecabezas, se usara dino.png:', src);
+                selectedPuzzleImage = PUZZLE_IMAGES[0];
+                applyPuzzleImage(selectedPuzzleImage.src);
+                resolve(false);
+            };
+            image.src = src;
+        });
+    }
+
     function createPieces() {
         pieces = [];
         for (let i = 0; i < size * size; i++) {
             pieces.push({
                 id: i,
                 currentPos: i,
-                correctPos: i
+                correctPos: i,
+                locked: false
             });
         }
     }
 
-    /**
-     * Mezcla las piezas aleatoriamente
-     */
     function shufflePieces() {
-        // Algoritmo de Fisher-Yates para barajar
+        completionQueued = false;
+        puzzleBoard.classList.remove('is-complete');
+
+        pieces.forEach(piece => {
+            piece.currentPos = piece.correctPos;
+            piece.locked = false;
+        });
+
         for (let i = pieces.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [pieces[i].currentPos, pieces[j].currentPos] = [pieces[j].currentPos, pieces[i].currentPos];
         }
-        
-        // Verificar si por casualidad quedó resuelto y volver a barajar si es necesario
+
         if (checkWin()) {
             shufflePieces();
+            return;
         }
+
+        updateLockedPieces();
     }
 
-    /**
-     * Dibuja las piezas en el tablero
-     */
     function renderBoard() {
+        clearSelection();
+        setDropTarget(null);
         puzzleBoard.innerHTML = '';
-        
-        // Ordenamos las piezas por su posición actual para renderizarlas en el grid
+
         const sortedPieces = [...pieces].sort((a, b) => a.currentPos - b.currentPos);
 
         sortedPieces.forEach(piece => {
             const pieceEl = document.createElement('div');
             pieceEl.classList.add('puzzle-piece');
-            pieceEl.setAttribute('draggable', true);
             pieceEl.dataset.id = piece.id;
+            pieceEl.draggable = false;
+            pieceEl.tabIndex = piece.locked ? -1 : 0;
+            pieceEl.setAttribute('role', 'button');
+            pieceEl.setAttribute('aria-label', `${selectedPuzzleImage.label}, pieza ${piece.id + 1}`);
+            pieceEl.setAttribute('aria-disabled', piece.locked ? 'true' : 'false');
 
-            // Calcular la posición del fondo (background-position)
-            // La imagen se divide en 3x3, cada pieza es 33.33%
             const row = Math.floor(piece.id / size);
             const col = piece.id % size;
             const posX = (col * 100) / (size - 1);
             const posY = (row * 100) / (size - 1);
-            
+
             pieceEl.style.backgroundPosition = `${posX}% ${posY}%`;
 
-            // Eventos de Drag and Drop
-            pieceEl.addEventListener('dragstart', handleDragStart);
-            pieceEl.addEventListener('dragover', handleDragOver);
-            pieceEl.addEventListener('dragenter', handleDragEnter);
-            pieceEl.addEventListener('dragleave', handleDragLeave);
-            pieceEl.addEventListener('drop', handleDrop);
-            pieceEl.addEventListener('dragend', handleDragEnd);
-
-            // Soporte para Touch (Móviles) básico mediante intercambio al hacer clic
-            pieceEl.addEventListener('click', handleClick);
+            if (piece.locked) {
+                pieceEl.classList.add('is-fixed');
+            } else {
+                pieceEl.addEventListener('pointerdown', handlePointerDown);
+                pieceEl.addEventListener('keydown', handlePieceKeyDown);
+            }
 
             puzzleBoard.appendChild(pieceEl);
         });
     }
 
-    // --- Lógica de Drag and Drop ---
+    function handlePointerDown(e) {
+        const pieceId = parseInt(this.dataset.id, 10);
+        const piece = getPieceById(pieceId);
 
-    function handleDragStart(e) {
-        draggedPiece = this;
-        this.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', this.dataset.id);
-    }
-
-    function handleDragOver(e) {
-        e.preventDefault();
-        return false;
-    }
-
-    function handleDragEnter(e) {
-        this.classList.add('over');
-    }
-
-    function handleDragLeave(e) {
-        this.classList.remove('over');
-    }
-
-    function handleDrop(e) {
-        e.stopPropagation();
-        e.preventDefault();
-
-        if (draggedPiece !== this) {
-            const draggedId = parseInt(draggedPiece.dataset.id);
-            const targetId = parseInt(this.dataset.id);
-
-            swapPieces(draggedId, targetId);
+        if (!piece || piece.locked || timeRemaining <= 0 || successModal.classList.contains('show')) {
+            return;
         }
-        return false;
+
+        e.preventDefault();
+        pointerState = {
+            pieceEl: this,
+            pieceId,
+            pointerId: e.pointerId,
+            startX: e.clientX,
+            startY: e.clientY,
+            dragging: false
+        };
+
+        this.classList.add('is-active');
+        try { this.setPointerCapture(e.pointerId); } catch (error) {}
+        this.addEventListener('pointermove', handlePointerMove);
+        this.addEventListener('pointerup', handlePointerUp);
+        this.addEventListener('pointercancel', handlePointerCancel);
     }
 
-    function handleDragEnd(e) {
-        this.classList.remove('dragging');
-        const items = document.querySelectorAll('.puzzle-piece');
-        items.forEach(item => item.classList.remove('over'));
+    function handlePointerMove(e) {
+        if (!pointerState || e.pointerId !== pointerState.pointerId) {
+            return;
+        }
+
+        const dx = e.clientX - pointerState.startX;
+        const dy = e.clientY - pointerState.startY;
+        const distance = Math.hypot(dx, dy);
+
+        if (distance >= DRAG_START_THRESHOLD) {
+            pointerState.dragging = true;
+            clearSelection();
+            pointerState.pieceEl.classList.add('dragging');
+        }
+
+        if (!pointerState.dragging) {
+            return;
+        }
+
+        pointerState.pieceEl.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(1.06)`;
+        setDropTarget(findPieceUnderPointer(e.clientX, e.clientY, pointerState.pieceEl));
     }
 
-    // --- Lógica de Intercambio ---
+    function handlePointerUp(e) {
+        if (!pointerState || e.pointerId !== pointerState.pointerId) {
+            return;
+        }
 
-    let firstSelection = null;
+        e.preventDefault();
+        const targetEl = currentDropTarget;
+        const pieceEl = pointerState.pieceEl;
+        const pieceId = pointerState.pieceId;
+        const wasDragging = pointerState.dragging;
 
-    function handleClick() {
+        cleanupPointerState();
+
+        if (wasDragging && targetEl) {
+            swapPieces(pieceId, parseInt(targetEl.dataset.id, 10));
+            return;
+        }
+
+        handleTapSelection(pieceEl);
+    }
+
+    function handlePointerCancel(e) {
+        if (!pointerState || e.pointerId !== pointerState.pointerId) {
+            return;
+        }
+
+        cleanupPointerState();
+    }
+
+    function cleanupPointerState() {
+        if (!pointerState) {
+            return;
+        }
+
+        const { pieceEl, pointerId } = pointerState;
+        try { pieceEl.releasePointerCapture(pointerId); } catch (error) {}
+        pieceEl.style.transform = '';
+        pieceEl.classList.remove('dragging', 'is-active');
+        pieceEl.removeEventListener('pointermove', handlePointerMove);
+        pieceEl.removeEventListener('pointerup', handlePointerUp);
+        pieceEl.removeEventListener('pointercancel', handlePointerCancel);
+        setDropTarget(null);
+        pointerState = null;
+    }
+
+    function findPieceUnderPointer(x, y, sourceEl) {
+        const previousPointerEvents = sourceEl.style.pointerEvents;
+        sourceEl.style.pointerEvents = 'none';
+        const elementUnderPointer = document.elementFromPoint(x, y);
+        sourceEl.style.pointerEvents = previousPointerEvents;
+
+        const targetEl = elementUnderPointer ? elementUnderPointer.closest('.puzzle-piece') : null;
+        if (!targetEl || targetEl === sourceEl || targetEl.classList.contains('is-fixed')) {
+            return null;
+        }
+
+        return targetEl;
+    }
+
+    function setDropTarget(targetEl) {
+        if (currentDropTarget === targetEl) {
+            return;
+        }
+
+        if (currentDropTarget) {
+            currentDropTarget.classList.remove('over');
+        }
+
+        currentDropTarget = targetEl;
+
+        if (currentDropTarget) {
+            currentDropTarget.classList.add('over');
+        }
+    }
+
+    function handleTapSelection(pieceEl) {
+        const pieceId = parseInt(pieceEl.dataset.id, 10);
+        const piece = getPieceById(pieceId);
+
+        if (!piece || piece.locked) {
+            return;
+        }
+
         if (!firstSelection) {
-            firstSelection = this;
-            this.style.outline = '4px solid var(--accent-color)';
-        } else {
-            if (firstSelection !== this) {
-                const id1 = parseInt(firstSelection.dataset.id);
-                const id2 = parseInt(this.dataset.id);
-                swapPieces(id1, id2);
-            }
-            firstSelection.style.outline = 'none';
+            firstSelection = pieceEl;
+            firstSelection.classList.add('is-selected');
+            return;
+        }
+
+        if (firstSelection === pieceEl) {
+            clearSelection();
+            return;
+        }
+
+        const firstId = parseInt(firstSelection.dataset.id, 10);
+        clearSelection();
+        swapPieces(firstId, pieceId);
+    }
+
+    function handlePieceKeyDown(e) {
+        if (e.key !== 'Enter' && e.key !== ' ') {
+            return;
+        }
+
+        e.preventDefault();
+        handleTapSelection(this);
+    }
+
+    function clearSelection() {
+        if (firstSelection) {
+            firstSelection.classList.remove('is-selected');
             firstSelection = null;
         }
     }
 
     function swapPieces(id1, id2) {
-        const piece1 = pieces.find(p => p.id === id1);
-        const piece2 = pieces.find(p => p.id === id2);
+        if (id1 === id2) {
+            return;
+        }
+
+        const piece1 = getPieceById(id1);
+        const piece2 = getPieceById(id2);
+
+        if (!piece1 || !piece2 || piece1.locked || piece2.locked) {
+            return;
+        }
 
         const tempPos = piece1.currentPos;
         piece1.currentPos = piece2.currentPos;
         piece2.currentPos = tempPos;
 
+        updateLockedPieces();
         renderBoard();
 
         if (checkWin()) {
-            setTimeout(showSuccess, 300);
+            completePuzzle();
         }
     }
 
-    /**
-     * Comprueba si todas las piezas están en su lugar
-     */
+    function completePuzzle() {
+        if (completionQueued) {
+            return;
+        }
+
+        completionQueued = true;
+        stopTimer();
+        clearSelection();
+        setDropTarget(null);
+        puzzleBoard.classList.add('is-complete');
+        puzzleBoard.setAttribute('aria-label', `${selectedPuzzleImage.label} completado`);
+
+        completionTimeout = setTimeout(() => {
+            completionTimeout = null;
+            showSuccess();
+        }, 900);
+    }
+
+    function getPieceById(id) {
+        return pieces.find(piece => piece.id === id);
+    }
+
+    function updateLockedPieces() {
+        pieces.forEach(piece => {
+            piece.locked = piece.currentPos === piece.correctPos;
+        });
+    }
+
     function checkWin() {
         return pieces.every(piece => piece.currentPos === piece.correctPos);
     }
@@ -235,14 +433,13 @@ document.addEventListener('DOMContentLoaded', () => {
             completed[STATION_ID] = true;
             localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
         } catch (e) {
-            console.warn('No se pudo marcar estación completa:', e);
+            console.warn('No se pudo marcar estacion completa:', e);
         }
     }
 
     async function guardarSbeelEnSupabase() {
         try {
             const progreso = await import('../supabase-utils.js');
-            const elapsedSeconds = TIME_LIMIT_SECONDS - timeRemaining;
             const finalScore = Math.max(0, timeRemaining);
 
             await progreso.guardarIntentoEstacion(STATION_ID, {
@@ -267,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stopTimer();
         const retryModalBtn = document.getElementById('retry-modal-btn');
         const modalContent = successModal ? successModal.querySelector('.modal-content') : null;
-        
+
         if (timeRemaining > 0) {
             solvedOnTime = true;
             markStationCompleted();
@@ -283,11 +480,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 successText.style.display = 'none';
                 closeModalBtn.style.display = 'none';
                 if (retryModalBtn) retryModalBtn.style.display = 'none';
-                
+
                 if (modalContent) {
                     modalContent.classList.add('modal-content--success-card');
                 }
-                
+
                 window.MuchStationCompletion?.renderInline(successMessageHost, {
                     stationId: '6',
                     isFinalStation: true,
@@ -329,17 +526,19 @@ document.addEventListener('DOMContentLoaded', () => {
         try { playBgMusic(); } catch (e) {}
     }
 
-    // --- Event Listeners ---
-
     resetBtn.addEventListener('click', () => {
-        shufflePieces();
-        renderBoard();
-        resetTimer();
-        startTimer();
+        resetGame();
     });
 
     closeModalBtn.addEventListener('click', () => {
-        try { closeModalBtn.style.transform = 'translateY(2px)'; closeModalBtn.style.opacity = '0.9'; setTimeout(() => { closeModalBtn.style.transform = ''; closeModalBtn.style.opacity = ''; }, 160); } catch (e) {}
+        try {
+            closeModalBtn.style.transform = 'translateY(2px)';
+            closeModalBtn.style.opacity = '0.9';
+            setTimeout(() => {
+                closeModalBtn.style.transform = '';
+                closeModalBtn.style.opacity = '';
+            }, 160);
+        } catch (e) {}
         setTimeout(() => { window.location.href = '../index.html?view=prep'; }, 180);
     });
 
@@ -347,15 +546,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (retryModalBtn) {
         retryModalBtn.addEventListener('click', () => {
             successModal.classList.remove('show');
-            shufflePieces();
-            renderBoard();
-            resetTimer();
-            startTimer();
+            resetGame();
         });
     }
 
     backBtn.addEventListener('click', () => {
-        try { backBtn.style.transform = 'translateX(-6px)'; backBtn.style.opacity = '0.9'; setTimeout(() => { backBtn.style.transform = ''; backBtn.style.opacity = ''; }, 160); } catch (e) {}
+        try {
+            backBtn.style.transform = 'translateX(-6px)';
+            backBtn.style.opacity = '0.9';
+            setTimeout(() => {
+                backBtn.style.transform = '';
+                backBtn.style.opacity = '';
+            }, 160);
+        } catch (e) {}
         setTimeout(() => { window.location.href = '../index.html?view=prep'; }, 180);
     });
 
@@ -374,6 +577,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stopTimer();
         timeRemaining = TIME_LIMIT_SECONDS;
         solvedOnTime = false;
+        completionQueued = false;
         updateTimerDisplay();
     }
 
@@ -392,7 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         stationId: '6',
                         badge: 'Nuevo intento',
                         title: 'Sigue explorando, vas muy bien',
-                        body: 'El tiempo se terminó esta vez, pero ya tienes otra oportunidad para completar el reto. Respira, observa con calma y vuelve a intentarlo.',
+                        body: 'El tiempo se termino esta vez, pero ya tienes otra oportunidad para completar el reto. Respira, observa con calma y vuelve a intentarlo.',
                         nextStationName: 'Nuevo intento',
                         detailLabel: 'Tu siguiente paso',
                         detailValue: 'Cierra este mensaje para volver a intentarlo',
@@ -413,12 +617,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resetGame() {
+        if (completionTimeout) {
+            clearTimeout(completionTimeout);
+            completionTimeout = null;
+        }
+        puzzleBoard.classList.remove('is-complete');
+        puzzleBoard.removeAttribute('aria-label');
         shufflePieces();
         renderBoard();
         resetTimer();
         startTimer();
     }
 
-    // Iniciar
     initGame();
 });

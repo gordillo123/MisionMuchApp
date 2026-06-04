@@ -186,12 +186,10 @@
     params.set('from', 'portada');
     btnJugar.href = 'index.html?' + params.toString();
 
-    // Lógica para el botón de regresar que mantenga los parámetros de la URL
+    // Lógica para el botón de regresar al mapa principal
     document.getElementById('btnReturnToMap').addEventListener('click', function(e) {
       e.preventDefault();
-      const searchParams = new URLSearchParams(window.location.search);
-
-      window.location.href = '../index.html?' + searchParams.toString();
+      window.location.href = '../index.html?view=prep';
     });
   </script>
 </body>
