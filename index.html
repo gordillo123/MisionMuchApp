@@ -937,6 +937,48 @@
         inset 0 2px 0px rgba(255,255,255,0.5);
     }
 
+    .btn-verify {
+      background: linear-gradient(135deg, #00B487, #00D2C4);
+      border: 4px solid #fff;
+      border-radius: 50px;
+      padding: 1.0rem 2.5rem;
+      color: white;
+      font-weight: 900;
+      font-size: 1.3rem;
+      cursor: pointer;
+      box-shadow: 
+        0 8px 0px rgba(0,0,0,0.3),
+        0 15px 30px rgba(0, 180, 135, 0.4);
+      transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      width: 100%;
+      white-space: normal;
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .btn-verify:hover {
+      transform: translateY(-4px) scale(1.05);
+      background: linear-gradient(135deg, #00D2C4, #00B487);
+      box-shadow: 
+        0 12px 0px rgba(0,0,0,0.2),
+        0 20px 40px rgba(0, 180, 135, 0.5);
+    }
+
+    .btn-verify:active {
+      transform: translateY(6px);
+      box-shadow: 
+        0 0px 0px #00936C,
+        0 5px 10px rgba(0,0,0,0.3),
+        inset 0 2px 0px rgba(255,255,255,0.5);
+    }
+
+
     .mobile-play-note {
       font-size: 0.85rem;
       color: #94a3b8;
@@ -1845,6 +1887,13 @@
       box-shadow:
         0 4px 10px rgba(0, 0, 0, 0.2),
         0 0 0 3px rgba(0, 180, 135, 0.12);
+    }
+
+    .map-marker.disabled, .map-marker--disabled {
+      opacity: 0.35 !important;
+      filter: grayscale(80%) !important;
+      pointer-events: none !important;
+      cursor: not-allowed !important;
     }
 
     @keyframes completePulse {
@@ -8872,6 +8921,7 @@
 
     let currentStation = '1';
     let selectedAvatar = null;
+    let activeStationIds = null;
 
     function includeHTML() {
       const elements = document.querySelectorAll('[data-include]');
@@ -8886,8 +8936,34 @@
       });
     }
 
+    async function fetchActiveStations() {
+      try {
+        if (typeof window.consultarEstaciones === 'function') {
+          const stations = await window.consultarEstaciones();
+          if (Array.isArray(stations) && stations.length > 0) {
+            activeStationIds = new Set(stations.map(s => String(s.id_estacion)));
+            console.log('[Sync] Estaciones activas cargadas:', Array.from(activeStationIds));
+            
+            // Si la estación actual es inactiva, mover a la primera activa
+            if (activeStationIds && !activeStationIds.has(String(currentStation))) {
+              const firstActive = Array.from(activeStationIds).find(id => id !== '1') || '1';
+              currentStation = firstActive;
+              localStorage.setItem('much_current_station', currentStation);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('[Sync] Error al obtener estaciones activas:', err);
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       includeHTML();
+      fetchActiveStations().then(() => {
+        if (typeof updateCompletedStationsOnMap === 'function') {
+          updateCompletedStationsOnMap();
+        }
+      });
 
       const orientationOverlay = document.getElementById('orientationOverlay');
       const hasCoarsePointer = () => window.matchMedia('(pointer: coarse)').matches;
@@ -9529,6 +9605,17 @@
         if (target) {
           target.classList.add('active');
           localStorage.setItem('much_current_view', viewId);
+
+          if (viewId === 'viewPrep') {
+            fetchActiveStations().then(() => {
+              if (typeof updateCompletedStationsOnMap === 'function') {
+                updateCompletedStationsOnMap();
+              }
+              // También restaurar avatar y mover a la estación actual
+              const savedStation = localStorage.getItem('much_current_station') || currentStation || '1';
+              moveToStation(savedStation);
+            });
+          }
           
           // NUEVO: Mostrar el botón hamburguesa SÓLO en el inicio (viewLanding)
           const hamburger = document.getElementById('hamburgerBtn');
@@ -10639,6 +10726,12 @@
             ensureMapMarkerCheckSlot(marker);
             marker.classList.toggle('completed', isCompleted);
 
+            // Verificar si está activa
+            if (activeStationIds) {
+              const isActive = activeStationIds.has(String(stationId));
+              marker.classList.toggle('disabled', !isActive);
+            }
+
             if (numberEl) {
               numberEl.textContent = stationId;
             }
@@ -10674,12 +10767,18 @@
           updateCompletedStationsOnMap();
           syncPrepRulesForStation(currentStation);
 
-          // Bloquear el botón de comenzar si la estación ya está completada
+          // Bloquear el botón de comenzar si la estación ya está completada o inactiva
           const completed = getCompletedStations();
           updateRewardClaimUI(completed);
           const btnComenzar = document.getElementById('btnComenzar');
           if (btnComenzar) {
-            if (completed[String(stationId)]) {
+            const isActive = !activeStationIds || activeStationIds.has(String(stationId));
+            if (!isActive) {
+              btnComenzar.innerHTML = '🔒 ESTACIÓN INACTIVA';
+              btnComenzar.style.background = '#e11d48';
+              btnComenzar.style.opacity = '0.7';
+              btnComenzar.style.pointerEvents = 'none';
+            } else if (completed[String(stationId)]) {
               btnComenzar.innerHTML = '🔒 ESTACIÓN COMPLETADA';
               btnComenzar.style.background = '#00B487';
               btnComenzar.style.opacity = '0.7';
@@ -10783,7 +10882,79 @@
         });
       }
 
-      document.getElementById('btnComenzar').onclick = () => {
+      document.getElementById('btnComenzar').onclick = async () => {
+        const btnComenzar = document.getElementById('btnComenzar');
+        const originalHTML = btnComenzar ? btnComenzar.innerHTML : '🚀 ¡COMENZAR!';
+
+        // Verificar ubicación vigente antes de comenzar cualquier estación
+        let estadoUbi = window.comprobarUbicacionVigente ? window.comprobarUbicacionVigente() : { ok: false, message: 'Función de ubicación no disponible.' };
+        
+        if (!estadoUbi.ok) {
+          // Si no está vigente localmente, intentar restaurar desde el servidor primero (silenciosamente)
+          if (window.intentarRestaurarVerificacionDesdeServidor) {
+            try {
+              const res = await window.intentarRestaurarVerificacionDesdeServidor();
+              if (res.ok) {
+                estadoUbi = { ok: true };
+              }
+            } catch (e) {
+              console.error('Error al intentar restaurar ubicación:', e);
+            }
+          }
+        }
+
+        if (!estadoUbi.ok) {
+          // Si sigue sin estar validada, disparar la geolocalización de forma interactiva justo en este momento
+          if (window.verificarUbicacionYRegistrar) {
+            try {
+              if (btnComenzar) {
+                btnComenzar.disabled = true;
+                btnComenzar.innerHTML = '⏳ VALIDANDO GPS...';
+                btnComenzar.style.opacity = '0.7';
+              }
+
+              const res = await window.verificarUbicacionYRegistrar();
+              if (res.ok) {
+                estadoUbi = { ok: true };
+                window.MuchStationCompletion?.showFloatingNotice({
+                  badge: '📍 Ubicación OK',
+                  title: '¡Ubicación validada!',
+                  body: 'Estás en el Museo Chiapas de Ciencia y Tecnología. ¡Que comience el juego!',
+                  detailLabel: 'Acción',
+                  detailValue: 'Listo para jugar'
+                });
+              } else {
+                window.MuchStationCompletion?.showFloatingNotice({
+                  badge: '📍 Ubicación incorrecta',
+                  title: 'No estás en el museo',
+                  body: res.message,
+                  detailLabel: 'GPS',
+                  detailValue: 'Acceso denegado'
+                });
+              }
+            } catch (e) {
+              window.MuchStationCompletion?.showFloatingNotice({
+                badge: '📍 Error GPS',
+                title: 'Error de validación',
+                body: 'Ocurrió un error al obtener tu geolocalización: ' + e.message,
+                detailLabel: 'Detalle',
+                detailValue: 'Reinténtalo'
+              });
+            } finally {
+              if (btnComenzar) {
+                btnComenzar.disabled = false;
+                btnComenzar.innerHTML = originalHTML;
+                btnComenzar.style.opacity = '';
+              }
+            }
+          }
+        }
+
+        if (!estadoUbi.ok) {
+          // Si después de todo no se pudo verificar, detenemos el flujo
+          return;
+        }
+
         const completed = getCompletedStations();
         if (completed[currentStation]) {
           window.MuchStationCompletion?.showFloatingNotice({
@@ -10843,6 +11014,106 @@
           startGameFlow();
         };
       }
+
+      // ==========================================
+      // FUNCIONES DE GEOLOCALIZACIÓN DEL MUSEO
+      // ==========================================
+      window.triggerLocationCheck = async () => {
+        const btn = document.getElementById('btnVerifyLocation');
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '⏳ Obteniendo GPS...';
+          btn.style.opacity = '0.7';
+        }
+
+        try {
+          const res = await window.verificarUbicacionYRegistrar();
+          
+          if (res.ok) {
+            if (btn) {
+              btn.innerHTML = '✅ Ubicación Validada';
+              btn.style.background = 'linear-gradient(135deg, #00B487, #00D2C4)';
+              btn.style.opacity = '1';
+            }
+            window.MuchStationCompletion?.showFloatingNotice({
+              badge: '📍 Ubicación OK',
+              title: '¡Ubicación validada!',
+              body: 'Ubicación validada. Estás en el Museo Chiapas de Ciencia y Tecnología y ya puedes jugar.',
+              detailLabel: 'Acción',
+              detailValue: 'Listo para jugar'
+            });
+          } else {
+            if (btn) {
+              btn.disabled = false;
+              btn.innerHTML = '📍 Verificar ubicación';
+              btn.style.opacity = '1';
+            }
+            window.MuchStationCompletion?.showFloatingNotice({
+              badge: '📍 Error de ubicación',
+              title: 'No estás en el museo',
+              body: res.message,
+              detailLabel: 'Intento',
+              detailValue: 'Reintentar verificación'
+            });
+          }
+        } catch (e) {
+          console.error(e);
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '📍 Verificar ubicación';
+            btn.style.opacity = '1';
+          }
+          window.MuchStationCompletion?.showFloatingNotice({
+            badge: '📍 Error',
+            title: 'Error de verificación',
+            body: 'Ocurrió un error inesperado al comprobar tu ubicación. Inténtalo de nuevo.',
+            detailLabel: 'Detalle',
+            detailValue: e.message
+          });
+        }
+      };
+
+      const checkInitialLocationBtn = async () => {
+        const btn = document.getElementById('btnVerifyLocation');
+        if (!btn) return;
+
+        if (window.comprobarUbicacionVigente) {
+          let estado = window.comprobarUbicacionVigente();
+          if (!estado.ok && window.intentarRestaurarVerificacionDesdeServidor) {
+            try {
+              const res = await window.intentarRestaurarVerificacionDesdeServidor();
+              if (res.ok) {
+                estado = { ok: true };
+              }
+            } catch (e) {
+              console.error('Error al intentar restaurar ubicación desde servidor:', e);
+            }
+          }
+          if (estado.ok) {
+            btn.innerHTML = '✅ Ubicación Validada';
+            btn.style.background = 'linear-gradient(135deg, #00B487, #00D2C4)';
+          }
+        }
+      };
+
+      const checkRedirectReason = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('reason') === 'location_required') {
+          const msg = urlParams.get('msg') || 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicación.';
+          window.setTimeout(() => {
+            window.MuchStationCompletion?.showFloatingNotice({
+              badge: '📍 Ubicación requerida',
+              title: 'Acceso restringido',
+              body: msg,
+              detailLabel: 'Requisito',
+              detailValue: 'Estar en el museo'
+            });
+          }, 800);
+        }
+      };
+
+      setTimeout(checkInitialLocationBtn, 500);
+      checkRedirectReason();
     });
 
     /* ════════════════════════════════════════════════════════════

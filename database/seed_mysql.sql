@@ -11,19 +11,19 @@ ON DUPLICATE KEY UPDATE nombre=nombre;
 -- 2. Insertar Estaciones de la Misión
 INSERT INTO estaciones (id_estacion, nombre, descripcion, orden, puntos, puntaje_minimo, tipo, activa) VALUES
 (1, 'Entrada MUCH', 'Preguntas de bienvenida al museo', 1, 10, 6, 'preguntas', 1),
-(2, 'SBEEL / Rompecabezas', 'Armado del rompecabezas SBEEL de dinosaurios', 2, 10, 10, 'rompecabezas', 1),
-(3, 'Sala de desarrollo sustentable', 'Preguntas sobre desarrollo sustentable y ecotecnias', 3, 10, 7, 'preguntas', 1),
+(2, 'Espinosaurio', 'Reto de saltos del Espinosaurio', 2, 15, 15, 'minijuego', 1),
+(3, 'Biodiversidad y Conocimiento', 'Preguntas sobre flora y fauna de Chiapas', 3, 10, 7, 'preguntas', 1),
 (4, 'Sala de energía', 'Preguntas sobre fuentes y tipos de energía', 4, 10, 7, 'preguntas', 1),
-(5, 'Sala de biodiversidad', 'Preguntas sobre la flora y fauna de Chiapas', 5, 10, 7, 'preguntas', 1),
-(6, 'Boleto final', 'Boleto final con folio y QR de premio', 6, 0, 0, 'boleto', 1)
+(5, 'Sala de desarrollo sustentable', 'Preguntas sobre desarrollo sustentable y ecotecnias', 5, 10, 7, 'preguntas', 1),
+(6, 'SBEEL Dinosaurios', 'Armado del rompecabezas SBEEL de dinosaurios', 6, 10, 10, 'rompecabezas', 1)
 ON DUPLICATE KEY UPDATE nombre=VALUES(nombre), descripcion=VALUES(descripcion), tipo=VALUES(tipo), puntos=VALUES(puntos), puntaje_minimo=VALUES(puntaje_minimo);
 
--- 3. Insertar Preguntas para la Sala de desarrollo sustentable (id_estacion = 3)
+-- 3. Insertar Preguntas para la Sala de desarrollo sustentable (id_estacion = 5)
 INSERT INTO preguntas (id_pregunta, id_estacion, pregunta, activa) VALUES
-(1, 3, '¿Qué es el desarrollo sustentable?', 1),
-(2, 3, '¿Cuál de las siguientes es una fuente de energía renovable?', 1),
-(3, 3, '¿Qué significan las 3R en el cuidado del medio ambiente?', 1)
-ON DUPLICATE KEY UPDATE pregunta=VALUES(pregunta);
+(1, 5, '¿Qué es el desarrollo sustentable?', 1),
+(2, 5, '¿Cuál de las siguientes es una fuente de energía renovable?', 1),
+(3, 5, '¿Qué significan las 3R en el cuidado del medio ambiente?', 1)
+ON DUPLICATE KEY UPDATE pregunta=VALUES(pregunta), id_estacion=VALUES(id_estacion);
 
 -- Respuestas para Pregunta 1
 INSERT INTO respuestas (id_respuesta, id_pregunta, texto_respuesta, es_correcta, activa) VALUES
@@ -76,12 +76,12 @@ INSERT INTO respuestas (id_respuesta, id_pregunta, texto_respuesta, es_correcta,
 ON DUPLICATE KEY UPDATE texto_respuesta=VALUES(texto_respuesta), es_correcta=VALUES(es_correcta);
 
 
--- 5. Insertar Preguntas para la Sala de biodiversidad (id_estacion = 5)
+-- 5. Insertar Preguntas para la Sala de biodiversidad (id_estacion = 3)
 INSERT INTO preguntas (id_pregunta, id_estacion, pregunta, activa) VALUES
-(7, 5, '¿Qué es la biodiversidad?', 1),
-(8, 5, '¿Qué tipo de selva es la Selva Lacandona, joya de biodiversidad en Chiapas?', 1),
-(9, 5, '¿Cuál es un animal representativo y en peligro de extinción de la Selva Lacandona?', 1)
-ON DUPLICATE KEY UPDATE pregunta=VALUES(pregunta);
+(7, 3, '¿Qué es la biodiversidad?', 1),
+(8, 3, '¿Qué tipo de selva es la Selva Lacandona, joya de biodiversidad en Chiapas?', 1),
+(9, 3, '¿Cuál es un animal representativo y en peligro de extinción de la Selva Lacandona?', 1)
+ON DUPLICATE KEY UPDATE pregunta=VALUES(pregunta), id_estacion=VALUES(id_estacion);
 
 -- Respuestas para Pregunta 7
 INSERT INTO respuestas (id_respuesta, id_pregunta, texto_respuesta, es_correcta, activa) VALUES

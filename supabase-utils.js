@@ -4,6 +4,293 @@
 
 const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
 
+// ==========================================
+// CONFIGURACIÓN DE GEOLOCALIZACIÓN DEL MUSEO
+// ==========================================
+const DIRECCION_MUSEO = "Calz. Cerro Hueco 3000, Rivera Cerro Hueco, FSTSE, 29094 Tuxtla Gutiérrez, Chiapas";
+const LATITUD_MUSEO = 16.72248; // Coloca la latitud real aquí (ej: 16.72248)
+const LONGITUD_MUSEO = -93.09100; // Coloca la longitud real aquí (ej: -93.09100)
+const RADIO_PERMITIDO_METROS = 150;
+const TIEMPO_VALIDACION_MINUTOS = 15; // 15 minutos de vigencia de verificación
+
+function calcularDistanciaHaversine(lat1, lon1, lat2, lon2) {
+  const R = 6371e3; // Radio de la Tierra en metros
+  const phi1 = lat1 * Math.PI / 180;
+  const phi2 = lat2 * Math.PI / 180;
+  const deltaPhi = (lat2 - lat1) * Math.PI / 180;
+  const deltaLambda = (lon2 - lon1) * Math.PI / 180;
+
+  const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+            Math.cos(phi1) * Math.cos(phi2) *
+            Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // Distancia en metros
+}
+
+function obtenerSessionId() {
+  let sessionId = localStorage.getItem('much_session_id');
+  if (!sessionId) {
+    sessionId = 'sess_' + Math.random().toString(36).substring(2, 15) + '_' + Date.now();
+    localStorage.setItem('much_session_id', sessionId);
+  }
+  return sessionId;
+}
+
+async function guardarVerificacionUbicacion(datos) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/verificaciones-ubicacion`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    });
+    if (!res.ok) throw new Error('Error en el servidor al guardar verificación');
+    return await res.json();
+  } catch (e) {
+    console.error('Error guardando verificación de ubicación en base de datos:', e.message);
+    throw e;
+  }
+}
+
+async function verificarUbicacionYRegistrar() {
+  return new Promise((resolve) => {
+    // Solicitar confirmación explícita a nivel de aplicación (siempre pedirá interacción)
+    const confirmar = confirm("Para poder jugar, la aplicación verificará tu ubicación física actual para asegurar que te encuentras en el Museo Chiapas de Ciencia y Tecnología. ¿Deseas permitir la comprobación GPS?");
+    
+    if (!confirmar) {
+      const errorMsg = 'Permiso de ubicación denegado por el usuario.';
+      const user = obtenerUsuarioLocal();
+      const payload = {
+        user_id: user ? (user.id_usuario || user.id) : null,
+        session_id: obtenerSessionId(),
+        direccion_museo: DIRECCION_MUSEO,
+        latitud_usuario: null,
+        longitud_usuario: null,
+        precision_gps: null,
+        latitud_museo: LATITUD_MUSEO,
+        longitud_museo: LONGITUD_MUSEO,
+        radio_permitido_metros: RADIO_PERMITIDO_METROS,
+        distancia_metros: null,
+        dentro_del_museo: false,
+        permiso_ubicacion: false,
+        mensaje_resultado: errorMsg
+      };
+
+      guardarVerificacionUbicacion(payload).catch(() => {});
+      
+      const verifLocal = {
+        dentro_del_museo: false,
+        timestamp: Date.now(),
+        mensaje_resultado: 'Para jugar necesitas permitir el acceso a tu ubicación.'
+      };
+      sessionStorage.setItem('much_last_location_verification', JSON.stringify(verifLocal));
+
+      return resolve({ ok: false, error: 'permission_denied', message: verifLocal.mensaje_resultado });
+    }
+
+    if (!navigator.geolocation) {
+      const errorMsg = 'El navegador no soporta geolocalización.';
+      const user = obtenerUsuarioLocal();
+      const payload = {
+        user_id: user ? (user.id_usuario || user.id) : null,
+        session_id: obtenerSessionId(),
+        direccion_museo: DIRECCION_MUSEO,
+        latitud_usuario: null,
+        longitud_usuario: null,
+        precision_gps: null,
+        latitud_museo: LATITUD_MUSEO,
+        longitud_museo: LONGITUD_MUSEO,
+        radio_permitido_metros: RADIO_PERMITIDO_METROS,
+        distancia_metros: null,
+        dentro_del_museo: false,
+        permiso_ubicacion: false,
+        mensaje_resultado: errorMsg
+      };
+
+      guardarVerificacionUbicacion(payload).catch(() => {});
+      
+      const verifLocal = {
+        dentro_del_museo: false,
+        timestamp: Date.now(),
+        mensaje_resultado: errorMsg
+      };
+      sessionStorage.setItem('much_last_location_verification', JSON.stringify(verifLocal));
+
+      return resolve({ ok: false, error: 'no_compatible', message: errorMsg });
+    }
+
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    };
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        const accuracy = position.coords.accuracy || null;
+        
+        const distancia = calcularDistanciaHaversine(lat, lon, LATITUD_MUSEO, LONGITUD_MUSEO);
+        const dentro = distancia <= RADIO_PERMITIDO_METROS;
+        const mensaje = dentro 
+          ? 'Ubicación validada correctamente.' 
+          : 'Usuario fuera del rango permitido del museo.';
+
+        const user = obtenerUsuarioLocal();
+        const payload = {
+          user_id: user ? (user.id_usuario || user.id) : null,
+          session_id: obtenerSessionId(),
+          direccion_museo: DIRECCION_MUSEO,
+          latitud_usuario: lat,
+          longitud_usuario: lon,
+          precision_gps: accuracy,
+          latitud_museo: LATITUD_MUSEO,
+          longitud_museo: LONGITUD_MUSEO,
+          radio_permitido_metros: RADIO_PERMITIDO_METROS,
+          distancia_metros: parseFloat(distancia.toFixed(2)),
+          dentro_del_museo: dentro,
+          permiso_ubicacion: true,
+          mensaje_resultado: mensaje
+        };
+
+        try {
+          await guardarVerificacionUbicacion(payload);
+        } catch (dbErr) {
+          console.error('Error al guardar verificación en BD:', dbErr);
+        }
+
+        const verifLocal = {
+          dentro_del_museo: dentro,
+          timestamp: Date.now(),
+          mensaje_resultado: dentro 
+            ? 'Ubicación validada. Estás en el Museo Chiapas de Ciencia y Tecnología y ya puedes jugar.'
+            : 'No puedes jugar porque no te encuentras en la ubicación del Museo Chiapas de Ciencia y Tecnología.'
+        };
+        sessionStorage.setItem('much_last_location_verification', JSON.stringify(verifLocal));
+        
+        resolve({ ok: dentro, dentro: dentro, distancia: distancia, message: verifLocal.mensaje_resultado });
+      },
+      async (error) => {
+        let codeMsg = 'Error desconocido al obtener ubicación.';
+        let permission = true;
+        let errorType = 'unknown';
+
+        if (error.code === error.PERMISSION_DENIED) {
+          codeMsg = 'Permiso de ubicación denegado.';
+          permission = false;
+          errorType = 'permission_denied';
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          codeMsg = 'Ubicación no disponible.';
+          errorType = 'position_unavailable';
+        } else if (error.code === error.TIMEOUT) {
+          codeMsg = 'Tiempo de espera agotado al obtener ubicación.';
+          errorType = 'timeout';
+        }
+
+        const user = obtenerUsuarioLocal();
+        const payload = {
+          user_id: user ? (user.id_usuario || user.id) : null,
+          session_id: obtenerSessionId(),
+          direccion_museo: DIRECCION_MUSEO,
+          latitud_usuario: null,
+          longitud_usuario: null,
+          precision_gps: null,
+          latitud_museo: LATITUD_MUSEO,
+          longitud_museo: LONGITUD_MUSEO,
+          radio_permitido_metros: RADIO_PERMITIDO_METROS,
+          distancia_metros: null,
+          dentro_del_museo: false,
+          permiso_ubicacion: permission,
+          mensaje_resultado: codeMsg
+        };
+
+        try {
+          await guardarVerificacionUbicacion(payload);
+        } catch (dbErr) {
+          console.error('Error al guardar verificación fallida en BD:', dbErr);
+        }
+
+        const verifLocal = {
+          dentro_del_museo: false,
+          timestamp: Date.now(),
+          mensaje_resultado: permission 
+            ? 'Error al obtener ubicación: ' + codeMsg
+            : 'Para jugar necesitas permitir el acceso a tu ubicación.'
+        };
+        sessionStorage.setItem('much_last_location_verification', JSON.stringify(verifLocal));
+
+        resolve({ 
+          ok: false, 
+          error: errorType, 
+          message: verifLocal.mensaje_resultado 
+        });
+      },
+      options
+    );
+  });
+}
+
+function comprobarUbicacionVigente() {
+  try {
+    const raw = sessionStorage.getItem('much_last_location_verification');
+    if (!raw) return { ok: false, message: 'No has verificado tu ubicación aún.' };
+    
+    const verif = JSON.parse(raw);
+    const ahora = Date.now();
+    const transcurridoMs = ahora - verif.timestamp;
+    const vigenciaMs = TIEMPO_VALIDACION_MINUTOS * 60 * 1000;
+
+    if (transcurridoMs > vigenciaMs) {
+      sessionStorage.removeItem('much_last_location_verification');
+      return { ok: false, expired: true, message: 'La verificación de ubicación ha expirado. Por favor, verifícala de nuevo.' };
+    }
+
+    if (!verif.dentro_del_museo) {
+      return { ok: false, message: verif.mensaje_resultado || 'No te encuentras en el Museo Chiapas de Ciencia y Tecnología.' };
+    }
+
+    return { ok: true, message: 'Ubicación válida.' };
+  } catch (e) {
+    console.error('Error al comprobar vigencia de ubicación:', e);
+    return { ok: false, message: 'Error al validar la ubicación.' };
+  }
+}
+
+function asegurarUbicacionVigente() {
+  const estado = comprobarUbicacionVigente();
+  if (!estado.ok) {
+    throw new Error('Acción bloqueada: ' + estado.message);
+  }
+}
+
+async function consultarUltimaVerificacion() {
+  const user = obtenerUsuarioLocal();
+  const userId = user ? (user.id_usuario || user.id) : null;
+  const sessionId = obtenerSessionId();
+
+  if (!userId && !sessionId) return null;
+
+  try {
+    const params = new URLSearchParams();
+    if (userId) params.append('user_id', userId);
+    if (sessionId) params.append('session_id', sessionId);
+
+    const res = await fetch(`${API_BASE_URL}/api/verificaciones-ubicacion/ultima?${params.toString()}`);
+    if (!res.ok) throw new Error('Error al obtener la última verificación');
+    return await res.json();
+  } catch (e) {
+    console.error('Error al consultar última verificación:', e);
+    return null;
+  }
+}
+
+async function intentarRestaurarVerificacionDesdeServidor() {
+  // Deshabilitado por solicitud del usuario para forzar solicitud de GPS en cada sesión nueva
+  return { ok: false };
+}
+
+
 async function initSupabase() {
   // Función placeholder para compatibilidad
   return window.supabase;
@@ -139,6 +426,23 @@ async function iniciarSesionConGoogle() {
         const data = await res.json();
         console.log('[Auth] Login exitoso:', data);
 
+        // Invalidar ubicación previa del usuario e invitado para exigir verificación fresca
+        const sessionId = localStorage.getItem('much_session_id');
+        const userId = data.id_usuario;
+        sessionStorage.removeItem('much_last_location_verification');
+
+        if (userId || sessionId) {
+          try {
+            await fetch(`${API_BASE_URL}/api/verificaciones-ubicacion/invalidar`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ user_id: userId, session_id: sessionId })
+            });
+          } catch (e) {
+            console.error('Error al invalidar ubicación al iniciar sesión:', e);
+          }
+        }
+
         // Guardar sesión en localStorage
         localStorage.setItem('much_google_user', JSON.stringify({
           id: data.id_usuario,
@@ -174,6 +478,24 @@ async function iniciarSesionConGoogle() {
 
 async function cerrarSesion() {
   console.log('🚪 Cerrando sesión y limpiando datos del usuario...');
+  
+  // Obtener IDs antes de borrar storage
+  const user = obtenerUsuarioLocal();
+  const userId = user ? (user.id_usuario || user.id) : null;
+  const sessionId = localStorage.getItem('much_session_id');
+
+  if (userId || sessionId) {
+    try {
+      await fetch(`${API_BASE_URL}/api/verificaciones-ubicacion/invalidar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId, session_id: sessionId })
+      });
+    } catch (e) {
+      console.error('Error al invalidar ubicación en el servidor:', e);
+    }
+  }
+
   const lugarSeguro = localStorage.getItem('much_lugar_seguro');
 
   // Limpiar completamente localStorage y sessionStorage para eliminar todo rastro del progreso anterior
@@ -212,8 +534,21 @@ async function consultarEstaciones() {
   }
 }
 
+// Comprobar si una estación específica está activa
+async function comprobarEstacionActiva(estacionId) {
+  try {
+    const estaciones = await consultarEstaciones();
+    if (!estaciones || estaciones.length === 0) return true; // Fallback
+    return estaciones.some(e => Number(e.id_estacion) === Number(estacionId));
+  } catch (err) {
+    console.error('Error en comprobarEstacionActiva:', err);
+    return true; // Fallback
+  }
+}
+
 // Guardar progreso del usuario en una estación
 async function guardarProgresoUsuario(estacionId, extra = {}) {
+  asegurarUbicacionVigente();
   const user = obtenerUsuarioLocal();
   if (!user) throw new Error('No hay usuario autenticado en local.');
 
@@ -250,6 +585,7 @@ async function guardarProgresoUsuario(estacionId, extra = {}) {
 
 // Inicializar progreso del usuario al entrar a una estación
 async function inicializarProgresoUsuario(estacionId) {
+  asegurarUbicacionVigente();
   const user = obtenerUsuarioLocal();
   if (!user) return null;
 
@@ -276,6 +612,7 @@ async function inicializarProgresoUsuario(estacionId) {
 
 // Reiniciar todo el progreso del usuario en la base de datos MySQL
 async function reiniciarProgresoUsuario() {
+  asegurarUbicacionVigente();
   const user = obtenerUsuarioLocal();
   if (!user) return null;
   const userId = user.id_usuario || user.id;
@@ -302,6 +639,7 @@ async function reiniciarProgresoUsuario() {
 
 // Guardar intento en una estación
 async function guardarIntentoEstacion(estacionId, intento = {}) {
+  asegurarUbicacionVigente();
   const user = obtenerUsuarioLocal();
   if (!user) throw new Error('No hay usuario autenticado en local.');
 
@@ -332,6 +670,7 @@ async function guardarIntentoEstacion(estacionId, intento = {}) {
 
 // Actualizar intento de estación existente
 async function actualizarIntentoEstacion(idIntento, intento = {}) {
+  asegurarUbicacionVigente();
   const user = obtenerUsuarioLocal();
   if (!user) throw new Error('No hay usuario autenticado en local.');
 
@@ -360,6 +699,7 @@ async function actualizarIntentoEstacion(idIntento, intento = {}) {
 
 // Guardar partida minijuego en partidas_minijuego
 async function guardarPartidaMinijuego(partida = {}) {
+  asegurarUbicacionVigente();
   const user = obtenerUsuarioLocal();
   if (!user) throw new Error('No hay usuario autenticado en local.');
 
@@ -388,6 +728,7 @@ async function guardarPartidaMinijuego(partida = {}) {
 
 // Guardar respuesta del usuario individualmente
 async function guardarRespuestaUsuario(idIntento, estacionId, preguntaTexto, respuestaTexto, esCorrecta) {
+  asegurarUbicacionVigente();
   const user = obtenerUsuarioLocal();
   if (!user) return null;
 
@@ -418,6 +759,7 @@ async function guardarRespuestaUsuario(idIntento, estacionId, preguntaTexto, res
 
 // Generar boleto final
 async function generarBoletoFinal() {
+  asegurarUbicacionVigente();
   const user = obtenerUsuarioLocal();
   if (!user) throw new Error('No hay usuario autenticado.');
 
@@ -472,6 +814,11 @@ window.generarBoletoFinal = generarBoletoFinal;
 window.iniciarJuego = iniciarJuego;
 window.cargarPreguntas = cargarPreguntas;
 window.responderPregunta = responderPregunta;
+window.verificarUbicacionYRegistrar = verificarUbicacionYRegistrar;
+window.comprobarUbicacionVigente = comprobarUbicacionVigente;
+window.consultarUltimaVerificacion = consultarUltimaVerificacion;
+window.intentarRestaurarVerificacionDesdeServidor = intentarRestaurarVerificacionDesdeServidor;
+window.comprobarEstacionActiva = comprobarEstacionActiva;
 
 export {
   initSupabase,
@@ -492,5 +839,11 @@ export {
   generarBoletoFinal,
   iniciarJuego,
   cargarPreguntas,
-  responderPregunta
+  responderPregunta,
+  verificarUbicacionYRegistrar,
+  comprobarUbicacionVigente,
+  consultarUltimaVerificacion,
+  intentarRestaurarVerificacionDesdeServidor,
+  comprobarEstacionActiva
 };
+

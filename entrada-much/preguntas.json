@@ -46,5 +46,29 @@
     "options": ["Azul cielo, rosa, verde", "Azul, amarillo, verde", "Morado, rosa, blanco", "Verde, café, negro"],
     "correctIndex": 0,
     "points": 10
+  },
+  {
+    "text": "🧬 ¿Qué significan las siglas MUCH?",
+    "options": ["Museo Chiapas de Ciencia y Tecnología", "Museo de la Comunidad Humana", "Muestra de Ciencia y Humana", "Mundo Científico e Histórico"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📍 ¿En qué reserva o parque natural se encuentra ubicado el MUCH?",
+    "options": ["Reserva de la Biósfera El Triunfo", "Parque Nacional Cañón del Sumidero", "Reserva El Zapotal", "Parque Joyyo Mayu"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🐒 ¿Cuál es el zoológico vecino que comparte la reserva El Zapotal con el MUCH?",
+    "options": ["ZooMAT (Zoológico Miguel Álvarez del Toro)", "Zoológico de Chapultepec", "Zoológico Guadalajara", "Zoo de Tuxtla"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦖 ¿Cuál es el dinosaurio carnívoro gigante cuyo fósil o representación da la bienvenida al museo?",
+    "options": ["Tiranosaurio Rex", "Espinosaurio", "Velociraptor", "Triceratops"],
+    "correctIndex": 1,
+    "points": 10
   }
 ]

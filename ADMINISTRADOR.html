@@ -1406,15 +1406,24 @@
         const data = await res.json();
         state.roles = data.roles || [];
         state.isAdmin = state.roles.includes('admin');
-        state.isTaquilla = state.roles.includes('taquilla');
+        state.isTaquilla = state.roles.includes('taquilla') || state.roles.includes('admin');
 
         if (!state.isAdmin && !state.isTaquilla) {
           showAccessDenied('Esta cuenta no cuenta con permisos de taquilla ni de administración en MySQL.');
           return;
         }
 
-        // Apply view restrictions
-        if (!state.isAdmin && state.isTaquilla) {
+        // Apply view restrictions or respect requested section in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sectionParam = urlParams.get('section');
+        if (sectionParam && TABS_CONFIG.some(t => t.id === sectionParam)) {
+          const config = TABS_CONFIG.find(t => t.id === sectionParam);
+          if (config.adminOnly && !state.isAdmin) {
+            state.activeTab = state.isTaquilla ? 'taquilla' : 'dashboard';
+          } else {
+            state.activeTab = sectionParam;
+          }
+        } else if (!state.isAdmin && state.isTaquilla) {
           state.activeTab = 'taquilla';
         }
 
@@ -1463,7 +1472,22 @@
       nav.innerHTML = '';
 
       TABS_CONFIG.forEach(tab => {
-        // Hide admin tabs for non-admin operators
+        // Taquilla siempre se muestra si el usuario tiene acceso
+        if (tab.id === 'taquilla') {
+          if (state.isAdmin || state.isTaquilla) {
+            const el = document.createElement('li');
+            el.className = `nav-item ${tab.id === state.activeTab ? 'active' : ''}`;
+            el.onclick = () => switchTab(tab.id);
+            el.innerHTML = `
+              <span class="nav-item-icon">${tab.icon}</span>
+              <span>${tab.name}</span>
+            `;
+            nav.appendChild(el);
+          }
+          return;
+        }
+
+        // Ocultar pestañas adminOnly para usuarios que no son admin
         if (tab.adminOnly && !state.isAdmin) return;
 
         const el = document.createElement('li');
@@ -1613,14 +1637,6 @@
               <span class="hint">Boletos utilizados para accesos</span>
             </div>
             <div class="metric-icon">✅</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-card-info">
-              <span class="label">Usuarios en Recorrido</span>
-              <span class="value">${s.usuariosProgreso.toLocaleString()}</span>
-              <span class="hint">Visitantes activos actualmente</span>
-            </div>
-            <div class="metric-icon">📈</div>
           </div>
           <div class="metric-card">
             <div class="metric-card-info">

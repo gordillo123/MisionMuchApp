@@ -1,3 +1,29 @@
+// Validar ubicación antes de permitir jugar
+(function() {
+  const raw = sessionStorage.getItem('much_last_location_verification');
+  let valid = false;
+  let msg = 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicación.';
+  if (raw) {
+    try {
+      const verif = JSON.parse(raw);
+      const transcurrido = Date.now() - verif.timestamp;
+      const vigenciaMs = 15 * 60 * 1000; // 15 minutos
+      if (transcurrido <= vigenciaMs && verif.dentro_del_museo) {
+        valid = true;
+      } else if (transcurrido > vigenciaMs) {
+        msg = 'La verificación de ubicación ha expirado. Por favor, verifícala de nuevo.';
+      } else {
+        msg = verif.mensaje_resultado || 'No te encuentras en el Museo Chiapas de Ciencia y Tecnología.';
+      }
+    } catch (e) {}
+  }
+  if (!valid) {
+    alert(msg);
+    window.location.href = '../index.html?reason=location_required&msg=' + encodeURIComponent(msg);
+    throw new Error('Acceso denegado: ubicación no válida.');
+  }
+})();
+
 /* ===== Funciones de Tiempo y Utilidades ===== */
 function getMexicoTime() {
   return new Date().toISOString(); // Let Supabase handle the timezone
@@ -219,6 +245,12 @@ if (document.readyState === "complete" || document.readyState === "interactive")
 async function inicializarProgresoSpinosaurio() {
   try {
     const progreso = await import('../supabase-utils.js');
+    const active = await progreso.comprobarEstacionActiva(2);
+    if (!active) {
+      alert('Esta estación se encuentra inactiva o cerrada.');
+      window.location.href = '../index.html';
+      return;
+    }
     await progreso.inicializarProgresoUsuario(2);
     console.log("Progreso de Spinosaurio inicializado en MySQL.");
   } catch (error) {

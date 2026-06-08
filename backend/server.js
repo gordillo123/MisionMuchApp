@@ -9,8 +9,39 @@ const pool = require('./db');
 const { OAuth2Client } = require('google-auth-library');
 require('dotenv').config();
 
+// Asegurar existencia de la tabla de verificación de ubicación
+(async () => {
+  try {
+    console.log('⏳ Verificando existencia de la tabla verificaciones_ubicacion...');
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS verificaciones_ubicacion (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NULL,
+        session_id VARCHAR(255) NULL,
+        direccion_museo TEXT NOT NULL,
+        latitud_usuario DOUBLE PRECISION NULL,
+        longitud_usuario DOUBLE PRECISION NULL,
+        precision_gps DOUBLE PRECISION NULL,
+        latitud_museo DOUBLE PRECISION NOT NULL,
+        longitud_museo DOUBLE PRECISION NOT NULL,
+        radio_permitido_metros INT NOT NULL DEFAULT 150,
+        distancia_metros DOUBLE PRECISION NULL,
+        dentro_del_museo BOOLEAN NOT NULL DEFAULT false,
+        permiso_ubicacion BOOLEAN NOT NULL DEFAULT false,
+        mensaje_resultado TEXT NULL,
+        fecha_verificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT fk_vu_usuario FOREIGN KEY (user_id) REFERENCES usuarios (id_usuario) ON DELETE SET NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+    console.log('✅ Tabla verificaciones_ubicacion verificada/creada con éxito.');
+  } catch (error) {
+    console.error('❌ Error al verificar/crear la tabla verificaciones_ubicacion:', error.message);
+  }
+})();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+
 
 // Cliente de Google OAuth
 const googleClientId = process.env.GOOGLE_CLIENT_ID || '';
@@ -73,6 +104,28 @@ async function esAdmin(idUsuario) {
 async function esTaquilla(idUsuario) {
   const roles = await obtenerRolUsuario(idUsuario);
   return roles.includes('taquilla') || roles.includes('admin');
+}
+
+// Generar Folio único de 6 caracteres alfanuméricos mezclados (ej: X7K9R2)
+async function generarFolioUnico(connection) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let attempts = 0;
+  while (attempts < 10) {
+    let randomPart = '';
+    for (let i = 0; i < 6; i++) {
+      randomPart += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    const folio = randomPart;
+    
+    // Verificar si el folio ya existe para garantizar unicidad
+    const [[exist]] = await connection.query('SELECT 1 FROM boletos WHERE folio = ? LIMIT 1', [folio]);
+    if (!exist) {
+      return folio;
+    }
+    attempts++;
+  }
+  // Fallback con timestamp en base 36
+  return Date.now().toString(36).toUpperCase();
 }
 
 // Middleware de autorización de Admin
@@ -286,6 +339,12 @@ app.get('/api/estaciones', async (req, res) => {
 app.get('/api/preguntas/:id_estacion', async (req, res) => {
   const idEstacion = req.params.id_estacion;
   try {
+    // Verificar si la estación está activa
+    const [[estacion]] = await pool.query('SELECT activa FROM estaciones WHERE id_estacion = ?', [idEstacion]);
+    if (!estacion || !estacion.activa) {
+      return res.status(403).json({ error: 'La estación se encuentra inactiva.' });
+    }
+
     // 1. Obtener todas las preguntas de la estación
     const [preguntas] = await pool.query(
       'SELECT id_pregunta, pregunta FROM preguntas WHERE id_estacion = ? AND activa = TRUE',
@@ -334,6 +393,15 @@ app.post('/api/progreso/completar', async (req, res) => {
 
   if (!id_usuario || !id_estacion) {
     return res.status(400).json({ error: 'Faltan parámetros obligatorios: id_usuario o id_estacion.' });
+  }
+
+  try {
+    const [[estacion]] = await pool.query('SELECT activa FROM estaciones WHERE id_estacion = ?', [id_estacion]);
+    if (!estacion || !estacion.activa) {
+      return res.status(403).json({ error: 'La estación se encuentra inactiva y no se puede guardar progreso.' });
+    }
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
   }
 
   const connection = await pool.getConnection();
@@ -422,9 +490,7 @@ app.post('/api/progreso/completar', async (req, res) => {
 
       if (!boletoExistente) {
         // Generar Folio y QR token únicos
-        const timestamp = Date.now();
-        const random = Math.floor(Math.random() * 10000);
-        const folio = `MUCH-${timestamp}-${random}`.toUpperCase();
+        const folio = await generarFolioUnico(connection);
         const qrToken = crypto.randomBytes(16).toString('hex');
         const host = req.get('host') || 'localhost:3000';
         const qrData = `http://${host}/taquilla?token=${qrToken}`;
@@ -494,6 +560,12 @@ app.post('/api/progreso/inicializar', async (req, res) => {
   }
 
   try {
+    // Verificar si la estación está activa
+    const [[estacion]] = await pool.query('SELECT activa FROM estaciones WHERE id_estacion = ?', [id_estacion]);
+    if (!estacion || !estacion.activa) {
+      return res.status(403).json({ error: 'La estación se encuentra inactiva.' });
+    }
+
     // Intentar insertar registro inicial si no existe, o actualizar fecha_inicio solo si es NULL.
     // Esto evita duplicados y mantiene puntuaciones previas.
     await pool.query(
@@ -593,6 +665,12 @@ app.post('/api/intentos', async (req, res) => {
   }
 
   try {
+    // Verificar si la estación está activa
+    const [[estacion]] = await pool.query('SELECT activa FROM estaciones WHERE id_estacion = ?', [id_estacion]);
+    if (!estacion || !estacion.activa) {
+      return res.status(403).json({ error: 'La estación se encuentra inactiva.' });
+    }
+
     const [result] = await pool.query(
       `INSERT INTO intentos_estacion (id_usuario, id_estacion, puntaje, aciertos, errores, aprobado)
        VALUES (?, ?, ?, ?, ?, ? )`,
@@ -772,9 +850,7 @@ app.post('/api/boletos', async (req, res) => {
     }
 
     // 3. Generar Folio y QR token únicos
-    const timestamp = Date.now();
-    const random = Math.floor(Math.random() * 10000);
-    const folio = `MUCH-${timestamp}-${random}`.toUpperCase();
+    const folio = await generarFolioUnico(connection);
     const qrToken = crypto.randomBytes(16).toString('hex');
     const host = req.get('host') || 'localhost:3000';
     const qrData = `http://${host}/taquilla?token=${qrToken}`;
@@ -1632,14 +1708,10 @@ app.get('/api/usuarios/:id_usuario/perfil', async (req, res) => {
       [idUsuario]
     );
 
-    // Mapeo estándar de las 5 estaciones del recorrido de juego
-    const estacionesRecorrido = [
-      { id: 2, nombre: 'Espinosaurio', puntos_base: 15, tipo: 'minijuego' },
-      { id: 3, nombre: 'Biodiversidad y Conocimiento', puntos_base: 10, tipo: 'preguntas' },
-      { id: 4, nombre: 'Sala de Energía', puntos_base: 10, tipo: 'preguntas' },
-      { id: 5, nombre: 'Desarrollo Sustentable', puntos_base: 10, tipo: 'preguntas' },
-      { id: 6, nombre: 'SBEEL Dinosaurios', puntos_base: 10, tipo: 'rompecabezas' }
-    ];
+    // Obtener estaciones activas del recorrido (excluyendo la estación 1 de bienvenida)
+    const [estacionesRecorrido] = await pool.query(
+      'SELECT id_estacion AS id, nombre, puntos AS puntos_base, tipo FROM estaciones WHERE activa = TRUE AND id_estacion != 1 ORDER BY orden ASC'
+    );
 
     let totalCompletadas = 0;
     let puntajeAcumuladoBase = 0;
@@ -1753,6 +1825,133 @@ app.get('/api/usuarios/:id_usuario/perfil', async (req, res) => {
 
   } catch (error) {
     console.error('Error al obtener perfil completo:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 10. POST /api/verificaciones-ubicacion
+// ==========================================
+app.post('/api/verificaciones-ubicacion', async (req, res) => {
+  const {
+    user_id,
+    session_id,
+    direccion_museo,
+    latitud_usuario,
+    longitud_usuario,
+    precision_gps,
+    latitud_museo,
+    longitud_museo,
+    radio_permitido_metros,
+    distancia_metros,
+    dentro_del_museo,
+    permiso_ubicacion,
+    mensaje_resultado
+  } = req.body;
+
+  if (!direccion_museo || latitud_museo === undefined || longitud_museo === undefined) {
+    return res.status(400).json({ error: 'Faltan parámetros obligatorios de la ubicación del museo.' });
+  }
+
+  try {
+    const [result] = await pool.query(
+      `INSERT INTO verificaciones_ubicacion (
+        user_id, session_id, direccion_museo, latitud_usuario, longitud_usuario,
+        precision_gps, latitud_museo, longitud_museo, radio_permitido_metros,
+        distancia_metros, dentro_del_museo, permiso_ubicacion, mensaje_resultado, fecha_verificacion
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+      [
+        user_id || null,
+        session_id || null,
+        direccion_museo,
+        latitud_usuario !== undefined ? latitud_usuario : null,
+        longitud_usuario !== undefined ? longitud_usuario : null,
+        precision_gps !== undefined ? precision_gps : null,
+        latitud_museo,
+        longitud_museo,
+        radio_permitido_metros || 150,
+        distancia_metros !== undefined ? distancia_metros : null,
+        Boolean(dentro_del_museo),
+        Boolean(permiso_ubicacion),
+        mensaje_resultado || null
+      ]
+    );
+
+    res.status(201).json({
+      message: 'Verificación de ubicación guardada correctamente.',
+      id_verificacion: result.insertId
+    });
+  } catch (error) {
+    console.error('Error al guardar verificación de ubicación:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 11. GET /api/verificaciones-ubicacion/ultima
+// ==========================================
+app.get('/api/verificaciones-ubicacion/ultima', async (req, res) => {
+  const { user_id, session_id } = req.query;
+
+  if (!user_id && !session_id) {
+    return res.status(400).json({ error: 'Debe proporcionar user_id o session_id.' });
+  }
+
+  try {
+    let query = `SELECT * FROM verificaciones_ubicacion WHERE `;
+    let params = [];
+
+    if (user_id && session_id) {
+      query += `(user_id = ? OR session_id = ?) `;
+      params.push(user_id, session_id);
+    } else if (user_id) {
+      query += `user_id = ? `;
+      params.push(user_id);
+    } else {
+      query += `session_id = ? `;
+      params.push(session_id);
+    }
+
+    query += `ORDER BY fecha_verificacion DESC LIMIT 1`;
+
+    const [[ultima]] = await pool.query(query, params);
+
+    res.json(ultima || null);
+  } catch (error) {
+    console.error('Error al obtener última verificación de ubicación:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 12. POST /api/verificaciones-ubicacion/invalidar
+// ==========================================
+app.post('/api/verificaciones-ubicacion/invalidar', async (req, res) => {
+  const { user_id, session_id } = req.body;
+
+  if (!user_id && !session_id) {
+    return res.status(400).json({ error: 'Debe proporcionar user_id o session_id.' });
+  }
+
+  try {
+    let query = `UPDATE verificaciones_ubicacion SET dentro_del_museo = false, mensaje_resultado = 'Verificación invalidada por cambio de sesión/cierre de sesión' WHERE `;
+    let params = [];
+
+    if (user_id && session_id) {
+      query += `(user_id = ? OR session_id = ?)`;
+      params.push(user_id, session_id);
+    } else if (user_id) {
+      query += `user_id = ?`;
+      params.push(user_id);
+    } else {
+      query += `session_id = ?`;
+      params.push(session_id);
+    }
+
+    await pool.query(query, params);
+    res.json({ message: 'Verificaciones invalidadas correctamente.' });
+  } catch (error) {
+    console.error('Error al invalidar verificaciones de ubicación:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
