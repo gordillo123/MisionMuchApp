@@ -7,6 +7,7 @@
   <title>Misión MUCH</title>
   <meta name="description"
     content="Un emocionante juego de preguntas sobre diversidad, dinosaurios, animales, ciencia y tecnología." />
+  <link rel="preload" as="image" href="assets/logo-institucional-aditech.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -8622,7 +8623,7 @@
         line-height: 1.28;
       }
     }
-    /* SPLASH SCREEN: capa inicial completa, aislada de la app principal. */
+    /* SPLASH SCREEN: capa inicial blanca, completa y aislada de la app principal. */
     body.splash-active {
       overflow: hidden;
     }
@@ -8630,27 +8631,87 @@
     body.splash-active > :not(#splashScreen) {
       visibility: hidden;
       opacity: 0;
+      pointer-events: none;
     }
 
     .splash-screen {
+      --splash-paper: #f7fbff;
       position: fixed;
+      top: 0;
+      left: 0;
       inset: 0;
       z-index: 2147483647;
-      display: grid;
-      place-items: center;
       width: 100vw;
       height: 100vh;
       height: 100dvh;
-      padding: clamp(1.5rem, 6vw, 4rem);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(1.25rem, 5vw, 3rem);
       overflow: hidden;
       isolation: isolate;
       pointer-events: all;
-      background: var(--bg-deep);
+      background:
+        radial-gradient(circle at 50% 43%, rgba(255, 255, 255, 0.98) 0 22%, rgba(247, 251, 255, 0.96) 52%, rgba(237, 246, 251, 0.98) 100%),
+        var(--splash-paper);
+      backdrop-filter: blur(0) saturate(1);
+      -webkit-backdrop-filter: blur(0) saturate(1);
+      filter: saturate(1);
       opacity: 1;
       visibility: visible;
       transition:
-        opacity 0.35s ease,
-        visibility 0.35s ease;
+        opacity 1.15s cubic-bezier(.22, 1, .36, 1),
+        backdrop-filter 1.15s cubic-bezier(.22, 1, .36, 1),
+        -webkit-backdrop-filter 1.15s cubic-bezier(.22, 1, .36, 1),
+        filter 1.15s cubic-bezier(.22, 1, .36, 1),
+        visibility 0s linear 1.15s;
+    }
+
+    .splash-screen::before,
+    .splash-screen::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .splash-screen::before {
+      inset: -18%;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 32% 36%, rgba(37, 182, 215, 0.14), transparent 29%),
+        radial-gradient(circle at 70% 60%, rgba(239, 76, 115, 0.11), transparent 31%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(231, 246, 252, 0.44));
+      opacity: 0.72;
+      transform: scale(1);
+      animation: splashAmbientShift 5.4s ease-in-out infinite;
+    }
+
+    .splash-screen::after {
+      inset: -35%;
+      z-index: 0;
+      background: linear-gradient(112deg, transparent 38%, rgba(255, 255, 255, 0.8) 48%, rgba(189, 228, 241, 0.4) 51%, transparent 62%);
+      opacity: 0;
+      transform: translate3d(-28%, 8%, 0) rotate(8deg);
+      animation: splashLightSweep 2.8s cubic-bezier(.16, 1, .3, 1) 0.25s both;
+    }
+
+    .splash-screen.is-exiting {
+      background: rgba(247, 251, 255, 0.48);
+      backdrop-filter: blur(14px) saturate(1.16);
+      -webkit-backdrop-filter: blur(14px) saturate(1.16);
+      filter: saturate(1.08);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      animation: splashScreenExit 1.15s cubic-bezier(.22, 1, .36, 1) both;
+    }
+
+    .splash-screen.is-exiting::before {
+      animation: splashExitDistortion 0.9s cubic-bezier(.22, 1, .36, 1) both;
+    }
+
+    .splash-screen.is-exiting::after {
+      animation: splashExitWash 0.9s cubic-bezier(.22, 1, .36, 1) both;
     }
 
     .splash-screen.is-hidden {
@@ -8694,67 +8755,248 @@
 
     .splash-logo-wrap {
       position: relative;
+      z-index: 1;
       display: grid;
       place-items: center;
-      width: min(84vw, 960px);
+      width: min(86vw, 640px);
+      max-width: 100%;
+      perspective: 900px;
+    }
+
+    .splash-logo-wrap::before {
+      content: "";
+      position: absolute;
+      width: min(72vw, 540px);
+      height: min(24vw, 190px);
+      border-radius: 999px;
+      background:
+        radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 18%, rgba(37, 182, 215, 0.18) 44%, rgba(239, 76, 115, 0.1) 68%, transparent 76%);
+      filter: blur(18px);
+      opacity: 0;
+      transform: translate3d(0, 18px, 0) scale(0.86);
+      animation: splashLogoHalo 1.05s cubic-bezier(.16, 1, .3, 1) 0.08s both;
+    }
+
+    .splash-logo-wrap::after {
+      content: "";
+      position: absolute;
+      z-index: 2;
+      width: min(80vw, 620px);
+      height: min(38vw, 260px);
+      border-radius: 40%;
+      background: linear-gradient(105deg, transparent 32%, rgba(255, 255, 255, 0.16) 43%, rgba(255, 255, 255, 0.64) 50%, rgba(255, 255, 255, 0.16) 57%, transparent 68%);
+      mix-blend-mode: screen;
+      opacity: 0;
+      transform: translate3d(-72%, 0, 0) skewX(-14deg);
+      animation: splashLogoGlint 2.2s cubic-bezier(.16, 1, .3, 1) 0.55s both;
     }
 
     .splash-logo {
       position: relative;
       z-index: 1;
-      width: min(82vw, 920px);
-      max-height: min(46vh, 340px);
+      display: block;
+      width: clamp(220px, 64vw, 620px);
+      max-width: 100%;
+      height: auto;
+      max-height: min(42vh, 260px);
       object-fit: contain;
+      transform-origin: center;
       animation:
-        splashLogoReveal 0.85s cubic-bezier(.16, 1, .3, 1) both,
-        splashLogoBreath 2.4s ease-in-out 0.85s infinite;
-      filter: drop-shadow(0 20px 38px rgba(0, 0, 0, 0.28));
+        splashLogoReveal 1.05s cubic-bezier(.16, 1, .3, 1) both,
+        splashLogoBreath 2.7s ease-in-out 1.05s infinite;
+      filter: drop-shadow(0 18px 34px rgba(14, 30, 58, 0.18));
     }
 
     .splash-screen.is-exiting .splash-logo {
-      animation: splashLogoExit 6s cubic-bezier(.22, 1, .36, 1) both;
+      animation: splashLogoFadeOut 0.9s cubic-bezier(.22, 1, .36, 1) both;
+    }
+
+    .splash-screen.is-exiting .splash-logo-wrap::before,
+    .splash-screen.is-exiting .splash-logo-wrap::after {
+      animation: splashLogoAuraExit 0.9s cubic-bezier(.22, 1, .36, 1) both;
     }
 
     @keyframes splashLogoReveal {
-      from {
+      0% {
         opacity: 0;
-        transform: translateY(18px) scale(0.9);
+        transform: translate3d(0, 22px, 0) scale(0.9) rotateX(8deg);
+        filter: blur(10px) drop-shadow(0 0 0 rgba(14, 30, 58, 0));
       }
 
-      to {
+      58% {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: translate3d(0, -3px, 0) scale(1.018) rotateX(0);
+        filter: blur(0) drop-shadow(0 20px 38px rgba(14, 30, 58, 0.2));
+      }
+
+      100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+        filter: blur(0) drop-shadow(0 18px 34px rgba(14, 30, 58, 0.18));
       }
     }
 
     @keyframes splashLogoBreath {
       0%,
       100% {
-        transform: translateY(0) scale(1);
+        transform: translate3d(0, 0, 0) scale(1);
+        filter: drop-shadow(0 18px 34px rgba(14, 30, 58, 0.18));
       }
 
       50% {
-        transform: translateY(-4px) scale(1.025);
+        transform: translate3d(0, -5px, 0) scale(1.018);
+        filter: drop-shadow(0 24px 42px rgba(14, 30, 58, 0.22));
       }
     }
 
-    @keyframes splashLogoExit {
-      0% {
+    @keyframes splashLogoFadeOut {
+      from {
         opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: drop-shadow(0 20px 38px rgba(0, 0, 0, 0.28));
+        transform: translate3d(0, 0, 0) scale(1);
+        filter: blur(0) drop-shadow(0 18px 34px rgba(14, 30, 58, 0.18));
       }
 
-      45% {
+      to {
+        opacity: 0;
+        transform: translate3d(0, -10px, 0) scale(0.96);
+        filter: blur(7px) drop-shadow(0 0 0 rgba(14, 30, 58, 0));
+      }
+    }
+
+    @keyframes splashScreenExit {
+      0% {
         opacity: 1;
-        transform: translateY(0) scale(1.22);
-        filter: drop-shadow(0 0 34px rgba(109, 208, 240, 0.4));
+        background: rgba(247, 251, 255, 0.96);
+        backdrop-filter: blur(0) saturate(1);
+        -webkit-backdrop-filter: blur(0) saturate(1);
+        filter: saturate(1);
+      }
+
+      36% {
+        opacity: 0.88;
+        background: rgba(247, 251, 255, 0.84);
+        backdrop-filter: blur(10px) saturate(1.1);
+        -webkit-backdrop-filter: blur(10px) saturate(1.1);
+        filter: saturate(1.08);
+      }
+
+      72% {
+        opacity: 0.44;
+        background: rgba(247, 251, 255, 0.64);
+        backdrop-filter: blur(18px) saturate(1.18);
+        -webkit-backdrop-filter: blur(18px) saturate(1.18);
+        filter: saturate(1.1);
       }
 
       100% {
         opacity: 0;
-        transform: translateY(0) scale(1.72);
-        filter: drop-shadow(0 0 0 rgba(109, 208, 240, 0));
+        background: rgba(247, 251, 255, 0.2);
+        backdrop-filter: blur(20px) saturate(1.2);
+        -webkit-backdrop-filter: blur(20px) saturate(1.2);
+        filter: saturate(1.1);
+      }
+    }
+
+    @keyframes splashLogoHalo {
+      from {
+        opacity: 0;
+        transform: translate3d(0, 22px, 0) scale(0.84);
+      }
+
+      to {
+        opacity: 0.78;
+        transform: translate3d(0, 10px, 0) scale(1);
+      }
+    }
+
+    @keyframes splashLogoGlint {
+      0% {
+        opacity: 0;
+        transform: translate3d(-72%, 0, 0) skewX(-14deg);
+      }
+
+      22% {
+        opacity: 0.6;
+      }
+
+      64% {
+        opacity: 0;
+        transform: translate3d(72%, 0, 0) skewX(-14deg);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate3d(72%, 0, 0) skewX(-14deg);
+      }
+    }
+
+    @keyframes splashLogoAuraExit {
+      from {
+        opacity: 0.76;
+        transform: translate3d(0, 10px, 0) scale(1);
+      }
+
+      to {
+        opacity: 0;
+        transform: translate3d(0, -8px, 0) scale(1.08);
+      }
+    }
+
+    @keyframes splashAmbientShift {
+      0%,
+      100% {
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+
+      50% {
+        transform: translate3d(1.2%, -1%, 0) scale(1.025);
+      }
+    }
+
+    @keyframes splashLightSweep {
+      0% {
+        opacity: 0;
+        transform: translate3d(-28%, 8%, 0) rotate(8deg);
+      }
+
+      28% {
+        opacity: 0.34;
+      }
+
+      72% {
+        opacity: 0;
+        transform: translate3d(24%, -4%, 0) rotate(8deg);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate3d(24%, -4%, 0) rotate(8deg);
+      }
+    }
+
+    @keyframes splashExitDistortion {
+      from {
+        opacity: 0.72;
+        transform: scale(1);
+        filter: blur(0);
+      }
+
+      to {
+        opacity: 0;
+        transform: scale(1.08) skewX(-1.2deg);
+        filter: blur(12px);
+      }
+    }
+
+    @keyframes splashExitWash {
+      from {
+        opacity: 0.22;
+        transform: translate3d(-12%, 0, 0) rotate(8deg);
+      }
+
+      to {
+        opacity: 0;
+        transform: translate3d(18%, -2%, 0) rotate(8deg);
       }
     }
 
@@ -8802,24 +9044,66 @@
 
     @media (max-width: 720px) {
       .splash-logo-wrap {
-        width: min(88vw, 580px);
+        width: min(88vw, 520px);
       }
 
       .splash-logo {
-        width: min(88vw, 560px);
-        max-height: 38vh;
+        width: min(88vw, 500px);
+        max-height: 34vh;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .splash-screen,
+      .splash-logo,
+      .splash-screen::before,
+      .splash-screen::after,
+      .splash-logo-wrap::before,
+      .splash-logo-wrap::after,
+      .splash-screen.is-exiting .splash-logo {
+        animation: none;
+      }
+
+      .splash-logo-wrap::after {
+        display: none;
       }
     }
   </style>
 </head>
 
 <body class="splash-active">
-  <!-- SPLASH SCREEN: cubre toda la app durante 8 segundos antes de revelar la pantalla principal. -->
+  <!-- SPLASH SCREEN: cubre toda la app durante 1.5 segundos antes de revelar la pantalla principal. -->
   <div class="splash-screen" id="splashScreen" aria-label="Cargando Mision MUCH" role="status">
     <div class="splash-logo-wrap">
       <img class="splash-logo" src="assets/logo-institucional-aditech.png" alt="Humanismo que Transforma - Agencia Digital Tecnologica del Estado">
     </div>
   </div>
+  <script>
+    // SPLASH SCREEN: inicia el conteo apenas se pinta la pantalla inicial.
+    (() => {
+      const splashScreen = document.getElementById('splashScreen');
+      if (!splashScreen) return;
+
+      const SPLASH_VISIBLE_MS = 1800;
+      const SPLASH_FADE_MS = 1000;
+      const APP_REVEAL_MS = 1000;
+
+      window.setTimeout(() => {
+        document.body.classList.remove('splash-active');
+        document.body.classList.add('app-revealing');
+        splashScreen.classList.add('is-exiting');
+
+        window.setTimeout(() => {
+          splashScreen.classList.add('is-hidden');
+          splashScreen.setAttribute('hidden', '');
+        }, SPLASH_FADE_MS);
+
+        window.setTimeout(() => {
+          document.body.classList.remove('app-revealing');
+        }, APP_REVEAL_MS);
+      }, SPLASH_VISIBLE_MS);
+    })();
+  </script>
 
   <!-- ORIENTATION OVERLAY -->
   <div id="orientationOverlay">
@@ -12233,34 +12517,6 @@
   <script src="scripts/orientation-manager.js"></script>
   <script>
     try { ensureBgMusic('Sonidos/musica fondo.mp3'); initBgAutoPlay(); } catch(e){}
-  </script>
-  <script>
-    // SPLASH SCREEN: mantiene la app oculta y la revela al terminar la salida suave.
-    (() => {
-      const splashScreen = document.getElementById('splashScreen');
-      if (!splashScreen) return;
-
-      const elapsed = performance.now();
-      const delay = Math.max(0, 4000 - elapsed);
-
-      window.setTimeout(() => {
-        splashScreen.classList.add('is-exiting');
-
-        window.setTimeout(() => {
-          splashScreen.classList.add('is-hidden');
-          document.body.classList.remove('splash-active');
-          document.body.classList.add('app-revealing');
-        }, 6000);
-
-        window.setTimeout(() => {
-          splashScreen.setAttribute('hidden', '');
-        }, 6350);
-
-        window.setTimeout(() => {
-          document.body.classList.remove('app-revealing');
-        }, 7300);
-      }, delay);
-    })();
   </script>
 </body>
 
