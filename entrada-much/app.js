@@ -1,5 +1,8 @@
 // Validar ubicación antes de permitir jugar
 (function() {
+  // DESACTIVADO TEMPORALMENTE para permitir pruebas y juego remoto
+  return;
+
   const raw = sessionStorage.getItem('much_last_location_verification');
   let valid = false;
   let msg = 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicación.';

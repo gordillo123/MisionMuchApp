@@ -54,206 +54,37 @@ async function guardarVerificacionUbicacion(datos) {
 
 async function verificarUbicacionYRegistrar() {
   return new Promise((resolve) => {
-    // Solicitar confirmación explícita a nivel de aplicación (siempre pedirá interacción)
-    const confirmar = confirm("Para poder jugar, la aplicación verificará tu ubicación física actual para asegurar que te encuentras en el Museo Chiapas de Ciencia y Tecnología. ¿Deseas permitir la comprobación GPS?");
-    
-    if (!confirmar) {
-      const errorMsg = 'Permiso de ubicación denegado por el usuario.';
-      const user = obtenerUsuarioLocal();
-      const payload = {
-        user_id: user ? (user.id_usuario || user.id) : null,
-        session_id: obtenerSessionId(),
-        direccion_museo: DIRECCION_MUSEO,
-        latitud_usuario: null,
-        longitud_usuario: null,
-        precision_gps: null,
-        latitud_museo: LATITUD_MUSEO,
-        longitud_museo: LONGITUD_MUSEO,
-        radio_permitido_metros: RADIO_PERMITIDO_METROS,
-        distancia_metros: null,
-        dentro_del_museo: false,
-        permiso_ubicacion: false,
-        mensaje_resultado: errorMsg
-      };
-
-      guardarVerificacionUbicacion(payload).catch(() => {});
-      
-      const verifLocal = {
-        dentro_del_museo: false,
-        timestamp: Date.now(),
-        mensaje_resultado: 'Para jugar necesitas permitir el acceso a tu ubicación.'
-      };
-      sessionStorage.setItem('much_last_location_verification', JSON.stringify(verifLocal));
-
-      return resolve({ ok: false, error: 'permission_denied', message: verifLocal.mensaje_resultado });
-    }
-
-    if (!navigator.geolocation) {
-      const errorMsg = 'El navegador no soporta geolocalización.';
-      const user = obtenerUsuarioLocal();
-      const payload = {
-        user_id: user ? (user.id_usuario || user.id) : null,
-        session_id: obtenerSessionId(),
-        direccion_museo: DIRECCION_MUSEO,
-        latitud_usuario: null,
-        longitud_usuario: null,
-        precision_gps: null,
-        latitud_museo: LATITUD_MUSEO,
-        longitud_museo: LONGITUD_MUSEO,
-        radio_permitido_metros: RADIO_PERMITIDO_METROS,
-        distancia_metros: null,
-        dentro_del_museo: false,
-        permiso_ubicacion: false,
-        mensaje_resultado: errorMsg
-      };
-
-      guardarVerificacionUbicacion(payload).catch(() => {});
-      
-      const verifLocal = {
-        dentro_del_museo: false,
-        timestamp: Date.now(),
-        mensaje_resultado: errorMsg
-      };
-      sessionStorage.setItem('much_last_location_verification', JSON.stringify(verifLocal));
-
-      return resolve({ ok: false, error: 'no_compatible', message: errorMsg });
-    }
-
-    const options = {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
+    // Verificación de ubicación desactivada temporalmente para facilitar pruebas y juego remoto.
+    // Esto evita requerir permisos GPS (que fallan en HTTP móvil) y confirmaciones.
+    const verifLocal = {
+      dentro_del_museo: true,
+      timestamp: Date.now(),
+      mensaje_resultado: 'Ubicación válida (Verificación de geolocalización desactivada temporalmente).'
     };
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        const accuracy = position.coords.accuracy || null;
-        
-        const distancia = calcularDistanciaHaversine(lat, lon, LATITUD_MUSEO, LONGITUD_MUSEO);
-        const dentro = distancia <= RADIO_PERMITIDO_METROS;
-        const mensaje = dentro 
-          ? 'Ubicación validada correctamente.' 
-          : 'Usuario fuera del rango permitido del museo.';
-
-        const user = obtenerUsuarioLocal();
-        const payload = {
-          user_id: user ? (user.id_usuario || user.id) : null,
-          session_id: obtenerSessionId(),
-          direccion_museo: DIRECCION_MUSEO,
-          latitud_usuario: lat,
-          longitud_usuario: lon,
-          precision_gps: accuracy,
-          latitud_museo: LATITUD_MUSEO,
-          longitud_museo: LONGITUD_MUSEO,
-          radio_permitido_metros: RADIO_PERMITIDO_METROS,
-          distancia_metros: parseFloat(distancia.toFixed(2)),
-          dentro_del_museo: dentro,
-          permiso_ubicacion: true,
-          mensaje_resultado: mensaje
-        };
-
-        try {
-          await guardarVerificacionUbicacion(payload);
-        } catch (dbErr) {
-          console.error('Error al guardar verificación en BD:', dbErr);
-        }
-
-        const verifLocal = {
-          dentro_del_museo: dentro,
-          timestamp: Date.now(),
-          mensaje_resultado: dentro 
-            ? 'Ubicación validada. Estás en el Museo Chiapas de Ciencia y Tecnología y ya puedes jugar.'
-            : 'No puedes jugar porque no te encuentras en la ubicación del Museo Chiapas de Ciencia y Tecnología.'
-        };
-        sessionStorage.setItem('much_last_location_verification', JSON.stringify(verifLocal));
-        
-        resolve({ ok: dentro, dentro: dentro, distancia: distancia, message: verifLocal.mensaje_resultado });
-      },
-      async (error) => {
-        let codeMsg = 'Error desconocido al obtener ubicación.';
-        let permission = true;
-        let errorType = 'unknown';
-
-        if (error.code === error.PERMISSION_DENIED) {
-          codeMsg = 'Permiso de ubicación denegado.';
-          permission = false;
-          errorType = 'permission_denied';
-        } else if (error.code === error.POSITION_UNAVAILABLE) {
-          codeMsg = 'Ubicación no disponible.';
-          errorType = 'position_unavailable';
-        } else if (error.code === error.TIMEOUT) {
-          codeMsg = 'Tiempo de espera agotado al obtener ubicación.';
-          errorType = 'timeout';
-        }
-
-        const user = obtenerUsuarioLocal();
-        const payload = {
-          user_id: user ? (user.id_usuario || user.id) : null,
-          session_id: obtenerSessionId(),
-          direccion_museo: DIRECCION_MUSEO,
-          latitud_usuario: null,
-          longitud_usuario: null,
-          precision_gps: null,
-          latitud_museo: LATITUD_MUSEO,
-          longitud_museo: LONGITUD_MUSEO,
-          radio_permitido_metros: RADIO_PERMITIDO_METROS,
-          distancia_metros: null,
-          dentro_del_museo: false,
-          permiso_ubicacion: permission,
-          mensaje_resultado: codeMsg
-        };
-
-        try {
-          await guardarVerificacionUbicacion(payload);
-        } catch (dbErr) {
-          console.error('Error al guardar verificación fallida en BD:', dbErr);
-        }
-
-        const verifLocal = {
-          dentro_del_museo: false,
-          timestamp: Date.now(),
-          mensaje_resultado: permission 
-            ? 'Error al obtener ubicación: ' + codeMsg
-            : 'Para jugar necesitas permitir el acceso a tu ubicación.'
-        };
-        sessionStorage.setItem('much_last_location_verification', JSON.stringify(verifLocal));
-
-        resolve({ 
-          ok: false, 
-          error: errorType, 
-          message: verifLocal.mensaje_resultado 
-        });
-      },
-      options
-    );
+    sessionStorage.setItem('much_last_location_verification', JSON.stringify(verifLocal));
+    
+    resolve({ 
+      ok: true, 
+      dentro: true, 
+      distancia: 0, 
+      message: verifLocal.mensaje_resultado 
+    });
   });
 }
 
 function comprobarUbicacionVigente() {
   try {
-    const raw = sessionStorage.getItem('much_last_location_verification');
-    if (!raw) return { ok: false, message: 'No has verificado tu ubicación aún.' };
-    
-    const verif = JSON.parse(raw);
-    const ahora = Date.now();
-    const transcurridoMs = ahora - verif.timestamp;
-    const vigenciaMs = TIEMPO_VALIDACION_MINUTOS * 60 * 1000;
-
-    if (transcurridoMs > vigenciaMs) {
-      sessionStorage.removeItem('much_last_location_verification');
-      return { ok: false, expired: true, message: 'La verificación de ubicación ha expirado. Por favor, verifícala de nuevo.' };
-    }
-
-    if (!verif.dentro_del_museo) {
-      return { ok: false, message: verif.mensaje_resultado || 'No te encuentras en el Museo Chiapas de Ciencia y Tecnología.' };
-    }
-
-    return { ok: true, message: 'Ubicación válida.' };
+    // Simular verificación de ubicación exitosa temporalmente para pruebas y juego remoto
+    const verifLocal = {
+      dentro_del_museo: true,
+      timestamp: Date.now(),
+      mensaje_resultado: 'Ubicación válida (Verificación de geolocalización desactivada temporalmente).'
+    };
+    sessionStorage.setItem('much_last_location_verification', JSON.stringify(verifLocal));
+    return { ok: true, message: 'Ubicación válida (Verificación desactivada).' };
   } catch (e) {
     console.error('Error al comprobar vigencia de ubicación:', e);
-    return { ok: false, message: 'Error al validar la ubicación.' };
+    return { ok: true, message: 'Ubicación válida (Verificación desactivada).' };
   }
 }
 

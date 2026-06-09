@@ -1106,29 +1106,26 @@
     document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
 
     async function goBackToMap(e) {
-      e.preventDefault();
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      try { await window.lockPortraitOrientation?.(); } catch (error) {}
       const searchParams = new URLSearchParams(window.location.search);
       searchParams.set('view', 'prep');
-      try { await window.lockPortraitOrientation?.(); } catch (error) {}
       window.location.href = '../index.html?' + searchParams.toString();
     }
 
     const exitToMapButton = document.getElementById('btnExitToMap');
-    const mapTargetURL = new URL('../index.html?view=prep', window.location.href).href;
-
-    async function goBackToMap(e) {
-      if (e) e.preventDefault();
-      try { await window.lockPortraitOrientation?.(); } catch (error) {}
-      window.location.href = mapTargetURL;
-    }
-
     if (exitToMapButton) {
       exitToMapButton.addEventListener('click', goBackToMap);
+      exitToMapButton.addEventListener('touchstart', goBackToMap, { passive: false });
     }
 
     const btnBackPortadaMap = document.getElementById('btnBackPortadaMap');
     if (btnBackPortadaMap) {
       btnBackPortadaMap.addEventListener('click', goBackToMap);
+      btnBackPortadaMap.addEventListener('touchstart', goBackToMap, { passive: false });
     }
 
   </script>

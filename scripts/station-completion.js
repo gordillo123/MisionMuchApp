@@ -144,10 +144,6 @@
       '</div>',
       '</div>',
       '<p class="station-completion-card__body">' + payload.body + '</p>',
-      '<div class="station-completion-card__detail">',
-      '<span class="station-completion-card__detail-label">' + payload.detailLabel + '</span>',
-      '<strong class="station-completion-card__detail-value">' + payload.detailValue + '</strong>',
-      '</div>',
       '<div class="station-completion-card__actions">',
       '<button type="button" class="station-completion-cta">' + payload.ctaLabel + '</button>',
       '</div>',
@@ -174,6 +170,18 @@
       clearInline(target);
       if (options && typeof options.onDismiss === 'function') {
         options.onDismiss(payload, target);
+      } else {
+        if (options && typeof options.onReturnToMap === 'function') {
+          options.onReturnToMap(payload, target);
+        } else if (typeof window.showView === 'function') {
+          window.showView('viewPrep');
+        } else {
+          try {
+            var mapParams = new URLSearchParams(window.location.search);
+            mapParams.set('view', 'prep');
+            window.location.href = '../index.html?' + mapParams.toString();
+          } catch (e) {}
+        }
       }
     });
     // Bind CTA in inline mode
@@ -261,6 +269,18 @@
       dismissMapNotice(toast);
       if (options && typeof options.onDismiss === 'function') {
         options.onDismiss(payload, toast);
+      } else {
+        if (options && typeof options.onReturnToMap === 'function') {
+          options.onReturnToMap(payload, toast);
+        } else if (typeof window.showView === 'function') {
+          window.showView('viewPrep');
+        } else {
+          try {
+            var mapParams = new URLSearchParams(window.location.search);
+            mapParams.set('view', 'prep');
+            window.location.href = '../index.html?' + mapParams.toString();
+          } catch (e) {}
+        }
       }
     });
 

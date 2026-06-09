@@ -473,7 +473,7 @@
     }
 
     .nav-brand-logo-agencia {
-      height: 76px;
+      height: 70px;
       max-width: min(336px, 36vw);
       padding: 0;
       flex-shrink: 0;
@@ -603,11 +603,12 @@
       }
 
       .nav-brand-logo-agencia {
-        height: 36px;
-        max-width: min(98px, 24vw);
-        padding: 0;
-        background: transparent;
-        box-shadow: none;
+        width: 150px !important;
+        height: auto !important;
+        background: rgba(255, 255, 255, 0.96) !important;
+        border-radius: 6px !important;
+        padding: 3px 6px !important;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18) !important;
       }
 
       .nav-brand-logo-planetario {
@@ -1156,11 +1157,12 @@
       }
 
       .nav-brand-logo-agencia {
-        height: 29px;
-        max-width: min(80px, 20vw);
-        padding: 0;
-        background: transparent;
-        box-shadow: none;
+        width: 140px !important;
+        height: auto !important;
+        background: rgba(255, 255, 255, 0.96) !important;
+        border-radius: 6px !important;
+        padding: 3px 6px !important;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18) !important;
       }
 
       .nav-links {
@@ -2321,11 +2323,12 @@
       }
 
       .nav-brand-logo-agencia {
-        height: 31px;
-        max-width: min(80px, 21vw);
-        padding: 0;
-        background: transparent;
-        box-shadow: none;
+        width: 120px !important;
+        height: auto !important;
+        background: rgba(255, 255, 255, 0.96) !important;
+        border-radius: 6px !important;
+        padding: 3px 6px !important;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18) !important;
       }
 
       .nav-brand-logo-planetario {
@@ -2396,11 +2399,12 @@
       }
 
       .nav-brand-logo-agencia {
-        height: 31px;
-        max-width: min(80px, 21vw);
-        padding: 0;
-        background: transparent;
-        box-shadow: none;
+        width: 150px !important;
+        height: auto !important;
+        background: rgba(255, 255, 255, 0.96) !important;
+        border-radius: 6px !important;
+        padding: 3px 6px !important;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18) !important;
       }
 
       .nav-brand-logo-planetario {
@@ -11021,9 +11025,6 @@
       window.triggerLocationCheck = async () => {
         const btn = document.getElementById('btnVerifyLocation');
         if (btn) {
-          btn.disabled = true;
-          btn.innerHTML = '⏳ Obteniendo GPS...';
-          btn.style.opacity = '0.7';
         }
 
         try {

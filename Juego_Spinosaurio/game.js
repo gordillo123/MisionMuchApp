@@ -1,5 +1,8 @@
 // Validar ubicación antes de permitir jugar
 (function() {
+  // DESACTIVADO TEMPORALMENTE para permitir pruebas y juego remoto
+  return;
+
   const raw = sessionStorage.getItem('much_last_location_verification');
   let valid = false;
   let msg = 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicación.';
@@ -299,11 +302,17 @@ function Start() {
 
   var btnExit = document.getElementById("btnExitToMap");
   if (btnExit) {
-    btnExit.addEventListener("click", function () {
+    var goBack = function (e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
       const mapParams = new URLSearchParams(window.location.search);
       mapParams.set('view', 'prep');
       window.location.href = '../index.html?' + mapParams.toString();
-    });
+    };
+    btnExit.addEventListener("click", goBack);
+    btnExit.addEventListener("touchstart", goBack, { passive: false });
   }
 
   // Nuevo: botón 'Siguiente' que aparece después de responder

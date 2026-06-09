@@ -1,5 +1,8 @@
 // Validar ubicación antes de permitir jugar
 (function() {
+  // DESACTIVADO TEMPORALMENTE para permitir pruebas y juego remoto
+  return;
+
   const raw = sessionStorage.getItem('much_last_location_verification');
   let valid = false;
   let msg = 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicación.';
@@ -793,13 +796,6 @@ class UIManager {
           nextStationId: '4',
           onReturnToMap: () => {
             window.location.href = '../index.html?view=prep';
-          },
-          onDismiss: () => {
-            e.giftRow.classList.remove('d-none');
-            if (e.nextStationBtn) {
-              e.nextStationBtn.textContent = 'Volver al mapa y continuar';
-              try { e.nextStationBtn.focus(); } catch (error) {}
-            }
           }
         });
         e.finalTitle.classList.add('visually-hidden');
