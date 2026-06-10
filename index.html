@@ -3860,7 +3860,9 @@
         linear-gradient(135deg, var(--msf-purple), var(--msf-blue));
       border: 3px solid rgba(255, 255, 255, 0.92);
       color: white;
-      font-size: 1.9rem;
+      font-family: "Arial Black", "Nunito", "Outfit", sans-serif;
+      font-size: 2.15rem;
+      font-weight: 950;
       line-height: 1;
       cursor: pointer;
       display: flex;
@@ -3875,6 +3877,11 @@
       pointer-events: auto !important;
       overflow: hidden;
       isolation: isolate;
+      text-shadow:
+        -1px 0 0 rgba(255, 255, 255, 0.9),
+        1px 0 0 rgba(255, 255, 255, 0.9),
+        0 -1px 0 rgba(255, 255, 255, 0.9),
+        0 1px 0 rgba(255, 255, 255, 0.9);
     }
 
     .back-button-prep::before {
@@ -8605,6 +8612,358 @@
         line-height: 1.28;
       }
     }
+
+    /* Presentacion final para instrucciones de la mision Spinosaurio. */
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-modal {
+      width: min(1220px, 98vw);
+      height: min(96dvh, 900px);
+      max-height: 94dvh;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      border-radius: 32px;
+      overflow: hidden;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .btn-back-regreso {
+      top: max(0.95rem, env(safe-area-inset-top));
+      right: max(1rem, env(safe-area-inset-right));
+      width: 48px;
+      height: 48px;
+      border-color: rgba(16, 185, 129, 0.28);
+      color: #0f766e;
+      background: rgba(240, 253, 250, 0.96);
+      box-shadow: 0 12px 24px rgba(15, 118, 110, 0.18);
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-header {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding:
+        max(3.7rem, calc(env(safe-area-inset-top) + 3.25rem))
+        clamp(4.4rem, 7vw, 5.4rem)
+        clamp(0.42rem, 0.72vw, 0.62rem)
+        clamp(1.2rem, 2.2vw, 1.75rem);
+      text-align: left;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-chip {
+      display: inline-flex;
+      margin: 0 0 0.38rem;
+      padding: 0.34rem 0.82rem;
+      font-size: clamp(0.62rem, 0.76vw, 0.72rem);
+      letter-spacing: 0.08em;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-modal .modal-title {
+      width: auto;
+      max-width: min(100%, 18ch);
+      margin: 0;
+      color: #0f172a;
+      font-size: clamp(2.35rem, 3.65vw, 3.7rem);
+      line-height: 1.04;
+      letter-spacing: 0;
+      text-align: left;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-header p {
+      display: block;
+      width: auto;
+      max-width: 58ch;
+      margin: 0.42rem 0 0;
+      color: #0f766e;
+      font-size: clamp(1rem, 1.18vw, 1.18rem);
+      line-height: 1.34;
+      text-align: left;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-content {
+      flex: 1 1 auto;
+      min-height: 0;
+      padding:
+        clamp(0.42rem, 0.8vw, 0.68rem)
+        clamp(1.1rem, 2vw, 1.55rem)
+        clamp(0.62rem, 1vw, 0.9rem);
+      overflow: hidden;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-stage {
+      display: flex;
+      align-items: stretch;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-board {
+      --rules-grid-gap: clamp(0.9rem, 1.35vw, 1.22rem);
+      display: grid;
+      flex: 1 1 auto;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      grid-auto-rows: minmax(0, 1fr);
+      gap: var(--rules-grid-gap);
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      align-content: stretch;
+      align-items: stretch;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-board > .rule-card {
+      min-width: 0;
+      min-height: 0;
+      height: 100%;
+      padding: clamp(1rem, 1.55vw, 1.35rem);
+      gap: clamp(0.16rem, 0.48vw, 0.36rem);
+      border-radius: 24px;
+      justify-content: flex-start;
+      overflow: hidden;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-head {
+      margin-bottom: clamp(0.12rem, 0.36vw, 0.26rem);
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-icon {
+      width: clamp(46px, 4.6vw, 60px);
+      height: clamp(46px, 4.6vw, 60px);
+      min-width: clamp(46px, 4.6vw, 60px);
+      border-radius: 18px;
+      font-size: clamp(1.22rem, 1.75vw, 1.65rem);
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-step {
+      min-width: clamp(40px, 4.2vw, 50px);
+      font-size: clamp(0.68rem, 0.95vw, 0.86rem);
+      padding: 0.22rem 0.54rem;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-title {
+      margin-bottom: 0.18rem;
+      color: #0f172a;
+      font-size: clamp(1.12rem, 1.35vw, 1.38rem);
+      line-height: 1.14;
+      overflow-wrap: break-word;
+      text-wrap: balance;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-copy {
+      flex: 0 1 auto;
+      max-height: none;
+      padding-right: 0;
+      overflow: visible;
+      color: #0f3d33;
+      font-size: clamp(0.95rem, 1.08vw, 1.1rem);
+      line-height: 1.34;
+      overflow-wrap: break-word;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-footer {
+      padding:
+        0.34rem
+        clamp(1rem, 2vw, 1.55rem)
+        max(0.95rem, calc(env(safe-area-inset-bottom) + 0.75rem));
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-confirm {
+      width: min(100%, 30rem);
+      min-width: 0;
+      background: linear-gradient(135deg, #10b981, #2563eb);
+      box-shadow: 0 8px 0 #0f172a;
+      font-size: clamp(1.08rem, 1.55vw, 1.34rem);
+      padding: 0.86rem 1.7rem;
+    }
+
+    @media (max-width: 980px) and (min-width: 761px) {
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-board {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-title {
+        font-size: clamp(1rem, 1.55vw, 1.18rem);
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-copy {
+        font-size: clamp(0.84rem, 1.22vw, 0.98rem);
+      }
+    }
+
+    @media (max-width: 760px) {
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-modal {
+        width: 100vw;
+        height: 100dvh;
+        max-height: 100dvh;
+        border-radius: 0;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .btn-back-regreso {
+        top: max(0.82rem, env(safe-area-inset-top));
+        right: max(0.84rem, env(safe-area-inset-right));
+        width: 44px;
+        height: 44px;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-header {
+        align-items: center;
+        padding:
+          max(3.7rem, calc(env(safe-area-inset-top) + 3.08rem))
+          max(0.9rem, env(safe-area-inset-right))
+          0.34rem
+          max(0.9rem, env(safe-area-inset-left));
+        text-align: center;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-chip {
+        display: none;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-modal .modal-title {
+        max-width: 16ch;
+        margin-inline: auto;
+        font-size: clamp(1.76rem, 6.8vw, 2.34rem);
+        line-height: 1.04;
+        text-align: center;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-header p {
+        display: block;
+        max-width: 34ch;
+        margin: 0.28rem auto 0;
+        font-size: clamp(0.84rem, 3.2vw, 1rem);
+        line-height: 1.25;
+        text-align: center;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-content {
+        padding:
+          0.42rem
+          max(0.78rem, env(safe-area-inset-right))
+          0.48rem
+          max(0.78rem, env(safe-area-inset-left));
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-board {
+        --rules-grid-gap: clamp(0.42rem, 1.55vw, 0.64rem);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+        grid-auto-rows: minmax(0, 1fr);
+        height: 100%;
+        max-height: none;
+        align-content: stretch;
+        align-items: stretch;
+        overflow: hidden;
+        padding-right: 0;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-board > .rule-card {
+        height: 100%;
+        min-height: 0;
+        padding: clamp(0.58rem, 2.05vw, 0.82rem) clamp(0.54rem, 1.95vw, 0.78rem);
+        gap: clamp(0.06rem, 0.52vw, 0.14rem);
+        overflow: hidden;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-head {
+        margin-bottom: clamp(0.06rem, 0.45vw, 0.14rem);
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-icon {
+        width: clamp(30px, 8.2vw, 40px);
+        height: clamp(30px, 8.2vw, 40px);
+        min-width: clamp(30px, 8.2vw, 40px);
+        font-size: clamp(0.9rem, 3.15vw, 1.12rem);
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-step {
+        min-width: clamp(27px, 7.3vw, 34px);
+        padding: 0.12rem 0.32rem;
+        font-size: clamp(0.52rem, 1.95vw, 0.64rem);
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-title {
+        margin-bottom: 0.12rem;
+        font-size: clamp(0.88rem, 3.35vw, 1.08rem);
+        line-height: 1.16;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-copy {
+        font-size: clamp(0.72rem, 2.72vw, 0.9rem);
+        line-height: 1.26;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-footer {
+        padding:
+          0.38rem
+          max(0.78rem, env(safe-area-inset-right))
+          max(0.95rem, calc(env(safe-area-inset-bottom) + 0.78rem))
+          max(0.78rem, env(safe-area-inset-left));
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-confirm {
+        padding: 0.7rem 1.08rem;
+        font-size: clamp(1rem, 3.65vw, 1.18rem);
+      }
+    }
+
+    @media (max-width: 380px) {
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-header {
+        padding-top: max(3.65rem, calc(env(safe-area-inset-top) + 3.05rem));
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-header p {
+        font-size: 0.76rem;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-board {
+        --rules-grid-gap: 0.34rem;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-board > .rule-card {
+        padding: 0.46rem 0.4rem 0.42rem !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-title {
+        font-size: 0.8rem;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-copy {
+        font-size: 0.66rem;
+        line-height: 1.2;
+      }
+    }
+
+    @media (max-width: 760px) and (max-height: 640px) {
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-header {
+        padding-top: max(3.35rem, calc(env(safe-area-inset-top) + 2.9rem));
+        padding-bottom: 0.26rem;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-header p {
+        display: none;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-modal .modal-title {
+        font-size: clamp(1.38rem, 5.8vw, 1.86rem);
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-content {
+        padding-block: 0.26rem 0.3rem;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-footer {
+        padding-top: 0.22rem;
+        padding-bottom: max(0.64rem, calc(env(safe-area-inset-bottom) + 0.5rem));
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-confirm {
+        padding: 0.54rem 0.9rem;
+        font-size: 0.9rem;
+      }
+    }
     /* SPLASH SCREEN: capa inicial blanca, completa y aislada de la app principal. */
     body.splash-active {
       overflow: hidden;
@@ -9082,6 +9441,584 @@
       min-width: 260px !important;
       height: auto !important;
       margin-top: 0 !important;
+    }
+
+    /* Override final: Spinosaurio debe llenar la pantalla sin scroll. */
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-modal {
+      width: 100vw !important;
+      height: 100dvh !important;
+      max-height: 100dvh !important;
+      display: grid !important;
+      grid-template-rows: clamp(82px, 15dvh, 122px) minmax(0, 1fr) clamp(66px, 13dvh, 92px) !important;
+      border-radius: 0 !important;
+      overflow: hidden !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .btn-back-regreso {
+      top: max(10px, env(safe-area-inset-top)) !important;
+      right: max(10px, env(safe-area-inset-right)) !important;
+      width: clamp(38px, 10vw, 50px) !important;
+      height: clamp(38px, 10vw, 50px) !important;
+      font-size: clamp(18px, 4.6vw, 24px) !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-header {
+      min-height: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding:
+        max(38px, calc(env(safe-area-inset-top) + 32px))
+        max(54px, env(safe-area-inset-right))
+        clamp(4px, 1vw, 10px)
+        max(12px, env(safe-area-inset-left)) !important;
+      text-align: center !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-chip {
+      display: none !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-modal .modal-title {
+      width: 100% !important;
+      max-width: 18ch !important;
+      margin: 0 auto !important;
+      font-size: clamp(22px, 7vw, 38px) !important;
+      line-height: 1.02 !important;
+      color: #0f172a !important;
+      text-align: center !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-header p {
+      display: block !important;
+      width: 100% !important;
+      max-width: 34ch !important;
+      margin: clamp(3px, 0.7vw, 7px) auto 0 !important;
+      font-size: clamp(10px, 3.2vw, 16px) !important;
+      line-height: 1.16 !important;
+      color: #00695c !important;
+      font-weight: 900 !important;
+      text-align: center !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-content {
+      flex: none !important;
+      min-height: 0 !important;
+      height: 100% !important;
+      display: grid !important;
+      padding:
+        clamp(6px, 1.7vw, 14px)
+        max(clamp(8px, 2vw, 18px), env(safe-area-inset-right))
+        clamp(6px, 1.7vw, 14px)
+        max(clamp(8px, 2vw, 18px), env(safe-area-inset-left)) !important;
+      overflow: hidden !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-stage {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      display: grid !important;
+      align-items: stretch !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-board {
+      --rules-grid-gap: clamp(7px, 1.9vw, 16px);
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+      grid-auto-rows: minmax(0, 1fr) !important;
+      gap: var(--rules-grid-gap) !important;
+      align-content: stretch !important;
+      align-items: stretch !important;
+      justify-items: stretch !important;
+      overflow: hidden !important;
+      padding: 0 !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-board > .rule-card {
+      width: 100% !important;
+      height: 100% !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      align-self: stretch !important;
+      justify-self: stretch !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      gap: clamp(3px, 0.8vw, 8px) !important;
+      padding: clamp(10px, 2.5vw, 20px) !important;
+      border-radius: clamp(16px, 3.8vw, 26px) !important;
+      overflow: hidden !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-head {
+      flex: 0 0 auto !important;
+      margin-bottom: clamp(2px, 0.7vw, 7px) !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-icon {
+      width: clamp(30px, 8.5vw, 54px) !important;
+      height: clamp(30px, 8.5vw, 54px) !important;
+      min-width: clamp(30px, 8.5vw, 54px) !important;
+      border-radius: clamp(10px, 2.4vw, 16px) !important;
+      font-size: clamp(16px, 4.4vw, 28px) !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-step {
+      min-width: clamp(28px, 7vw, 44px) !important;
+      padding: clamp(2px, 0.7vw, 5px) clamp(5px, 1.4vw, 10px) !important;
+      font-size: clamp(8px, 2.2vw, 12px) !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-title {
+      flex: 0 0 auto !important;
+      margin: 0 0 clamp(2px, 0.6vw, 6px) !important;
+      font-size: clamp(12px, 3.8vw, 22px) !important;
+      line-height: 1.08 !important;
+      color: #003c35 !important;
+      font-weight: 900 !important;
+      overflow-wrap: break-word !important;
+      text-wrap: balance !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-copy {
+      flex: 0 1 auto !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
+      font-size: clamp(9px, 2.85vw, 16px) !important;
+      line-height: 1.22 !important;
+      color: #173f38 !important;
+      font-weight: 850 !important;
+      overflow-wrap: break-word !important;
+      text-wrap: pretty !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-footer {
+      min-height: 0 !important;
+      height: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin: 0 !important;
+      padding:
+        clamp(6px, 1.5vw, 12px)
+        max(clamp(12px, 3vw, 22px), env(safe-area-inset-right))
+        max(clamp(8px, 2vw, 16px), env(safe-area-inset-bottom))
+        max(clamp(12px, 3vw, 22px), env(safe-area-inset-left)) !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-confirm {
+      width: min(94%, 520px) !important;
+      min-width: 0 !important;
+      height: 100% !important;
+      max-height: clamp(52px, 10dvh, 76px) !important;
+      margin: 0 !important;
+      padding: 0 clamp(18px, 4vw, 34px) !important;
+      border-radius: 999px !important;
+      font-size: clamp(16px, 4.6vw, 28px) !important;
+      font-weight: 950 !important;
+      letter-spacing: 0.4px !important;
+      background: linear-gradient(135deg, #12c878, #247be5) !important;
+      box-shadow: 0 8px 0 #102036, 0 12px 24px rgba(15, 118, 110, 0.28) !important;
+    }
+
+    @media (max-width: 380px), (max-height: 620px) {
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-modal {
+        grid-template-rows: clamp(70px, 13dvh, 96px) minmax(0, 1fr) clamp(58px, 12dvh, 78px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-header {
+        padding:
+          max(34px, calc(env(safe-area-inset-top) + 28px))
+          max(50px, env(safe-area-inset-right))
+          clamp(2px, 0.8vw, 6px)
+          max(8px, env(safe-area-inset-left)) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-modal .modal-title {
+        font-size: clamp(19px, 6.2vw, 28px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-header p {
+        font-size: clamp(8px, 2.7vw, 12px) !important;
+        line-height: 1.08 !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-board {
+        --rules-grid-gap: clamp(5px, 1.4vw, 10px);
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-board > .rule-card {
+        gap: clamp(2px, 0.5vw, 5px) !important;
+        padding: clamp(7px, 1.8vw, 12px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-icon {
+        width: clamp(24px, 7vw, 34px) !important;
+        height: clamp(24px, 7vw, 34px) !important;
+        min-width: clamp(24px, 7vw, 34px) !important;
+        font-size: clamp(12px, 3.4vw, 18px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-step {
+        min-width: clamp(22px, 6vw, 30px) !important;
+        font-size: clamp(7px, 1.9vw, 10px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-title {
+        font-size: clamp(10px, 3vw, 15px) !important;
+        line-height: 1.05 !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rule-card-copy {
+        font-size: clamp(8px, 2.35vw, 12px) !important;
+        line-height: 1.14 !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-confirm {
+        font-size: clamp(14px, 4vw, 20px) !important;
+        max-height: clamp(46px, 9.5dvh, 62px) !important;
+      }
+    }
+
+    /* Override final: aplicar el layout grande y sin scroll a todas las reglas. */
+    #rulesOverlay.avatar-overlay.open .rules-modal {
+      width: 100vw !important;
+      height: 100dvh !important;
+      max-height: 100dvh !important;
+      display: grid !important;
+      grid-template-rows: clamp(82px, 15dvh, 122px) minmax(0, 1fr) clamp(66px, 13dvh, 92px) !important;
+      border-radius: 0 !important;
+      overflow: hidden !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open .btn-back-regreso {
+      top: max(10px, env(safe-area-inset-top)) !important;
+      right: max(10px, env(safe-area-inset-right)) !important;
+      width: clamp(38px, 10vw, 50px) !important;
+      height: clamp(38px, 10vw, 50px) !important;
+      font-size: clamp(18px, 4.6vw, 24px) !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-header {
+      min-height: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding:
+        max(38px, calc(env(safe-area-inset-top) + 32px))
+        max(54px, env(safe-area-inset-right))
+        clamp(4px, 1vw, 10px)
+        max(12px, env(safe-area-inset-left)) !important;
+      text-align: center !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-chip {
+      display: none !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-modal .modal-title {
+      width: 100% !important;
+      max-width: 18ch !important;
+      margin: 0 auto !important;
+      font-size: clamp(22px, 7vw, 38px) !important;
+      line-height: 1.02 !important;
+      text-align: center !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-header p {
+      display: block !important;
+      width: 100% !important;
+      max-width: 34ch !important;
+      margin: clamp(3px, 0.7vw, 7px) auto 0 !important;
+      font-size: clamp(10px, 3.2vw, 16px) !important;
+      line-height: 1.16 !important;
+      font-weight: 900 !important;
+      text-align: center !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-content {
+      flex: none !important;
+      min-height: 0 !important;
+      height: 100% !important;
+      display: grid !important;
+      padding:
+        clamp(6px, 1.7vw, 14px)
+        max(clamp(8px, 2vw, 18px), env(safe-area-inset-right))
+        clamp(6px, 1.7vw, 14px)
+        max(clamp(8px, 2vw, 18px), env(safe-area-inset-left)) !important;
+      overflow: hidden !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-stage {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      display: grid !important;
+      align-items: stretch !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-board {
+      --rules-grid-gap: clamp(7px, 1.9vw, 16px);
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+      grid-auto-rows: minmax(0, 1fr) !important;
+      gap: var(--rules-grid-gap) !important;
+      align-content: stretch !important;
+      align-items: stretch !important;
+      justify-items: stretch !important;
+      overflow: hidden !important;
+      padding: 0 !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-board > .rule-card {
+      width: 100% !important;
+      height: 100% !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      align-self: stretch !important;
+      justify-self: stretch !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      gap: clamp(3px, 0.8vw, 8px) !important;
+      padding: clamp(10px, 2.5vw, 20px) !important;
+      border-radius: clamp(16px, 3.8vw, 26px) !important;
+      overflow: hidden !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-board > .rule-card:last-child:nth-child(odd) {
+      grid-column: 1 / -1 !important;
+      width: calc((100% - var(--rules-grid-gap)) / 2) !important;
+      max-width: 100% !important;
+      justify-self: center !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rule-card-head {
+      flex: 0 0 auto !important;
+      margin-bottom: clamp(2px, 0.7vw, 7px) !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rule-card-icon {
+      width: clamp(30px, 8.5vw, 54px) !important;
+      height: clamp(30px, 8.5vw, 54px) !important;
+      min-width: clamp(30px, 8.5vw, 54px) !important;
+      border-radius: clamp(10px, 2.4vw, 16px) !important;
+      font-size: clamp(16px, 4.4vw, 28px) !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rule-card-step {
+      min-width: clamp(28px, 7vw, 44px) !important;
+      padding: clamp(2px, 0.7vw, 5px) clamp(5px, 1.4vw, 10px) !important;
+      font-size: clamp(8px, 2.2vw, 12px) !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rule-card-title {
+      flex: 0 0 auto !important;
+      margin: 0 0 clamp(2px, 0.6vw, 6px) !important;
+      font-size: clamp(12px, 3.8vw, 22px) !important;
+      line-height: 1.08 !important;
+      font-weight: 900 !important;
+      overflow-wrap: break-word !important;
+      text-wrap: balance !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rule-card-copy {
+      flex: 0 1 auto !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
+      font-size: clamp(9px, 2.85vw, 16px) !important;
+      line-height: 1.22 !important;
+      font-weight: 850 !important;
+      overflow-wrap: break-word !important;
+      text-wrap: pretty !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-footer {
+      min-height: 0 !important;
+      height: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin: 0 !important;
+      padding:
+        clamp(6px, 1.5vw, 12px)
+        max(clamp(12px, 3vw, 22px), env(safe-area-inset-right))
+        max(clamp(8px, 2vw, 16px), env(safe-area-inset-bottom))
+        max(clamp(12px, 3vw, 22px), env(safe-area-inset-left)) !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-confirm {
+      width: min(94%, 520px) !important;
+      min-width: 0 !important;
+      height: 100% !important;
+      max-height: clamp(52px, 10dvh, 76px) !important;
+      margin: 0 !important;
+      padding: 0 clamp(18px, 4vw, 34px) !important;
+      border-radius: 999px !important;
+      font-size: clamp(16px, 4.6vw, 28px) !important;
+      font-weight: 950 !important;
+      letter-spacing: 0.4px !important;
+    }
+
+    @media (max-width: 380px), (max-height: 620px) {
+      #rulesOverlay.avatar-overlay.open .rules-modal {
+        grid-template-rows: clamp(70px, 13dvh, 96px) minmax(0, 1fr) clamp(58px, 12dvh, 78px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rules-header {
+        padding:
+          max(34px, calc(env(safe-area-inset-top) + 28px))
+          max(50px, env(safe-area-inset-right))
+          clamp(2px, 0.8vw, 6px)
+          max(8px, env(safe-area-inset-left)) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rules-modal .modal-title {
+        font-size: clamp(19px, 6.2vw, 28px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rules-header p {
+        font-size: clamp(8px, 2.7vw, 12px) !important;
+        line-height: 1.08 !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rules-board {
+        --rules-grid-gap: clamp(5px, 1.4vw, 10px);
+      }
+
+      #rulesOverlay.avatar-overlay.open .rules-board > .rule-card {
+        gap: clamp(2px, 0.5vw, 5px) !important;
+        padding: clamp(7px, 1.8vw, 12px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rule-card-icon {
+        width: clamp(24px, 7vw, 34px) !important;
+        height: clamp(24px, 7vw, 34px) !important;
+        min-width: clamp(24px, 7vw, 34px) !important;
+        font-size: clamp(12px, 3.4vw, 18px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rule-card-step {
+        min-width: clamp(22px, 6vw, 30px) !important;
+        font-size: clamp(7px, 1.9vw, 10px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rule-card-title {
+        font-size: clamp(10px, 3vw, 15px) !important;
+        line-height: 1.05 !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rule-card-copy {
+        font-size: clamp(8px, 2.35vw, 12px) !important;
+        line-height: 1.14 !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open .rules-confirm {
+        font-size: clamp(14px, 4vw, 20px) !important;
+        max-height: clamp(46px, 9.5dvh, 62px) !important;
+      }
+    }
+
+    /* Sala C tiene un titulo y subtitulo mas largos: evitar encimado con tarjetas. */
+    #rulesOverlay.avatar-overlay.open.sustainable-station-rules-mode .rules-modal {
+      grid-template-rows: clamp(112px, 22dvh, 152px) minmax(0, 1fr) clamp(62px, 12dvh, 84px) !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.sustainable-station-rules-mode .rules-header {
+      padding:
+        max(36px, calc(env(safe-area-inset-top) + 30px))
+        max(52px, env(safe-area-inset-right))
+        clamp(5px, 1.2vw, 10px)
+        max(12px, env(safe-area-inset-left)) !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.sustainable-station-rules-mode .rules-modal .modal-title {
+      max-width: 17ch !important;
+      font-size: clamp(20px, 6.4vw, 32px) !important;
+      line-height: 0.98 !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.sustainable-station-rules-mode .rules-header p {
+      max-width: 37ch !important;
+      margin-top: clamp(4px, 0.9vw, 8px) !important;
+      font-size: clamp(8px, 2.55vw, 13px) !important;
+      line-height: 1.1 !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.sustainable-station-rules-mode .rules-content {
+      padding-top: clamp(6px, 1.4vw, 12px) !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.sustainable-station-rules-mode .rules-board {
+      --rules-grid-gap: clamp(6px, 1.55vw, 12px);
+    }
+
+    #rulesOverlay.avatar-overlay.open.sustainable-station-rules-mode .rules-board > .rule-card {
+      padding: clamp(8px, 2vw, 16px) !important;
+      gap: clamp(2px, 0.65vw, 6px) !important;
+      justify-content: center !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.sustainable-station-rules-mode .rule-card-icon {
+      width: clamp(26px, 7.2vw, 44px) !important;
+      height: clamp(26px, 7.2vw, 44px) !important;
+      min-width: clamp(26px, 7.2vw, 44px) !important;
+      font-size: clamp(13px, 3.6vw, 22px) !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.sustainable-station-rules-mode .rule-card-title {
+      font-size: clamp(10px, 3.25vw, 18px) !important;
+      line-height: 1.08 !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open.sustainable-station-rules-mode .rule-card-copy {
+      font-size: clamp(7px, 2.45vw, 13px) !important;
+      line-height: 1.16 !important;
+    }
+
+    @media (max-width: 380px), (max-height: 620px) {
+      #rulesOverlay.avatar-overlay.open.sustainable-station-rules-mode .rules-modal {
+        grid-template-rows: clamp(98px, 20dvh, 126px) minmax(0, 1fr) clamp(56px, 11dvh, 72px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open.sustainable-station-rules-mode .rules-modal .modal-title {
+        font-size: clamp(18px, 5.8vw, 25px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open.sustainable-station-rules-mode .rules-header p {
+        font-size: clamp(7px, 2.25vw, 10px) !important;
+        line-height: 1.08 !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open.sustainable-station-rules-mode .rules-board > .rule-card {
+        padding: clamp(6px, 1.6vw, 10px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open.sustainable-station-rules-mode .rule-card-title {
+        font-size: clamp(9px, 2.8vw, 13px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open.sustainable-station-rules-mode .rule-card-copy {
+        font-size: clamp(6px, 2.05vw, 10px) !important;
+        line-height: 1.12 !important;
+      }
     }
   </style>
 </head>

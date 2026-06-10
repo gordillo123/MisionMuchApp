@@ -101,7 +101,7 @@ window.APP_MODULES = {
   `,
 
   "modules/prep.html": `
-<button class="back-button-prep" id="btnBackPrep" title="Volver">←</button>
+<button class="back-button-prep" id="btnBackPrep" title="Volver">&#11013;</button>
 <div class="intro-container">
   <div class="rules-col">
     <div class="card">
@@ -435,7 +435,7 @@ window.APP_MODULES = {
 
   "modules/rules.html": `
 <div class="avatar-modal rules-modal">
-  <button class="btn-back-regreso" id="btnBackRules" title="Cerrar">&#10005;</button>
+  <button class="btn-back-regreso" id="btnBackRules" type="button" title="Cerrar" aria-label="Cerrar">&#10005;</button>
   <div class="modal-header rules-header">
     <span class="rules-chip">Gu&iacute;a del Explorador</span>
     <h2 class="modal-title">C&oacute;mo Jugar</h2>
