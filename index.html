@@ -1409,6 +1409,7 @@
     }
 
     .avatar-modal {
+      position: relative;
       background: var(--white);
       border: 8px solid var(--msf-blue);
       border-radius: 40px;
@@ -2812,6 +2813,7 @@
 
     /* ════ ESTILOS MEJORADOS PARA MODAL DE REGLAS ════ */
     .rules-modal {
+      position: relative;
       width: min(1080px, 96vw);
       height: min(92vh, 760px);
       max-height: 92vh;
@@ -2826,7 +2828,7 @@
 
     .rules-header {
       position: relative;
-      padding: clamp(4.1rem, 5vw, 4.8rem) clamp(1.4rem, 5vw, 5rem) 0.15rem;
+      padding: clamp(2.8rem, 4vw, 3.5rem) clamp(1.4rem, 5vw, 5rem) 0.15rem;
       text-align: center;
     }
 
@@ -6243,7 +6245,7 @@
         padding:
           0.45rem
           max(0.72rem, env(safe-area-inset-right))
-          max(0.9rem, env(safe-area-inset-bottom))
+          max(2.5rem, calc(env(safe-area-inset-bottom) + 2rem))
           max(0.72rem, env(safe-area-inset-left));
       }
     }
@@ -7719,7 +7721,7 @@
       #rulesOverlay .rules-header,
       #rulesOverlay.start-rules-mode .rules-header {
         padding:
-          max(4.5rem, calc(env(safe-area-inset-top) + 3.6rem))
+          max(3.2rem, calc(env(safe-area-inset-top) + 2.4rem))
           max(1rem, env(safe-area-inset-right))
           0.42rem
           max(1rem, env(safe-area-inset-left));
@@ -7876,7 +7878,7 @@
         padding:
           0.6rem
           max(0.95rem, env(safe-area-inset-right))
-          max(1rem, env(safe-area-inset-bottom))
+          max(2.8rem, calc(env(safe-area-inset-bottom) + 2.2rem))
           max(0.95rem, env(safe-area-inset-left));
       }
 
@@ -8045,7 +8047,7 @@
         padding:
           0.26rem
           max(0.65rem, env(safe-area-inset-right))
-          max(0.44rem, env(safe-area-inset-bottom))
+          max(2.2rem, calc(env(safe-area-inset-bottom) + 1.8rem))
           max(0.65rem, env(safe-area-inset-left));
       }
 
@@ -8061,6 +8063,7 @@
       #rulesOverlay.start-rules-mode .rules-content {
         display: flex;
         flex-direction: column;
+        flex: 1 1 auto;
         min-height: 0;
         overflow: hidden;
         padding-block: 0.18rem 0.24rem;
@@ -8095,7 +8098,7 @@
         align-items: stretch;
         height: 100%;
         overflow-x: hidden;
-        overflow-y: hidden;
+        overflow-y: auto;
         padding-right: 0;
       }
 
@@ -8150,9 +8153,9 @@
       #rulesOverlay.biodiversity-station-rules-mode .rule-card-title,
       #rulesOverlay.energy-station-rules-mode .rule-card-title,
       #rulesOverlay.sustainable-station-rules-mode .rule-card-title {
-        margin-bottom: 0.08rem;
-        font-size: clamp(0.66rem, 2.5vw, 0.88rem);
-        line-height: 1.06;
+        margin-bottom: 0.2rem;
+        font-size: clamp(0.8rem, 2.8vw, 0.96rem);
+        line-height: 1.25;
         overflow-wrap: anywhere;
         text-wrap: auto;
       }
@@ -8164,8 +8167,8 @@
       #rulesOverlay.biodiversity-station-rules-mode .rule-card-copy,
       #rulesOverlay.energy-station-rules-mode .rule-card-copy,
       #rulesOverlay.sustainable-station-rules-mode .rule-card-copy {
-        font-size: clamp(0.5rem, 1.9vw, 0.72rem);
-        line-height: 1.13;
+        font-size: clamp(0.68rem, 2.2vw, 0.82rem);
+        line-height: 1.35;
         overflow-wrap: anywhere;
       }
     }
@@ -8183,7 +8186,7 @@
       #rulesOverlay.biodiversity-station-rules-mode .rule-card-title,
       #rulesOverlay.energy-station-rules-mode .rule-card-title,
       #rulesOverlay.sustainable-station-rules-mode .rule-card-title {
-        font-size: clamp(0.58rem, 2.35vw, 0.72rem);
+        font-size: clamp(0.72rem, 2.5vw, 0.86rem);
       }
 
       #rulesOverlay .rule-card-copy,
@@ -8193,8 +8196,8 @@
       #rulesOverlay.biodiversity-station-rules-mode .rule-card-copy,
       #rulesOverlay.energy-station-rules-mode .rule-card-copy,
       #rulesOverlay.sustainable-station-rules-mode .rule-card-copy {
-        font-size: clamp(0.44rem, 1.78vw, 0.58rem);
-        line-height: 1.1;
+        font-size: clamp(0.6rem, 2vw, 0.72rem);
+        line-height: 1.28;
       }
     }
 
@@ -8294,7 +8297,8 @@
       min-height: 0;
       align-content: stretch;
       align-items: stretch;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
       padding: 0;
     }
 
@@ -8308,6 +8312,14 @@
       gap: clamp(0.18rem, 0.45vw, 0.34rem);
       padding: clamp(0.86rem, 1.35vw, 1.12rem);
       overflow: hidden;
+      border-radius: 16px;
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+
+    #rulesOverlay.avatar-overlay.open .rules-board > .rule-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     }
 
     #rulesOverlay.avatar-overlay.open.biodiversity-station-rules-mode .rule-card::before,
@@ -8398,10 +8410,10 @@
 
       #rulesOverlay.avatar-overlay.open .rules-header {
         padding:
-          max(3.55rem, calc(env(safe-area-inset-top) + 3.25rem))
-          max(3.15rem, env(safe-area-inset-right))
-          0.24rem
-          max(0.85rem, env(safe-area-inset-left));
+          max(3.2rem, calc(env(safe-area-inset-top) + 2.4rem))
+          max(1.5rem, env(safe-area-inset-right))
+          0.42rem
+          max(1.5rem, env(safe-area-inset-left));
       }
 
       #rulesOverlay.avatar-overlay.open .rules-chip,
@@ -8416,6 +8428,7 @@
       }
 
       #rulesOverlay.avatar-overlay.open .rules-content {
+        flex: 1 1 auto;
         padding:
           0.26rem
           max(0.62rem, env(safe-area-inset-right))
@@ -8428,8 +8441,8 @@
       }
 
       #rulesOverlay.avatar-overlay.open .rules-board > .rule-card {
-        padding: clamp(0.48rem, 1.7vw, 0.72rem);
-        gap: clamp(0.08rem, 0.45vw, 0.18rem);
+        padding: clamp(0.64rem, 2vw, 0.9rem) clamp(0.58rem, 1.8vw, 0.8rem);
+        gap: clamp(0.24rem, 0.8vw, 0.45rem);
       }
 
       #rulesOverlay.avatar-overlay.open .rule-card-head {
@@ -8451,23 +8464,23 @@
       }
 
       #rulesOverlay.avatar-overlay.open .rule-card-title {
-        margin-bottom: 0.08rem;
-        font-size: 0.95rem;
-        line-height: 1.08;
+        margin-bottom: 0.2rem;
+        font-size: clamp(0.82rem, 2.8vw, 0.98rem);
+        line-height: 1.25;
         text-wrap: auto;
       }
 
       #rulesOverlay.avatar-overlay.open .rule-card-copy {
         padding-right: 0.12rem;
-        font-size: 0.8rem;
-        line-height: 1.24;
+        font-size: clamp(0.68rem, 2.2vw, 0.84rem);
+        line-height: 1.35;
       }
 
       #rulesOverlay.avatar-overlay.open .rules-footer {
         padding:
           0.34rem
           max(0.74rem, env(safe-area-inset-right))
-          max(0.58rem, env(safe-area-inset-bottom))
+          max(2.2rem, calc(env(safe-area-inset-bottom) + 1.8rem))
           max(0.74rem, env(safe-area-inset-left));
       }
 
