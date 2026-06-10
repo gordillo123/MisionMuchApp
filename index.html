@@ -569,12 +569,12 @@
       -webkit-backdrop-filter: none;
       object-fit: contain;
       transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      filter: drop-shadow(0 0 3px #000) drop-shadow(0 0 6px #000) drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+      filter: drop-shadow(0 0 3px #000) drop-shadow(0 0 6px #000) drop-shadow(0 0 10px rgba(255, 255, 255, 0.85));
     }
 
     .hero-agency-logo:hover {
       transform: translateY(-5px) rotate(-1.5deg) scale(1.04);
-      filter: drop-shadow(0 0 4px #000) drop-shadow(0 0 8px #000) drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
+      filter: drop-shadow(0 0 4px #000) drop-shadow(0 0 8px #000) drop-shadow(0 0 15px rgba(255, 255, 255, 0.95));
     }
 
     @media (max-width: 768px) {
@@ -587,7 +587,7 @@
         box-shadow: none;
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
-        filter: drop-shadow(0 0 3px #000) drop-shadow(0 0 6px #000) drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+        filter: drop-shadow(0 0 3px #000) drop-shadow(0 0 6px #000) drop-shadow(0 0 10px rgba(255, 255, 255, 0.85));
       }
       .hero-agency-logo-container {
         margin-top: -1.8rem;
@@ -2390,7 +2390,7 @@
         box-shadow: none !important;
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
-        filter: drop-shadow(0 0 3px #000) drop-shadow(0 0 6px #000) drop-shadow(0 0 10px rgba(255, 255, 255, 0.4)) !important;
+        filter: drop-shadow(0 0 3px #000) drop-shadow(0 0 6px #000) drop-shadow(0 0 10px rgba(255, 255, 255, 0.85)) !important;
       }
 
       .hero-agency-logo-container {
@@ -3681,8 +3681,8 @@
 
     .prep-agency-standalone {
       display: block;
-      height: clamp(82px, 16vw, 128px);
-      max-width: clamp(260px, 62vw, 480px);
+      height: clamp(100px, 18vw, 150px);
+      max-width: clamp(280px, 68vw, 520px);
       object-fit: contain;
       background: transparent !important;
       border: none !important;
@@ -3692,12 +3692,12 @@
       backdrop-filter: none !important;
       -webkit-backdrop-filter: none !important;
       transition: transform 0.2s ease;
-      filter: drop-shadow(0 0 3px #000) drop-shadow(0 0 6px #000) drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+      filter: none;
     }
 
     .prep-agency-standalone:hover {
       transform: scale(1.04);
-      filter: drop-shadow(0 0 4px #000) drop-shadow(0 0 8px #000) drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
+      filter: none;
     }
 
     @media (max-width: 520px) {
@@ -3734,9 +3734,9 @@
       }
 
       .prep-agency-standalone {
-        height: 72px;
-        max-width: 300px;
-        filter: drop-shadow(0 0 3px #000) drop-shadow(0 0 6px #000) drop-shadow(0 0 10px rgba(255, 255, 255, 0.4)) !important;
+        height: 85px;
+        max-width: 320px;
+        filter: none !important;
       }
     }
 
