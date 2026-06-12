@@ -532,7 +532,7 @@ async function restartGameInPlace(e) {
 /* ===== QUIZ JSON ===== */
 async function cargarQuizJSON() {
   try {
-    const res = await fetch("quiz.json?cb=" + Date.now());
+    const res = await fetch("quiz.json", { cache: "force-cache" });
     const data = await res.json();
     const list = Array.isArray(data.questions) ? data.questions : [];
     quizData = list.length ? list[Math.floor(Math.random() * list.length)] : null;

@@ -12331,6 +12331,54 @@
         return '';
       }
 
+      const stationPrefetchUrls = [
+        'entrada-much/index.html?from=portada&sala=entrada',
+        'entrada-much/styles.css',
+        'entrada-much/preguntas-local.js',
+        'entrada-much/app.js',
+        'SALA-Biodiversidad-y-Conocimiento/index.html?from=portada&sala=biodiversidad',
+        'SALA-Biodiversidad-y-Conocimiento/styles.css',
+        'SALA-Biodiversidad-y-Conocimiento/preguntas-local.js',
+        'SALA-Biodiversidad-y-Conocimiento/app.js',
+        'sala_energia/index.html?from=portada&sala=energia',
+        'sala_energia/styles.css',
+        'sala_energia/preguntas-local.js',
+        'sala_energia/app.js',
+        'Sala_Desarrollo_Sustentable/index.html?from=portada&sala=desarrollo-sustentable',
+        'Sala_Desarrollo_Sustentable/styles.css',
+        'Sala_Desarrollo_Sustentable/preguntas-local.js',
+        'Sala_Desarrollo_Sustentable/app.js',
+        'Juego_Spinosaurio/index.html',
+        'Juego_Spinosaurio/styles.css',
+        'Juego_Spinosaurio/game.js',
+        'Juego_Spinosaurio/quiz.json',
+        'Sbeel_Dinosaurios/index.html',
+        'Sbeel_Dinosaurios/style.css',
+        'Sbeel_Dinosaurios/script.js'
+      ];
+
+      function prefetchStationResources() {
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        if (connection?.saveData) return;
+
+        stationPrefetchUrls.forEach((href) => {
+          const link = document.createElement('link');
+          link.rel = 'prefetch';
+          link.href = href;
+          document.head.appendChild(link);
+        });
+      }
+
+      function scheduleStationPrefetch() {
+        if ('requestIdleCallback' in window) {
+          window.requestIdleCallback(prefetchStationResources, { timeout: 2500 });
+        } else {
+          window.setTimeout(prefetchStationResources, 1500);
+        }
+      }
+
+      scheduleStationPrefetch();
+
       function playCurrentStation() {
         const url = getCurrentStationGameUrl();
         if (url) {

@@ -185,7 +185,7 @@ async function loadPreguntas() {
     } else {
       console.log('[loadPreguntas] Banco local no detectado, intentando fetch...');
       try {
-        const resp = await fetch('preguntas.json', { cache: 'no-store' });
+        const resp = await fetch('preguntas.json', { cache: 'force-cache' });
         if (resp.ok) {
           bank = await resp.json();
           console.log('[loadPreguntas] Fetch exitoso. Total:', bank.length);
@@ -893,6 +893,18 @@ const elements = {
 const sound = new SoundFX(elements.soundToggle || null);
 const confetti = new Confetti(document.getElementById('confetti'));
 
+function verifyStationActive(estacionId) {
+  import('../supabase-utils.js')
+    .then(progreso => progreso.comprobarEstacionActiva(estacionId))
+    .then(active => {
+      if (!active) {
+        alert('Esta estacion se encuentra inactiva o cerrada.');
+        window.location.href = '../index.html';
+      }
+    })
+    .catch(err => console.warn('No se pudo verificar el estado de la estacion:', err));
+}
+
 // === INICIALIZAR MINI-MAPA ===
 function initMiniMap() {
   const miniMapAvatar = document.getElementById('miniMapAvatar');
@@ -938,13 +950,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const start = async () => {
     try {
-      const progreso = await import('../supabase-utils.js');
-      const active = await progreso.comprobarEstacionActiva(1);
-      if (!active) {
-        alert('Esta estación se encuentra inactiva o cerrada.');
-        window.location.href = '../index.html';
-        return;
-      }
+      verifyStationActive(1);
       await loadPreguntas();
       startQuizInDB();
       if (welcome) welcome.classList.add('hidden');

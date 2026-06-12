@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function initGame() {
         selectedPuzzleImage = selectRandomPuzzleImage();
         applyPuzzleImage(selectedPuzzleImage.src);
-        await preloadPuzzleImage(selectedPuzzleImage.src);
+        preloadPuzzleImage(selectedPuzzleImage.src);
         createPieces();
         shufflePieces();
         renderBoard();

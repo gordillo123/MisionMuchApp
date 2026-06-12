@@ -215,9 +215,13 @@ function getMexicoTime() {
 // ------------------------------------------------------------
 async function loadPreguntas() {
   try {
-    const resp = await fetch('preguntas.json', { cache: 'no-store' });
-    if (!resp.ok) throw new Error('No se pudo cargar preguntas.json: ' + resp.status);
-    let bank = await resp.json();
+    let bank = Array.isArray(window.MUCH_PREGUNTAS_SUSTENTABLE) ? window.MUCH_PREGUNTAS_SUSTENTABLE : null;
+
+    if (!bank || bank.length === 0) {
+      const resp = await fetch('preguntas.json', { cache: 'force-cache' });
+      if (!resp.ok) throw new Error('No se pudo cargar preguntas.json: ' + resp.status);
+      bank = await resp.json();
+    }
 
     if (!Array.isArray(bank)) {
       const keys = Object.keys(bank || {});
@@ -957,6 +961,18 @@ const elements = {
 const sound = new SoundFX(elements.soundToggle || null);
 const confetti = new Confetti(document.getElementById('confetti'));
 
+function verifyStationActive(estacionId) {
+  import('../supabase-utils.js')
+    .then(progreso => progreso.comprobarEstacionActiva(estacionId))
+    .then(active => {
+      if (!active) {
+        alert('Esta estacion se encuentra inactiva o cerrada.');
+        window.location.href = '../index.html';
+      }
+    })
+    .catch(err => console.warn('No se pudo verificar el estado de la estacion:', err));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const welcome = document.getElementById('welcome');
   const quizShell = document.getElementById('quizShell');
@@ -965,13 +981,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const start = async () => {
     try {
-      const progreso = await import('../supabase-utils.js');
-      const active = await progreso.comprobarEstacionActiva(5);
-      if (!active) {
-        alert('Esta estación se encuentra inactiva o cerrada.');
-        window.location.href = '../index.html';
-        return;
-      }
+      verifyStationActive(5);
       await loadPreguntas();
       startQuizInDB();
       if (welcome) welcome.classList.add('hidden');
