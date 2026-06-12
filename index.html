@@ -11913,7 +11913,7 @@
             : 'Lee estas reglas clave para completar tu recorrido científico dentro del museo.';
         }
         if (btnCerrarReglas) {
-          btnCerrarReglas.innerText = isStartingGame ? 'Enterado, jugar' : '¡Entendido!';
+          btnCerrarReglas.innerText = isStartingGame ? 'Enterado, jugar!' : '¡Entendido!';
         }
       }
 
@@ -11936,8 +11936,8 @@
         }
         if (btnCerrarReglas) {
           btnCerrarReglas.innerText = stationConfig
-            ? 'Listo, vamos al reto'
-            : (isStartingGame ? 'Enterado, jugar' : 'Entendido');
+            ? 'Listo, vamos al reto!'
+            : (isStartingGame ? 'Enterado, jugar!' : 'Entendido!');
         }
 
         return;
@@ -11983,9 +11983,9 @@
         }
         if (btnCerrarReglas) {
           if (isStation2Start || isStation3Start || isStation4Start || isStation5Start || isStation6Start) {
-            btnCerrarReglas.innerText = 'Listo, vamos al reto';
+            btnCerrarReglas.innerText = 'Listo, vamos al reto!';
           } else {
-            btnCerrarReglas.innerText = isStartingGame ? 'Enterado, jugar' : 'Entendido';
+            btnCerrarReglas.innerText = isStartingGame ? 'Enterado, jugar!' : 'Entendido!';
           }
         }
       }
