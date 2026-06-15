@@ -275,7 +275,7 @@ async function iniciarSesionConGoogle() {
         }
 
         // Guardar sesión en localStorage
-        localStorage.setItem('much_google_user', JSON.stringify({
+        const sessionUser = {
           id: data.id_usuario,
           id_usuario: data.id_usuario,
           name: data.nombre,
@@ -283,9 +283,38 @@ async function iniciarSesionConGoogle() {
           picture: data.avatar_url,
           avatar_url: data.avatar_url,
           roles: data.roles || ['usuario']
-        }));
+        };
+        localStorage.setItem('much_google_user', JSON.stringify(sessionUser));
 
         loginModal.style.display = 'none';
+
+        if (window.MuchRoleAccess) {
+          const access = window.MuchRoleAccess.getAccessInfo(sessionUser);
+          if (access.isInternal) {
+            const didRedirect = window.MuchRoleAccess.redirectToRoleHome({
+              user: sessionUser,
+              basePath: './'
+            });
+            if (didRedirect) {
+              resolve(data);
+              return;
+            }
+          }
+        } else {
+          const roles = Array.isArray(sessionUser.roles)
+            ? sessionUser.roles.map(r => String(r).toLowerCase())
+            : [];
+          if (roles.includes('admin') || roles.includes('administrador')) {
+            window.location.href = 'ADMINISTRADOR.html';
+            resolve(data);
+            return;
+          }
+          if (roles.includes('taquilla') || roles.includes('taquillero')) {
+            window.location.href = 'ADMINISTRADOR.html?section=taquilla';
+            resolve(data);
+            return;
+          }
+        }
         
         // Disparar evento para actualizar vistas
         window.dispatchEvent(new Event('storage'));
@@ -307,7 +336,7 @@ async function iniciarSesionConGoogle() {
   });
 }
 
-async function cerrarSesion() {
+async function cerrarSesion(options = {}) {
   console.log('🚪 Cerrando sesión y limpiando datos del usuario...');
   
   // Obtener IDs antes de borrar storage
@@ -338,8 +367,12 @@ async function cerrarSesion() {
     localStorage.setItem('much_lugar_seguro', lugarSeguro);
   }
   
-  // Recargar de inmediato para reiniciar estado
-  window.location.reload();
+  // Recargar o redirigir de inmediato para reiniciar estado
+  if (options.redirectTo) {
+    window.location.replace(options.redirectTo);
+  } else if (options.reload !== false) {
+    window.location.reload();
+  }
   return true;
 }
 

@@ -13,6 +13,10 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Outfit:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap"
     rel="stylesheet" />
+  <script src="assets/role-access.js"></script>
+  <script>
+    window.MuchRoleAccess?.redirectIfInternalUserOnPlayerPage({ basePath: './' });
+  </script>
   <link rel="stylesheet" href="assets/station-completion.css" />
   <style>
     /* ────────────────────────────────────────────────
@@ -10578,6 +10582,8 @@
       }
 
       async function openProfile() {
+        if (redirectInternalUserIfNeeded()) return;
+
         if (!googleUser && !selectedAvatar) {
           startGameFlow();
           return;
@@ -10928,7 +10934,41 @@
         googleUser = null;
       }
 
+      function getRoleAccess(user = googleUser) {
+        if (window.MuchRoleAccess) {
+          return window.MuchRoleAccess.getAccessInfo(user);
+        }
+
+        const roles = Array.isArray(user?.roles) ? user.roles.map(r => String(r).toLowerCase()) : [];
+        const isAdmin = roles.includes('admin') || roles.includes('administrador');
+        const isTaquilla = !isAdmin && (roles.includes('taquilla') || roles.includes('taquillero'));
+        return {
+          roles,
+          primaryRole: isAdmin ? 'admin' : (isTaquilla ? 'taquilla' : 'usuario'),
+          isAdmin,
+          isTaquilla,
+          isPlayer: !isAdmin && !isTaquilla,
+          isInternal: isAdmin || isTaquilla
+        };
+      }
+
+      function redirectInternalUserIfNeeded(user = googleUser) {
+        const access = getRoleAccess(user);
+        if (!user || !access.isInternal) return false;
+
+        if (window.MuchRoleAccess) {
+          return window.MuchRoleAccess.redirectIfInternalUserOnPlayerPage({
+            user,
+            basePath: './'
+          });
+        }
+
+        window.location.replace(access.isAdmin ? 'ADMINISTRADOR.html' : 'ADMINISTRADOR.html?section=taquilla');
+        return true;
+      }
+
       function openAvatarSelection() {
+        if (redirectInternalUserIfNeeded()) return;
         loginOverlay.classList.remove('open');
         overlay.classList.add('open');
         if (googleUser) {
@@ -11002,11 +11042,16 @@
         console.log('[Login] Usuario autenticado:', googleUser);
         localStorage.setItem('much_google_user', JSON.stringify(googleUser));
 
+        if (redirectInternalUserIfNeeded(googleUser)) {
+          return googleUser;
+        }
+
         try {
           await window.verificarUsuarioEnTabla();
           // Sincronizar el progreso de la BD después de verificar el usuario
-          await sincronizarProgresoDesdeBD();
           await actualizarVisibilidadMenuRoles();
+          if (redirectInternalUserIfNeeded(googleUser)) return googleUser;
+          await sincronizarProgresoDesdeBD();
         } catch (error) {
           console.error('[Login] Error verificando public.usuarios:', error);
         }
@@ -11017,6 +11062,7 @@
 
       async function completeGoogleLogin() {
         const user = await sincronizarUsuarioSupabase();
+        if (user && getRoleAccess(user).isInternal) return;
         if (user && !restoreSavedAvatar()) openAvatarSelection();
       }
 
@@ -11033,6 +11079,7 @@
         };
 
         const user = await sincronizarUsuarioSupabase();
+        if (user && getRoleAccess(user).isInternal) return;
         if (user && !restoreSavedAvatar()) openAvatarSelection();
       }
 
@@ -11074,6 +11121,8 @@
       }, 500);
 
       function showView(viewId) {
+        if (viewId !== 'viewLanding' && redirectInternalUserIfNeeded()) return;
+
         document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
         const target = document.getElementById(viewId);
         if (target) {
@@ -11203,28 +11252,45 @@
           'muchtuxtla@gmail.com',
           'luceroynn@gmail.com'
         ];
+        const localTaquillaEmails = [
+          'yadiran0514@gmail.com'
+        ];
         const isLocalAdmin = localAllowedEmails.includes(email.toLowerCase());
-        const isLocalTaquilla = isLocalAdmin || email.toLowerCase().includes('taquilla');
+        const isLocalTaquilla = !isLocalAdmin && (
+          localTaquillaEmails.includes(email.toLowerCase()) ||
+          email.toLowerCase().includes('taquilla')
+        );
 
         try {
           const res = await fetch(`${API_BASE_URL}/api/usuarios/${userId}/roles`);
           if (!res.ok) throw new Error('Error al consultar roles');
           const data = await res.json();
           const roles = data.roles || [];
+          const userWithRoles = { ...user, roles };
+          if (isLocalAdmin && !roles.includes('admin')) userWithRoles.roles = [...roles, 'admin'];
+          if (isLocalTaquilla && !userWithRoles.roles.includes('taquilla')) userWithRoles.roles = [...userWithRoles.roles, 'taquilla'];
+          localStorage.setItem('much_google_user', JSON.stringify(userWithRoles));
 
-          const isAdmin = roles.includes('admin') || isLocalAdmin;
-          const isTaquilla = roles.includes('taquilla') || roles.includes('admin') || isLocalTaquilla;
+          const access = getRoleAccess(userWithRoles);
 
           if (adminBtn) {
-            if (isAdmin) adminBtn.style.removeProperty('display');
+            if (access.isAdmin) adminBtn.style.removeProperty('display');
             else adminBtn.style.setProperty('display', 'none', 'important');
           }
           if (taquillaBtn) {
-            if (isTaquilla) taquillaBtn.style.removeProperty('display');
+            if (access.isTaquilla) taquillaBtn.style.removeProperty('display');
             else taquillaBtn.style.setProperty('display', 'none', 'important');
           }
+
+          googleUser = userWithRoles;
+          redirectInternalUserIfNeeded(userWithRoles);
         } catch (error) {
           console.warn('[Roles] Fallo consulta API, usando fallback de correo:', error);
+          const fallbackRoles = isLocalAdmin ? ['admin'] : (isLocalTaquilla ? ['taquilla'] : (user.roles || []));
+          const userWithFallback = { ...user, roles: fallbackRoles };
+          googleUser = userWithFallback;
+          localStorage.setItem('much_google_user', JSON.stringify(userWithFallback));
+
           if (adminBtn) {
             if (isLocalAdmin) adminBtn.style.removeProperty('display');
             else adminBtn.style.setProperty('display', 'none', 'important');
@@ -11233,6 +11299,8 @@
             if (isLocalTaquilla) taquillaBtn.style.removeProperty('display');
             else taquillaBtn.style.setProperty('display', 'none', 'important');
           }
+
+          redirectInternalUserIfNeeded(userWithFallback);
         }
       }
       window.actualizarVisibilidadMenuRoles = actualizarVisibilidadMenuRoles;
@@ -11258,12 +11326,16 @@
         }
 
         if (buttonId === 'btnAdmin') {
-          window.location.href = 'ADMINISTRADOR.html';
+          if (getRoleAccess().isAdmin) {
+            window.location.href = 'ADMINISTRADOR.html';
+          }
           return;
         }
 
         if (buttonId === 'btnTaquilla') {
-          window.location.href = 'ADMINISTRADOR.html?section=taquilla';
+          if (getRoleAccess().isTaquilla) {
+            window.location.href = 'ADMINISTRADOR.html?section=taquilla';
+          }
           return;
         }
 
@@ -11308,6 +11380,8 @@
       }
 
       window.startGameFlow = () => {
+        if (redirectInternalUserIfNeeded()) return;
+
         // 1. Si no hay sesión de Google, pedir login (Prioridad máxima)
         if (!googleUser) {
           loginOverlay.classList.add('open');
@@ -12047,6 +12121,8 @@
 
       // NUEVO: Lógica para manejar el regreso desde las estaciones y persistencia
       async function checkStatePersistence() {
+        if (redirectInternalUserIfNeeded()) return;
+
         const urlParams = new URLSearchParams(window.location.search);
 
         if (urlParams.get('view') === 'prep') {
@@ -12762,7 +12838,9 @@
     if (btnAdmin) {
       btnAdmin.addEventListener('click', (e) => {
         e.preventDefault();
-        window.location.href = 'ADMINISTRADOR.html';
+        if (window.MuchRoleAccess?.canAccessArea('admin')) {
+          window.location.href = 'ADMINISTRADOR.html';
+        }
       });
     }
 
@@ -12770,7 +12848,9 @@
     if (btnTaquilla) {
       btnTaquilla.addEventListener('click', (e) => {
         e.preventDefault();
-        window.location.href = 'ADMINISTRADOR.html?section=taquilla';
+        if (window.MuchRoleAccess?.canAccessArea('taquilla')) {
+          window.location.href = 'ADMINISTRADOR.html?section=taquilla';
+        }
       });
     }
 

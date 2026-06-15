@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="assets/role-access.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <style>
     :root {
@@ -1398,15 +1399,24 @@
           return;
         }
 
-        state.user = localUser;
         // Verify real roles in the MySQL DB
         const res = await fetch(`${API_BASE_URL}/api/usuarios/${localUser.id_usuario}/roles`);
         if (!res.ok) throw new Error('No se pudieron consultar los roles del usuario.');
         
         const data = await res.json();
-        state.roles = data.roles || [];
-        state.isAdmin = state.roles.includes('admin');
-        state.isTaquilla = state.roles.includes('taquilla') || state.roles.includes('admin');
+        const userWithRoles = { ...localUser, roles: data.roles || [] };
+        const access = window.MuchRoleAccess
+          ? window.MuchRoleAccess.getAccessInfo(userWithRoles)
+          : {
+              isAdmin: userWithRoles.roles.includes('admin'),
+              isTaquilla: !userWithRoles.roles.includes('admin') && userWithRoles.roles.includes('taquilla')
+            };
+
+        state.user = userWithRoles;
+        state.roles = userWithRoles.roles;
+        state.isAdmin = access.isAdmin;
+        state.isTaquilla = access.isTaquilla;
+        localStorage.setItem('much_google_user', JSON.stringify(userWithRoles));
 
         if (!state.isAdmin && !state.isTaquilla) {
           showAccessDenied('Esta cuenta no cuenta con permisos de taquilla ni de administración en MySQL.');
@@ -1416,15 +1426,22 @@
         // Apply view restrictions or respect requested section in URL
         const urlParams = new URLSearchParams(window.location.search);
         const sectionParam = urlParams.get('section');
-        if (sectionParam && TABS_CONFIG.some(t => t.id === sectionParam)) {
-          const config = TABS_CONFIG.find(t => t.id === sectionParam);
-          if (config.adminOnly && !state.isAdmin) {
-            state.activeTab = state.isTaquilla ? 'taquilla' : 'dashboard';
-          } else {
-            state.activeTab = sectionParam;
+        if (state.isAdmin) {
+          const requested = TABS_CONFIG.find(t => t.id === sectionParam);
+          state.activeTab = requested && requested.adminOnly ? requested.id : 'dashboard';
+
+          if (sectionParam === 'taquilla') {
+            const cleanUrl = new URL(window.location.href);
+            cleanUrl.searchParams.delete('section');
+            window.history.replaceState({}, '', cleanUrl);
           }
-        } else if (!state.isAdmin && state.isTaquilla) {
+        } else if (state.isTaquilla) {
           state.activeTab = 'taquilla';
+          if (sectionParam !== 'taquilla') {
+            const taquillaUrl = new URL(window.location.href);
+            taquillaUrl.searchParams.set('section', 'taquilla');
+            window.history.replaceState({}, '', taquillaUrl);
+          }
         }
 
         setupUI();
@@ -1463,6 +1480,10 @@
       else if (state.isTaquilla) roleLabel = 'Taquilla';
       document.getElementById('userRoleBadge').textContent = roleLabel;
 
+      document.querySelectorAll('a[href="./index.html?view=landing"]').forEach((link) => {
+        link.hidden = true;
+      });
+
       renderSidebar();
       switchTab(state.activeTab);
     }
@@ -1472,9 +1493,9 @@
       nav.innerHTML = '';
 
       TABS_CONFIG.forEach(tab => {
-        // Taquilla siempre se muestra si el usuario tiene acceso
+        // Taquilla solo se muestra al rol taquillero.
         if (tab.id === 'taquilla') {
-          if (state.isAdmin || state.isTaquilla) {
+          if (state.isTaquilla) {
             const el = document.createElement('li');
             el.className = `nav-item ${tab.id === state.activeTab ? 'active' : ''}`;
             el.onclick = () => switchTab(tab.id);
@@ -1502,8 +1523,10 @@
     }
 
     function switchTab(tabId) {
-      // Force non-admins into taquilla view
-      if (!state.isAdmin && tabId !== 'taquilla') {
+      // Keep each internal role in its own workspace.
+      if (state.isAdmin && tabId === 'taquilla') {
+        tabId = 'dashboard';
+      } else if (state.isTaquilla && tabId !== 'taquilla') {
         tabId = 'taquilla';
       }
 
@@ -3049,9 +3072,10 @@
     document.getElementById('btnDeniedLogout').addEventListener('click', () => logoutFlow());
 
     async function logoutFlow() {
-      stopScanner();
+      await stopScanner();
       try {
-        await window.cerrarSesion();
+        await window.cerrarSesion({ redirectTo: './index.html' });
+        return;
       } catch (error) {
         console.error(error);
       }
@@ -3060,7 +3084,8 @@
       state.roles = [];
       state.isAdmin = false;
       state.isTaquilla = false;
-      showAuthBarrier('Sesión institucional cerrada.');
+      window.location.replace('./index.html');
+      return;
     }
 
     document.getElementById('btnRefreshTop').addEventListener('click', () => loadTabContent());

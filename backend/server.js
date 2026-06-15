@@ -154,6 +154,28 @@ async function permitirTaquillaOAdmin(req, res, next) {
   next();
 }
 
+function obtenerIdUsuarioDePeticion(req) {
+  return req.headers['x-user-id'] || req.body?.id_usuario || req.params?.id_usuario || req.params?.idUsuario;
+}
+
+// Middleware de autorizacion de jugador.
+// Admin y taquilla pueden conservar rol "usuario" por compatibilidad, pero no deben jugar.
+async function permitirJugador(req, res, next) {
+  const idUsuario = obtenerIdUsuarioDePeticion(req);
+  if (!idUsuario) {
+    return res.status(401).json({ error: 'No autorizado. Falta identificador de usuario.' });
+  }
+
+  const roles = await obtenerRolUsuario(idUsuario);
+  if (roles.includes('admin') || roles.includes('taquilla')) {
+    return res.status(403).json({
+      error: 'Permiso denegado. Las cuentas de Administrador o Taquilla no pueden ejecutar acciones de jugador.'
+    });
+  }
+
+  next();
+}
+
 // ==========================================
 // 1. GET /api/health (Health check)
 // ==========================================
@@ -388,7 +410,7 @@ app.get('/api/preguntas/:id_estacion', async (req, res) => {
 // ==========================================
 // 5. POST /api/progreso/completar
 // ==========================================
-app.post('/api/progreso/completar', async (req, res) => {
+app.post('/api/progreso/completar', permitirJugador, async (req, res) => {
   const { id_usuario, id_estacion, puntaje, aciertos, errores, aprobada } = req.body;
 
   if (!id_usuario || !id_estacion) {
@@ -552,7 +574,7 @@ app.post('/api/progreso/completar', async (req, res) => {
 // ==========================================
 // 5a. POST /api/progreso/inicializar
 // ==========================================
-app.post('/api/progreso/inicializar', async (req, res) => {
+app.post('/api/progreso/inicializar', permitirJugador, async (req, res) => {
   const { id_usuario, id_estacion } = req.body;
 
   if (!id_usuario || !id_estacion) {
@@ -592,7 +614,7 @@ app.post('/api/progreso/inicializar', async (req, res) => {
 // ==========================================
 // 5a-1. POST /api/progreso/reset
 // ==========================================
-app.post('/api/progreso/reset', async (req, res) => {
+app.post('/api/progreso/reset', permitirJugador, async (req, res) => {
   const { id_usuario } = req.body;
 
   if (!id_usuario) {
@@ -630,7 +652,7 @@ app.post('/api/progreso/reset', async (req, res) => {
 // ==========================================
 // 5b. POST /api/partidas-minijuego
 // ==========================================
-app.post('/api/partidas-minijuego', async (req, res) => {
+app.post('/api/partidas-minijuego', permitirJugador, async (req, res) => {
   const { id_usuario, id_estacion, puntaje, aprobado } = req.body;
 
   if (!id_usuario) {
@@ -657,7 +679,7 @@ app.post('/api/partidas-minijuego', async (req, res) => {
 // ==========================================
 // 6. POST /api/intentos
 // ==========================================
-app.post('/api/intentos', async (req, res) => {
+app.post('/api/intentos', permitirJugador, async (req, res) => {
   const { id_usuario, id_estacion, puntaje, aciertos, errores, aprobado } = req.body;
 
   if (!id_usuario || !id_estacion) {
@@ -689,7 +711,7 @@ app.post('/api/intentos', async (req, res) => {
 // ==========================================
 // 6a. PUT /api/intentos/:id_intento
 // ==========================================
-app.put('/api/intentos/:id_intento', async (req, res) => {
+app.put('/api/intentos/:id_intento', permitirJugador, async (req, res) => {
   const idIntento = req.params.id_intento;
   const { puntaje, aciertos, errores, aprobado } = req.body;
 
@@ -711,7 +733,7 @@ app.put('/api/intentos/:id_intento', async (req, res) => {
 // ==========================================
 // 7. POST /api/respuestas-usuario
 // ==========================================
-app.post('/api/respuestas-usuario', async (req, res) => {
+app.post('/api/respuestas-usuario', permitirJugador, async (req, res) => {
   const { id_intento, id_usuario, id_estacion, pregunta_texto, respuesta_texto, es_correcta } = req.body;
 
   if (!id_intento || !id_usuario || !id_estacion || !pregunta_texto || !respuesta_texto) {
@@ -794,7 +816,7 @@ app.post('/api/respuestas-usuario', async (req, res) => {
 // ==========================================
 // 8. GET /api/progreso/:id_usuario
 // ==========================================
-app.get('/api/progreso/:id_usuario', async (req, res) => {
+app.get('/api/progreso/:id_usuario', permitirJugador, async (req, res) => {
   const idUsuario = req.params.id_usuario;
   try {
     const [progreso] = await pool.query(
@@ -813,7 +835,7 @@ app.get('/api/progreso/:id_usuario', async (req, res) => {
 // ==========================================
 // 9. POST /api/boletos
 // ==========================================
-app.post('/api/boletos', async (req, res) => {
+app.post('/api/boletos', permitirJugador, async (req, res) => {
   const { id_usuario } = req.body;
 
   if (!id_usuario) {
@@ -1689,7 +1711,7 @@ app.get('/api/leaderboard', async (req, res) => {
 // ==========================================
 // 21. GET /api/usuarios/:id_usuario/perfil
 // ==========================================
-app.get('/api/usuarios/:id_usuario/perfil', async (req, res) => {
+app.get('/api/usuarios/:id_usuario/perfil', permitirJugador, async (req, res) => {
   const idUsuario = req.params.id_usuario;
   try {
     // 1. Obtener datos del usuario
