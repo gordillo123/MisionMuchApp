@@ -1539,9 +1539,16 @@
       records: [], // Tab records (boletos, usuarios, etc.)
       queries: {}, // Searches per tab
       filters: {}, // Active filter per tab
+      dateFilters: {
+        year: '',
+        specific: '',
+        start: '',
+        end: ''
+      },
       syncedAt: null,
       loading: false,
       expandedAttempts: new Set(),
+      expandedBoletos: new Set(),
       selectedUserIdForRoles: null,
       currentPage: 1,
       pageSize: 10
@@ -1557,7 +1564,7 @@
       { id: 'intentos', name: 'Intentos de Trivia', icon: '📝', desc: 'Respuestas enviadas por los usuarios en las trivias.', adminOnly: true },
       // { id: 'minijuegos', name: 'Minijuegos', icon: '🎮', desc: 'Registros de partidas del juego del dinosaurio.', adminOnly: true },
       { id: 'boletos', name: 'Boletos Ganados', icon: '🎟️', desc: 'Control de folios generados para los visitantes.', adminOnly: true },
-      { id: 'movimientos', name: 'Movimientos de Boletos', icon: '🔄', desc: 'Log de auditoría específico para folios.', adminOnly: true },
+      // { id: 'movimientos', name: 'Movimientos de Boletos', icon: '🔄', desc: 'Log de auditoría específico para folios.', adminOnly: true },
       { id: 'taquilla', name: 'Taquilla y Escaneos', icon: '🔍', desc: 'Validación manual, escaneo de códigos QR e historial de lecturas.', adminOnly: false },
       { id: 'auditoria', name: 'Auditoría de Acciones', icon: '🛡️', desc: 'Logs de seguridad y cambios operacionales.', adminOnly: true }
     ];
@@ -1631,6 +1638,92 @@
         'x-user-email': String(state.user?.email || 'muchtuxtla@gmail.com')
       };
     }
+
+    function checkDateMatch(dateValue, year, specific, start, end) {
+      if (!dateValue) return false;
+      const rDate = new Date(dateValue);
+      if (Number.isNaN(rDate.getTime())) return false;
+      
+      const localYear = rDate.getFullYear();
+      const localMonth = String(rDate.getMonth() + 1).padStart(2, '0');
+      const localDay = String(rDate.getDate()).padStart(2, '0');
+      const localDateStr = `${localYear}-${localMonth}-${localDay}`;
+
+      if (year && String(localYear) !== year) return false;
+      if (specific && localDateStr !== specific) return false;
+      if (start && localDateStr < start) return false;
+      if (end && localDateStr > end) return false;
+      return true;
+    }
+
+    function renderDateFiltersHTML() {
+      const tabsWithDate = ['usuarios', 'intentos', 'boletos', 'auditoria', 'taquilla'];
+      if (!tabsWithDate.includes(state.activeTab)) {
+        return '';
+      }
+
+      const currentYear = new Date().getFullYear();
+      let yearOptionsHTML = '<option value="">Todos los años</option>';
+      for (let y = currentYear + 1; y >= 2024; y--) {
+        const selected = String(y) === state.dateFilters.year ? 'selected' : '';
+        yearOptionsHTML += `<option value="${y}" ${selected}>${y}</option>`;
+      }
+
+      return `
+        <div class="date-filter-bar" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; padding: 12px 16px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 12px; width: 100%; align-items: flex-end; box-sizing: border-box;">
+          <div class="form-group" style="margin: 0; min-width: 130px; flex: 1;">
+            <label class="form-label" style="font-size: 0.72rem; margin-bottom: 4px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em;">Filtrar por Año</label>
+            <select id="dateFilterYear" class="form-input" style="min-height: 38px; padding: 6px 10px; font-size: 0.85rem;" onchange="window.handleDateFilterChange('year', this.value)">
+              ${yearOptionsHTML}
+            </select>
+          </div>
+          <div class="form-group" style="margin: 0; min-width: 150px; flex: 1.2;">
+            <label class="form-label" style="font-size: 0.72rem; margin-bottom: 4px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em;">Fecha Específica</label>
+            <input type="date" id="dateFilterSpecific" class="form-input" style="min-height: 38px; padding: 6px 10px; font-size: 0.85rem;" value="${state.dateFilters.specific}" onchange="window.handleDateFilterChange('specific', this.value)">
+          </div>
+          <div style="display: flex; gap: 8px; align-items: flex-end; flex: 2; min-width: 300px;">
+            <div class="form-group" style="margin: 0; flex: 1;">
+              <label class="form-label" style="font-size: 0.72rem; margin-bottom: 4px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em;">Rango Desde</label>
+              <input type="date" id="dateFilterStart" class="form-input" style="min-height: 38px; padding: 6px 10px; font-size: 0.85rem;" value="${state.dateFilters.start}" onchange="window.handleDateFilterChange('start', this.value)">
+            </div>
+            <span style="padding-bottom: 8px; color: var(--text-dim); font-size: 0.85rem; font-weight: 700;">a</span>
+            <div class="form-group" style="margin: 0; flex: 1;">
+              <label class="form-label" style="font-size: 0.72rem; margin-bottom: 4px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em;">Hasta</label>
+              <input type="date" id="dateFilterEnd" class="form-input" style="min-height: 38px; padding: 6px 10px; font-size: 0.85rem;" value="${state.dateFilters.end}" onchange="window.handleDateFilterChange('end', this.value)">
+            </div>
+          </div>
+          <button class="btn btn-soft" style="padding: 8px 16px; font-size: 0.82rem; min-height: 38px;" onclick="window.clearDateFilters()">Limpiar Fechas ✕</button>
+        </div>
+      `;
+    }
+
+    window.handleDateFilterChange = function(filterKey, value) {
+      state.dateFilters[filterKey] = value;
+      state.currentPage = 1;
+      if (state.activeTab === 'taquilla') {
+        renderTaquillaLogsTable();
+      } else {
+        renderActiveView();
+      }
+    };
+
+    window.clearDateFilters = function() {
+      state.dateFilters = { year: '', specific: '', start: '', end: '' };
+      state.currentPage = 1;
+      if (state.activeTab === 'taquilla') {
+        const yearSel = document.getElementById('dateFilterYear');
+        const specInp = document.getElementById('dateFilterSpecific');
+        const startInp = document.getElementById('dateFilterStart');
+        const endInp = document.getElementById('dateFilterEnd');
+        if (yearSel) yearSel.value = '';
+        if (specInp) specInp.value = '';
+        if (startInp) startInp.value = '';
+        if (endInp) endInp.value = '';
+        renderTaquillaLogsTable();
+      } else {
+        renderActiveView();
+      }
+    };
 
     // Core Auth Initialization
     async function initAuth() {
@@ -1784,6 +1877,8 @@
 
       state.activeTab = tabId;
       state.currentPage = 1; // Reset page number on tab switch
+      state.dateFilters = { year: '', specific: '', start: '', end: '' }; // Reset date filters
+      if (state.expandedBoletos) state.expandedBoletos.clear(); // Reset expanded tickets
       renderSidebar();
 
       const config = TABS_CONFIG.find(t => t.id === tabId);
@@ -1811,28 +1906,45 @@
           renderDashboardView();
         } else {
           // General tables loading
-          let endpoint = '';
-          switch (state.activeTab) {
-            case 'usuarios': endpoint = '/api/admin/usuarios'; break;
-            case 'roles': endpoint = '/api/admin/roles-permisos'; break;
-            case 'estaciones': endpoint = '/api/admin/estaciones'; break;
-            case 'preguntas': endpoint = '/api/admin/preguntas-respuestas'; break;
-            case 'progreso': endpoint = '/api/admin/progreso'; break;
-            case 'intentos': endpoint = '/api/admin/intentos-respuestas'; break;
-            case 'minijuegos': endpoint = '/api/admin/minijuegos'; break;
-            case 'boletos': endpoint = '/api/admin/boletos'; break;
-            case 'movimientos': endpoint = '/api/admin/movimientos-boletos'; break;
-            case 'taquilla': endpoint = '/api/admin/escaneos-qr'; break;
-            case 'auditoria': endpoint = '/api/admin/auditoria'; break;
-          }
-
-          const res = await fetch(`${API_BASE_URL}${endpoint}`, { headers: getHeaders() });
-          if (!res.ok) throw new Error(`Error al cargar datos de ${state.activeTab}.`);
-          state.records = await res.json();
-          if (state.activeTab === 'taquilla' && document.getElementById('ticketReader')) {
-            renderTaquillaLogsTable();
-          } else {
+          if (state.activeTab === 'boletos') {
+            const [resBoletos, resMovimientos] = await Promise.all([
+              fetch(`${API_BASE_URL}/api/admin/boletos`, { headers: getHeaders() }),
+              fetch(`${API_BASE_URL}/api/admin/movimientos-boletos`, { headers: getHeaders() })
+            ]);
+            if (!resBoletos.ok || !resMovimientos.ok) throw new Error('Error al cargar datos de boletos.');
+            
+            const boletos = await resBoletos.json();
+            const movimientos = await resMovimientos.json();
+            
+            state.records = boletos.map(b => ({
+              ...b,
+              movimientos: movimientos.filter(m => m.id_boleto === b.id_boleto)
+            }));
+            
             renderActiveView();
+          } else {
+            let endpoint = '';
+            switch (state.activeTab) {
+              case 'usuarios': endpoint = '/api/admin/usuarios'; break;
+              case 'roles': endpoint = '/api/admin/roles-permisos'; break;
+              case 'estaciones': endpoint = '/api/admin/estaciones'; break;
+              case 'preguntas': endpoint = '/api/admin/preguntas-respuestas'; break;
+              case 'progreso': endpoint = '/api/admin/progreso'; break;
+              case 'intentos': endpoint = '/api/admin/intentos-respuestas'; break;
+              case 'minijuegos': endpoint = '/api/admin/minijuegos'; break;
+              case 'movimientos': endpoint = '/api/admin/movimientos-boletos'; break;
+              case 'taquilla': endpoint = '/api/admin/escaneos-qr'; break;
+              case 'auditoria': endpoint = '/api/admin/auditoria'; break;
+            }
+
+            const res = await fetch(`${API_BASE_URL}${endpoint}`, { headers: getHeaders() });
+            if (!res.ok) throw new Error(`Error al cargar datos de ${state.activeTab}.`);
+            state.records = await res.json();
+            if (state.activeTab === 'taquilla' && document.getElementById('ticketReader')) {
+              renderTaquillaLogsTable();
+            } else {
+              renderActiveView();
+            }
           }
         }
 
@@ -1942,9 +2054,10 @@
             <table>
               <thead>
                 <tr>
-                  <th>Estación</th>
-                  <th>Sala</th>
+                  <th>Estación / Recorrido</th>
+                  <th>Sala / Módulo</th>
                   <th>Intentos Totales</th>
+                  <th>Escaneos de Boletos</th>
                   <th>Popularidad Relativa</th>
                 </tr>
               </thead>
@@ -1955,6 +2068,7 @@
                       <td style="font-weight: 700;">Sala ${row.id_estacion}</td>
                       <td>${escapeHtml(row.nombre)}</td>
                       <td style="font-weight: 800; color: var(--accent);">${row.total_intentos.toLocaleString()}</td>
+                      <td style="color: var(--text-dim); font-size: 0.85rem;">No aplica (Boleto global)</td>
                       <td>
                         <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; width: 100px; display: inline-block; vertical-align: middle; margin-right: 10px;">
                           <div style="background: var(--accent); height: 100%; width: ${Math.min(100, (row.total_intentos / (s.usuarios || 1)) * 100)}%;"></div>
@@ -1964,6 +2078,19 @@
                     </tr>
                   `;
                 }).join('')}
+                <!-- Fila consolidada para el Recorrido Completo (Boleto Digital) -->
+                <tr style="border-top: 2px solid var(--border); background: rgba(73, 198, 255, 0.05);">
+                  <td style="font-weight: 700; color: var(--accent);">Recorrido Completo</td>
+                  <td style="font-weight: 600;">Canje de Boleto Digital (Taquilla)</td>
+                  <td style="font-weight: 800; color: var(--text-soft);">${s.usuariosCompletado.toLocaleString()} completados</td>
+                  <td style="font-weight: 800; color: var(--success);">${s.escaneos.toLocaleString()} escaneos (${s.boletosUsados.toLocaleString()} canjes)</td>
+                  <td>
+                    <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; width: 100px; display: inline-block; vertical-align: middle; margin-right: 10px;">
+                      <div style="background: var(--success); height: 100%; width: ${Math.min(100, (s.boletosUsados / (s.boletos || 1)) * 100)}%;"></div>
+                    </div>
+                    <span style="font-size: 0.8rem; color: var(--text-dim);">${((s.boletosUsados / (s.boletos || 1)) * 100 || 0).toFixed(1)}% canjeados</span>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -2047,6 +2174,7 @@
               <input id="searchInput" type="search" placeholder="${placeholder}" value="${escapeHtml(query)}" oninput="handleSearch(this.value)">
             </div>
             ${filterHTML}
+            ${renderDateFiltersHTML()}
           </div>
 
           <div class="table-wrap responsive-table-stack">
@@ -2092,6 +2220,12 @@
       const query = (state.queries[state.activeTab] || '').toLowerCase().trim();
       const filter = state.filters[state.activeTab] || 'all';
 
+      const yearFilter = state.dateFilters?.year || '';
+      const specificFilter = state.dateFilters?.specific || '';
+      const startFilter = state.dateFilters?.start || '';
+      const endFilter = state.dateFilters?.end || '';
+      const hasDateFilter = yearFilter || specificFilter || startFilter || endFilter;
+
       return records.filter(row => {
         // Query filter
         let matchesQuery = true;
@@ -2118,7 +2252,30 @@
           else if (filter === 'usuario') matchesFilter = String(row.rol_accion || '').toLowerCase() === 'usuario';
         }
 
-        return matchesQuery && matchesFilter;
+        // Date filter
+        let matchesDate = true;
+        if (hasDateFilter) {
+          let rowDateStr = '';
+          if (state.activeTab === 'usuarios') rowDateStr = row.fecha_registro;
+          else if (state.activeTab === 'intentos') rowDateStr = row.fecha_intento;
+          else if (state.activeTab === 'auditoria') rowDateStr = row.fecha_accion;
+          else if (state.activeTab === 'taquilla') rowDateStr = row.fecha_escaneo;
+
+          if (state.activeTab === 'boletos') {
+            const ticketMatches = checkDateMatch(row.fecha_generacion, yearFilter, specificFilter, startFilter, endFilter);
+            let movementsMatches = false;
+            if (row.movimientos && row.movimientos.length > 0) {
+              movementsMatches = row.movimientos.some(m => checkDateMatch(m.fecha_movimiento, yearFilter, specificFilter, startFilter, endFilter));
+            }
+            matchesDate = ticketMatches || movementsMatches;
+          } else if (rowDateStr) {
+            matchesDate = checkDateMatch(rowDateStr, yearFilter, specificFilter, startFilter, endFilter);
+          } else {
+            matchesDate = false;
+          }
+        }
+
+        return matchesQuery && matchesFilter && matchesDate;
       });
     }
 
@@ -2154,11 +2311,21 @@
     // Dynamic modular table templates mapping directly to MySQL schema
     function renderSpecificTable(rows) {
       if (rows.length === 0) {
+        const query = (state.queries[state.activeTab] || '').trim();
+        const filter = state.filters[state.activeTab] || 'all';
+        const yearFilter = state.dateFilters?.year || '';
+        const specificFilter = state.dateFilters?.specific || '';
+        const startFilter = state.dateFilters?.start || '';
+        const endFilter = state.dateFilters?.end || '';
+        const hasFilters = query || filter !== 'all' || yearFilter || specificFilter || startFilter || endFilter;
+
         return `
           <div class="empty-state">
             <span class="empty-state-icon">🔎</span>
             <strong>Sin coincidencias</strong>
-            <span>No se encontraron registros activos en la base de datos local.</span>
+            <span>${hasFilters 
+              ? 'No se encontraron registros que coincidan con los criterios de búsqueda o filtros de fecha seleccionados.' 
+              : 'No se encontraron registros activos en la base de datos local.'}</span>
           </div>
         `;
       }
@@ -2507,6 +2674,48 @@
                   const esVigente = row.estado === 'activo' || row.estado === 'Vigente';
                   const esCanjeado = row.estado === 'canjeado' || row.usado === 1;
 
+                  let movementsHTML = '';
+                  if (state.expandedBoletos?.has(row.id_boleto)) {
+                    const movs = row.movimientos || [];
+                    movementsHTML = `
+                      <tr class="expandable-row-content">
+                        <td colspan="8" style="padding: 16px 24px; background: rgba(255, 255, 255, 0.015);">
+                          <div style="border-left: 3px solid var(--accent); padding-left: 16px;">
+                            <h4 style="margin: 0 0 12px; color: var(--accent); font-family: 'Fredoka', sans-serif; font-size: 1.05rem;">Historial de Movimientos del Boleto</h4>
+                            ${movs.length === 0 ? `
+                              <p style="margin: 0; font-size: 0.85rem; color: var(--text-soft);">No se registran movimientos para este boleto.</p>
+                            ` : `
+                              <div class="table-wrap" style="background: rgba(0, 0, 0, 0.2);">
+                                <table style="font-size: 0.85rem; width: 100%;">
+                                  <thead>
+                                    <tr>
+                                      <th style="padding: 8px 12px; font-size: 0.75rem;">ID</th>
+                                      <th style="padding: 8px 12px; font-size: 0.75rem;">Tipo de Movimiento</th>
+                                      <th style="padding: 8px 12px; font-size: 0.75rem;">Fecha y Hora</th>
+                                      <th style="padding: 8px 12px; font-size: 0.75rem;">Operador Responsable</th>
+                                      <th style="padding: 8px 12px; font-size: 0.75rem;">Observaciones</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    ${movs.map(m => `
+                                      <tr>
+                                        <td style="padding: 10px 12px;">#${m.id_movimiento}</td>
+                                        <td style="padding: 10px 12px;"><span class="tag tag-info" style="font-size: 0.7rem; padding: 2px 6px;">${escapeHtml(m.tipo_movimiento)}</span></td>
+                                        <td style="padding: 10px 12px;">${formatDate(m.fecha_movimiento, true)}</td>
+                                        <td style="padding: 10px 12px;"><strong style="color: var(--accent);">${escapeHtml(m.nombre_operador || 'Sistema')}</strong></td>
+                                        <td style="padding: 10px 12px;" class="muted">${escapeHtml(m.observaciones || 'Ninguna')}</td>
+                                      </tr>
+                                    `).join('')}
+                                  </tbody>
+                                </table>
+                              </div>
+                            `}
+                          </div>
+                        </td>
+                      </tr>
+                    `;
+                  }
+
                   return `
                     <tr>
                       <td data-label="Folio">
@@ -2537,8 +2746,13 @@
                           <button class="btn btn-solid" style="padding: 6px 12px; font-size: 0.76rem; background: #2563eb; color: white;" onclick="window.activarBoletoTab(${row.id_boleto}, '${escapeHtml(row.folio)}')">🔄 Activar</button>
                         `}
                         <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.76rem; background: #dc2626; color: white;" onclick="window.eliminarBoletoTab(${row.id_boleto}, '${escapeHtml(row.folio)}')">🗑️ Borrar</button>
+                        
+                        <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.76rem; border-color: rgba(73, 198, 255, 0.4); color: var(--accent); background: rgba(73, 198, 255, 0.05);" onclick="window.toggleBoletoMovimientos(${row.id_boleto})">
+                          🔄 Historial (${row.movimientos ? row.movimientos.length : 0})
+                        </button>
                       </td>
                     </tr>
+                    ${movementsHTML}
                   `;
                 }).join('')}
               </tbody>
@@ -2638,6 +2852,16 @@
         state.expandedAttempts.delete(idIntento);
       } else {
         state.expandedAttempts.add(idIntento);
+      }
+      renderActiveView();
+    };
+
+    window.toggleBoletoMovimientos = function(idBoleto) {
+      if (!state.expandedBoletos) state.expandedBoletos = new Set();
+      if (state.expandedBoletos.has(idBoleto)) {
+        state.expandedBoletos.delete(idBoleto);
+      } else {
+        state.expandedBoletos.add(idBoleto);
       }
       renderActiveView();
     };
@@ -2895,6 +3119,7 @@
               <span>🔎</span>
               <input id="taquillaSearchInput" type="search" placeholder="Filtrar escaneos..." oninput="handleSearch(this.value)">
             </div>
+            ${renderDateFiltersHTML()}
           </div>
           <div class="table-wrap responsive-table-stack" id="taquillaLogsTableWrap">
             <!-- Rendered below -->
@@ -2918,20 +3143,42 @@
 
     function renderTaquillaLogsTable() {
       const query = (state.queries[state.activeTab] || '').toLowerCase().trim();
+      
+      const yearFilter = state.dateFilters?.year || '';
+      const specificFilter = state.dateFilters?.specific || '';
+      const startFilter = state.dateFilters?.start || '';
+      const endFilter = state.dateFilters?.end || '';
+      const hasDateFilter = yearFilter || specificFilter || startFilter || endFilter;
+
       const filtered = state.records.filter(row => {
-        if (!query) return true;
-        const haystack = Object.values(row).map(v => String(v ?? '').toLowerCase()).join(' ');
-        return haystack.includes(query);
+        let matchesQuery = true;
+        if (query) {
+          const haystack = Object.values(row).map(v => String(v ?? '').toLowerCase()).join(' ');
+          matchesQuery = haystack.includes(query);
+        }
+
+        let matchesDate = true;
+        if (hasDateFilter && row.fecha_escaneo) {
+          matchesDate = checkDateMatch(row.fecha_escaneo, yearFilter, specificFilter, startFilter, endFilter);
+        } else if (hasDateFilter) {
+          matchesDate = false;
+        }
+
+        return matchesQuery && matchesDate;
       });
 
       const tableWrap = document.getElementById('taquillaLogsTableWrap');
       if (!tableWrap) return;
 
       if (filtered.length === 0) {
+        const hasFilters = query || hasDateFilter;
         tableWrap.innerHTML = `
           <div class="empty-state">
-            <strong>No hay lecturas</strong>
-            <span>No se registran escaneos que coincidan con la búsqueda.</span>
+            <span class="empty-state-icon">🔎</span>
+            <strong>Sin coincidencias</strong>
+            <span>${hasFilters 
+              ? 'No se encontraron escaneos que coincidan con los criterios de búsqueda o filtros de fecha seleccionados.' 
+              : 'No se registran escaneos de boletos en la base de datos local.'}</span>
           </div>
         `;
         return;

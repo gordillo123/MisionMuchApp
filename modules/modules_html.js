@@ -325,10 +325,17 @@ window.APP_MODULES = {
 
   "modules/login.html": `
 <div class="avatar-modal login-modal">
+  <button class="btn-login-back" id="btnBackLogin" type="button" title="Regresar" aria-label="Regresar">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+      <line x1="19" y1="12" x2="5" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+    Regresar
+  </button>
   <div class="modal-header">
     <div class="login-badge">🔐</div>
-    <h2 class="modal-title">Entra con Google</h2>
-    <p class="login-copy">Para guardar tu avance en la misión, inicia sesión con tu cuenta de Google.</p>
+    <h2 class="modal-title" id="loginTitle">Entra con Google</h2>
+    <p class="login-copy" id="loginCopy">Para guardar tu avance en la misión, inicia sesión con tu cuenta de Google.</p>
   </div>
   <div class="google-login-area">
     <div id="googleSignInButton"></div>
@@ -343,8 +350,9 @@ window.APP_MODULES = {
         <path fill="#34A853"
           d="M24 47.5c6.3 0 11.6-2.1 15.4-5.7l-7.3-5.7c-2 1.3-4.6 2.1-8.1 2.1-6.1 0-11.4-4.1-13.2-9.8l-7.7 6C6.9 42.2 14.8 47.5 24 47.5z" />
       </svg>
-      Continuar con Google
+      <span id="btnGoogleText">Continuar con Google</span>
     </button>
+    
     <p class="login-note" id="loginNote">Usa Google para comenzar tu aventura.</p>
   </div>
 </div>
