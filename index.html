@@ -12120,11 +12120,26 @@
 
       };
 
+      function openPlayerLoginModal() {
+        showView('viewLanding');
+        loginOverlay.classList.add('open');
+
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete('login');
+        const query = cleanUrl.searchParams.toString();
+        window.history.replaceState({}, '', cleanUrl.pathname + (query ? `?${query}` : ''));
+      }
+
       // NUEVO: Lógica para manejar el regreso desde las estaciones y persistencia
       async function checkStatePersistence() {
         if (redirectInternalUserIfNeeded()) return;
 
         const urlParams = new URLSearchParams(window.location.search);
+
+        if (urlParams.get('login') === '1' && !googleUser) {
+          openPlayerLoginModal();
+          return;
+        }
 
         if (urlParams.get('view') === 'prep') {
           if (restoreSavedAvatar()) {

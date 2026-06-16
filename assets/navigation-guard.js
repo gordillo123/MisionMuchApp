@@ -10,6 +10,12 @@
   // Obtener la ruta limpia actual
   const path = window.location.pathname.toLowerCase();
 
+  // El panel administrativo/taquilla tiene su propia barrera de autenticación
+  const isAdminPanelPage = path.endsWith('/administrador.html');
+  if (isAdminPanelPage) {
+    return;
+  }
+
   // Identificar si la página actual es la principal (index.html)
   const isMainPage = path.endsWith('/') || 
                      path.endsWith('/index.html') ||

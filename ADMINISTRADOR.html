@@ -33,6 +33,15 @@
       --radius-lg: 18px;
       --radius-md: 12px;
       --sidebar-width: 280px;
+      --msf-pink: #FF76B4;
+      --msf-blue: #6DD0F0;
+      --msf-yellow: #FFC549;
+      --msf-purple: #775AFF;
+      --msf-green: #00B487;
+      --bg-deep: #1A1C2C;
+      --bg-soft: #F4F4F9;
+      --white: #ffffff;
+      --radius-game: 24px;
     }
 
     * {
@@ -85,6 +94,155 @@
       display: none !important;
     }
 
+    /* Splash inicial (misma experiencia que index.html) */
+    body.splash-active {
+      overflow: hidden;
+    }
+
+    body.splash-active > :not(#adminSplashScreen) {
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .splash-screen {
+      --splash-paper: #f7fbff;
+      position: fixed;
+      inset: 0;
+      z-index: 2147483647;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(1.25rem, 5vw, 3rem);
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 43%, rgba(255, 255, 255, 0.98) 0 22%, rgba(247, 251, 255, 0.96) 52%, rgba(237, 246, 251, 0.98) 100%),
+        var(--splash-paper);
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 1.15s cubic-bezier(.22, 1, .36, 1), visibility 0s linear 1.15s;
+    }
+
+    .splash-screen::before,
+    .splash-screen::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .splash-screen::before {
+      inset: -18%;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 32% 36%, rgba(37, 182, 215, 0.14), transparent 29%),
+        radial-gradient(circle at 70% 60%, rgba(239, 76, 115, 0.11), transparent 31%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(231, 246, 252, 0.44));
+      opacity: 0.72;
+      animation: splashAmbientShift 5.4s ease-in-out infinite;
+    }
+
+    .splash-screen::after {
+      inset: -35%;
+      z-index: 0;
+      background: linear-gradient(112deg, transparent 38%, rgba(255, 255, 255, 0.8) 48%, rgba(189, 228, 241, 0.4) 51%, transparent 62%);
+      opacity: 0;
+      transform: translate3d(-28%, 8%, 0) rotate(8deg);
+      animation: splashLightSweep 2.8s cubic-bezier(.16, 1, .3, 1) 0.25s both;
+    }
+
+    .splash-screen.is-exiting {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      animation: splashScreenExit 1.15s cubic-bezier(.22, 1, .36, 1) both;
+    }
+
+    .splash-screen.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .splash-logo-wrap {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      width: min(86vw, 640px);
+    }
+
+    .splash-logo-wrap::before {
+      content: "";
+      position: absolute;
+      width: min(72vw, 540px);
+      height: min(24vw, 190px);
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 18%, rgba(37, 182, 215, 0.18) 44%, rgba(239, 76, 115, 0.1) 68%, transparent 76%);
+      filter: blur(18px);
+      animation: splashLogoHalo 1.05s cubic-bezier(.16, 1, .3, 1) 0.08s both;
+    }
+
+    .splash-logo {
+      position: relative;
+      z-index: 1;
+      display: block;
+      width: clamp(220px, 64vw, 620px);
+      max-width: 100%;
+      height: auto;
+      max-height: min(42vh, 260px);
+      object-fit: contain;
+      animation: splashLogoReveal 1.05s cubic-bezier(.16, 1, .3, 1) both, splashLogoBreath 2.7s ease-in-out 1.05s infinite;
+      filter: drop-shadow(0 18px 34px rgba(14, 30, 58, 0.18));
+    }
+
+    .splash-screen.is-exiting .splash-logo {
+      animation: splashLogoFadeOut 0.9s cubic-bezier(.22, 1, .36, 1) both;
+    }
+
+    body.admin-auth-revealing .admin-auth-screen {
+      animation: adminAuthReveal 0.9s cubic-bezier(.16, 1, .3, 1) both;
+    }
+
+    @keyframes splashLogoReveal {
+      0% { opacity: 0; transform: translate3d(0, 22px, 0) scale(0.9); filter: blur(10px); }
+      58% { opacity: 1; transform: translate3d(0, -3px, 0) scale(1.018); filter: blur(0); }
+      100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0); }
+    }
+
+    @keyframes splashLogoBreath {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(0, -5px, 0) scale(1.018); }
+    }
+
+    @keyframes splashLogoFadeOut {
+      to { opacity: 0; transform: translate3d(0, -10px, 0) scale(0.96); filter: blur(7px); }
+    }
+
+    @keyframes splashScreenExit {
+      to { opacity: 0; backdrop-filter: blur(20px); }
+    }
+
+    @keyframes splashLogoHalo {
+      from { opacity: 0; transform: translate3d(0, 22px, 0) scale(0.84); }
+      to { opacity: 0.78; transform: translate3d(0, 10px, 0) scale(1); }
+    }
+
+    @keyframes splashAmbientShift {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.025); }
+    }
+
+    @keyframes splashLightSweep {
+      0% { opacity: 0; transform: translate3d(-28%, 8%, 0) rotate(8deg); }
+      28% { opacity: 0.34; }
+      100% { opacity: 0; transform: translate3d(24%, -4%, 0) rotate(8deg); }
+    }
+
+    @keyframes adminAuthReveal {
+      from { opacity: 0; transform: translateY(24px) scale(0.96); filter: blur(10px); }
+      to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+
     /* Auth Screens Styles */
     .admin-auth-screen {
       min-height: 100vh;
@@ -93,98 +251,135 @@
       padding: 24px;
       position: relative;
       z-index: 10;
+      background:
+        radial-gradient(circle at top left, rgba(109, 208, 240, 0.12), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(255, 118, 180, 0.1), transparent 30%),
+        var(--bg-main);
     }
 
-    .admin-auth-card {
-      width: min(100%, 460px);
-      background: var(--bg-panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      padding: 36px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(20px);
+    .admin-auth-layout {
+      width: min(100%, 560px);
+      display: grid;
+      gap: 0;
+      justify-items: center;
+    }
+
+    .admin-auth-logo-wrap {
+      display: none;
+    }
+
+    .admin-login-modal {
+      width: min(100%, 520px);
+      background: var(--white);
+      border: 8px solid var(--msf-yellow);
+      border-radius: 40px;
+      box-shadow: 0 18px 0 var(--bg-deep);
+      overflow: hidden;
+    }
+
+    .admin-login-modal .modal-header {
       text-align: center;
-      display: grid;
-      gap: 20px;
+      padding: 2rem 2rem 0.5rem;
     }
 
-    .admin-auth-badge {
-      width: 80px;
-      height: 80px;
-      border-radius: 24px;
-      display: grid;
-      place-items: center;
-      font-size: 2.2rem;
-      margin: 0 auto;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      box-shadow: 0 12px 28px rgba(73, 198, 255, 0.25);
-    }
-
-    .admin-auth-eyebrow {
-      color: var(--accent);
-      font-size: 0.8rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      margin: 0;
-    }
-
-    .admin-auth-card h1 {
+    .admin-login-modal .modal-title {
       margin: 0;
       font-family: 'Fredoka', sans-serif;
-      font-size: 2.2rem;
+      font-size: clamp(2rem, 5vw, 2.5rem);
+      font-weight: 900;
+      color: var(--msf-pink);
+      text-shadow: 3px 3px 0 var(--msf-blue);
       line-height: 1.1;
+    }
+
+    .login-badge {
+      width: 86px;
+      height: 86px;
+      margin: 0 auto 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-soft);
+      border: 5px solid var(--bg-deep);
+      border-radius: 28px;
+      font-size: 2.7rem;
+      box-shadow: 0 7px 0 var(--msf-blue);
+    }
+
+    .login-copy {
+      max-width: 360px;
+      margin: 0.6rem auto 0;
+      color: #4f5364;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+
+    .google-login-area {
+      padding: 1rem 2rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn-google {
+      width: min(100%, 360px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.9rem;
+      background: var(--white);
+      border: 5px solid var(--bg-deep);
+      border-radius: var(--radius-game);
+      padding: 0.9rem 1.1rem;
+      color: var(--bg-deep);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 7px 0 var(--bg-deep);
+      transition: all 0.12s;
+    }
+
+    .btn-google:hover {
+      transform: translateY(2px);
+      box-shadow: 0 5px 0 var(--bg-deep);
+      background: #fdfdfd;
+    }
+
+    .btn-google:active {
+      transform: translateY(7px);
+      box-shadow: 0 0 0 var(--bg-deep);
+    }
+
+    .google-g {
+      width: 28px;
+      height: 28px;
+      flex: 0 0 28px;
+    }
+
+    .login-note {
+      min-height: 1.2rem;
+      margin: 0;
+      color: var(--msf-purple);
+      font-size: 0.9rem;
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.45;
+    }
+
+    .login-note.error {
+      color: #d63b63;
+    }
+
+    .login-note.success {
+      color: var(--msf-green);
     }
 
     .admin-auth-copy {
       color: var(--text-soft);
       line-height: 1.6;
       margin: 0;
-    }
-
-    .admin-auth-button {
-      min-height: 56px;
-      border: 0;
-      border-radius: 16px;
-      color: white;
-      font-weight: 800;
-      cursor: pointer;
-      font-size: 1.05rem;
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
-      box-shadow: 0 12px 30px rgba(73, 198, 255, 0.25);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-    }
-
-    .admin-auth-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 16px 36px rgba(73, 198, 255, 0.35);
-    }
-
-    .admin-auth-message {
-      margin: 0;
-      padding: 14px;
-      border-radius: 14px;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--text-soft);
-    }
-
-    .admin-auth-message.error {
-      color: #ff9b9b;
-      background: rgba(239, 68, 68, 0.12);
-      border-color: rgba(239, 68, 68, 0.18);
-    }
-
-    .admin-auth-message.success {
-      color: #79f2c0;
-      background: rgba(16, 185, 129, 0.12);
-      border-color: rgba(16, 185, 129, 0.18);
     }
 
     /* Layout Structure */
@@ -1173,26 +1368,43 @@
   </style>
 </head>
 
-<body>
+<body class="splash-active">
+  <!-- Splash inicial con logo institucional -->
+  <div class="splash-screen" id="adminSplashScreen" aria-label="Cargando Misión MUCH" role="status">
+    <div class="splash-logo-wrap">
+      <img
+        class="splash-logo"
+        src="assets/logo-institucional-aditech.png"
+        alt="Humanismo que Transforma - Agencia Digital Tecnológica del Estado"
+      >
+    </div>
+  </div>
+
   <!-- Auth Barrier Screen -->
   <section class="admin-auth-screen" id="adminAuthScreen">
-    <div class="admin-auth-card">
-      <div class="admin-auth-badge">🛡️</div>
-      <p class="admin-auth-eyebrow">Acceso administrativo</p>
-      <h1>Iniciar sesión en el Panel</h1>
-      <p class="admin-auth-copy">
-        Ingresa con tu cuenta institucional autorizada de Google para consultar y administrar la base de datos de Misión MUCH.
-      </p>
-      <button class="admin-auth-button" id="btnGoogleAuth" type="button">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z" fill="#FBBC05"/>
-          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-        </svg>
-        Iniciar sesión con Google
-      </button>
-      <p class="admin-auth-message" id="adminAuthMessage">Validando credenciales...</p>
+    <div class="admin-auth-layout">
+      <div class="admin-login-modal">
+        <div class="modal-header">
+          <div class="login-badge">🔐</div>
+          <h2 class="modal-title">Entra con Google</h2>
+          <p class="login-copy">
+            Para acceder al panel de administración o taquilla, inicia sesión con tu cuenta institucional de Google.
+          </p>
+        </div>
+
+        <div class="google-login-area">
+          <button class="btn-google" id="btnGoogleAuth" type="button">
+            <svg class="google-g" viewBox="0 0 48 48" aria-hidden="true">
+              <path fill="#EA4335" d="M24 9.5c3.5 0 6.5 1.2 8.9 3.5l6.6-6.6C35.5 2.7 30.3.5 24 .5 14.8.5 6.9 5.8 3.1 13.6l7.7 6C12.6 13.7 17.9 9.5 24 9.5z" />
+              <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.5 2.8-2.2 5.2-4.7 6.8l7.3 5.7c4.3-4 7.2-9.9 7.2-16.5z" />
+              <path fill="#FBBC05" d="M10.8 28.4c-.5-1.4-.8-2.9-.8-4.4s.3-3 .8-4.4l-7.7-6C1.5 16.7.5 20.2.5 24s1 7.3 2.6 10.4l7.7-6z" />
+              <path fill="#34A853" d="M24 47.5c6.3 0 11.6-2.1 15.4-5.7l-7.3-5.7c-2 1.3-4.6 2.1-8.1 2.1-6.1 0-11.4-4.1-13.2-9.8l-7.7 6C6.9 42.2 14.8 47.5 24 47.5z" />
+            </svg>
+            <span>Continuar con Google</span>
+          </button>
+          <p class="login-note" id="adminAuthMessage">Usa Google para acceder al panel.</p>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1359,6 +1571,38 @@
       isValidating: false
     };
 
+    let adminSplashTimerId = null;
+
+    function dismissAdminSplash(immediate = false) {
+      const splash = document.getElementById('adminSplashScreen');
+      if (!splash || splash.classList.contains('is-hidden')) return;
+
+      if (adminSplashTimerId) {
+        window.clearTimeout(adminSplashTimerId);
+        adminSplashTimerId = null;
+      }
+
+      document.body.classList.remove('splash-active');
+      document.body.classList.add('admin-auth-revealing');
+      splash.classList.add('is-exiting');
+
+      window.setTimeout(() => {
+        splash.classList.add('is-hidden');
+        splash.setAttribute('hidden', '');
+        document.body.classList.remove('admin-auth-revealing');
+      }, immediate ? 250 : 1000);
+    }
+
+    function startAdminSplash() {
+      const splash = document.getElementById('adminSplashScreen');
+      if (!splash) return;
+
+      adminSplashTimerId = window.setTimeout(() => {
+        adminSplashTimerId = null;
+        dismissAdminSplash(false);
+      }, 1800);
+    }
+
     // Date formatting helpers
     const dateFormatter = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' });
     const dateTimeFormatter = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' });
@@ -1396,7 +1640,7 @@
       try {
         const localUser = JSON.parse(localStorage.getItem('much_google_user') || 'null');
         if (!localUser) {
-          showAuthBarrier('Esperando inicio de sesión con Google.');
+          showAuthBarrier('Usa Google para acceder al panel.');
           return;
         }
 
@@ -1420,7 +1664,7 @@
         localStorage.setItem('much_google_user', JSON.stringify(userWithRoles));
 
         if (!state.isAdmin && !state.isTaquilla) {
-          showAccessDenied('Esta cuenta no cuenta con permisos de taquilla ni de administración en MySQL.');
+          showAccessDenied('Esta cuenta no cuenta con permisos de taquilla ni de administración.');
           return;
         }
 
@@ -1453,14 +1697,20 @@
     }
 
     function showAuthBarrier(msg) {
+      if (window.location.search) {
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.search = '';
+        window.history.replaceState({}, '', cleanUrl);
+      }
       document.getElementById('adminAuthScreen').hidden = false;
       document.getElementById('deniedScreen').hidden = true;
       document.getElementById('adminShell').hidden = true;
       document.getElementById('adminAuthMessage').textContent = msg;
-      document.getElementById('adminAuthMessage').className = 'admin-auth-message';
+      document.getElementById('adminAuthMessage').className = 'login-note';
     }
 
     function showAccessDenied(msg) {
+      dismissAdminSplash(true);
       document.getElementById('adminAuthScreen').hidden = true;
       document.getElementById('deniedScreen').hidden = false;
       document.getElementById('adminShell').hidden = true;
@@ -1468,6 +1718,7 @@
     }
 
     function setupUI() {
+      dismissAdminSplash(true);
       document.getElementById('adminAuthScreen').hidden = true;
       document.getElementById('deniedScreen').hidden = true;
       document.getElementById('adminShell').hidden = false;
@@ -2616,7 +2867,7 @@
               <div class="panel-head">
                 <div class="panel-title-wrap">
                   <h3>Ficha de Validación</h3>
-                  <p>Detalle de validez obtenido directamente desde MySQL.</p>
+                  <p>Detalle de validez del boleto consultado.</p>
                 </div>
                 <span id="scanCheckedAt" style="font-size: 0.8rem; color: var(--text-dim);">Sin consulta</span>
               </div>
@@ -3051,19 +3302,19 @@
     // Google Login Integrations
     document.getElementById('btnGoogleAuth').addEventListener('click', async () => {
       const messageEl = document.getElementById('adminAuthMessage');
-      messageEl.textContent = 'Abriendo modal seguro de Google Auth...';
+      messageEl.className = 'login-note';
+      messageEl.textContent = 'Redirigiendo a Google...';
       
       try {
         const user = await window.iniciarSesionConGoogle();
         if (user) {
-          messageEl.className = 'admin-auth-message success';
+          messageEl.className = 'login-note success';
           messageEl.textContent = 'Acceso concedido. Sincronizando panel...';
-          // Reload view with session
           initAuth();
         }
       } catch (error) {
         console.error(error);
-        messageEl.className = 'admin-auth-message error';
+        messageEl.className = 'login-note error';
         messageEl.textContent = error.message || 'Error al iniciar sesión con Google.';
       }
     });
@@ -3072,21 +3323,48 @@
     document.getElementById('btnLogoutAdmin').addEventListener('click', () => logoutFlow());
     document.getElementById('btnDeniedLogout').addEventListener('click', () => logoutFlow());
 
-    async function logoutFlow() {
-      await stopScanner();
-      try {
-        await window.cerrarSesion({ redirectTo: './index.html' });
-        return;
-      } catch (error) {
-        console.error(error);
-      }
-      localStorage.removeItem('much_google_user');
+    function resetSessionState() {
       state.user = null;
       state.roles = [];
       state.isAdmin = false;
       state.isTaquilla = false;
-      window.location.replace('./index.html');
-      return;
+      state.activeTab = 'dashboard';
+      state.loading = false;
+    }
+
+    function enforceLoginScreen(message) {
+      resetSessionState();
+      showAuthBarrier(message || 'Usa Google para acceder al panel.');
+    }
+
+    function getPostLogoutLoginPath() {
+      const adminLoginUrl = new URL('ADMINISTRADOR.html', window.location.href);
+      adminLoginUrl.search = '';
+      adminLoginUrl.hash = '';
+      return `${adminLoginUrl.pathname}`;
+    }
+
+    async function logoutFlow() {
+      await stopScanner();
+      const loginPath = getPostLogoutLoginPath();
+      resetSessionState();
+
+      try {
+        if (typeof window.cerrarSesion === 'function') {
+          await window.cerrarSesion({
+            redirectTo: loginPath,
+            preserveAdminNav: true
+          });
+          return;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+
+      localStorage.removeItem('much_google_user');
+      sessionStorage.clear();
+      sessionStorage.setItem('much_internal_navigation', 'true');
+      window.location.replace(loginPath);
     }
 
     document.getElementById('btnRefreshTop').addEventListener('click', () => loadTabContent());
@@ -3134,7 +3412,20 @@
       }
     });
 
+    // Evitar que el botón "atrás" del navegador muestre el panel sin sesión activa
+    window.addEventListener('pageshow', (event) => {
+      const localUser = JSON.parse(localStorage.getItem('much_google_user') || 'null');
+      if (!localUser) {
+        enforceLoginScreen('Usa Google para acceder al panel.');
+        return;
+      }
+      if (event.persisted && !state.user) {
+        initAuth();
+      }
+    });
+
     // Run Initializations
+    startAdminSplash();
     initAuth();
   </script>
 </body>

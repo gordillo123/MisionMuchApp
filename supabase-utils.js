@@ -368,6 +368,10 @@ async function cerrarSesion(options = {}) {
   }
   
   // Recargar o redirigir de inmediato para reiniciar estado
+  if (options.preserveAdminNav) {
+    sessionStorage.setItem('much_internal_navigation', 'true');
+  }
+
   if (options.redirectTo) {
     window.location.replace(options.redirectTo);
   } else if (options.reload !== false) {
