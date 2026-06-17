@@ -1285,6 +1285,13 @@ app.get('/api/admin/boletos', permitirAdmin, async (req, res) => {
           params.push(...parametrosRangoFechas(range));
           return condicionRangoFechas(column, range);
         });
+      params.push(...parametrosRangoFechas(range));
+      dateConditions.push(`EXISTS (
+        SELECT 1
+        FROM movimientos_boleto mb
+        WHERE mb.id_boleto = b.id_boleto
+          AND ${condicionRangoFechas('mb.fecha_movimiento', range)}
+      )`);
       dateWhere = `WHERE (${dateConditions.join(' OR ')})`;
     }
 

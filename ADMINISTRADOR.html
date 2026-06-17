@@ -1732,7 +1732,6 @@
       // { id: 'roles', name: 'Roles y Permisos', icon: '🔐', desc: 'Matriz de asignación de privilegios de usuario.', adminOnly: true },
       { id: 'estaciones', name: 'Estaciones', icon: '🗺️', desc: 'Estado y configuración de las salas del museo.', adminOnly: true },
       // { id: 'preguntas', name: 'Preguntas y Trivia', icon: '❓', desc: 'Administración de preguntas por estación.', adminOnly: true },
-      // { id: 'progreso', name: 'Progreso de Recorrido', icon: '📈', desc: 'Seguimiento del avance de los visitantes.', adminOnly: true },
       { id: 'intentos', name: 'Intentos de Trivia', icon: '📝', desc: 'Respuestas enviadas por los usuarios en las trivias.', adminOnly: true },
       // { id: 'minijuegos', name: 'Minijuegos', icon: '🎮', desc: 'Registros de partidas del juego del dinosaurio.', adminOnly: true },
       { id: 'boletos', name: 'Boletos Ganados', icon: '🎟️', desc: 'Control de folios generados para los visitantes.', adminOnly: true },
@@ -1969,7 +1968,7 @@
     }
 
     function renderDateFiltersHTML() {
-      const tabsWithDate = ['dashboard', 'usuarios', 'roles', 'progreso', 'intentos', 'minijuegos', 'boletos', 'movimientos', 'auditoria', 'taquilla'];
+      const tabsWithDate = ['dashboard', 'usuarios', 'roles', 'preguntas', 'progreso', 'intentos', 'minijuegos', 'boletos', 'movimientos', 'auditoria', 'taquilla'];
       if (!tabsWithDate.includes(state.activeTab)) {
         return '';
       }
@@ -2678,11 +2677,14 @@
 
           if (state.activeTab === 'boletos') {
             const ticketMatches = checkDateMatch(row.fecha_generacion, yearFilter, specificFilter, startFilter, endFilter);
+            const usageMatches = checkDateMatch(row.fecha_uso, yearFilter, specificFilter, startFilter, endFilter);
+            const exchangeMatches = checkDateMatch(row.fecha_canje, yearFilter, specificFilter, startFilter, endFilter);
+            const scanMatches = checkDateMatch(row.ultimo_escaneo, yearFilter, specificFilter, startFilter, endFilter);
             let movementsMatches = false;
             if (row.movimientos && row.movimientos.length > 0) {
               movementsMatches = row.movimientos.some(m => checkDateMatch(m.fecha_movimiento, yearFilter, specificFilter, startFilter, endFilter));
             }
-            matchesDate = ticketMatches || movementsMatches;
+            matchesDate = ticketMatches || usageMatches || exchangeMatches || scanMatches || movementsMatches;
           } else if (rowDateStr) {
             matchesDate = checkDateMatch(rowDateStr, yearFilter, specificFilter, startFilter, endFilter);
           } else {
@@ -2808,6 +2810,33 @@
 
         case 'roles':
           const rData = state.records; // Uses full config containing roles & user mappings
+          const roleAssignments = Array.isArray(rData.usuariosRoles) ? rData.usuariosRoles : [];
+          const roleAssignmentsHTML = roleAssignments.length > 0
+            ? roleAssignments.map(ur => {
+                return `
+                  <tr>
+                    <td>
+                      <strong>${escapeHtml(ur.nombre_usuario)}</strong><br>
+                      <span style="font-size: 0.78rem; color: var(--text-dim);">${escapeHtml(ur.correo_usuario)}</span>
+                    </td>
+                    <td><span class="tag tag-info">${escapeHtml(ur.nombre_rol)}</span></td>
+                    <td>${formatDate(ur.fecha_asignacion, true)}</td>
+                    <td><strong style="color: var(--accent);">${escapeHtml(ur.nombre_asignador || 'Sistema / Auto')}</strong></td>
+                  </tr>
+                `;
+              }).join('')
+            : `
+              <tr>
+                <td colspan="4">
+                  <div class="empty-state">
+                    <span class="empty-state-icon">&#128269;</span>
+                    <strong>No hay registros para las fechas seleccionadas</strong>
+                    <span>Selecciona otro rango de fechas para consultar asignaciones de permisos.</span>
+                  </div>
+                </td>
+              </tr>
+            `;
+
           return `
             <div style="display: grid; gap: 24px;">
               <div>
@@ -2842,19 +2871,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    ${rData.usuariosRoles.map(ur => {
-                      return `
-                        <tr>
-                          <td>
-                            <strong>${escapeHtml(ur.nombre_usuario)}</strong><br>
-                            <span style="font-size: 0.78rem; color: var(--text-dim);">${escapeHtml(ur.correo_usuario)}</span>
-                          </td>
-                          <td><span class="tag tag-info">${escapeHtml(ur.nombre_rol)}</span></td>
-                          <td>${formatDate(ur.fecha_asignacion, true)}</td>
-                          <td><strong style="color: var(--accent);">${escapeHtml(ur.nombre_asignador || 'Sistema / Auto')}</strong></td>
-                        </tr>
-                      `;
-                    }).join('')}
+                    ${roleAssignmentsHTML}
                   </tbody>
                 </table>
               </div>
