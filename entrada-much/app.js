@@ -301,7 +301,7 @@ async function endQuizInDB({ puntaje_total, num_correctas, num_preguntas }) {
 
     console.log(`🏁 Finalizando intento ${attemptId} en MySQL...`);
 
-    const isPassed = num_correctas === num_preguntas; // 6/6 correct to pass in Entrada MUCH
+    const isPassed = num_correctas >= Math.ceil(num_preguntas * 0.7);
 
     await progreso.actualizarIntentoEstacion(attemptId, {
       puntaje: puntaje_total,
@@ -703,12 +703,13 @@ class UIManager {
       this.stopQuestionTimer();
       e.quizView.classList.add('d-none');
       e.finalView.classList.remove('d-none');
+      e.finalTitle.classList.remove('visually-hidden');
       e.finalTitle.textContent = 'Verificando resultados...';
-      e.finalMsg.textContent = 'Por favor espera.';
+      window.MuchStationCompletion?.clearInline(e.finalMsg, 'Por favor espera.');
       e.giftRow.classList.add('d-none');
       e.retryRow.classList.add('d-none');
 
-      const allCorrect = s.correct === QUESTIONS.length;
+      const isPassed = s.correct >= Math.ceil(QUESTIONS.length * 0.7); // 70% or more, consistent with other stations
       const puntajeFinal = s.correct * 10;
 
       saveQuizResultLocal({
@@ -727,23 +728,45 @@ class UIManager {
       e.finalCorrect.textContent = s.correct.toString();
       e.finalTotal.textContent = QUESTIONS.length.toString();
 
-      if (allCorrect) {
-        const limiteAlcanzado = await checkLimiteBoletos();
+      if (isPassed) {
+        const completedStations = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
+        const alreadyCompleted = Boolean(completedStations['1']);
 
-        if (limiteAlcanzado) {
-          e.finalTitle.textContent = '¡Felicidades, eres un experto! 🧠';
-          e.finalMsg.innerHTML = '<span style="color: #e6007a; font-weight: bold;">Lo sentimos, los boletos para esta sala se han agotado por hoy.</span><br>¡Vuelve a intentarlo mañana!';
-          e.retryRow.classList.remove('d-none');
+        let showCompletionCard = false;
+        if (alreadyCompleted) {
+          showCompletionCard = true;
         } else {
+          const limiteAlcanzado = await checkLimiteBoletos();
+          if (limiteAlcanzado) {
+            e.finalTitle.classList.remove('visually-hidden');
+            e.finalTitle.textContent = '¡Felicidades, eres un experto! 🧠';
+            window.MuchStationCompletion?.clearInline(
+              e.finalMsg,
+              'Lo sentimos, los boletos para esta sala se han agotado por hoy. ¡Vuelve a intentarlo mañana!'
+            );
+            e.retryRow.classList.remove('d-none');
+          } else {
+            showCompletionCard = true;
+          }
+        }
+
+        if (showCompletionCard) {
           const prize = this.prizeMgr.random();
           this.currentPrize = prize;
 
-          e.finalTitle.textContent = '¡Felicidades!';
-          e.finalMsg.textContent = '¡Has ganado un boleto! Presiona "Ver mi boleto" 🎟️';
-          if (e.nextStationBtn) {
-            e.nextStationBtn.textContent = 'Ver mi boleto 🎟️';
-          }
-          e.giftRow.classList.remove('d-none');
+          window.MuchStationCompletion?.renderInline(e.finalMsg, {
+            stationId: '1',
+            nextStationId: '2',
+            badge: 'Estación completada',
+            onReturnToMap: () => {
+              this.goBackToMap();
+            }
+          });
+
+          e.finalTitle.classList.add('visually-hidden');
+          e.giftRow.classList.add('d-none');
+          e.retryRow.classList.add('d-none');
+
           this.sound.victory();
           this.playCompletionSound();
           try { playBgMusic(); } catch (e) {}
@@ -773,8 +796,9 @@ class UIManager {
         }
         return;
       } else {
+        e.finalTitle.classList.remove('visually-hidden');
         e.finalTitle.textContent = 'Buen intento 👀';
-        e.finalMsg.textContent = 'Sigue explorando el museo.';
+        window.MuchStationCompletion?.clearInline(e.finalMsg, 'Sigue explorando el museo.');
         e.retryRow.classList.remove('d-none');
         this.playIncorrectSound();
         try { playBgMusic(); } catch (e) {}

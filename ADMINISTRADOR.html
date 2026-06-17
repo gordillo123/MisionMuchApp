@@ -2026,7 +2026,8 @@
       }
 
       state.dateFilters[filterKey] = parsed.iso;
-      syncDatePartInputs(filterKey, parsed.iso);
+      const refs = getDatePartRefs(filterKey);
+      if (refs.picker) refs.picker.value = parsed.iso || '';
       state.dateFilters.year = '';
       state.dateFilters.specific = '';
       const rangeError = getDateFilterError();
@@ -2409,7 +2410,7 @@
         ${hasRangeData ? '' : `
           <div class="panel empty-state" style="margin-bottom: 20px;">
             <span class="empty-state-icon">&#128269;</span>
-            <strong>No hay registros para las fechas seleccionadas</strong>
+            <strong>No hay datos disponibles para esta fecha</strong>
             <span>Selecciona otro rango de fechas para consultar tablas, tarjetas y estadisticas.</span>
           </div>
         `}
@@ -2742,13 +2743,13 @@
         const hasDateFilter = yearFilter || specificFilter || startFilter || endFilter;
         const hasFilters = query || filter !== 'all' || hasDateFilter;
         const emptyMessage = hasDateFilter
-          ? 'No hay registros para las fechas seleccionadas'
+          ? 'No hay datos disponibles para esta fecha'
           : (hasFilters ? 'No se encontraron registros que coincidan con los criterios seleccionados.' : 'No se encontraron registros activos en la base de datos local.');
 
         return `
           <div class="empty-state">
             <span class="empty-state-icon">🔎</span>
-            <strong>${hasDateFilter ? 'No hay registros para las fechas seleccionadas' : 'Sin coincidencias'}</strong>
+            <strong>${hasDateFilter ? 'No hay datos disponibles para esta fecha' : 'Sin coincidencias'}</strong>
             <span>${emptyMessage}</span>
             <span hidden>${hasFilters
               ? 'No se encontraron registros que coincidan con los criterios de búsqueda o filtros de fecha seleccionados.' 
@@ -2830,7 +2831,7 @@
                 <td colspan="4">
                   <div class="empty-state">
                     <span class="empty-state-icon">&#128269;</span>
-                    <strong>No hay registros para las fechas seleccionadas</strong>
+                    <strong>No hay datos disponibles para esta fecha</strong>
                     <span>Selecciona otro rango de fechas para consultar asignaciones de permisos.</span>
                   </div>
                 </td>
@@ -3616,12 +3617,12 @@
       if (filtered.length === 0) {
         const hasFilters = query || hasDateFilter;
         const emptyMessage = hasDateFilter
-          ? 'No hay registros para las fechas seleccionadas'
+          ? 'No hay datos disponibles para esta fecha'
           : (hasFilters ? 'No se encontraron escaneos que coincidan con los criterios seleccionados.' : 'No se registran escaneos de boletos en la base de datos local.');
         tableWrap.innerHTML = `
           <div class="empty-state">
             <span class="empty-state-icon">🔎</span>
-            <strong>${hasDateFilter ? 'No hay registros para las fechas seleccionadas' : 'Sin coincidencias'}</strong>
+            <strong>${hasDateFilter ? 'No hay datos disponibles para esta fecha' : 'Sin coincidencias'}</strong>
             <span>${emptyMessage}</span>
             <span hidden>${hasFilters
               ? 'No se encontraron escaneos que coincidan con los criterios de búsqueda o filtros de fecha seleccionados.' 
