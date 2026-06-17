@@ -158,6 +158,38 @@ function obtenerIdUsuarioDePeticion(req) {
   return req.headers['x-user-id'] || req.body?.id_usuario || req.params?.id_usuario || req.params?.idUsuario;
 }
 
+function obtenerRangoFechasAdmin(req) {
+  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+  const rawStart = typeof req.query.startDate === 'string' && datePattern.test(req.query.startDate)
+    ? req.query.startDate
+    : '';
+  const rawEnd = typeof req.query.endDate === 'string' && datePattern.test(req.query.endDate)
+    ? req.query.endDate
+    : '';
+
+  if (!rawStart && !rawEnd) return null;
+
+  let startDate = rawStart || rawEnd;
+  let endDate = rawEnd || rawStart;
+  if (startDate > endDate) {
+    [startDate, endDate] = [endDate, startDate];
+  }
+
+  return { startDate, endDate };
+}
+
+function parametrosRangoFechas(range) {
+  return range ? [range.startDate, range.endDate] : [];
+}
+
+function condicionRangoFechas(column, range) {
+  return range ? `${column} >= ? AND ${column} < DATE_ADD(?, INTERVAL 1 DAY)` : '';
+}
+
+function whereDesdeCondiciones(conditions) {
+  return conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+}
+
 // Middleware de autorizacion de jugador.
 // Admin y taquilla pueden conservar rol "usuario" por compatibilidad, pero no deben jugar.
 async function permitirJugador(req, res, next) {
@@ -1215,13 +1247,23 @@ app.delete('/api/admin/boletos/:id_boleto', permitirTaquillaOAdmin, async (req, 
 // ==========================================
 app.get('/api/admin/usuarios', permitirAdmin, async (req, res) => {
   try {
+    const range = obtenerRangoFechasAdmin(req);
+    const conditions = [];
+    const params = [];
+    if (range) {
+      conditions.push(condicionRangoFechas('u.fecha_registro', range));
+      params.push(...parametrosRangoFechas(range));
+    }
+
     const [usuarios] = await pool.query(
       `SELECT u.*, GROUP_CONCAT(r.nombre SEPARATOR ', ') AS roles
        FROM usuarios u
        LEFT JOIN usuarios_roles ur ON u.id_usuario = ur.id_usuario
        LEFT JOIN roles r ON ur.id_rol = r.id_rol
+       ${whereDesdeCondiciones(conditions)}
        GROUP BY u.id_usuario
-       ORDER BY u.fecha_registro DESC`
+       ORDER BY u.fecha_registro DESC`,
+      params
     );
     res.json(usuarios);
   } catch (error) {
@@ -1234,12 +1276,26 @@ app.get('/api/admin/usuarios', permitirAdmin, async (req, res) => {
 // ==========================================
 app.get('/api/admin/boletos', permitirAdmin, async (req, res) => {
   try {
+    const range = obtenerRangoFechasAdmin(req);
+    const params = [];
+    let dateWhere = '';
+    if (range) {
+      const dateConditions = ['b.fecha_generacion', 'b.fecha_uso', 'b.fecha_canje', 'b.ultimo_escaneo']
+        .map((column) => {
+          params.push(...parametrosRangoFechas(range));
+          return condicionRangoFechas(column, range);
+        });
+      dateWhere = `WHERE (${dateConditions.join(' OR ')})`;
+    }
+
     const [boletos] = await pool.query(
       `SELECT b.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario, u2.nombre AS nombre_canjeador
        FROM boletos b
        JOIN usuarios u ON b.id_usuario = u.id_usuario
        LEFT JOIN usuarios u2 ON b.canjeado_por = u2.id_usuario
-       ORDER BY b.fecha_generacion DESC`
+       ${dateWhere}
+       ORDER BY b.fecha_generacion DESC`,
+      params
     );
     res.json(boletos);
   } catch (error) {
@@ -1252,12 +1308,22 @@ app.get('/api/admin/boletos', permitirAdmin, async (req, res) => {
 // ==========================================
 app.get('/api/admin/progreso', permitirAdmin, async (req, res) => {
   try {
+    const range = obtenerRangoFechasAdmin(req);
+    const conditions = [];
+    const params = [];
+    if (range) {
+      conditions.push(condicionRangoFechas('COALESCE(p.fecha_completado, p.updated_at, p.created_at)', range));
+      params.push(...parametrosRangoFechas(range));
+    }
+
     const [progreso] = await pool.query(
       `SELECT p.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario, e.nombre AS nombre_estacion
        FROM progreso_usuario p
        JOIN usuarios u ON p.id_usuario = u.id_usuario
        JOIN estaciones e ON p.id_estacion = e.id_estacion
-       ORDER BY p.updated_at DESC`
+       ${whereDesdeCondiciones(conditions)}
+       ORDER BY p.updated_at DESC`,
+      params
     );
     res.json(progreso);
   } catch (error) {
@@ -1270,13 +1336,23 @@ app.get('/api/admin/progreso', permitirAdmin, async (req, res) => {
 // ==========================================
 app.get('/api/admin/movimientos-boletos', permitirAdmin, async (req, res) => {
   try {
+    const range = obtenerRangoFechasAdmin(req);
+    const conditions = [];
+    const params = [];
+    if (range) {
+      conditions.push(condicionRangoFechas('m.fecha_movimiento', range));
+      params.push(...parametrosRangoFechas(range));
+    }
+
     const [movimientos] = await pool.query(
       `SELECT m.*, b.folio AS folio_boleto, u.nombre AS nombre_usuario, u2.nombre AS nombre_operador
        FROM movimientos_boleto m
        JOIN boletos b ON m.id_boleto = b.id_boleto
        JOIN usuarios u ON m.id_usuario = u.id_usuario
        LEFT JOIN usuarios u2 ON m.realizado_por = u2.id_usuario
-       ORDER BY m.fecha_movimiento DESC`
+       ${whereDesdeCondiciones(conditions)}
+       ORDER BY m.fecha_movimiento DESC`,
+      params
     );
     res.json(movimientos);
   } catch (error) {
@@ -1289,11 +1365,21 @@ app.get('/api/admin/movimientos-boletos', permitirAdmin, async (req, res) => {
 // ==========================================
 app.get('/api/admin/auditoria', permitirAdmin, async (req, res) => {
   try {
+    const range = obtenerRangoFechasAdmin(req);
+    const conditions = [];
+    const params = [];
+    if (range) {
+      conditions.push(condicionRangoFechas('a.fecha_accion', range));
+      params.push(...parametrosRangoFechas(range));
+    }
+
     const [auditoria] = await pool.query(
       `SELECT a.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario
        FROM auditoria_acciones a
        LEFT JOIN usuarios u ON a.id_usuario = u.id_usuario
-       ORDER BY a.fecha_accion DESC`
+       ${whereDesdeCondiciones(conditions)}
+       ORDER BY a.fecha_accion DESC`,
+      params
     );
     res.json(auditoria);
   } catch (error) {
@@ -1319,31 +1405,65 @@ app.get('/api/usuarios/:id_usuario/roles', async (req, res) => {
 // ==========================================
 app.get('/api/admin/dashboard-stats', permitirAdmin, async (req, res) => {
   try {
+    const range = obtenerRangoFechasAdmin(req);
+    const rangeParams = () => parametrosRangoFechas(range);
+    const whereDate = (column) => range ? `WHERE ${condicionRangoFechas(column, range)}` : '';
+    const andDate = (column) => range ? `AND ${condicionRangoFechas(column, range)}` : '';
+
     const queries = {
-      usuarios: 'SELECT COUNT(*) AS count FROM usuarios',
-      estaciones: 'SELECT COUNT(*) AS count FROM estaciones',
-      preguntas: 'SELECT COUNT(*) AS count FROM preguntas',
-      boletos: 'SELECT COUNT(*) AS count FROM boletos',
-      boletosUsados: "SELECT COUNT(*) AS count FROM boletos WHERE usado = 1 OR estado = 'canjeado'",
-      usuariosProgreso: 'SELECT COUNT(DISTINCT id_usuario) AS count FROM progreso_usuario WHERE completada = 0',
-      usuariosCompletado: `SELECT COUNT(*) AS count FROM (
-        SELECT id_usuario FROM progreso_usuario 
-        WHERE aprobada = TRUE AND id_estacion IN (2, 3, 4, 5, 6) 
-        GROUP BY id_usuario 
-        HAVING COUNT(DISTINCT id_estacion) = 5
-      ) AS sub`,
-      escaneos: 'SELECT COUNT(*) AS count FROM escaneos_qr_boleto',
-      intentosPorEstacion: `SELECT e.id_estacion, e.nombre, COUNT(i.id_intento) AS total_intentos 
-        FROM estaciones e 
-        LEFT JOIN intentos_estacion i ON e.id_estacion = i.id_estacion 
-        GROUP BY e.id_estacion 
-        ORDER BY e.orden`
+      usuarios: {
+        sql: `SELECT COUNT(*) AS count FROM usuarios ${whereDate('fecha_registro')}`,
+        params: rangeParams()
+      },
+      estaciones: {
+        sql: 'SELECT COUNT(*) AS count FROM estaciones',
+        params: []
+      },
+      preguntas: {
+        sql: `SELECT COUNT(*) AS count FROM preguntas ${whereDate('created_at')}`,
+        params: rangeParams()
+      },
+      boletos: {
+        sql: `SELECT COUNT(*) AS count FROM boletos ${whereDate('fecha_generacion')}`,
+        params: rangeParams()
+      },
+      boletosUsados: {
+        sql: `SELECT COUNT(*) AS count FROM boletos WHERE (usado = 1 OR estado = 'canjeado') ${andDate('COALESCE(fecha_canje, fecha_uso)')}`,
+        params: rangeParams()
+      },
+      usuariosProgreso: {
+        sql: `SELECT COUNT(DISTINCT id_usuario) AS count FROM progreso_usuario WHERE completada = 0 ${andDate('COALESCE(updated_at, created_at)')}`,
+        params: rangeParams()
+      },
+      usuariosCompletado: {
+        sql: `SELECT COUNT(*) AS count FROM (
+          SELECT id_usuario, MAX(COALESCE(fecha_completado, updated_at, created_at)) AS fecha_final
+          FROM progreso_usuario
+          WHERE aprobada = TRUE AND id_estacion IN (2, 3, 4, 5, 6)
+          GROUP BY id_usuario
+          HAVING COUNT(DISTINCT id_estacion) = 5 ${range ? `AND ${condicionRangoFechas('fecha_final', range)}` : ''}
+        ) AS sub`,
+        params: rangeParams()
+      },
+      escaneos: {
+        sql: `SELECT COUNT(*) AS count FROM escaneos_qr_boleto ${whereDate('fecha_escaneo')}`,
+        params: rangeParams()
+      },
+      intentosPorEstacion: {
+        sql: `SELECT e.id_estacion, e.nombre, COUNT(i.id_intento) AS total_intentos
+          FROM estaciones e
+          LEFT JOIN intentos_estacion i ON e.id_estacion = i.id_estacion ${range ? `AND ${condicionRangoFechas('i.fecha_intento', range)}` : ''}
+          GROUP BY e.id_estacion
+          ORDER BY e.orden`,
+        params: rangeParams()
+      }
     };
 
     const results = {};
     const keys = Object.keys(queries);
     const promises = keys.map(async (key) => {
-      const [rows] = await pool.query(queries[key]);
+      const queryConfig = queries[key];
+      const [rows] = await pool.query(queryConfig.sql, queryConfig.params);
       if (key === 'intentosPorEstacion') {
         results[key] = rows;
       } else {
@@ -1363,6 +1483,14 @@ app.get('/api/admin/dashboard-stats', permitirAdmin, async (req, res) => {
 // ==========================================
 app.get('/api/admin/roles-permisos', permitirAdmin, async (req, res) => {
   try {
+    const range = obtenerRangoFechasAdmin(req);
+    const conditions = [];
+    const params = [];
+    if (range) {
+      conditions.push(condicionRangoFechas('ur.fecha_asignacion', range));
+      params.push(...parametrosRangoFechas(range));
+    }
+
     const [roles] = await pool.query('SELECT * FROM roles ORDER BY id_rol');
     const [usuariosRoles] = await pool.query(
       `SELECT ur.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario, r.nombre AS nombre_rol, u2.nombre AS nombre_asignador
@@ -1370,7 +1498,9 @@ app.get('/api/admin/roles-permisos', permitirAdmin, async (req, res) => {
        JOIN usuarios u ON ur.id_usuario = u.id_usuario
        JOIN roles r ON ur.id_rol = r.id_rol
        LEFT JOIN usuarios u2 ON ur.asignado_por = u2.id_usuario
-       ORDER BY ur.fecha_asignacion DESC`
+       ${whereDesdeCondiciones(conditions)}
+       ORDER BY ur.fecha_asignacion DESC`,
+      params
     );
     res.json({ roles, usuariosRoles });
   } catch (error) {
@@ -1395,11 +1525,21 @@ app.get('/api/admin/estaciones', permitirAdmin, async (req, res) => {
 // ==========================================
 app.get('/api/admin/preguntas-respuestas', permitirAdmin, async (req, res) => {
   try {
+    const range = obtenerRangoFechasAdmin(req);
+    const conditions = [];
+    const params = [];
+    if (range) {
+      conditions.push(condicionRangoFechas('p.created_at', range));
+      params.push(...parametrosRangoFechas(range));
+    }
+
     const [preguntas] = await pool.query(
       `SELECT p.*, e.nombre AS nombre_estacion 
        FROM preguntas p 
        JOIN estaciones e ON p.id_estacion = e.id_estacion
-       ORDER BY e.orden, p.id_pregunta`
+       ${whereDesdeCondiciones(conditions)}
+       ORDER BY e.orden, p.id_pregunta`,
+      params
     );
     const [respuestas] = await pool.query('SELECT * FROM respuestas ORDER BY id_pregunta, id_respuesta');
     
@@ -1428,21 +1568,40 @@ app.get('/api/admin/preguntas-respuestas', permitirAdmin, async (req, res) => {
 // ==========================================
 app.get('/api/admin/intentos-respuestas', permitirAdmin, async (req, res) => {
   try {
+    const range = obtenerRangoFechasAdmin(req);
+    const conditions = [];
+    const params = [];
+    if (range) {
+      conditions.push(condicionRangoFechas('i.fecha_intento', range));
+      params.push(...parametrosRangoFechas(range));
+    }
+
     const [intentos] = await pool.query(
       `SELECT i.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario, e.nombre AS nombre_estacion
        FROM intentos_estacion i
        JOIN usuarios u ON i.id_usuario = u.id_usuario
        JOIN estaciones e ON i.id_estacion = e.id_estacion
-       ORDER BY i.fecha_intento DESC`
+       ${whereDesdeCondiciones(conditions)}
+       ORDER BY i.fecha_intento DESC`,
+      params
     );
-    const [respuestasUsuario] = await pool.query(
-      `SELECT ru.*, p.pregunta, r.texto_respuesta AS texto_respuesta_seleccionada, r2.texto_respuesta AS texto_respuesta_correcta
-       FROM respuestas_usuario ru
-       JOIN preguntas p ON ru.id_pregunta = p.id_pregunta
-       JOIN respuestas r ON ru.id_respuesta = r.id_respuesta
-       LEFT JOIN respuestas r2 ON p.id_pregunta = r2.id_pregunta AND r2.es_correcta = TRUE
-       ORDER BY ru.fecha_respuesta DESC`
-    );
+
+    let respuestasUsuario = [];
+    if (intentos.length > 0) {
+      const intentoIds = intentos.map((intento) => intento.id_intento);
+      const placeholders = intentoIds.map(() => '?').join(',');
+      const [rows] = await pool.query(
+        `SELECT ru.*, p.pregunta, r.texto_respuesta AS texto_respuesta_seleccionada, r2.texto_respuesta AS texto_respuesta_correcta
+         FROM respuestas_usuario ru
+         JOIN preguntas p ON ru.id_pregunta = p.id_pregunta
+         JOIN respuestas r ON ru.id_respuesta = r.id_respuesta
+         LEFT JOIN respuestas r2 ON p.id_pregunta = r2.id_pregunta AND r2.es_correcta = TRUE
+         WHERE ru.id_intento IN (${placeholders})
+         ORDER BY ru.fecha_respuesta DESC`,
+        intentoIds
+      );
+      respuestasUsuario = rows;
+    }
 
     // Agrupar respuestas por intento
     const respuestasPorIntento = {};
@@ -1469,12 +1628,22 @@ app.get('/api/admin/intentos-respuestas', permitirAdmin, async (req, res) => {
 // ==========================================
 app.get('/api/admin/minijuegos', permitirAdmin, async (req, res) => {
   try {
+    const range = obtenerRangoFechasAdmin(req);
+    const conditions = [];
+    const params = [];
+    if (range) {
+      conditions.push(condicionRangoFechas('p.fecha_partida', range));
+      params.push(...parametrosRangoFechas(range));
+    }
+
     const [partidas] = await pool.query(
       `SELECT p.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario, e.nombre AS nombre_estacion
        FROM partidas_minijuego p
        JOIN usuarios u ON p.id_usuario = u.id_usuario
        LEFT JOIN estaciones e ON p.id_estacion = e.id_estacion
-       ORDER BY p.fecha_partida DESC`
+       ${whereDesdeCondiciones(conditions)}
+       ORDER BY p.fecha_partida DESC`,
+      params
     );
     res.json(partidas);
   } catch (error) {
@@ -1487,12 +1656,22 @@ app.get('/api/admin/minijuegos', permitirAdmin, async (req, res) => {
 // ==========================================
 app.get('/api/admin/escaneos-qr', permitirTaquillaOAdmin, async (req, res) => {
   try {
+    const range = obtenerRangoFechasAdmin(req);
+    const conditions = [];
+    const params = [];
+    if (range) {
+      conditions.push(condicionRangoFechas('e.fecha_escaneo', range));
+      params.push(...parametrosRangoFechas(range));
+    }
+
     const [escaneos] = await pool.query(
       `SELECT e.*, b.folio AS folio_boleto, u.nombre AS nombre_operador
        FROM escaneos_qr_boleto e
        LEFT JOIN boletos b ON e.id_boleto = b.id_boleto
        LEFT JOIN usuarios u ON e.escaneado_por = u.id_usuario
-       ORDER BY e.fecha_escaneo DESC`
+       ${whereDesdeCondiciones(conditions)}
+       ORDER BY e.fecha_escaneo DESC`,
+      params
     );
     res.json(escaneos);
   } catch (error) {

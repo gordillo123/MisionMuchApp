@@ -806,6 +806,105 @@
       box-shadow: 0 6px 16px rgba(73, 198, 255, 0.1);
     }
 
+    .date-filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      width: 100%;
+      align-items: flex-end;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .date-filter-field {
+      display: grid;
+      gap: 5px;
+      flex: 1 1 210px;
+      min-width: 0;
+    }
+
+    .date-filter-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .date-filter-actions .btn {
+      min-height: 40px;
+      padding: 8px 12px;
+      font-size: 0.82rem;
+    }
+
+    .date-filter-bar .form-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.05em;
+    }
+
+    .date-filter-bar .form-input {
+      min-height: 40px;
+      padding: 0 10px;
+      font-size: 0.84rem;
+      border-radius: 10px;
+    }
+
+    .date-parts-row {
+      display: grid;
+      grid-template-columns: minmax(34px, 0.75fr) minmax(34px, 0.75fr) minmax(58px, 1fr) 40px;
+      gap: 6px;
+    }
+
+    .date-part-input {
+      text-align: center;
+      padding: 0 6px !important;
+    }
+
+    .date-picker-wrap {
+      position: relative;
+      display: block;
+      min-width: 40px;
+      height: 40px;
+    }
+
+    .date-picker-button {
+      width: 100%;
+      height: 100%;
+      min-height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(73, 198, 255, 0.1);
+      color: var(--text-main);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .native-date-picker {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .date-filter-message {
+      width: 100%;
+      margin: 0;
+      color: var(--text-soft);
+      font-size: 0.78rem;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    .date-filter-message.error {
+      color: #ff9d9d;
+    }
+
     /* Table Design */
     .table-wrap {
       overflow-x: auto;
@@ -1363,7 +1462,84 @@
         max-width: none;
       }
 
+      .date-filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: stretch;
+        gap: 8px;
+        padding: 10px;
+        border-radius: 10px;
+      }
 
+      .date-filter-field {
+        flex: initial;
+      }
+
+      .date-filter-bar .form-label {
+        font-size: 0.6rem;
+        letter-spacing: 0.03em;
+      }
+
+      .date-filter-bar .form-input {
+        min-height: 34px;
+        padding: 0 8px;
+        font-size: 0.76rem;
+        border-radius: 8px;
+      }
+
+      .date-parts-row {
+        grid-template-columns: minmax(32px, 0.7fr) minmax(32px, 0.7fr) minmax(54px, 1fr) 34px;
+        gap: 5px;
+      }
+
+      .date-part-input {
+        padding: 0 4px !important;
+      }
+
+      .date-picker-wrap,
+      .date-picker-button {
+        min-height: 34px;
+        height: 34px;
+      }
+
+      .date-picker-button {
+        border-radius: 8px;
+        font-size: 0.88rem;
+      }
+
+      .date-filter-actions {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        width: 100%;
+      }
+
+      .date-filter-actions .btn {
+        min-height: 34px;
+        padding: 6px 10px;
+        font-size: 0.74rem;
+        justify-content: center;
+      }
+
+      .date-filter-message {
+        grid-column: 1 / -1;
+        font-size: 0.68rem;
+        line-height: 1.25;
+      }
+
+
+    }
+
+    @media (max-width: 480px) {
+      .date-filter-bar {
+        grid-template-columns: 1fr;
+      }
+
+      .date-filter-actions,
+      .date-filter-message {
+        grid-column: auto;
+      }
     }
   </style>
 </head>
@@ -1539,19 +1715,15 @@
       records: [], // Tab records (boletos, usuarios, etc.)
       queries: {}, // Searches per tab
       filters: {}, // Active filter per tab
-      dateFilters: {
-        year: '',
-        specific: '',
-        start: '',
-        end: ''
-      },
+      dateFilters: createDefaultDateFilters(),
       syncedAt: null,
       loading: false,
       expandedAttempts: new Set(),
       expandedBoletos: new Set(),
       selectedUserIdForRoles: null,
       currentPage: 1,
-      pageSize: 10
+      pageSize: 10,
+      dateFilterApplyTimer: null
     };
 
     const TABS_CONFIG = [
@@ -1621,6 +1793,146 @@
       return withTime ? dateTimeFormatter.format(parsed) : dateFormatter.format(parsed);
     }
 
+    function getLocalDateInputValue(date = new Date()) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function createDefaultDateFilters() {
+      const today = getLocalDateInputValue();
+      return { year: '', specific: '', start: today, end: today };
+    }
+
+    function normalizeDateFilters(filters = state.dateFilters) {
+      let start = filters.start || filters.specific || '';
+      let end = filters.end || filters.specific || '';
+      if (start && !end) end = start;
+      if (end && !start) start = end;
+      return { start, end };
+    }
+
+    function getDateFilterError(filters = state.dateFilters) {
+      const { start, end } = normalizeDateFilters(filters);
+      if (start && end && start > end) {
+        return 'La fecha inicial no puede ser mayor que la fecha final.';
+      }
+      return '';
+    }
+
+    function getDateRangeLabel(filters = state.dateFilters) {
+      const { start, end } = normalizeDateFilters(filters);
+      if (!start && !end) return 'Sin rango de fechas aplicado.';
+      if (start === end) return `Mostrando registros del ${formatDateInputLabel(start)}.`;
+      return `Mostrando registros del ${formatDateInputLabel(start)} al ${formatDateInputLabel(end)}.`;
+    }
+
+    function getDatePartsFromIso(value) {
+      const [year = '', month = '', day = ''] = String(value || '').split('-');
+      return { day, month, year };
+    }
+
+    function formatDateInputLabel(value) {
+      const { day, month, year } = getDatePartsFromIso(value);
+      return day && month && year ? `${day}/${month}/${year}` : value;
+    }
+
+    function getDatePartRefs(filterKey) {
+      const prefix = filterKey === 'start' ? 'Start' : 'End';
+      return {
+        day: document.getElementById(`dateFilter${prefix}Day`),
+        month: document.getElementById(`dateFilter${prefix}Month`),
+        year: document.getElementById(`dateFilter${prefix}Year`),
+        picker: document.getElementById(`dateFilter${prefix}Picker`)
+      };
+    }
+
+    function syncDatePartInputs(filterKey, isoValue) {
+      const refs = getDatePartRefs(filterKey);
+      const parts = getDatePartsFromIso(isoValue);
+      if (refs.day) refs.day.value = parts.day || '';
+      if (refs.month) refs.month.value = parts.month || '';
+      if (refs.year) refs.year.value = parts.year || '';
+      if (refs.picker) refs.picker.value = isoValue || '';
+    }
+
+    function cleanDatePartInput(input, maxLength) {
+      if (!input) return '';
+      const cleaned = input.value.replace(/\D/g, '').slice(0, maxLength);
+      input.value = cleaned;
+      return cleaned;
+    }
+
+    function parseDateParts(day, month, year) {
+      const hasAny = Boolean(day || month || year);
+      if (!hasAny) return { iso: '', complete: true, error: '' };
+      if (!day || !month || year.length < 4) {
+        return { iso: '', complete: false, error: 'Completa dia, mes y año para aplicar el filtro.' };
+      }
+
+      const dayNumber = Number(day);
+      const monthNumber = Number(month);
+      const yearNumber = Number(year);
+      if (monthNumber < 1 || monthNumber > 12 || yearNumber < 2000) {
+        return { iso: '', complete: true, error: 'Revisa la fecha: usa dia, mes y año validos.' };
+      }
+
+      const maxDay = new Date(yearNumber, monthNumber, 0).getDate();
+      if (dayNumber < 1 || dayNumber > maxDay) {
+        return { iso: '', complete: true, error: 'Revisa el dia seleccionado para ese mes.' };
+      }
+
+      return {
+        iso: `${String(yearNumber).padStart(4, '0')}-${String(monthNumber).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`,
+        complete: true,
+        error: ''
+      };
+    }
+
+    function readDateFilterParts(filterKey) {
+      const refs = getDatePartRefs(filterKey);
+      if (!refs.day || !refs.month || !refs.year) {
+        return { iso: state.dateFilters[filterKey] || '', complete: true, error: '' };
+      }
+
+      const day = cleanDatePartInput(refs.day, 2);
+      const month = cleanDatePartInput(refs.month, 2);
+      const year = cleanDatePartInput(refs.year, 4);
+      return parseDateParts(day, month, year);
+    }
+
+    function renderDatePartsField(filterKey, label) {
+      const prefix = filterKey === 'start' ? 'Start' : 'End';
+      const parts = getDatePartsFromIso(state.dateFilters[filterKey]);
+      return `
+        <div class="date-filter-field">
+          <label class="form-label">${label}</label>
+          <div class="date-parts-row">
+            <input class="form-input date-part-input" id="dateFilter${prefix}Day" type="text" inputmode="numeric" maxlength="2" placeholder="DD" aria-label="${label} dia" value="${parts.day}" oninput="window.handleDatePartChange('${filterKey}')">
+            <input class="form-input date-part-input" id="dateFilter${prefix}Month" type="text" inputmode="numeric" maxlength="2" placeholder="MM" aria-label="${label} mes" value="${parts.month}" oninput="window.handleDatePartChange('${filterKey}')">
+            <input class="form-input date-part-input" id="dateFilter${prefix}Year" type="text" inputmode="numeric" maxlength="4" placeholder="AAAA" aria-label="${label} año" value="${parts.year}" oninput="window.handleDatePartChange('${filterKey}')">
+            <span class="date-picker-wrap">
+              <button class="date-picker-button" type="button" aria-label="Elegir ${label} en calendario" onclick="window.openDatePicker('${filterKey}')">&#128197;</button>
+              <input class="native-date-picker" id="dateFilter${prefix}Picker" type="date" value="${state.dateFilters[filterKey] || ''}" aria-label="Calendario ${label}" onchange="window.handleDatePickerChange('${filterKey}', this.value)">
+            </span>
+          </div>
+        </div>
+      `;
+    }
+
+    function buildApiUrl(endpoint, includeDateRange = true) {
+      const url = new URL(endpoint, API_BASE_URL);
+      if (includeDateRange && !getDateFilterError()) {
+        const { start, end } = normalizeDateFilters();
+        if (start && end) {
+          url.searchParams.set('startDate', start);
+          url.searchParams.set('endDate', end);
+        }
+      }
+      return url.toString();
+    }
+
     function escapeHtml(value) {
       return String(value ?? '').replace(/[&<>"']/g, (char) => ({
         '&': '&amp;',
@@ -1657,72 +1969,171 @@
     }
 
     function renderDateFiltersHTML() {
-      const tabsWithDate = ['usuarios', 'intentos', 'boletos', 'auditoria', 'taquilla'];
+      const tabsWithDate = ['dashboard', 'usuarios', 'roles', 'progreso', 'intentos', 'minijuegos', 'boletos', 'movimientos', 'auditoria', 'taquilla'];
       if (!tabsWithDate.includes(state.activeTab)) {
         return '';
       }
-
-      const currentYear = new Date().getFullYear();
-      let yearOptionsHTML = '<option value="">Todos los años</option>';
-      for (let y = currentYear + 1; y >= 2024; y--) {
-        const selected = String(y) === state.dateFilters.year ? 'selected' : '';
-        yearOptionsHTML += `<option value="${y}" ${selected}>${y}</option>`;
-      }
+      const rangeError = getDateFilterError();
 
       return `
-        <div class="date-filter-bar" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; padding: 12px 16px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 12px; width: 100%; align-items: flex-end; box-sizing: border-box;">
-          <div class="form-group" style="margin: 0; min-width: 130px; flex: 1;">
-            <label class="form-label" style="font-size: 0.72rem; margin-bottom: 4px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em;">Filtrar por Año</label>
-            <select id="dateFilterYear" class="form-input" style="min-height: 38px; padding: 6px 10px; font-size: 0.85rem;" onchange="window.handleDateFilterChange('year', this.value)">
-              ${yearOptionsHTML}
-            </select>
+        <div class="date-filter-bar">
+          ${renderDatePartsField('start', 'Desde')}
+          ${renderDatePartsField('end', 'Hasta')}
+          <div class="date-filter-actions">
+            <button class="btn btn-solid" type="button" onclick="window.applyDateFilters()">Aplicar</button>
+            <button class="btn btn-soft" type="button" onclick="window.clearDateFilters()">Hoy</button>
           </div>
-          <div class="form-group" style="margin: 0; min-width: 150px; flex: 1.2;">
-            <label class="form-label" style="font-size: 0.72rem; margin-bottom: 4px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em;">Fecha Específica</label>
-            <input type="date" id="dateFilterSpecific" class="form-input" style="min-height: 38px; padding: 6px 10px; font-size: 0.85rem;" value="${state.dateFilters.specific}" onchange="window.handleDateFilterChange('specific', this.value)">
-          </div>
-          <div style="display: flex; gap: 8px; align-items: flex-end; flex: 2; min-width: 300px;">
-            <div class="form-group" style="margin: 0; flex: 1;">
-              <label class="form-label" style="font-size: 0.72rem; margin-bottom: 4px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em;">Rango Desde</label>
-              <input type="date" id="dateFilterStart" class="form-input" style="min-height: 38px; padding: 6px 10px; font-size: 0.85rem;" value="${state.dateFilters.start}" onchange="window.handleDateFilterChange('start', this.value)">
-            </div>
-            <span style="padding-bottom: 8px; color: var(--text-dim); font-size: 0.85rem; font-weight: 700;">a</span>
-            <div class="form-group" style="margin: 0; flex: 1;">
-              <label class="form-label" style="font-size: 0.72rem; margin-bottom: 4px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em;">Hasta</label>
-              <input type="date" id="dateFilterEnd" class="form-input" style="min-height: 38px; padding: 6px 10px; font-size: 0.85rem;" value="${state.dateFilters.end}" onchange="window.handleDateFilterChange('end', this.value)">
-            </div>
-          </div>
-          <button class="btn btn-soft" style="padding: 8px 16px; font-size: 0.82rem; min-height: 38px;" onclick="window.clearDateFilters()">Limpiar Fechas ✕</button>
+          <p class="date-filter-message ${rangeError ? 'error' : ''}" id="dateFilterMessage">${rangeError || getDateRangeLabel()}</p>
         </div>
       `;
+
     }
 
     window.handleDateFilterChange = function(filterKey, value) {
       state.dateFilters[filterKey] = value;
-      state.currentPage = 1;
-      if (state.activeTab === 'taquilla') {
-        renderTaquillaLogsTable();
-      } else {
-        renderActiveView();
+      state.dateFilters.year = '';
+      state.dateFilters.specific = '';
+      const msg = document.getElementById('dateFilterMessage');
+      const rangeError = getDateFilterError();
+      if (msg) {
+        msg.textContent = rangeError || getDateRangeLabel();
+        msg.classList.toggle('error', Boolean(rangeError));
+      }
+      if (state.dateFilterApplyTimer) {
+        window.clearTimeout(state.dateFilterApplyTimer);
+      }
+      if (!rangeError) {
+        state.dateFilterApplyTimer = window.setTimeout(() => {
+          state.dateFilterApplyTimer = null;
+          window.applyDateFilters();
+        }, 450);
       }
     };
 
-    window.clearDateFilters = function() {
-      state.dateFilters = { year: '', specific: '', start: '', end: '' };
-      state.currentPage = 1;
-      if (state.activeTab === 'taquilla') {
-        const yearSel = document.getElementById('dateFilterYear');
-        const specInp = document.getElementById('dateFilterSpecific');
-        const startInp = document.getElementById('dateFilterStart');
-        const endInp = document.getElementById('dateFilterEnd');
-        if (yearSel) yearSel.value = '';
-        if (specInp) specInp.value = '';
-        if (startInp) startInp.value = '';
-        if (endInp) endInp.value = '';
-        renderTaquillaLogsTable();
-      } else {
-        renderActiveView();
+    window.handleDatePartChange = function(filterKey) {
+      const parsed = readDateFilterParts(filterKey);
+      const msg = document.getElementById('dateFilterMessage');
+
+      if (!parsed.complete || parsed.error) {
+        if (msg) {
+          msg.textContent = parsed.error;
+          msg.classList.add('error');
+        }
+        if (state.dateFilterApplyTimer) {
+          window.clearTimeout(state.dateFilterApplyTimer);
+          state.dateFilterApplyTimer = null;
+        }
+        return;
       }
+
+      state.dateFilters[filterKey] = parsed.iso;
+      syncDatePartInputs(filterKey, parsed.iso);
+      state.dateFilters.year = '';
+      state.dateFilters.specific = '';
+      const rangeError = getDateFilterError();
+      if (msg) {
+        msg.textContent = rangeError || getDateRangeLabel();
+        msg.classList.toggle('error', Boolean(rangeError));
+      }
+
+      if (state.dateFilterApplyTimer) {
+        window.clearTimeout(state.dateFilterApplyTimer);
+      }
+      if (!rangeError) {
+        state.dateFilterApplyTimer = window.setTimeout(() => {
+          state.dateFilterApplyTimer = null;
+          window.applyDateFilters();
+        }, 450);
+      }
+    };
+
+    window.openDatePicker = function(filterKey) {
+      const refs = getDatePartRefs(filterKey);
+      if (!refs.picker) return;
+      refs.picker.value = state.dateFilters[filterKey] || refs.picker.value || '';
+      if (typeof refs.picker.showPicker === 'function') {
+        refs.picker.showPicker();
+      } else {
+        refs.picker.focus();
+        refs.picker.click();
+      }
+    };
+
+    window.handleDatePickerChange = function(filterKey, value) {
+      state.dateFilters[filterKey] = value || '';
+      state.dateFilters.year = '';
+      state.dateFilters.specific = '';
+      syncDatePartInputs(filterKey, state.dateFilters[filterKey]);
+
+      const msg = document.getElementById('dateFilterMessage');
+      const rangeError = getDateFilterError();
+      if (msg) {
+        msg.textContent = rangeError || getDateRangeLabel();
+        msg.classList.toggle('error', Boolean(rangeError));
+      }
+
+      if (state.dateFilterApplyTimer) {
+        window.clearTimeout(state.dateFilterApplyTimer);
+      }
+      if (!rangeError) {
+        state.dateFilterApplyTimer = window.setTimeout(() => {
+          state.dateFilterApplyTimer = null;
+          window.applyDateFilters();
+        }, 250);
+      }
+    };
+
+    window.applyDateFilters = function() {
+      if (state.dateFilterApplyTimer) {
+        window.clearTimeout(state.dateFilterApplyTimer);
+        state.dateFilterApplyTimer = null;
+      }
+      const startParts = readDateFilterParts('start');
+      const endParts = readDateFilterParts('end');
+      const partsError = startParts.error || endParts.error;
+      if (partsError || !startParts.complete || !endParts.complete) {
+        const msg = document.getElementById('dateFilterMessage');
+        const message = partsError || 'Completa dia, mes y año para aplicar el filtro.';
+        if (msg) {
+          msg.textContent = message;
+          msg.classList.add('error');
+        } else {
+          alert(message);
+        }
+        return;
+      }
+
+      const nextFilters = {
+        year: '',
+        specific: '',
+        start: startParts.iso,
+        end: endParts.iso
+      };
+      const normalized = normalizeDateFilters(nextFilters);
+      nextFilters.start = normalized.start;
+      nextFilters.end = normalized.end;
+
+      const rangeError = getDateFilterError(nextFilters);
+      if (rangeError) {
+        const msg = document.getElementById('dateFilterMessage');
+        if (msg) {
+          msg.textContent = rangeError;
+          msg.classList.add('error');
+        } else {
+          alert(rangeError);
+        }
+        return;
+      }
+
+      state.dateFilters = nextFilters;
+      state.currentPage = 1;
+      loadTabContent();
+    };
+
+    window.clearDateFilters = function() {
+      state.dateFilters = createDefaultDateFilters();
+      state.currentPage = 1;
+      loadTabContent();
     };
 
     // Core Auth Initialization
@@ -1877,7 +2288,6 @@
 
       state.activeTab = tabId;
       state.currentPage = 1; // Reset page number on tab switch
-      state.dateFilters = { year: '', specific: '', start: '', end: '' }; // Reset date filters
       if (state.expandedBoletos) state.expandedBoletos.clear(); // Reset expanded tickets
       renderSidebar();
 
@@ -1900,7 +2310,7 @@
 
       try {
         if (state.activeTab === 'dashboard') {
-          const res = await fetch(`${API_BASE_URL}/api/admin/dashboard-stats`, { headers: getHeaders() });
+          const res = await fetch(buildApiUrl('/api/admin/dashboard-stats'), { headers: getHeaders() });
           if (!res.ok) throw new Error('Error al cargar métricas del Dashboard.');
           state.stats = await res.json();
           renderDashboardView();
@@ -1908,8 +2318,8 @@
           // General tables loading
           if (state.activeTab === 'boletos') {
             const [resBoletos, resMovimientos] = await Promise.all([
-              fetch(`${API_BASE_URL}/api/admin/boletos`, { headers: getHeaders() }),
-              fetch(`${API_BASE_URL}/api/admin/movimientos-boletos`, { headers: getHeaders() })
+              fetch(buildApiUrl('/api/admin/boletos'), { headers: getHeaders() }),
+              fetch(buildApiUrl('/api/admin/movimientos-boletos'), { headers: getHeaders() })
             ]);
             if (!resBoletos.ok || !resMovimientos.ok) throw new Error('Error al cargar datos de boletos.');
             
@@ -1937,7 +2347,7 @@
               case 'auditoria': endpoint = '/api/admin/auditoria'; break;
             }
 
-            const res = await fetch(`${API_BASE_URL}${endpoint}`, { headers: getHeaders() });
+            const res = await fetch(buildApiUrl(endpoint), { headers: getHeaders() });
             if (!res.ok) throw new Error(`Error al cargar datos de ${state.activeTab}.`);
             state.records = await res.json();
             if (state.activeTab === 'taquilla' && document.getElementById('ticketReader')) {
@@ -1980,7 +2390,7 @@
           <span class="empty-state-icon" style="color: var(--danger)">⛔</span>
           <strong>Error de conexión</strong>
           <span>${escapeHtml(msg)}</span>
-          <button class="btn btn-solid" style="margin-top: 15px;" onclick="loadTabContent()">Reintentar conexión</button>
+          <button class="btn btn-solid" style="margin-top: 15px;" onclick="window.loadTabContent()">Reintentar conexión</button>
         </div>
       `;
     }
@@ -1989,16 +2399,29 @@
     function renderDashboardView() {
       const s = state.stats;
       const container = document.getElementById('viewContainers');
-      
+      const totalIntentos = (s.intentosPorEstacion || []).reduce((sum, row) => sum + Number(row.total_intentos || 0), 0);
+      const hasRangeData = [s.usuarios, s.boletos, s.boletosUsados, s.usuariosCompletado, s.escaneos, totalIntentos]
+        .some(value => Number(value || 0) > 0);
+
       container.innerHTML = `
+        <div class="panel" style="margin-bottom: 20px;">
+          ${renderDateFiltersHTML()}
+        </div>
+        ${hasRangeData ? '' : `
+          <div class="panel empty-state" style="margin-bottom: 20px;">
+            <span class="empty-state-icon">&#128269;</span>
+            <strong>No hay registros para las fechas seleccionadas</strong>
+            <span>Selecciona otro rango de fechas para consultar tablas, tarjetas y estadisticas.</span>
+          </div>
+        `}
         <div class="metrics-grid">
           <div class="metric-card">
             <div class="metric-card-info">
               <span class="label">Total Usuarios</span>
               <span class="value">${s.usuarios.toLocaleString()}</span>
-              <span class="hint">Visitantes registrados en la BD</span>
+              <span class="hint">Visitantes registrados en el rango</span>
             </div>
-            <div class="metric-icon">👥</div>
+            <div class="metric-icon">&#128101;</div>
           </div>
           <div class="metric-card">
             <div class="metric-card-info">
@@ -2006,96 +2429,84 @@
               <span class="value">${s.estaciones.toLocaleString()}</span>
               <span class="hint">Salas configuradas y activas</span>
             </div>
-            <div class="metric-icon">🗺️</div>
+            <div class="metric-icon">&#128506;</div>
           </div>
-
           <div class="metric-card">
             <div class="metric-card-info">
               <span class="label">Boletos Generados</span>
               <span class="value">${s.boletos.toLocaleString()}</span>
-              <span class="hint">Folios asignados por premios</span>
+              <span class="hint">Folios asignados en el rango</span>
             </div>
-            <div class="metric-icon">🎟️</div>
+            <div class="metric-icon">&#127915;</div>
           </div>
           <div class="metric-card">
             <div class="metric-card-info">
               <span class="label">Boletos Canjeados</span>
               <span class="value">${s.boletosUsados.toLocaleString()}</span>
-              <span class="hint">Boletos utilizados para accesos</span>
+              <span class="hint">Canjes realizados en el rango</span>
             </div>
-            <div class="metric-icon">✅</div>
+            <div class="metric-icon">&#10003;</div>
           </div>
           <div class="metric-card">
             <div class="metric-card-info">
-              <span class="label">Recorridos Completos</span>
+              <span class="label">Misiones Completadas</span>
               <span class="value">${s.usuariosCompletado.toLocaleString()}</span>
-              <span class="hint">Completaron salas del juego</span>
+              <span class="hint">Finalizados en el rango</span>
             </div>
-            <div class="metric-icon">🏆</div>
+            <div class="metric-icon">&#127942;</div>
           </div>
           <div class="metric-card">
             <div class="metric-card-info">
               <span class="label">Total Escaneos QR</span>
               <span class="value">${s.escaneos.toLocaleString()}</span>
-              <span class="hint">Lecturas ejecutadas en taquilla</span>
+              <span class="hint">Lecturas ejecutadas en el rango</span>
             </div>
-            <div class="metric-icon">🔍</div>
+            <div class="metric-icon">&#128269;</div>
           </div>
         </div>
 
         <div class="panel" style="margin-top: 24px;">
           <div class="panel-head">
             <div class="panel-title-wrap">
-              <h3>Intentos Realizados por Estación</h3>
-              <p>Métricas detalladas sobre la interactividad de los visitantes en cada sala del museo.</p>
+              <h3>Intentos Realizados por Estacion</h3>
+              <p>Metricas por estacion dentro del rango de fechas seleccionado.</p>
             </div>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Estación / Recorrido</th>
-                  <th>Sala / Módulo</th>
+                  <th>Estacion</th>
                   <th>Intentos Totales</th>
-                  <th>Escaneos de Boletos</th>
                   <th>Popularidad Relativa</th>
                 </tr>
               </thead>
               <tbody>
-                ${s.intentosPorEstacion.map(row => {
+                ${(s.intentosPorEstacion || []).map(row => {
+                  const total = Number(row.total_intentos || 0);
+                  const popularity = ((total / (s.usuarios || 1)) * 100);
                   return `
                     <tr>
-                      <td style="font-weight: 700;">Sala ${row.id_estacion}</td>
-                      <td>${escapeHtml(row.nombre)}</td>
-                      <td style="font-weight: 800; color: var(--accent);">${row.total_intentos.toLocaleString()}</td>
-                      <td style="color: var(--text-dim); font-size: 0.85rem;">No aplica (Boleto global)</td>
+                      <td>
+                        <strong>${escapeHtml(row.nombre)}</strong><br>
+                        <span style="font-size: 0.78rem; color: var(--text-dim);">ID #${row.id_estacion}</span>
+                      </td>
+                      <td style="font-weight: 800; color: var(--accent);">${total.toLocaleString()}</td>
                       <td>
                         <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; width: 100px; display: inline-block; vertical-align: middle; margin-right: 10px;">
-                          <div style="background: var(--accent); height: 100%; width: ${Math.min(100, (row.total_intentos / (s.usuarios || 1)) * 100)}%;"></div>
+                          <div style="background: var(--accent); height: 100%; width: ${Math.min(100, popularity)}%;"></div>
                         </div>
-                        <span style="font-size: 0.8rem; color: var(--text-dim);">${((row.total_intentos / (s.usuarios || 1)) * 100).toFixed(1)}%</span>
+                        <span style="font-size: 0.8rem; color: var(--text-dim);">${popularity.toFixed(1)}%</span>
                       </td>
                     </tr>
                   `;
                 }).join('')}
-                <!-- Fila consolidada para el Recorrido Completo (Boleto Digital) -->
-                <tr style="border-top: 2px solid var(--border); background: rgba(73, 198, 255, 0.05);">
-                  <td style="font-weight: 700; color: var(--accent);">Recorrido Completo</td>
-                  <td style="font-weight: 600;">Canje de Boleto Digital (Taquilla)</td>
-                  <td style="font-weight: 800; color: var(--text-soft);">${s.usuariosCompletado.toLocaleString()} completados</td>
-                  <td style="font-weight: 800; color: var(--success);">${s.escaneos.toLocaleString()} escaneos (${s.boletosUsados.toLocaleString()} canjes)</td>
-                  <td>
-                    <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; width: 100px; display: inline-block; vertical-align: middle; margin-right: 10px;">
-                      <div style="background: var(--success); height: 100%; width: ${Math.min(100, (s.boletosUsados / (s.boletos || 1)) * 100)}%;"></div>
-                    </div>
-                    <span style="font-size: 0.8rem; color: var(--text-dim);">${((s.boletosUsados / (s.boletos || 1)) * 100 || 0).toFixed(1)}% canjeados</span>
-                  </td>
-                </tr>
               </tbody>
             </table>
           </div>
         </div>
       `;
+      return;
     }
 
     function renderActiveView() {
@@ -2117,38 +2528,38 @@
         placeholder = 'Buscar por folio, nombre, correo o estatus...';
         filterHTML = `
           <div class="filter-chips">
-            <button class="filter-chip ${filter === 'all' ? 'active' : ''}" onclick="setTabFilter('all')">Todos</button>
-            <button class="filter-chip ${filter === 'activo' ? 'active' : ''}" onclick="setTabFilter('activo')">Vigentes</button>
-            <button class="filter-chip ${filter === 'canjeado' ? 'active' : ''}" onclick="setTabFilter('canjeado')">Canjeados</button>
-            <button class="filter-chip ${filter === 'cancelado' ? 'active' : ''}" onclick="setTabFilter('cancelado')">Cancelados</button>
+            <button class="filter-chip ${filter === 'all' ? 'active' : ''}" onclick="window.setTabFilter('all')">Todos</button>
+            <button class="filter-chip ${filter === 'activo' ? 'active' : ''}" onclick="window.setTabFilter('activo')">Vigentes</button>
+            <button class="filter-chip ${filter === 'canjeado' ? 'active' : ''}" onclick="window.setTabFilter('canjeado')">Canjeados</button>
+            <button class="filter-chip ${filter === 'cancelado' ? 'active' : ''}" onclick="window.setTabFilter('cancelado')">Cancelados</button>
           </div>
         `;
       } else if (state.activeTab === 'progreso') {
         placeholder = 'Buscar por nombre de usuario o sala...';
         filterHTML = `
           <div class="filter-chips">
-            <button class="filter-chip ${filter === 'all' ? 'active' : ''}" onclick="setTabFilter('all')">Todos</button>
-            <button class="filter-chip ${filter === 'aprobada' ? 'active' : ''}" onclick="setTabFilter('aprobada')">Aprobadas</button>
-            <button class="filter-chip ${filter === 'pendiente' ? 'active' : ''}" onclick="setTabFilter('pendiente')">En Progreso</button>
+            <button class="filter-chip ${filter === 'all' ? 'active' : ''}" onclick="window.setTabFilter('all')">Todos</button>
+            <button class="filter-chip ${filter === 'aprobada' ? 'active' : ''}" onclick="window.setTabFilter('aprobada')">Aprobadas</button>
+            <button class="filter-chip ${filter === 'pendiente' ? 'active' : ''}" onclick="window.setTabFilter('pendiente')">En Progreso</button>
           </div>
         `;
       } else if (state.activeTab === 'intentos') {
         placeholder = 'Buscar por usuario o estación...';
         filterHTML = `
           <div class="filter-chips">
-            <button class="filter-chip ${filter === 'all' ? 'active' : ''}" onclick="setTabFilter('all')">Todos</button>
-            <button class="filter-chip ${filter === 'aprobado' ? 'active' : ''}" onclick="setTabFilter('aprobado')">Aprobados</button>
-            <button class="filter-chip ${filter === 'reprobado' ? 'active' : ''}" onclick="setTabFilter('reprobado')">Reprobados</button>
+            <button class="filter-chip ${filter === 'all' ? 'active' : ''}" onclick="window.setTabFilter('all')">Todos</button>
+            <button class="filter-chip ${filter === 'aprobado' ? 'active' : ''}" onclick="window.setTabFilter('aprobado')">Aprobados</button>
+            <button class="filter-chip ${filter === 'reprobado' ? 'active' : ''}" onclick="window.setTabFilter('reprobado')">Reprobados</button>
           </div>
         `;
       } else if (state.activeTab === 'auditoria') {
         placeholder = 'Buscar en logs de auditoría...';
         filterHTML = `
           <div class="filter-chips">
-            <button class="filter-chip ${filter === 'all' ? 'active' : ''}" onclick="setTabFilter('all')">Todos</button>
-            <button class="filter-chip ${filter === 'admin' ? 'active' : ''}" onclick="setTabFilter('admin')">Admin</button>
-            <button class="filter-chip ${filter === 'taquilla' ? 'active' : ''}" onclick="setTabFilter('taquilla')">Taquilla</button>
-            <button class="filter-chip ${filter === 'usuario' ? 'active' : ''}" onclick="setTabFilter('usuario')">Usuario</button>
+            <button class="filter-chip ${filter === 'all' ? 'active' : ''}" onclick="window.setTabFilter('all')">Todos</button>
+            <button class="filter-chip ${filter === 'admin' ? 'active' : ''}" onclick="window.setTabFilter('admin')">Admin</button>
+            <button class="filter-chip ${filter === 'taquilla' ? 'active' : ''}" onclick="window.setTabFilter('taquilla')">Taquilla</button>
+            <button class="filter-chip ${filter === 'usuario' ? 'active' : ''}" onclick="window.setTabFilter('usuario')">Usuario</button>
           </div>
         `;
       } else if (state.activeTab === 'taquilla') {
@@ -2171,7 +2582,7 @@
           <div class="toolbar">
             <div class="search-wrap">
               <span>🔎</span>
-              <input id="searchInput" type="search" placeholder="${placeholder}" value="${escapeHtml(query)}" oninput="handleSearch(this.value)">
+              <input id="searchInput" type="search" placeholder="${placeholder}" value="${escapeHtml(query)}" oninput="window.handleSearch(this.value)">
             </div>
             ${filterHTML}
             ${renderDateFiltersHTML()}
@@ -2222,8 +2633,9 @@
 
       const yearFilter = state.dateFilters?.year || '';
       const specificFilter = state.dateFilters?.specific || '';
-      const startFilter = state.dateFilters?.start || '';
-      const endFilter = state.dateFilters?.end || '';
+      const normalizedFilters = normalizeDateFilters();
+      const startFilter = normalizedFilters.start;
+      const endFilter = normalizedFilters.end;
       const hasDateFilter = yearFilter || specificFilter || startFilter || endFilter;
 
       return records.filter(row => {
@@ -2257,7 +2669,10 @@
         if (hasDateFilter) {
           let rowDateStr = '';
           if (state.activeTab === 'usuarios') rowDateStr = row.fecha_registro;
+          else if (state.activeTab === 'progreso') rowDateStr = row.updated_at || row.fecha_completado || row.fecha_inicio || row.created_at;
           else if (state.activeTab === 'intentos') rowDateStr = row.fecha_intento;
+          else if (state.activeTab === 'minijuegos') rowDateStr = row.fecha_partida;
+          else if (state.activeTab === 'movimientos') rowDateStr = row.fecha_movimiento;
           else if (state.activeTab === 'auditoria') rowDateStr = row.fecha_accion;
           else if (state.activeTab === 'taquilla') rowDateStr = row.fecha_escaneo;
 
@@ -2308,6 +2723,10 @@
       renderActiveView();
     }
 
+    window.loadTabContent = loadTabContent;
+    window.handleSearch = handleSearch;
+    window.setTabFilter = setTabFilter;
+
     // Dynamic modular table templates mapping directly to MySQL schema
     function renderSpecificTable(rows) {
       if (rows.length === 0) {
@@ -2315,15 +2734,21 @@
         const filter = state.filters[state.activeTab] || 'all';
         const yearFilter = state.dateFilters?.year || '';
         const specificFilter = state.dateFilters?.specific || '';
-        const startFilter = state.dateFilters?.start || '';
-        const endFilter = state.dateFilters?.end || '';
-        const hasFilters = query || filter !== 'all' || yearFilter || specificFilter || startFilter || endFilter;
+        const normalizedFilters = normalizeDateFilters();
+        const startFilter = normalizedFilters.start;
+        const endFilter = normalizedFilters.end;
+        const hasDateFilter = yearFilter || specificFilter || startFilter || endFilter;
+        const hasFilters = query || filter !== 'all' || hasDateFilter;
+        const emptyMessage = hasDateFilter
+          ? 'No hay registros para las fechas seleccionadas'
+          : (hasFilters ? 'No se encontraron registros que coincidan con los criterios seleccionados.' : 'No se encontraron registros activos en la base de datos local.');
 
         return `
           <div class="empty-state">
             <span class="empty-state-icon">🔎</span>
-            <strong>Sin coincidencias</strong>
-            <span>${hasFilters 
+            <strong>${hasDateFilter ? 'No hay registros para las fechas seleccionadas' : 'Sin coincidencias'}</strong>
+            <span>${emptyMessage}</span>
+            <span hidden>${hasFilters
               ? 'No se encontraron registros que coincidan con los criterios de búsqueda o filtros de fecha seleccionados.' 
               : 'No se encontraron registros activos en la base de datos local.'}</span>
           </div>
@@ -3117,7 +3542,7 @@
           <div class="toolbar" style="margin-bottom: 14px;">
             <div class="search-wrap" style="max-width: 360px;">
               <span>🔎</span>
-              <input id="taquillaSearchInput" type="search" placeholder="Filtrar escaneos..." oninput="handleSearch(this.value)">
+              <input id="taquillaSearchInput" type="search" placeholder="Filtrar escaneos..." oninput="window.handleSearch(this.value)">
             </div>
             ${renderDateFiltersHTML()}
           </div>
@@ -3146,8 +3571,9 @@
       
       const yearFilter = state.dateFilters?.year || '';
       const specificFilter = state.dateFilters?.specific || '';
-      const startFilter = state.dateFilters?.start || '';
-      const endFilter = state.dateFilters?.end || '';
+      const normalizedFilters = normalizeDateFilters();
+      const startFilter = normalizedFilters.start;
+      const endFilter = normalizedFilters.end;
       const hasDateFilter = yearFilter || specificFilter || startFilter || endFilter;
 
       const filtered = state.records.filter(row => {
@@ -3172,11 +3598,15 @@
 
       if (filtered.length === 0) {
         const hasFilters = query || hasDateFilter;
+        const emptyMessage = hasDateFilter
+          ? 'No hay registros para las fechas seleccionadas'
+          : (hasFilters ? 'No se encontraron escaneos que coincidan con los criterios seleccionados.' : 'No se registran escaneos de boletos en la base de datos local.');
         tableWrap.innerHTML = `
           <div class="empty-state">
             <span class="empty-state-icon">🔎</span>
-            <strong>Sin coincidencias</strong>
-            <span>${hasFilters 
+            <strong>${hasDateFilter ? 'No hay registros para las fechas seleccionadas' : 'Sin coincidencias'}</strong>
+            <span>${emptyMessage}</span>
+            <span hidden>${hasFilters
               ? 'No se encontraron escaneos que coincidan con los criterios de búsqueda o filtros de fecha seleccionados.' 
               : 'No se registran escaneos de boletos en la base de datos local.'}</span>
           </div>
