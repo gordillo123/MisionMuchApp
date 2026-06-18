@@ -131,7 +131,8 @@
 
       .btn-back-regreso {
         top: 0.65rem;
-        right: 0.65rem;
+        right: auto;
+        left: 0.65rem;
         width: 40px;
         height: 40px;
         font-size: 1.05rem;
@@ -2466,9 +2467,9 @@
 
       .hero-badges {
         justify-content: center;
-        margin-top: 1rem;
+        margin-top: 1.3rem;
         gap: 0.55rem;
-        padding: 0.5rem;
+        padding: 0.35rem 0.5rem 0.25rem;
       }
 
       .badge {
@@ -2637,6 +2638,41 @@
     /* ESTILOS PUNTUAJES MODAL */
     .scores-modal {
       width: min(700px, 95vw);
+    }
+
+    .scores-close {
+      position: absolute;
+      top: 0.75rem;
+      right: auto;
+      left: 0.75rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 3px solid var(--bg-deep);
+      background: var(--white);
+      color: var(--bg-deep);
+      font-size: 1.18rem;
+      font-weight: 900;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 0 var(--bg-deep);
+      z-index: 5;
+      transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+    }
+
+    .scores-close:hover {
+      background: var(--msf-pink);
+      color: var(--white);
+      transform: translateY(1px);
+      box-shadow: 0 3px 0 var(--bg-deep);
+    }
+
+    .scores-close:active {
+      transform: translateY(4px);
+      box-shadow: 0 0 0 var(--bg-deep);
     }
 
     .scores-content {
@@ -3596,8 +3632,8 @@
     .btn-back-regreso {
       position: absolute;
       top: 1.1rem;
-      right: 1.1rem;
-      left: auto;
+      right: auto;
+      left: 1.1rem;
       width: 46px;
       height: 46px;
       border-radius: 50%;
@@ -7781,8 +7817,8 @@
 
       #rulesOverlay .btn-back-regreso {
         top: max(0.82rem, env(safe-area-inset-top));
-        right: max(0.9rem, env(safe-area-inset-right));
-        left: auto;
+        right: auto;
+        left: max(0.9rem, env(safe-area-inset-left));
       }
 
       #rulesOverlay .rules-chip,
@@ -8669,7 +8705,8 @@
 
     #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .btn-back-regreso {
       top: max(0.95rem, env(safe-area-inset-top));
-      right: max(1rem, env(safe-area-inset-right));
+      right: auto;
+      left: max(1rem, env(safe-area-inset-left));
       width: 48px;
       height: 48px;
       border-color: rgba(16, 185, 129, 0.28);
@@ -8845,7 +8882,8 @@
 
       #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .btn-back-regreso {
         top: max(0.82rem, env(safe-area-inset-top));
-        right: max(0.84rem, env(safe-area-inset-right));
+        right: auto;
+        left: max(0.84rem, env(safe-area-inset-left));
         width: 44px;
         height: 44px;
       }
@@ -9499,7 +9537,8 @@
 
     #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .btn-back-regreso {
       top: max(10px, env(safe-area-inset-top)) !important;
-      right: max(10px, env(safe-area-inset-right)) !important;
+      right: auto !important;
+      left: max(10px, env(safe-area-inset-left)) !important;
       width: clamp(38px, 10vw, 50px) !important;
       height: clamp(38px, 10vw, 50px) !important;
       font-size: clamp(18px, 4.6vw, 24px) !important;
@@ -9515,7 +9554,7 @@
         max(38px, calc(env(safe-area-inset-top) + 32px))
         max(54px, env(safe-area-inset-right))
         clamp(4px, 1vw, 10px)
-        max(12px, env(safe-area-inset-left)) !important;
+        max(54px, env(safe-area-inset-left)) !important;
       text-align: center !important;
     }
 
@@ -9745,7 +9784,8 @@
 
     #rulesOverlay.avatar-overlay.open .btn-back-regreso {
       top: max(10px, env(safe-area-inset-top)) !important;
-      right: max(10px, env(safe-area-inset-right)) !important;
+      right: auto !important;
+      left: max(10px, env(safe-area-inset-left)) !important;
       width: clamp(38px, 10vw, 50px) !important;
       height: clamp(38px, 10vw, 50px) !important;
       font-size: clamp(18px, 4.6vw, 24px) !important;
@@ -9761,7 +9801,7 @@
         max(38px, calc(env(safe-area-inset-top) + 32px))
         max(54px, env(safe-area-inset-right))
         clamp(4px, 1vw, 10px)
-        max(12px, env(safe-area-inset-left)) !important;
+        max(54px, env(safe-area-inset-left)) !important;
       text-align: center !important;
     }
 
@@ -10956,7 +10996,16 @@
       if (btnCerrarPuntajes) {
         btnCerrarPuntajes.onclick = () => scoresOverlay.classList.remove('open');
       }
-      scoresOverlay.onclick = (e) => { if (e.target === scoresOverlay) scoresOverlay.classList.remove('open'); };
+      if (scoresOverlay) {
+        scoresOverlay.addEventListener('click', (e) => {
+          const targetEl = e.target instanceof Element ? e.target : e.target.parentElement;
+          const closeButton = targetEl ? targetEl.closest('#btnBackScores') : null;
+          if (e.target === scoresOverlay || closeButton) {
+            e.preventDefault();
+            scoresOverlay.classList.remove('open');
+          }
+        });
+      }
 
       // 4. Login, Modal & Filtros
       selectedAvatar = null;
@@ -12132,10 +12181,16 @@
           if (shouldStart) playCurrentStation();
         };
       }
-      rulesOverlay.onclick = (e) => { if (e.target === rulesOverlay) closeRulesOverlay(); };
-
-      // Botón cerrar reglas con X
-      document.getElementById('btnBackRules').onclick = closeRulesOverlay;
+      if (rulesOverlay) {
+        rulesOverlay.addEventListener('click', (e) => {
+          const targetEl = e.target instanceof Element ? e.target : e.target.parentElement;
+          const closeButton = targetEl ? targetEl.closest('#btnBackRules') : null;
+          if (e.target === rulesOverlay || closeButton) {
+            e.preventDefault();
+            closeRulesOverlay();
+          }
+        });
+      }
 
       // Botón regreso desde vista de preparación
       document.getElementById('btnBackPrep').onclick = () => {

@@ -386,6 +386,7 @@ window.APP_MODULES = {
 
   "modules/scores.html": `
 <div class="avatar-modal scores-modal">
+  <button class="scores-close" id="btnBackScores" type="button" title="Cerrar" aria-label="Cerrar">&#10005;</button>
   <div class="modal-header">
     <h2 class="modal-title" style="color: var(--msf-pink);">🏆 Tabla de Honor</h2>
     <p>Los mejores exploradores del museo</p>
@@ -485,7 +486,7 @@ window.APP_MODULES = {
             <span class="rule-card-step">04</span>
           </div>
           <h3 class="rule-card-title">Suma puntos en tu misi&oacute;n</h3>
-          <p class="rule-card-copy">Cada estaci&oacute;n completada vale <strong>10 puntos</strong>, y la estaci&oacute;n del Espinosaurio vale <strong>15 puntos</strong>.</p>
+          <p class="rule-card-copy"><strong>Puntaje m&aacute;ximo:</strong> 65 puntos.<br><strong>Puntaje m&iacute;nimo para ganar:</strong> 53 puntos.</p>
         </article>
 
         <article class="rule-card">
@@ -494,7 +495,16 @@ window.APP_MODULES = {
             <span class="rule-card-step">05</span>
           </div>
           <h3 class="rule-card-title">Gana tu recompensa final</h3>
-          <p class="rule-card-copy">Junta al menos <strong>45 puntos de 55</strong> y completa tu misi&oacute;n cient&iacute;fica para obtener tu recompensa digital.</p>
+          <p class="rule-card-copy">Completa tu misi&oacute;n cient&iacute;fica con el puntaje m&iacute;nimo y termina el recorrido para desbloquear tu premio.</p>
+        </article>
+
+        <article class="rule-card">
+          <div class="rule-card-head">
+            <span class="rule-card-icon" aria-hidden="true">&#127903;</span>
+            <span class="rule-card-step">06</span>
+          </div>
+          <h3 class="rule-card-title">Celebra tu gran logro</h3>
+          <p class="rule-card-copy">Al finalizar, recibe un <strong>boleto gratis</strong> para <strong>MUCH</strong> o <strong>Planetario</strong> y sigue disfrutando la aventura.</p>
         </article>
       </div>
     </div>
