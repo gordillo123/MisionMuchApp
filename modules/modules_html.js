@@ -15,6 +15,10 @@ window.APP_MODULES = {
       <span class="slogan-divider">•</span>
       <span class="slogan-part aprende">Aprende</span>
     </div>
+    <button class="screen-sound-toggle landing-sound-toggle" type="button" aria-label="Quitar sonido" aria-pressed="true" title="Quitar sonido">
+      <span class="sound-icon sound-icon-on" aria-hidden="true">&#128266;</span>
+      <span class="sound-icon sound-icon-off" aria-hidden="true">&#128263;</span>
+    </button>
     <div class="nav-links">
       <a href="#" class="nav-btn active" id="btnInicio">
         <span class="nav-icon">🏠</span>
@@ -102,6 +106,10 @@ window.APP_MODULES = {
 
   "modules/prep.html": `
 <button class="back-button-prep" id="btnBackPrep" title="Volver">&#11013;</button>
+<button class="screen-sound-toggle prep-sound-toggle" type="button" aria-label="Quitar sonido" aria-pressed="true" title="Quitar sonido">
+  <span class="sound-icon sound-icon-on" aria-hidden="true">&#128266;</span>
+  <span class="sound-icon sound-icon-off" aria-hidden="true">&#128263;</span>
+</button>
 <div class="intro-container">
   <div class="rules-col">
     <div class="card">

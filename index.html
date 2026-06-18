@@ -458,6 +458,69 @@
       -webkit-text-fill-color: transparent;
     }
 
+    .screen-sound-toggle {
+      width: 44px;
+      height: 44px;
+      margin-left: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--white);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.12rem;
+      line-height: 1;
+      box-shadow: none;
+      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .screen-sound-toggle:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.26);
+      transform: translateY(-1px);
+    }
+
+    .screen-sound-toggle:active {
+      transform: translateY(1px);
+    }
+
+    .screen-sound-toggle .sound-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen-sound-toggle .sound-icon-off {
+      display: none;
+    }
+
+    .screen-sound-toggle.is-muted .sound-icon-on {
+      display: none;
+    }
+
+    .screen-sound-toggle.is-muted .sound-icon-off {
+      display: inline-flex;
+    }
+
+    .prep-sound-toggle {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      margin-left: 0;
+      z-index: 1020;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 42%),
+        linear-gradient(135deg, var(--msf-pink), var(--msf-yellow));
+      border: 3px solid rgba(255, 255, 255, 0.92);
+      box-shadow:
+        0 14px 30px rgba(255, 118, 180, 0.3),
+        0 4px 10px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+
     @media (max-width: 992px) {
       .nav-slogan {
         font-size: 0.9rem;
@@ -467,22 +530,38 @@
     @media (max-width: 768px) {
       .nav-slogan {
         font-size: 0.8rem;
-        max-width: calc(100% - 80px); /* Deja espacio para el botón hamburguesa */
+        max-width: calc(100% - 132px); /* Deja espacio para sonido y hamburguesa */
         gap: 0.4rem;
       }
       .nav-slogan .slogan-divider {
         margin: 0;
+      }
+
+      .landing-sound-toggle {
+        position: fixed;
+        top: 0.7rem;
+        right: 3.65rem;
+        z-index: 1010;
+        width: 42px;
+        height: 42px;
+        margin-left: 0;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.08);
       }
     }
 
     @media (max-width: 480px) {
       .nav-slogan {
         font-size: 0.72rem;
-        max-width: calc(100% - 80px);
+        max-width: calc(100% - 128px);
         gap: 0.25rem;
       }
       .nav-slogan .slogan-divider {
         margin: 0 0.05rem;
+      }
+
+      .landing-sound-toggle {
+        right: 3.45rem;
       }
     }
 
@@ -10566,7 +10645,62 @@
         document.addEventListener(eventName, requestPortraitLock, { passive: true });
       });
 
-      // 1. Partículas
+      // Sonido solo en Inicio y Preparacion
+      const LANDING_SOUND_KEY = 'much_landing_sound';
+      const screenSoundToggles = Array.from(document.querySelectorAll('.screen-sound-toggle'));
+      window.bgMusicScope = 'main';
+
+      function isLandingSoundEnabled() {
+        return localStorage.getItem(LANDING_SOUND_KEY) !== 'off';
+      }
+
+      function getActiveViewId() {
+        return document.querySelector('.view-section.active')?.id || 'viewLanding';
+      }
+
+      function isSoundView(viewId) {
+        return viewId === 'viewLanding' || viewId === 'viewPrep';
+      }
+
+      function syncLandingSoundToggle() {
+        const enabled = isLandingSoundEnabled();
+        screenSoundToggles.forEach((toggle) => {
+          toggle.classList.toggle('is-muted', !enabled);
+          toggle.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+          toggle.setAttribute('aria-label', enabled ? 'Quitar sonido' : 'Poner sonido');
+          toggle.setAttribute('title', enabled ? 'Quitar sonido' : 'Poner sonido');
+        });
+      }
+
+      function applySoundForView(viewId = getActiveViewId(), shouldPlay = true) {
+        const canPlayHere = isLandingSoundEnabled() && isSoundView(viewId);
+        window.bgMusicMuted = !canPlayHere;
+        if (window.bgMusic) window.bgMusic.muted = !canPlayHere;
+        if (canPlayHere) {
+          if (shouldPlay && typeof window.playBgMusic === 'function') window.playBgMusic();
+        } else if (typeof window.pauseBgMusic === 'function') {
+          window.pauseBgMusic();
+        }
+        syncLandingSoundToggle();
+      }
+
+      function setLandingSoundEnabled(enabled, shouldPlay = true) {
+        localStorage.setItem(LANDING_SOUND_KEY, enabled ? 'on' : 'off');
+        applySoundForView(getActiveViewId(), shouldPlay);
+      }
+
+      function syncSoundForView(viewId, shouldPlay = true) {
+        applySoundForView(viewId, shouldPlay);
+      }
+
+      setLandingSoundEnabled(isLandingSoundEnabled(), false);
+      screenSoundToggles.forEach((toggle) => {
+        toggle.addEventListener('click', () => {
+          setLandingSoundEnabled(!isLandingSoundEnabled(), true);
+        });
+      });
+
+      // 1. Particulas
       const bg = document.getElementById('bgParticles');
       for (let i = 0; i < 25; i++) {
         const star = document.createElement('div');
@@ -11250,6 +11384,8 @@
             }
           }
           
+          syncSoundForView(viewId, true);
+
           // Limpiar el parámetro ?view= de la URL para que no cause saltos al recargar
           const url = new URL(window.location);
           url.searchParams.delete('view');
@@ -12585,6 +12721,8 @@
               // Ignorar: algunos navegadores no soportan unlock fuera de fullscreen.
             }
           }
+          if (typeof window.pauseBgMusic === 'function') window.pauseBgMusic();
+          window.bgMusicMuted = true;
           window.location.href = url;
           return;
         }
@@ -13755,7 +13893,12 @@
   <script src="scripts/bg-music.js"></script>
   <script src="scripts/orientation-manager.js"></script>
   <script>
-    try { ensureBgMusic('Sonidos/musica fondo.mp3'); initBgAutoPlay(); } catch(e){}
+    try {
+      window.bgMusicScope = 'main';
+      window.bgMusicMuted = localStorage.getItem('much_landing_sound') === 'off';
+      ensureBgMusic('Sonidos/musica fondo.mp3');
+      if (!window.bgMusicMuted) initBgAutoPlay();
+    } catch(e){}
   </script>
 </body>
 

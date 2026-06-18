@@ -137,7 +137,7 @@ function ensureBgMusic() {
     }
   } catch (e) {}
 }
-function playBgMusic() { try { ensureBgMusic(); window.bgMusic.play().catch(()=>{}); } catch (e) {} }
+function playBgMusic() { try { pauseBgMusic(); } catch (e) {} }
 function pauseBgMusic() { try { if (window.bgMusic && !window.bgMusic.paused) window.bgMusic.pause(); } catch (e) {} }
 
 async function initSupabase() {
