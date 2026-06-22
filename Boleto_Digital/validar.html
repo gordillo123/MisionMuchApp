@@ -50,20 +50,24 @@
     // 1. Obtener ID de la URL (soporta ?folio=... o ?ticket=...)
     const params = new URLSearchParams(window.location.search);
     const folioBoleto = params.get('folio') || params.get('ticket');
+    const tokenBoleto = params.get('token') || params.get('qr_token');
 
     loader.textContent = "Buscando boleto...";
 
-    if (!folioBoleto) {
+    if (!folioBoleto && !tokenBoleto) {
       loader.innerHTML = "⚠️ <b>Esperando escaneo...</b><br><br><span style='font-size:14px'>Escanea un QR para validar.</span>";
     } else {
-      verificarBoleto(folioBoleto);
+      verificarBoleto(tokenBoleto || folioBoleto, Boolean(tokenBoleto));
     }
 
-    async function verificarBoleto(id) {
+    async function verificarBoleto(id, porToken = false) {
       try {
         loader.textContent = "Consultando base de datos MySQL local...";
 
-        const res = await fetch(`${API_BASE_URL}/api/boletos/${id}`);
+        const endpoint = porToken
+          ? `${API_BASE_URL}/api/boletos/qr/${id}`
+          : `${API_BASE_URL}/api/boletos/${id}`;
+        const res = await fetch(endpoint);
         loader.style.display = 'none';
         resultArea.style.display = 'block';
 
@@ -84,8 +88,12 @@
           <p style="font-family:monospace; color:#22d3ee; font-size:16px">${data.folio}</p>
           <span class="label">Correo</span>
           <p style="font-size:14px; color:#cbd5e1">${data.correo_usuario || 'Sin correo'}</p>
+          <span class="label">Tipo de boleto</span>
+          <p style="font-size:14px; color:#bae6fd">${data.tipo_entrada || 'Sin seleccionar'}</p>
           <span class="label">Fecha Generación</span>
           <p>${new Date(data.fecha_generacion).toLocaleDateString('es-MX', { hour: '2-digit', minute: '2-digit' })}</p>
+          <span class="label">Fecha de vencimiento</span>
+          <p>${data.valido_hasta ? new Date(data.valido_hasta).toLocaleDateString('es-MX', { hour: '2-digit', minute: '2-digit' }) : 'Sin fecha'}</p>
         `;
 
         // Lógica de validación (Semáforo)

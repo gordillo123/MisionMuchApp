@@ -10182,6 +10182,480 @@
         line-height: 1.12 !important;
       }
     }
+
+    body.mission-reward-open {
+      overflow: hidden;
+    }
+
+    .mission-reward-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10050;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: max(16px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+      background:
+        linear-gradient(135deg, rgba(5, 150, 105, 0.94), rgba(15, 23, 42, 0.96) 48%, rgba(190, 24, 93, 0.92)),
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.08) 0 2px, transparent 2px 18px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+
+    .mission-reward-overlay.open {
+      display: flex;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mission-reward-panel {
+      position: relative;
+      width: min(100%, 880px);
+      max-height: calc(100dvh - 28px);
+      overflow: hidden auto;
+      border: 3px solid rgba(255, 255, 255, 0.82);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(239, 253, 250, 0.98)),
+        repeating-linear-gradient(90deg, rgba(14, 165, 233, 0.07) 0 1px, transparent 1px 24px);
+      color: #102033;
+      box-shadow: 0 26px 70px rgba(2, 6, 23, 0.44);
+      padding: clamp(18px, 3vw, 34px);
+      transform: translateY(16px) scale(0.98);
+      transition: transform 0.26s cubic-bezier(.18, .9, .24, 1.2);
+    }
+
+    .mission-reward-overlay.open .mission-reward-panel {
+      transform: translateY(0) scale(1);
+    }
+
+    .mission-confetti {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      border-radius: 8px;
+    }
+
+    .mission-confetti-piece {
+      position: absolute;
+      top: -18px;
+      width: 9px;
+      height: 16px;
+      border-radius: 3px;
+      background: var(--piece-color, #facc15);
+      opacity: 0.9;
+      animation: mission-confetti-fall var(--piece-duration, 3.1s) linear infinite;
+      animation-delay: var(--piece-delay, 0s);
+      transform: translate3d(0, 0, 0) rotate(var(--piece-rotate, 0deg));
+    }
+
+    .mission-reward-content {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(170px, 0.72fr) minmax(0, 1.28fr);
+      align-items: center;
+      gap: clamp(16px, 3vw, 34px);
+    }
+
+    .mission-reward-avatar-stage {
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .mission-reward-avatar-ring {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: clamp(138px, 22vw, 210px);
+      aspect-ratio: 1;
+      border: 4px solid #0ea5e9;
+      border-radius: 50%;
+      background:
+        conic-gradient(from 20deg, #facc15, #22c55e, #38bdf8, #f472b6, #facc15);
+      box-shadow: 0 14px 0 #0f766e, 0 24px 40px rgba(15, 118, 110, 0.28);
+      animation: mission-avatar-ring 3.2s ease-in-out infinite;
+    }
+
+    .mission-reward-avatar-ring::before {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: inset 0 0 0 3px rgba(6, 182, 212, 0.2);
+    }
+
+    .mission-reward-avatar {
+      position: relative;
+      z-index: 1;
+      width: 78%;
+      height: 78%;
+      object-fit: contain;
+      filter: drop-shadow(0 12px 12px rgba(2, 6, 23, 0.2));
+      animation: mission-avatar-jump 0.9s ease-in-out infinite;
+      transform-origin: center bottom;
+    }
+
+    .mission-reward-spark {
+      position: absolute;
+      z-index: 2;
+      width: 16px;
+      aspect-ratio: 1;
+      background: #facc15;
+      clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 56%, 79% 91%, 50% 69%, 21% 91%, 32% 56%, 2% 35%, 39% 35%);
+      animation: mission-spark-twinkle 1.4s ease-in-out infinite;
+    }
+
+    .mission-reward-spark:nth-of-type(1) {
+      top: 10%;
+      left: 8%;
+    }
+
+    .mission-reward-spark:nth-of-type(2) {
+      right: 4%;
+      top: 24%;
+      animation-delay: 0.32s;
+      background: #38bdf8;
+    }
+
+    .mission-reward-spark:nth-of-type(3) {
+      bottom: 12%;
+      left: 14%;
+      animation-delay: 0.58s;
+      background: #f472b6;
+    }
+
+    .mission-reward-avatar-name {
+      margin: 0;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #dffcf6;
+      color: #075985;
+      font-weight: 900;
+      font-size: clamp(0.82rem, 2vw, 1rem);
+      text-align: center;
+      max-width: 100%;
+    }
+
+    .mission-reward-copy {
+      min-width: 0;
+      text-align: left;
+    }
+
+    .mission-reward-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #102033;
+      color: #fde68a;
+      font-size: clamp(0.78rem, 1.8vw, 0.92rem);
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .mission-reward-title {
+      margin: 0;
+      color: #0f766e;
+      font-size: clamp(2rem, 5vw, 4.2rem);
+      line-height: 0.98;
+      font-weight: 1000;
+      text-wrap: balance;
+    }
+
+    .mission-reward-subtitle {
+      margin: 10px 0 0;
+      color: #17324a;
+      font-size: clamp(1rem, 2.3vw, 1.35rem);
+      line-height: 1.3;
+      font-weight: 850;
+      max-width: 38rem;
+    }
+
+    .mission-ticket-callout {
+      margin: clamp(14px, 2.5vw, 22px) 0 0;
+      padding: clamp(12px, 2vw, 16px);
+      border: 2px dashed #0ea5e9;
+      border-radius: 8px;
+      background: #f0f9ff;
+      color: #0f172a;
+      font-weight: 900;
+      font-size: clamp(1rem, 2.2vw, 1.22rem);
+      text-align: center;
+    }
+
+    .mission-ticket-callout strong {
+      display: block;
+      color: #be185d;
+      font-size: clamp(1.35rem, 3.8vw, 2.25rem);
+      line-height: 1.05;
+      margin-bottom: 4px;
+    }
+
+    .mission-ticket-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(10px, 2vw, 16px);
+      margin-top: clamp(14px, 2vw, 18px);
+    }
+
+    .mission-ticket-option {
+      position: relative;
+      display: grid;
+      grid-template-columns: clamp(58px, 10vw, 86px) minmax(0, 1fr);
+      align-items: center;
+      gap: clamp(10px, 2vw, 16px);
+      min-height: clamp(104px, 15vw, 132px);
+      width: 100%;
+      border: 3px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #102033;
+      padding: clamp(12px, 2vw, 18px);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 8px 0 #cbd5e1, 0 16px 24px rgba(15, 23, 42, 0.13);
+      transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+
+    .mission-ticket-option:hover {
+      transform: translateY(-3px);
+      border-color: #0ea5e9;
+      box-shadow: 0 10px 0 #0284c7, 0 18px 28px rgba(14, 165, 233, 0.2);
+    }
+
+    .mission-ticket-option.is-selected {
+      border-color: #be185d;
+      background: #fff7ed;
+      box-shadow: 0 8px 0 #be185d, 0 18px 30px rgba(190, 24, 93, 0.18);
+    }
+
+    .mission-ticket-option.is-selected::after {
+      content: "\2713";
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #16a34a;
+      color: #ffffff;
+      font-weight: 1000;
+      box-shadow: 0 3px 0 #166534;
+    }
+
+    .mission-ticket-icon {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      background: #ecfeff;
+      border: 2px solid #bae6fd;
+      padding: 8px;
+      overflow: hidden;
+    }
+
+    .mission-ticket-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .mission-ticket-name {
+      display: block;
+      color: #102033;
+      font-size: clamp(1.25rem, 3vw, 1.85rem);
+      font-weight: 1000;
+      line-height: 1;
+      overflow-wrap: anywhere;
+    }
+
+    .mission-ticket-note {
+      display: block;
+      margin-top: 6px;
+      color: #475569;
+      font-size: clamp(0.78rem, 1.8vw, 0.95rem);
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .mission-reward-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: clamp(16px, 2.7vw, 24px);
+    }
+
+    .mission-reward-continue {
+      min-width: min(100%, 240px);
+      min-height: 58px;
+      border: 0;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #0f766e, #16a34a);
+      color: #ffffff;
+      font: inherit;
+      font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+      font-weight: 1000;
+      cursor: pointer;
+      box-shadow: 0 8px 0 #064e3b, 0 16px 26px rgba(15, 118, 110, 0.24);
+      transition: transform 0.16s ease, opacity 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .mission-reward-continue:not(:disabled):hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 0 #064e3b, 0 18px 28px rgba(15, 118, 110, 0.26);
+    }
+
+    .mission-reward-continue:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+      box-shadow: 0 5px 0 #64748b;
+      background: #94a3b8;
+    }
+
+    @keyframes mission-avatar-jump {
+      0%, 100% {
+        transform: translateY(0) rotate(-2deg) scale(1);
+      }
+
+      45% {
+        transform: translateY(-18px) rotate(3deg) scale(1.05);
+      }
+    }
+
+    @keyframes mission-avatar-ring {
+      0%, 100% {
+        transform: rotate(-2deg);
+      }
+
+      50% {
+        transform: rotate(2deg);
+      }
+    }
+
+    @keyframes mission-spark-twinkle {
+      0%, 100% {
+        transform: scale(0.72) rotate(0deg);
+        opacity: 0.5;
+      }
+
+      50% {
+        transform: scale(1.18) rotate(16deg);
+        opacity: 1;
+      }
+    }
+
+    @keyframes mission-confetti-fall {
+      0% {
+        transform: translate3d(0, -20px, 0) rotate(0deg);
+      }
+
+      100% {
+        transform: translate3d(var(--piece-drift, 28px), calc(100dvh + 60px), 0) rotate(520deg);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .mission-reward-overlay {
+        align-items: stretch;
+        padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+      }
+
+      .mission-reward-panel {
+        width: 100%;
+        max-height: calc(100dvh - 20px);
+        padding: clamp(14px, 4vw, 20px);
+      }
+
+      .mission-reward-content {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        text-align: center;
+      }
+
+      .mission-reward-copy {
+        text-align: center;
+      }
+
+      .mission-reward-kicker {
+        justify-content: center;
+      }
+
+      .mission-reward-subtitle {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .mission-ticket-options {
+        grid-template-columns: 1fr;
+      }
+
+      .mission-ticket-option {
+        min-height: 92px;
+      }
+
+      .mission-reward-actions {
+        justify-content: center;
+      }
+
+      .mission-reward-continue {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 380px), (max-height: 680px) {
+      .mission-reward-panel {
+        padding: 12px;
+      }
+
+      .mission-reward-avatar-ring {
+        width: clamp(104px, 30vw, 128px);
+        box-shadow: 0 8px 0 #0f766e, 0 16px 24px rgba(15, 118, 110, 0.2);
+      }
+
+      .mission-reward-avatar-name,
+      .mission-reward-kicker {
+        display: none;
+      }
+
+      .mission-reward-title {
+        font-size: clamp(1.7rem, 8vw, 2.45rem);
+      }
+
+      .mission-reward-subtitle {
+        font-size: clamp(0.86rem, 3.8vw, 1rem);
+        line-height: 1.22;
+      }
+
+      .mission-ticket-callout {
+        margin-top: 10px;
+        padding: 10px;
+      }
+
+      .mission-ticket-callout strong {
+        font-size: clamp(1.12rem, 6vw, 1.55rem);
+      }
+
+      .mission-ticket-option {
+        grid-template-columns: 54px minmax(0, 1fr);
+        min-height: 78px;
+        padding: 10px;
+      }
+
+      .mission-reward-continue {
+        min-height: 50px;
+      }
+    }
   </style>
 </head>
 
@@ -12426,6 +12900,34 @@
       };
 
       const REQUIRED_REWARD_STATIONS = ['2', '3', '4', '5', '6'];
+      const MISSION_REWARD_CHOICE_KEY = 'much_mission_reward_ticket_choice';
+      const MISSION_REWARD_CLAIMED_KEY = 'much_mission_reward_claimed';
+      const MISSION_TICKET_OPTIONS = {
+        planetario: {
+          key: 'planetario',
+          label: 'Planetario',
+          title: 'Boleto para el Planetario',
+          acceso: 'Planetario',
+          lugar: 'Planetario Tuxtla',
+          image: 'assets/logo-planetario-tuxtla.svg',
+          alt: 'Planetario Tuxtla',
+          note: 'Explora el universo y sus descubrimientos.'
+        },
+        much: {
+          key: 'much',
+          label: 'MUCH',
+          title: 'MISION MUCH - Boleto MUCH',
+          acceso: 'MUCH',
+          lugar: 'Museo Chiapas de Ciencia y Tecnologia',
+          image: 'entrada-much/logo-much.png',
+          alt: 'Museo MUCH',
+          note: 'Sigue descubriendo ciencia y aventura.'
+        }
+      };
+
+      let missionRewardOverlayOpen = false;
+      let missionRewardCelebrationTimer = null;
+      let selectedMissionTicketOption = null;
 
       function getCompletedStations() {
         try {
@@ -12439,31 +12941,262 @@
         return REQUIRED_REWARD_STATIONS.every(stationId => completed[stationId]);
       }
 
-      function buildMissionPrize() {
+      function getMissionTicketChoiceFromStorage() {
+        try {
+          const raw = localStorage.getItem(MISSION_REWARD_CHOICE_KEY);
+          if (!raw) return null;
+          const saved = JSON.parse(raw);
+          return MISSION_TICKET_OPTIONS[saved?.key] || null;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function saveMissionTicketChoice(option) {
+        if (!option || !option.key) return;
+        selectedMissionTicketOption = option;
+        localStorage.setItem(MISSION_REWARD_CHOICE_KEY, JSON.stringify({
+          key: option.key,
+          label: option.label,
+          acceso: option.acceso,
+          lugar: option.lugar,
+          selectedAt: new Date().toISOString()
+        }));
+      }
+
+      function hasMissionRewardClaimStarted() {
+        return localStorage.getItem(MISSION_REWARD_CLAIMED_KEY) === 'true';
+      }
+
+      function buildMissionPrize(ticketOption = selectedMissionTicketOption || getMissionTicketChoiceFromStorage() || MISSION_TICKET_OPTIONS.much) {
         return {
-          key: 'mision_much_entrada_gratis',
-          title: 'MISIÓN MUCH · Entrada gratis',
-          label: 'Entrada gratis al Museo MUCH',
-          premio: 'Entrada gratis al Museo MUCH',
-          acceso: 'Entrada gratis al Museo MUCH',
-          lugar: 'Museo Chiapas de Ciencia y Tecnología',
+          key: `mision_much_boleto_${ticketOption.key}`,
+          title: ticketOption.title,
+          label: ticketOption.acceso,
+          premio: ticketOption.acceso,
+          acceso: ticketOption.acceso,
+          tipo_entrada: ticketOption.acceso,
+          destino_boleto: ticketOption.label,
+          ticketChoice: {
+            key: ticketOption.key,
+            label: ticketOption.label
+          },
+          lugar: ticketOption.lugar,
           sala: 'mision-much',
-          date: new Date().toISOString(),
-          emoji: '🎟️'
+          date: new Date().toISOString()
         };
+      }
+
+      function getMissionRewardAvatar() {
+        if (selectedAvatar?.id) return selectedAvatar;
+        try {
+          const savedAvatar = JSON.parse(localStorage.getItem('much_selected_avatar') || 'null');
+          if (savedAvatar?.id) return savedAvatar;
+        } catch (e) {}
+        return { id: 'dino1', name: 'Explorador' };
+      }
+
+      function createMissionConfetti(container) {
+        if (!container || container.dataset.ready === 'true') return;
+        const colors = ['#facc15', '#22c55e', '#38bdf8', '#f472b6', '#fb7185', '#a78bfa'];
+        for (let i = 0; i < 44; i += 1) {
+          const piece = document.createElement('span');
+          piece.className = 'mission-confetti-piece';
+          piece.style.left = `${Math.random() * 100}%`;
+          piece.style.setProperty('--piece-color', colors[i % colors.length]);
+          piece.style.setProperty('--piece-delay', `${Math.random() * 2.6}s`);
+          piece.style.setProperty('--piece-duration', `${2.4 + Math.random() * 2.2}s`);
+          piece.style.setProperty('--piece-drift', `${Math.round((Math.random() - 0.5) * 130)}px`);
+          piece.style.setProperty('--piece-rotate', `${Math.round(Math.random() * 180)}deg`);
+          container.appendChild(piece);
+        }
+        container.dataset.ready = 'true';
+      }
+
+      function ensureMissionRewardOverlay() {
+        let overlay = document.getElementById('missionRewardOverlay');
+        if (overlay) return overlay;
+
+        overlay = document.createElement('section');
+        overlay.id = 'missionRewardOverlay';
+        overlay.className = 'mission-reward-overlay';
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-modal', 'true');
+        overlay.setAttribute('aria-hidden', 'true');
+        overlay.setAttribute('aria-labelledby', 'missionRewardTitle');
+        overlay.innerHTML = `
+          <div class="mission-reward-panel">
+            <div class="mission-confetti" aria-hidden="true"></div>
+            <div class="mission-reward-content">
+              <div class="mission-reward-avatar-stage">
+                <div class="mission-reward-avatar-ring" aria-hidden="true">
+                  <span class="mission-reward-spark"></span>
+                  <span class="mission-reward-spark"></span>
+                  <span class="mission-reward-spark"></span>
+                  <img id="missionRewardAvatar" class="mission-reward-avatar" src="avatars/dino1.png" alt="">
+                </div>
+                <p id="missionRewardAvatarName" class="mission-reward-avatar-name">Explorador</p>
+              </div>
+
+              <div class="mission-reward-copy">
+                <span class="mission-reward-kicker">Mision cientifica completada</span>
+                <h2 id="missionRewardTitle" class="mission-reward-title">&iexcl;Felicidades, explorador!</h2>
+                <p class="mission-reward-subtitle">Completaste todas las estaciones y terminaste tu misi&oacute;n cient&iacute;fica.</p>
+                <div class="mission-ticket-callout">
+                  <strong>&iexcl;Ganaste un boleto!</strong>
+                  <span>Elige el lugar que deseas visitar.</span>
+                </div>
+
+                <div class="mission-ticket-options" role="radiogroup" aria-label="Elige tu boleto">
+                  <button type="button" class="mission-ticket-option" data-ticket-option="planetario" role="radio" aria-checked="false">
+                    <span class="mission-ticket-icon"><img src="assets/logo-planetario-tuxtla.svg" alt=""></span>
+                    <span>
+                      <span class="mission-ticket-name">Planetario</span>
+                      <span class="mission-ticket-note">Explora el universo y sus descubrimientos.</span>
+                    </span>
+                  </button>
+                  <button type="button" class="mission-ticket-option" data-ticket-option="much" role="radio" aria-checked="false">
+                    <span class="mission-ticket-icon"><img src="entrada-much/logo-much.png" alt=""></span>
+                    <span>
+                      <span class="mission-ticket-name">MUCH</span>
+                      <span class="mission-ticket-note">Sigue descubriendo ciencia y aventura.</span>
+                    </span>
+                  </button>
+                </div>
+
+                <div class="mission-reward-actions">
+                  <button type="button" id="missionRewardContinue" class="mission-reward-continue" disabled>Continuar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        overlay.querySelectorAll('.mission-ticket-option').forEach((button) => {
+          button.addEventListener('click', () => {
+            selectMissionTicketOption(button.dataset.ticketOption);
+          });
+        });
+
+        const continueButton = overlay.querySelector('#missionRewardContinue');
+        if (continueButton) {
+          continueButton.addEventListener('click', continueMissionRewardFlow);
+        }
+
+        createMissionConfetti(overlay.querySelector('.mission-confetti'));
+        return overlay;
+      }
+
+      function syncMissionTicketSelection(optionKey) {
+        const overlay = ensureMissionRewardOverlay();
+        const continueButton = overlay.querySelector('#missionRewardContinue');
+        overlay.querySelectorAll('.mission-ticket-option').forEach((button) => {
+          const selected = button.dataset.ticketOption === optionKey;
+          button.classList.toggle('is-selected', selected);
+          button.setAttribute('aria-checked', selected ? 'true' : 'false');
+        });
+        if (continueButton) {
+          continueButton.disabled = !optionKey;
+        }
+      }
+
+      function selectMissionTicketOption(optionKey) {
+        const option = MISSION_TICKET_OPTIONS[optionKey];
+        if (!option) return;
+        saveMissionTicketChoice(option);
+        syncMissionTicketSelection(option.key);
+      }
+
+      function shouldShowMissionRewardCelebration(completed = getCompletedStations()) {
+        const prepView = document.getElementById('viewPrep');
+        return Boolean(
+          prepView?.classList.contains('active')
+          && areAllRewardStationsCompleted(completed)
+          && !hasMissionRewardClaimStarted()
+        );
+      }
+
+      function openMissionRewardOverlay() {
+        if (missionRewardOverlayOpen || !shouldShowMissionRewardCelebration()) return;
+
+        const overlay = ensureMissionRewardOverlay();
+        const avatar = getMissionRewardAvatar();
+        const avatarImg = overlay.querySelector('#missionRewardAvatar');
+        const avatarName = overlay.querySelector('#missionRewardAvatarName');
+        const savedChoice = getMissionTicketChoiceFromStorage();
+
+        if (avatarImg) {
+          avatarImg.src = `avatars/${avatar.id}.png`;
+          avatarImg.alt = avatar.name || 'Avatar elegido';
+        }
+        if (avatarName) {
+          avatarName.textContent = avatar.name || 'Explorador';
+        }
+
+        selectedMissionTicketOption = savedChoice || null;
+        syncMissionTicketSelection(savedChoice?.key || '');
+
+        missionRewardOverlayOpen = true;
+        overlay.setAttribute('aria-hidden', 'false');
+        overlay.classList.add('open');
+        document.body.classList.add('mission-reward-open');
+
+        window.setTimeout(() => {
+          const focusTarget = overlay.querySelector('.mission-ticket-option');
+          if (focusTarget) focusTarget.focus({ preventScroll: true });
+        }, 80);
+      }
+
+      function scheduleMissionRewardCelebration(completed = getCompletedStations()) {
+        if (!shouldShowMissionRewardCelebration(completed) || missionRewardOverlayOpen || missionRewardCelebrationTimer) return;
+
+        missionRewardCelebrationTimer = window.setTimeout(() => {
+          missionRewardCelebrationTimer = null;
+          openMissionRewardOverlay();
+        }, 650);
+      }
+
+      async function continueMissionRewardFlow() {
+        const option = selectedMissionTicketOption || getMissionTicketChoiceFromStorage();
+        if (!option) return;
+
+        if (window.asegurarJuegoPermitido) {
+          try {
+            await window.asegurarJuegoPermitido();
+          } catch (error) {
+            return;
+          }
+        }
+
+        const prize = buildMissionPrize(option);
+        localStorage.setItem('much_quiz_prize', JSON.stringify(prize));
+        localStorage.setItem(MISSION_REWARD_CLAIMED_KEY, 'true');
+        const params = new URLSearchParams({
+          sala: 'mision-much',
+          premio: 'entrada-gratis',
+          destino: option.key
+        });
+        window.location.href = `Boleto_Digital/registro.html?${params.toString()}`;
       }
 
       function updateRewardClaimUI(completed = getCompletedStations()) {
         const rewardClaimBox = document.getElementById('rewardClaimBox');
         const btnClaimReward = document.getElementById('btnClaimReward');
         const isUnlocked = areAllRewardStationsCompleted(completed);
+        const claimStarted = hasMissionRewardClaimStarted();
 
         if (rewardClaimBox) {
-          rewardClaimBox.classList.toggle('is-hidden', !isUnlocked);
+          rewardClaimBox.classList.toggle('is-hidden', !isUnlocked || claimStarted);
         }
 
         if (btnClaimReward) {
-          btnClaimReward.disabled = !isUnlocked;
+          btnClaimReward.disabled = !isUnlocked || claimStarted;
+        }
+
+        if (isUnlocked && !claimStarted) {
+          scheduleMissionRewardCelebration(completed);
         }
       }
 
@@ -12480,17 +13213,8 @@
           return;
         }
 
-        if (window.asegurarJuegoPermitido) {
-          try {
-            await window.asegurarJuegoPermitido();
-          } catch (error) {
-            return;
-          }
-        }
-
-        localStorage.setItem('much_quiz_prize', JSON.stringify(buildMissionPrize()));
-        localStorage.setItem('much_mission_reward_claimed', 'true');
-        window.location.href = 'Boleto_Digital/registro.html?sala=mision-much&premio=entrada-gratis';
+        if (hasMissionRewardClaimStarted()) return;
+        openMissionRewardOverlay();
       }
 
       function ensureMapMarkerCheckSlot(marker) {
@@ -12626,6 +13350,7 @@
           localStorage.setItem('much_completed_stations', '{}');
           localStorage.removeItem('much_quiz_prize');
           localStorage.removeItem('much_mission_reward_claimed');
+          localStorage.removeItem(MISSION_REWARD_CHOICE_KEY);
           window.MuchStationCompletion?.clearPendingNotice();
           currentStation = '1';
           localStorage.setItem('much_current_station', '1');

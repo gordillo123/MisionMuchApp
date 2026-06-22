@@ -83,6 +83,65 @@
       padding: 10px;
     }
 
+    body.planetarium-ticket {
+      color: #e0f2fe;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(56, 189, 248, .35), transparent 24%),
+        radial-gradient(circle at 84% 12%, rgba(250, 204, 21, .22), transparent 16%),
+        radial-gradient(circle at 76% 78%, rgba(168, 85, 247, .3), transparent 22%),
+        linear-gradient(135deg, #020617, #0f172a 46%, #1e1b4b);
+    }
+
+    body.planetarium-ticket::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,.9) 0 1px, transparent 1.6px),
+        radial-gradient(circle, rgba(125,211,252,.8) 0 1px, transparent 1.4px);
+      background-size: 72px 72px, 118px 118px;
+      background-position: 0 0, 24px 36px;
+      opacity: .55;
+    }
+
+    body.planetarium-ticket .ticket-card {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(145deg, rgba(15, 23, 42, .96), rgba(30, 27, 75, .96));
+      border: 1px solid rgba(125, 211, 252, .45);
+      box-shadow: 0 24px 60px rgba(2, 6, 23, .52), 0 0 34px rgba(56, 189, 248, .18);
+    }
+
+    body.planetarium-ticket .ticket-card::before {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      right: -92px;
+      top: -72px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 35%, #fef3c7 0 8%, #f59e0b 9% 34%, #7c2d12 35% 100%);
+      box-shadow: 0 0 0 14px rgba(56, 189, 248, .11);
+      opacity: .9;
+    }
+
+    body.planetarium-ticket .ticket-card::after {
+      content: "";
+      position: absolute;
+      width: 290px;
+      height: 78px;
+      right: -120px;
+      top: 28px;
+      border: 2px solid rgba(186, 230, 253, .72);
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-radius: 50%;
+      transform: rotate(-18deg);
+      opacity: .7;
+    }
+
     .ticket-paper {
       border: 2px dashed var(--paper-line);
       border-radius: 12px;
@@ -90,6 +149,78 @@
       position: relative;
       background: #fff;
       overflow: hidden;
+    }
+
+    body.planetarium-ticket .ticket-paper {
+      background: linear-gradient(180deg, rgba(15, 23, 42, .88), rgba(12, 18, 38, .95));
+      border-color: rgba(125, 211, 252, .5);
+    }
+
+    body.planetarium-ticket .ticket-title {
+      color: #fef08a;
+      font-size: clamp(1.32rem, 4vw, 2rem);
+      text-shadow: 0 0 18px rgba(250, 204, 21, .22);
+    }
+
+    body.planetarium-ticket .label {
+      color: #7dd3fc;
+    }
+
+    body.planetarium-ticket .value {
+      color: #f8fafc;
+    }
+
+    body.planetarium-ticket .folio {
+      color: #082f49;
+      background: #e0f2fe;
+      border-color: #7dd3fc;
+    }
+
+    body.planetarium-ticket .row {
+      border-bottom-color: rgba(125, 211, 252, .22);
+    }
+
+    body.planetarium-ticket .logo-box {
+      border-color: rgba(125, 211, 252, .35);
+      background: rgba(255, 255, 255, .96);
+    }
+
+    body.planetarium-ticket #qrcode {
+      border-color: #7dd3fc;
+      box-shadow: 0 0 0 6px rgba(56, 189, 248, .13);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-height: 30px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #dcfce7;
+      color: #166534;
+      font-weight: 900;
+    }
+
+    .status-pill.used {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-pill.expired {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .message {
+      margin: 14px 0 0;
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(14, 165, 233, .1);
+      border: 1px solid rgba(14, 165, 233, .24);
+      color: inherit;
+      font-weight: 800;
+      text-align: center;
     }
 
     .ticket-head {
@@ -315,11 +446,11 @@
             <div id="tNombre" class="value">—</div>
           </div>
           <div class="row">
-            <div class="label">Acceso:</div>
+            <div class="label">Tipo de premio:</div>
             <div id="tPremio" class="value">—</div>
           </div>
           <div class="row">
-            <div class="label">Vigencia:</div>
+            <div class="label">Fecha de emisi&oacute;n:</div>
             <div id="tFecha" class="value">—</div>
           </div>
           <div class="row">
@@ -357,19 +488,60 @@
     (function () {
       const qs = new URLSearchParams(location.search);
       const el = (id) => document.getElementById(id);
-      const hoy = new Date(); const fin = new Date(hoy); fin.setDate(hoy.getDate() + 7);
-      const fmt = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' });
+      const fmtFull = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' });
+      const parseDate = (value, fallback = new Date()) => {
+        const date = value ? new Date(value) : fallback;
+        return Number.isNaN(date.getTime()) ? fallback : date;
+      };
 
-      const acceso = qs.get('acceso') || qs.get('premio') || qs.get('titulo') || 'Visita General(Museo + Planetario)';
+      const rawAccess = qs.get('acceso') || qs.get('premio') || qs.get('titulo') || 'MUCH';
+      const isPlanetario = /planetario/i.test(rawAccess) || /planetario/i.test(qs.get('destino') || '');
+      const acceso = isPlanetario ? 'Planetario' : rawAccess;
       const titulo = qs.get('titulo') || acceso || 'MUCH · Premio';
-      const ubicacion = qs.get('ubicacion') || qs.get('lugar') || 'Museo Chiapas';
+      const ubicacion = qs.get('ubicacion') || qs.get('lugar') || (isPlanetario ? 'Planetario Tuxtla' : 'Museo Chiapas');
+      const fechaEmision = parseDate(qs.get('valido_desde'));
+      const fechaVencimiento = parseDate(qs.get('valido_hasta'), new Date(fechaEmision.getTime() + 7 * 24 * 60 * 60 * 1000));
+      const estadoRaw = (qs.get('estado') || 'activo').toLowerCase();
+      const estadoVisible = estadoRaw === 'canjeado' || estadoRaw === 'usado'
+        ? 'Utilizado'
+        : (estadoRaw === 'vencido' ? 'Vencido' : 'Disponible');
+
+      if (isPlanetario) {
+        document.body.classList.add('planetarium-ticket');
+        const logos = document.querySelectorAll('.ticket-logo');
+        if (logos[1]) {
+          logos[1].src = '../assets/logo-planetario-tuxtla.svg';
+          logos[1].alt = 'Planetario Tuxtla';
+        }
+      }
 
       el('tTitle').textContent = titulo;
       el('tFolio').textContent = qs.get('folio') || 'Folio: ...';
       el('tNombre').textContent = qs.get('nombre') || '—';
       el('tPremio').textContent = acceso;
-      el('tFecha').textContent = `${fmt.format(hoy)} al ${fmt.format(fin)}`;
+      el('tFecha').textContent = fmtFull.format(fechaEmision);
       el('tLugar').innerHTML = ubicacion;
+      const rows = document.querySelector('.rows');
+      const placeBefore = document.getElementById('tLugar')?.closest('.row');
+      if (rows && placeBefore && !document.getElementById('tVencimiento')) {
+        const vencimientoRow = document.createElement('div');
+        vencimientoRow.className = 'row';
+        vencimientoRow.innerHTML = `<div class="label">Fecha de vencimiento:</div><div id="tVencimiento" class="value">${fmtFull.format(fechaVencimiento)}</div>`;
+        rows.insertBefore(vencimientoRow, placeBefore);
+
+        const estadoRow = document.createElement('div');
+        estadoRow.className = 'row';
+        const statusClass = estadoVisible === 'Utilizado' ? 'used' : (estadoVisible === 'Vencido' ? 'expired' : '');
+        estadoRow.innerHTML = `<div class="label">Estado:</div><div id="tEstado" class="value"><span class="status-pill ${statusClass}">${estadoVisible}</span></div>`;
+        rows.insertBefore(estadoRow, placeBefore);
+      }
+
+      const note = document.querySelector('.note');
+      if (note) {
+        note.textContent = isPlanetario
+          ? 'Felicidades, explorador. Este boleto es exclusivo para el Planetario y se valida una sola vez en Taquilla.'
+          : 'Felicidades por completar tu misión científica. Válido por una sola entrada.';
+      }
       el('tCorreo').textContent = qs.get('correo') || '—';
       el('tTel').textContent = qs.get('telefono') || '—';
     })();
@@ -383,8 +555,10 @@
 
       // Buscamos 'folio' (que es lo que manda registro.html) o 'ticket' como respaldo
       const folio = params.get('folio') || params.get('ticket');
+      const qrToken = params.get('qr_token') || params.get('token') || '';
+      const qrData = params.get('qr_data') || '';
 
-      if (folio && container) {
+      if ((folio || qrToken || qrData) && container) {
         // Detectamos si es local o producción para crear el link correcto
         const isLocal = window.location.href.includes('localhost') || window.location.href.includes('127.0.0.1');
 
@@ -394,7 +568,9 @@
           : 'https://gordillo123.github.io/MisionMuchApp/Boleto_Digital';
 
         // Link final que leerá el guardia
-        const validationUrl = `${baseUrl}/validar.html?folio=${folio}`;
+        const validationUrl = qrData || (qrToken
+          ? `${baseUrl}/validar.html?token=${encodeURIComponent(qrToken)}`
+          : `${baseUrl}/validar.html?folio=${encodeURIComponent(folio)}`);
 
         console.log("QR apunta a:", validationUrl); // Debug
 

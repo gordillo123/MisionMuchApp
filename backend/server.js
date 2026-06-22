@@ -11,6 +11,64 @@ const { OAuth2Client } = require('google-auth-library');
 require('dotenv').config();
 
 const playtime = createPlaytimeBlockService(pool);
+const TICKET_VALIDITY_DAYS = Math.max(1, Number(process.env.TICKET_VALIDITY_DAYS || process.env.BOLETO_VALIDEZ_DIAS || 7));
+
+function tieneTexto(value) {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+function calcularFechaVencimientoBoleto(fechaBase = new Date()) {
+  const base = fechaBase instanceof Date ? new Date(fechaBase.getTime()) : new Date(fechaBase);
+  base.setDate(base.getDate() + TICKET_VALIDITY_DAYS);
+  return base;
+}
+
+function normalizarDestinoBoleto(destino, tipoEntrada) {
+  const descriptor = `${destino || ''} ${tipoEntrada || ''}`.toLowerCase();
+  if (descriptor.includes('planetario')) return 'Planetario';
+  if (descriptor.includes('much') || descriptor.includes('museo')) return 'MUCH';
+  return '';
+}
+
+function normalizarTipoEntrada(tipoEntrada, destino) {
+  const destinoNormalizado = normalizarDestinoBoleto(destino, tipoEntrada);
+  if (destinoNormalizado) return destinoNormalizado;
+  return tieneTexto(tipoEntrada) ? tipoEntrada.trim() : '';
+}
+
+function esBoletoPlanetario(destino) {
+  return String(destino || '').toLowerCase().includes('planetario');
+}
+
+async function columnaExiste(tableName, columnName) {
+  const [[row]] = await pool.query(
+    `SELECT COUNT(*) AS total
+     FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?`,
+    [tableName, columnName]
+  );
+  return Number(row?.total || 0) > 0;
+}
+
+async function agregarColumnaSiFalta(tableName, columnName, ddl) {
+  if (await columnaExiste(tableName, columnName)) return;
+  await pool.query(ddl);
+}
+
+async function ensureTicketSchema() {
+  const [[table]] = await pool.query(
+    `SELECT COUNT(*) AS total
+     FROM information_schema.TABLES
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'boletos'`
+  );
+  if (!Number(table?.total || 0)) return;
+
+  await agregarColumnaSiFalta('boletos', 'tipo_entrada', "ALTER TABLE boletos ADD COLUMN tipo_entrada VARCHAR(100) NULL AFTER qr_data");
+  await agregarColumnaSiFalta('boletos', 'destino_boleto', "ALTER TABLE boletos ADD COLUMN destino_boleto VARCHAR(50) NULL AFTER tipo_entrada");
+  await agregarColumnaSiFalta('boletos', 'seccion_boleto', "ALTER TABLE boletos ADD COLUMN seccion_boleto VARCHAR(100) NULL AFTER destino_boleto");
+  await agregarColumnaSiFalta('boletos', 'valido_desde', "ALTER TABLE boletos ADD COLUMN valido_desde TIMESTAMP NULL AFTER usado");
+  await agregarColumnaSiFalta('boletos', 'valido_hasta', "ALTER TABLE boletos ADD COLUMN valido_hasta TIMESTAMP NULL AFTER valido_desde");
+}
 
 // Asegurar existencia de la tabla de verificación de ubicación
 (async () => {
@@ -43,6 +101,7 @@ const playtime = createPlaytimeBlockService(pool);
 
   try {
     await playtime.ensureTables();
+    await ensureTicketSchema();
     console.log('✅ Tablas de bloqueo de juego verificadas/creadas con éxito.');
   } catch (error) {
     console.error('❌ Error al verificar/crear tablas de bloqueo de juego:', error.message);
@@ -198,6 +257,54 @@ function condicionRangoFechas(column, range) {
 
 function whereDesdeCondiciones(conditions) {
   return conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+}
+
+function anexarMetadataBoleto(boleto) {
+  if (!boleto) return boleto;
+
+  let metadata = {};
+  if (typeof boleto.observaciones === 'string' && boleto.observaciones.trim().startsWith('{')) {
+    try {
+      metadata = JSON.parse(boleto.observaciones);
+    } catch (error) {
+      metadata = {};
+    }
+  }
+
+  const tipoEntradaRaw = boleto.tipo_entrada || metadata.tipo_entrada || '';
+  const destinoBoleto = normalizarDestinoBoleto(boleto.destino_boleto || metadata.destino_boleto, tipoEntradaRaw);
+  const tipoEntrada = normalizarTipoEntrada(tipoEntradaRaw, destinoBoleto);
+  const validoHasta = boleto.valido_hasta || metadata.valido_hasta || null;
+  const vencido = Boolean(
+    validoHasta
+    && !boleto.usado
+    && String(boleto.estado || '').toLowerCase() === 'activo'
+    && new Date(validoHasta).getTime() < Date.now()
+  );
+  const estadoNormalizado = vencido ? 'vencido' : boleto.estado;
+
+  return {
+    ...boleto,
+    estado: estadoNormalizado,
+    tipo_entrada: tipoEntrada,
+    destino_boleto: destinoBoleto,
+    seccion_boleto: boleto.seccion_boleto || metadata.seccion_boleto || (destinoBoleto ? (esBoletoPlanetario(destinoBoleto) ? 'Planetario' : 'MUCH') : ''),
+    lugar_boleto: boleto.lugar_boleto || metadata.lugar || '',
+    valido_desde: boleto.valido_desde || metadata.valido_desde || boleto.fecha_generacion || null,
+    valido_hasta: validoHasta,
+    estado_visible: boleto.usado ? 'Utilizado' : (vencido ? 'Vencido' : 'Disponible')
+  };
+}
+
+async function marcarBoletoVencidoSiAplica(boleto, connection = pool) {
+  const boletoNormalizado = anexarMetadataBoleto(boleto);
+  if (boletoNormalizado?.estado === 'vencido' && String(boleto?.estado || '').toLowerCase() !== 'vencido') {
+    await connection.query(
+      "UPDATE boletos SET estado = 'vencido', ultimo_escaneo = CURRENT_TIMESTAMP WHERE id_boleto = ?",
+      [boleto.id_boleto]
+    );
+  }
+  return boletoNormalizado;
 }
 
 // Middleware de autorizacion de jugador.
@@ -559,7 +666,7 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
         const folio = await generarFolioUnico(connection);
         const qrToken = crypto.randomBytes(16).toString('hex');
         const host = req.get('host') || 'localhost:3000';
-        const qrData = `http://${host}/taquilla?token=${qrToken}`;
+        const qrData = `http://${host}/Boleto_Digital/validar.html?token=${qrToken}`;
 
         // Insertar boleto
         const [boletoResult] = await connection.query(
@@ -886,7 +993,7 @@ app.get('/api/progreso/:id_usuario', permitirJugador, async (req, res) => {
 // 9. POST /api/boletos
 // ==========================================
 app.post('/api/boletos', permitirJugador, verificarBloqueoJugador, async (req, res) => {
-  const { id_usuario, reclamar } = req.body;
+  const { id_usuario, reclamar, tipo_entrada, destino_boleto, lugar } = req.body;
 
   if (!id_usuario) {
     return res.status(400).json({ error: 'Falta el id_usuario.' });
@@ -909,6 +1016,26 @@ app.post('/api/boletos', permitirJugador, verificarBloqueoJugador, async (req, r
       console.warn(`Usuario ${id_usuario} intenta generar boleto sin completar todo el recorrido. Estaciones aprobadas:`, estacionesAprobadas);
     }
 
+    const recibioSeleccionBoleto = [tipo_entrada, destino_boleto, lugar].some(tieneTexto);
+    const destinoNormalizado = recibioSeleccionBoleto ? normalizarDestinoBoleto(destino_boleto, tipo_entrada) : '';
+    const tipoEntradaNormalizado = recibioSeleccionBoleto ? normalizarTipoEntrada(tipo_entrada, destinoNormalizado) : '';
+    const fechaEmisionBoleto = new Date();
+    const fechaVencimientoBoleto = calcularFechaVencimientoBoleto(fechaEmisionBoleto);
+    const seccionBoleto = destinoNormalizado ? (esBoletoPlanetario(destinoNormalizado) ? 'Planetario' : 'MUCH') : '';
+    const lugarBoleto = typeof lugar === 'string' && lugar.trim()
+      ? lugar.trim()
+      : (destinoNormalizado ? (esBoletoPlanetario(destinoNormalizado) ? 'Planetario Tuxtla' : 'Museo Chiapas de Ciencia y Tecnologia') : '');
+    const ticketMetadata = recibioSeleccionBoleto ? {
+      tipo_entrada: tipoEntradaNormalizado,
+      destino_boleto: destinoNormalizado,
+      seccion_boleto: seccionBoleto,
+      lugar: lugarBoleto,
+      valido_desde: fechaEmisionBoleto.toISOString(),
+      valido_hasta: fechaVencimientoBoleto.toISOString()
+    } : null;
+    const hasTicketMetadata = Boolean(ticketMetadata);
+    const ticketObservaciones = hasTicketMetadata ? JSON.stringify(ticketMetadata) : null;
+
     const [[boletoExistente]] = await connection.query(
       'SELECT * FROM boletos WHERE id_usuario = ?',
       [id_usuario]
@@ -921,12 +1048,23 @@ app.post('/api/boletos', permitirJugador, verificarBloqueoJugador, async (req, r
       const folio = await generarFolioUnico(connection);
       const qrToken = crypto.randomBytes(16).toString('hex');
       const host = req.get('host') || 'localhost:3000';
-      const qrData = `http://${host}/taquilla?token=${qrToken}`;
+      const qrData = `http://${host}/Boleto_Digital/validar.html?token=${qrToken}`;
 
       const [boletoResult] = await connection.query(
-        `INSERT INTO boletos (id_usuario, folio, qr_token, qr_data, estado, usado)
-         VALUES (?, ?, ?, ?, 'activo', FALSE)`,
-        [id_usuario, folio, qrToken, qrData]
+        `INSERT INTO boletos (id_usuario, folio, qr_token, qr_data, tipo_entrada, destino_boleto, seccion_boleto, estado, usado, valido_desde, valido_hasta, observaciones)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 'activo', FALSE, ?, ?, ?)`,
+        [
+          id_usuario,
+          folio,
+          qrToken,
+          qrData,
+          tipoEntradaNormalizado || null,
+          destinoNormalizado || null,
+          seccionBoleto || null,
+          hasTicketMetadata ? fechaEmisionBoleto : null,
+          hasTicketMetadata ? fechaVencimientoBoleto : null,
+          ticketObservaciones
+        ]
       );
 
       const newBoletoId = boletoResult.insertId;
@@ -948,6 +1086,40 @@ app.post('/api/boletos', permitirJugador, verificarBloqueoJugador, async (req, r
       );
 
       await playtime.registrarGanado(id_usuario, newBoletoId, connection);
+    } else if (hasTicketMetadata) {
+      const host = req.get('host') || 'localhost:3000';
+      const qrDataActualizado = boletoExistente.qr_token
+        ? `http://${host}/Boleto_Digital/validar.html?token=${boletoExistente.qr_token}`
+        : boletoExistente.qr_data;
+      await connection.query(
+        `UPDATE boletos
+         SET qr_data = CASE
+               WHEN qr_data IS NULL OR qr_data = '' OR LOCATE('/taquilla', qr_data) > 0 THEN ?
+               ELSE qr_data
+             END,
+             tipo_entrada = COALESCE(NULLIF(tipo_entrada, ''), ?),
+             destino_boleto = COALESCE(NULLIF(destino_boleto, ''), ?),
+             seccion_boleto = COALESCE(NULLIF(seccion_boleto, ''), ?),
+             valido_desde = COALESCE(valido_desde, ?),
+             valido_hasta = COALESCE(valido_hasta, ?),
+             observaciones = CASE
+               WHEN observaciones IS NULL OR observaciones = '' OR observaciones NOT LIKE '{%' THEN ?
+               ELSE observaciones
+             END
+         WHERE id_boleto = ?`,
+        [
+          qrDataActualizado,
+          tipoEntradaNormalizado,
+          destinoNormalizado,
+          seccionBoleto,
+          fechaEmisionBoleto,
+          fechaVencimientoBoleto,
+          ticketObservaciones,
+          boletoExistente.id_boleto
+        ]
+      );
+      const [[boletoActualizado]] = await connection.query('SELECT * FROM boletos WHERE id_boleto = ?', [boletoExistente.id_boleto]);
+      boletoRespuesta = boletoActualizado;
     }
 
     let reclamoInfo = null;
@@ -957,7 +1129,16 @@ app.post('/api/boletos', permitirJugador, verificarBloqueoJugador, async (req, r
 
     await connection.commit();
 
-    const payload = { ...boletoRespuesta };
+    const payload = anexarMetadataBoleto({ ...boletoRespuesta });
+    if (ticketMetadata?.tipo_entrada && !payload.tipo_entrada) {
+      payload.tipo_entrada = ticketMetadata.tipo_entrada;
+    }
+    if (ticketMetadata?.destino_boleto && !payload.destino_boleto) {
+      payload.destino_boleto = ticketMetadata.destino_boleto;
+    }
+    payload.valido_desde = payload.valido_desde || ticketMetadata?.valido_desde || null;
+    payload.valido_hasta = payload.valido_hasta || ticketMetadata?.valido_hasta || null;
+    payload.seccion_boleto = payload.seccion_boleto || ticketMetadata?.seccion_boleto || '';
     if (reclamoInfo) {
       payload.reclamo = reclamoInfo;
     }
@@ -990,6 +1171,30 @@ app.get('/api/boletos/count-today', async (req, res) => {
 });
 
 // ==========================================
+// 9c. GET /api/boletos/qr/:qr_token
+// ==========================================
+app.get('/api/boletos/qr/:qr_token', async (req, res) => {
+  const qrToken = req.params.qr_token;
+  try {
+    const [[boleto]] = await pool.query(
+      `SELECT b.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario
+       FROM boletos b
+       JOIN usuarios u ON b.id_usuario = u.id_usuario
+       WHERE b.qr_token = ?`,
+      [qrToken]
+    );
+
+    if (!boleto) {
+      return res.status(404).json({ error: 'QR de boleto no registrado.' });
+    }
+
+    res.json(await marcarBoletoVencidoSiAplica(boleto));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
 // 10. GET /api/boletos/:folio
 // ==========================================
 app.get('/api/boletos/:folio', async (req, res) => {
@@ -1007,7 +1212,7 @@ app.get('/api/boletos/:folio', async (req, res) => {
       return res.status(404).json({ error: 'Boleto no encontrado por folio.' });
     }
 
-    res.json(boleto);
+    res.json(await marcarBoletoVencidoSiAplica(boleto));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -1040,7 +1245,7 @@ app.get('/api/taquilla/boleto/folio/:folio', permitirTaquillaOAdmin, async (req,
       [boleto.id_boleto, boleto.id_usuario, idOperador]
     );
 
-    res.json(boleto);
+    res.json(await marcarBoletoVencidoSiAplica(boleto));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -1073,8 +1278,13 @@ app.get('/api/taquilla/boleto/qr/:qr_token', permitirTaquillaOAdmin, async (req,
       return res.status(404).json({ error: 'QR de boleto no registrado.' });
     }
 
+    const boletoNormalizado = await marcarBoletoVencidoSiAplica(boleto);
+
     // 2. Registrar el escaneo
-    const resultadoEscaneo = boleto.estado; // activo, canjeado, cancelado, vencido
+    const estadoEscaneo = String(boletoNormalizado.estado || '').toLowerCase();
+    const resultadoEscaneo = estadoEscaneo === 'activo'
+      ? 'valido'
+      : (estadoEscaneo === 'canjeado' || boletoNormalizado.usado ? 'duplicado' : estadoEscaneo || 'invalido');
     await pool.query(
       `INSERT INTO escaneos_qr_boleto (id_boleto, qr_token, escaneado_por, resultado, observaciones)
        VALUES (?, ?, ?, ?, 'Boleto escaneado por taquilla')`,
@@ -1094,7 +1304,7 @@ app.get('/api/taquilla/boleto/qr/:qr_token', permitirTaquillaOAdmin, async (req,
       [boleto.id_boleto, boleto.id_usuario, idOperador]
     );
 
-    res.json(boleto);
+    res.json(boletoNormalizado);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -1117,6 +1327,23 @@ app.post('/api/taquilla/boletos/:id_boleto/canjear', permitirTaquillaOAdmin, asy
     }
 
     // 2. Validar que esté activo y no canjeado
+    const vencido = boleto.valido_hasta && new Date(boleto.valido_hasta).getTime() < Date.now();
+    if (vencido && boleto.estado === 'activo' && !boleto.usado) {
+      await pool.query(
+        "UPDATE boletos SET estado = 'vencido', ultimo_escaneo = CURRENT_TIMESTAMP WHERE id_boleto = ?",
+        [idBoleto]
+      );
+      await pool.query(
+        `INSERT INTO movimientos_boleto (id_boleto, id_usuario, realizado_por, tipo_movimiento, observaciones)
+         VALUES (?, ?, ?, 'vencimiento', ?)`,
+        [idBoleto, boleto.id_usuario, idOperador, observaciones || 'Intento de canje rechazado por boleto vencido']
+      );
+      return res.status(400).json({
+        error: 'boleto_vencido',
+        mensaje: 'El boleto esta vencido y no puede validarse.'
+      });
+    }
+
     if (boleto.estado !== 'activo' || boleto.usado) {
       return res.status(400).json({
         error: `No se puede canjear el boleto. Estatus actual: ${boleto.estado}, Usado: ${boleto.usado ? 'Sí' : 'No'}`
@@ -1124,16 +1351,27 @@ app.post('/api/taquilla/boletos/:id_boleto/canjear', permitirTaquillaOAdmin, asy
     }
 
     // 3. Actualizar boleto
-    await pool.query(
+    const [canjeResult] = await pool.query(
       `UPDATE boletos 
        SET estado = 'canjeado',
            usado = TRUE,
            fecha_uso = CURRENT_TIMESTAMP,
            fecha_canje = CURRENT_TIMESTAMP,
-           canjeado_por = ?
-       WHERE id_boleto = ?`,
+           canjeado_por = ?,
+           ultimo_escaneo = CURRENT_TIMESTAMP
+       WHERE id_boleto = ?
+         AND estado = 'activo'
+         AND usado = FALSE
+         AND (valido_hasta IS NULL OR valido_hasta >= CURRENT_TIMESTAMP)`,
       [idOperador, idBoleto]
     );
+
+    if (!canjeResult.affectedRows) {
+      return res.status(409).json({
+        error: 'boleto_no_disponible',
+        mensaje: 'El boleto ya no esta disponible para validarse.'
+      });
+    }
 
     // 4. Registrar movimiento canje
     await pool.query(
@@ -1313,7 +1551,7 @@ app.get('/api/admin/boletos', permitirAdmin, async (req, res) => {
     const params = [];
     let dateWhere = '';
     if (range) {
-      const dateConditions = ['b.fecha_generacion', 'b.fecha_uso', 'b.fecha_canje', 'b.ultimo_escaneo']
+      const dateConditions = ['b.fecha_generacion', 'b.fecha_uso', 'b.fecha_canje', 'b.ultimo_escaneo', 'b.valido_hasta']
         .map((column) => {
           params.push(...parametrosRangoFechas(range));
           return condicionRangoFechas(column, range);
@@ -1337,7 +1575,7 @@ app.get('/api/admin/boletos', permitirAdmin, async (req, res) => {
        ORDER BY b.fecha_generacion DESC`,
       params
     );
-    res.json(boletos);
+    res.json(boletos.map(anexarMetadataBoleto));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -1705,9 +1943,11 @@ app.get('/api/admin/escaneos-qr', permitirTaquillaOAdmin, async (req, res) => {
     }
 
     const [escaneos] = await pool.query(
-      `SELECT e.*, b.folio AS folio_boleto, u.nombre AS nombre_operador
+      `SELECT e.*, b.folio AS folio_boleto, b.tipo_entrada, b.destino_boleto, b.seccion_boleto,
+              b.valido_hasta, visitante.nombre AS nombre_visitante, u.nombre AS nombre_operador
        FROM escaneos_qr_boleto e
        LEFT JOIN boletos b ON e.id_boleto = b.id_boleto
+       LEFT JOIN usuarios visitante ON b.id_usuario = visitante.id_usuario
        LEFT JOIN usuarios u ON e.escaneado_por = u.id_usuario
        ${whereDesdeCondiciones(conditions)}
        ORDER BY e.fecha_escaneo DESC`,
@@ -1723,12 +1963,15 @@ app.get('/api/admin/escaneos-qr', permitirTaquillaOAdmin, async (req, res) => {
 // 19i-b. POST /api/taquilla/escaneo-qr (Registrar un intento de escaneo)
 // ==========================================
 app.post('/api/taquilla/escaneo-qr', permitirTaquillaOAdmin, async (req, res) => {
-  const { qr_token, resultado, observaciones } = req.body;
+  const { id_boleto, qr_token, resultado, observaciones } = req.body;
   const idOperador = req.headers['x-user-id'] || null;
 
   try {
-    const [[boleto]] = await pool.query('SELECT id_boleto FROM boletos WHERE qr_token = ? OR folio = ?', [qr_token, qr_token]);
-    const idBoleto = boleto ? boleto.id_boleto : null;
+    let idBoleto = Number(id_boleto) || null;
+    if (!idBoleto) {
+      const [[boleto]] = await pool.query('SELECT id_boleto FROM boletos WHERE qr_token = ? OR folio = ?', [qr_token, qr_token]);
+      idBoleto = boleto ? boleto.id_boleto : null;
+    }
 
     await pool.query(
       `INSERT INTO escaneos_qr_boleto (id_boleto, qr_token, escaneado_por, resultado, observaciones)

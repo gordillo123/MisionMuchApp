@@ -12,6 +12,7 @@
   <script src="assets/navigation-guard.js"></script>
   <script src="assets/role-access.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     :root {
       --bg-main: #060c18;
@@ -1036,6 +1037,45 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
+    .admin-qr-cell {
+      display: grid;
+      gap: 6px;
+      min-width: 72px;
+      justify-items: start;
+    }
+
+    .admin-qr-preview {
+      display: grid;
+      place-items: center;
+      width: 62px;
+      height: 62px;
+      padding: 5px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1px solid rgba(73, 198, 255, 0.45);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+      color: #0f172a;
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .admin-qr-preview canvas,
+    .admin-qr-preview img {
+      width: 52px !important;
+      height: 52px !important;
+    }
+
+    .admin-qr-token {
+      max-width: 76px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--text-dim);
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 0.7rem;
+    }
+
     /* Badge & Tags */
     .tag {
       display: inline-flex;
@@ -2038,6 +2078,37 @@
       }[char]));
     }
 
+    function getTicketQrPayload(row) {
+      if (row?.qr_data) return row.qr_data;
+      if (row?.qr_token) return `${API_BASE_URL}/Boleto_Digital/validar.html?token=${encodeURIComponent(row.qr_token)}`;
+      return row?.folio || '';
+    }
+
+    function hydrateAdminQrPreviews() {
+      const previews = document.querySelectorAll('.admin-qr-preview[data-qr-value]:not([data-rendered])');
+      previews.forEach((preview) => {
+        const value = preview.getAttribute('data-qr-value') || '';
+        preview.dataset.rendered = 'true';
+        preview.textContent = '';
+        if (!value) {
+          preview.textContent = 'Sin QR';
+          return;
+        }
+        if (typeof QRCode === 'undefined') {
+          preview.textContent = 'QR';
+          return;
+        }
+        new QRCode(preview, {
+          text: value,
+          width: 52,
+          height: 52,
+          colorDark: '#0f172a',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      });
+    }
+
     function getHeaders() {
       return {
         'Content-Type': 'application/json',
@@ -2637,6 +2708,7 @@
             <button class="filter-chip ${filter === 'all' ? 'active' : ''}" onclick="window.setTabFilter('all')">Todos</button>
             <button class="filter-chip ${filter === 'activo' ? 'active' : ''}" onclick="window.setTabFilter('activo')">Vigentes</button>
             <button class="filter-chip ${filter === 'canjeado' ? 'active' : ''}" onclick="window.setTabFilter('canjeado')">Canjeados</button>
+            <button class="filter-chip ${filter === 'vencido' ? 'active' : ''}" onclick="window.setTabFilter('vencido')">Vencidos</button>
             <button class="filter-chip ${filter === 'cancelado' ? 'active' : ''}" onclick="window.setTabFilter('cancelado')">Cancelados</button>
           </div>
         `;
@@ -2706,6 +2778,9 @@
           </div>
         </div>
       `;
+      if (state.activeTab === 'boletos') {
+        requestAnimationFrame(hydrateAdminQrPreviews);
+      }
     }
 
     function renderPaginationControls(totalRecords) {
@@ -2760,6 +2835,7 @@
         if (state.activeTab === 'boletos') {
           if (filter === 'activo') matchesFilter = row.estado === 'activo' || row.estado === 'Vigente';
           else if (filter === 'canjeado') matchesFilter = row.estado === 'canjeado' || row.usado === 1;
+          else if (filter === 'vencido') matchesFilter = row.estado === 'vencido';
           else if (filter === 'cancelado') matchesFilter = row.estado === 'cancelado';
         } else if (state.activeTab === 'progreso') {
           if (filter === 'aprobada') matchesFilter = row.aprobada === 1 || row.completada === 1;
@@ -2790,11 +2866,12 @@
             const usageMatches = checkDateMatch(row.fecha_uso, yearFilter, specificFilter, startFilter, endFilter);
             const exchangeMatches = checkDateMatch(row.fecha_canje, yearFilter, specificFilter, startFilter, endFilter);
             const scanMatches = checkDateMatch(row.ultimo_escaneo, yearFilter, specificFilter, startFilter, endFilter);
+            const expirationMatches = checkDateMatch(row.valido_hasta, yearFilter, specificFilter, startFilter, endFilter);
             let movementsMatches = false;
             if (row.movimientos && row.movimientos.length > 0) {
               movementsMatches = row.movimientos.some(m => checkDateMatch(m.fecha_movimiento, yearFilter, specificFilter, startFilter, endFilter));
             }
-            matchesDate = ticketMatches || usageMatches || exchangeMatches || scanMatches || movementsMatches;
+            matchesDate = ticketMatches || usageMatches || exchangeMatches || scanMatches || expirationMatches || movementsMatches;
           } else if (rowDateStr) {
             matchesDate = checkDateMatch(rowDateStr, yearFilter, specificFilter, startFilter, endFilter);
           } else {
@@ -2826,6 +2903,9 @@
           const paginationContainer = document.getElementById('paginationControlsContainer');
           if (paginationContainer) {
             paginationContainer.innerHTML = renderPaginationControls(filtered.length);
+          }
+          if (state.activeTab === 'boletos') {
+            requestAnimationFrame(hydrateAdminQrPreviews);
           }
         }
       }, 150);
@@ -3564,9 +3644,12 @@
               <thead>
                 <tr>
                   <th>Folio</th>
+                  <th>QR</th>
                   <th>Visitante</th>
                   <th>Tipo Entrada</th>
+                  <th>Secci&oacute;n</th>
                   <th>Estatus Acceso</th>
+                  <th>Vencimiento</th>
                   <th>Generación</th>
                   <th>Uso / Canje</th>
                   <th>Operador Canje</th>
@@ -3577,7 +3660,9 @@
                 ${rows.map(row => {
                   let statusTag = 'tag-success';
                   if (row.estado === 'canjeado' || row.usado === 1) statusTag = 'tag-warning';
+                  else if (row.estado === 'vencido') statusTag = 'tag-danger';
                   else if (row.estado === 'cancelado') statusTag = 'tag-danger';
+                  const qrPayload = getTicketQrPayload(row);
 
                   const esVigente = row.estado === 'activo' || row.estado === 'Vigente';
                   const esCanjeado = row.estado === 'canjeado' || row.usado === 1;
@@ -3587,7 +3672,7 @@
                     const movs = row.movimientos || [];
                     movementsHTML = `
                       <tr class="expandable-row-content">
-                        <td colspan="8" style="padding: 16px 24px; background: rgba(255, 255, 255, 0.015);">
+                        <td colspan="11" style="padding: 16px 24px; background: rgba(255, 255, 255, 0.015);">
                           <div style="border-left: 3px solid var(--accent); padding-left: 16px;">
                             <h4 style="margin: 0 0 12px; color: var(--accent); font-family: 'Fredoka', sans-serif; font-size: 1.05rem;">Historial de Movimientos del Boleto</h4>
                             ${movs.length === 0 ? `
@@ -3629,16 +3714,26 @@
                       <td data-label="Folio">
                         <span class="folio-code" style="font-size: 0.9rem; padding: 4px 8px; border-radius: 8px;">${escapeHtml(row.folio)}</span>
                       </td>
+                      <td data-label="QR">
+                        <div class="admin-qr-cell">
+                          <div class="admin-qr-preview" data-qr-value="${escapeHtml(qrPayload)}">QR</div>
+                          <span class="admin-qr-token" title="${escapeHtml(row.qr_token || '')}">${escapeHtml(row.qr_token || 'Sin QR')}</span>
+                        </div>
+                      </td>
                       <td data-label="Visitante">
                         <strong>${escapeHtml(row.nombre_usuario)}</strong><br>
                         <span style="font-size: 0.8rem; color: var(--text-dim);">${escapeHtml(row.correo_usuario)}</span>
                       </td>
                       <td data-label="Tipo Entrada">
-                        <span class="tag tag-dark">${escapeHtml(row.tipo_entrada || 'General')}</span>
+                        <span class="tag tag-dark">${escapeHtml(row.tipo_entrada || 'Sin seleccionar')}</span>
+                      </td>
+                      <td data-label="Secci&oacute;n">
+                        <strong>${escapeHtml(row.seccion_boleto || row.destino_boleto || 'Sin seleccionar')}</strong>
                       </td>
                       <td data-label="Estatus Acceso">
-                        <span class="tag ${statusTag}">${esCanjeado ? 'Canjeado' : esVigente ? 'Vigente' : escapeHtml(row.estado)}</span>
+                        <span class="tag ${statusTag}">${esCanjeado ? 'Utilizado' : (row.estado === 'vencido' ? 'Vencido' : esVigente ? 'Disponible' : escapeHtml(row.estado))}</span>
                       </td>
+                      <td data-label="Vencimiento">${formatDate(row.valido_hasta, true)}</td>
                       <td data-label="Generación">${formatDate(row.fecha_generacion, true)}</td>
                       <td data-label="Uso / Canje">${formatDate(row.fecha_uso || row.fecha_canje, true)}</td>
                       <td data-label="Operador Canje">
@@ -4103,6 +4198,8 @@
             <tr>
               <th>ID Lectura</th>
               <th>Boleto Folio</th>
+              <th>Tipo</th>
+              <th>Secci&oacute;n</th>
               <th>Operador</th>
               <th>Resultado</th>
               <th>Fecha y Hora</th>
@@ -4111,13 +4208,16 @@
           </thead>
           <tbody>
             ${filtered.map(row => {
-              const outcomeTag = row.resultado === 'EXITOSO' || row.resultado === 'valido' ? 'tag-success' : 'tag-danger';
+              const resultadoNormalizado = String(row.resultado || '').toLowerCase();
+              const outcomeTag = ['exitoso', 'valido', 'activo'].includes(resultadoNormalizado) ? 'tag-success' : 'tag-danger';
               return `
                 <tr>
                   <td data-label="ID Lectura" style="font-family: monospace;">#${row.id_escaneo}</td>
                   <td data-label="Boleto Folio">
                     <span class="folio-code" style="font-size: 0.8rem; padding: 2px 6px; border-radius: 6px;">${escapeHtml(row.folio_boleto || 'Desconocido')}</span>
                   </td>
+                  <td data-label="Tipo">${escapeHtml(row.tipo_entrada || 'Sin tipo')}</td>
+                  <td data-label="Secci&oacute;n">${escapeHtml(row.seccion_boleto || row.destino_boleto || '-')}</td>
                   <td data-label="Operador"><strong style="color: var(--accent);">${escapeHtml(row.nombre_operador || 'Público / Auto')}</strong></td>
                   <td data-label="Resultado"><span class="tag ${outcomeTag}">${escapeHtml(row.resultado)}</span></td>
                   <td data-label="Fecha y Hora">${formatDate(row.fecha_escaneo, true)}</td>
@@ -4179,6 +4279,7 @@
         // 1. Try fetching by QR token direct
         let ticketData = null;
         let qrToken = '';
+        let scanLoggedByQrLookup = false;
         try {
           const parsed = new URL(lookup);
           qrToken = parsed.searchParams.get('token') || '';
@@ -4190,6 +4291,7 @@
         const headers = getHeaders();
         if (qrToken) {
           const res = await fetch(`${API_BASE_URL}/api/taquilla/boleto/qr/${qrToken}`, { headers });
+          scanLoggedByQrLookup = true;
           if (res.ok) ticketData = await res.json();
         }
 
@@ -4201,6 +4303,17 @@
 
         if (!ticketData) {
           scannerState.lastFolio = lookupValue;
+          if (!scanLoggedByQrLookup) {
+            await fetch(`${API_BASE_URL}/api/taquilla/escaneo-qr`, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({
+                qr_token: lookupValue,
+                resultado: 'no_encontrado',
+                observaciones: 'Intento de escaneo sin coincidencia en boletos'
+              })
+            });
+          }
           setScannerFeedback(`El boleto ${lookupValue} no existe en la base de datos.`, 'error');
           renderScanResultCard(null, lookupValue, 'No se encontró coincidencia.');
           return;
@@ -4248,6 +4361,10 @@
           outcome = 'duplicado';
           feedbackMessage = `Boleto ${ticketData.folio} ya fue canjeado previamente. Acceso Rechazado.`;
           feedbackTone = 'error';
+        } else if (stateVal.toLowerCase() === 'vencido') {
+          outcome = 'vencido';
+          feedbackMessage = `Boleto ${ticketData.folio} esta vencido. Acceso Rechazado.`;
+          feedbackTone = 'error';
         } else if (stateVal.toLowerCase() === 'cancelado') {
           outcome = 'cancelado';
           feedbackMessage = `Boleto ${ticketData.folio} se encuentra cancelado. Acceso Rechazado.`;
@@ -4255,15 +4372,18 @@
         }
 
         // Register scan event in MySQL
-        await fetch(`${API_BASE_URL}/api/taquilla/escaneo-qr`, {
+        if (!scanLoggedByQrLookup) {
+          await fetch(`${API_BASE_URL}/api/taquilla/escaneo-qr`, {
           method: 'POST',
           headers,
           body: JSON.stringify({
-            qr_token: ticketData.qr_token || 'manual_entry',
+            id_boleto: ticketData.id_boleto,
+            qr_token: ticketData.qr_token || ticketData.folio || 'manual_entry',
             resultado: outcome,
             observaciones: `Validación por taquillero. Resultado: ${outcome}`
           })
-        });
+          });
+        }
 
         setScannerFeedback(feedbackMessage, feedbackTone);
         renderScanResultCard(ticketData, lookupValue, feedbackMessage, wasJustRedeemed);
@@ -4315,6 +4435,9 @@
       } else if (ticket.estado === 'cancelado') {
         badgeClass = 'tag-danger';
         badgeLabel = 'Cancelado - Rechazado';
+      } else if (ticket.estado === 'vencido') {
+        badgeClass = 'tag-danger';
+        badgeLabel = 'Vencido - Rechazado';
       }
 
       scanResultBody.innerHTML = `
@@ -4343,8 +4466,16 @@
               <strong>${formatDate(ticket.fecha_generacion)}</strong>
             </div>
             <div class="scanner-meta-item">
+              <span>Vencimiento</span>
+              <strong>${formatDate(ticket.valido_hasta || ticket.fecha_vencimiento)}</strong>
+            </div>
+            <div class="scanner-meta-item">
               <span>Tipo Entrada</span>
-              <strong>${escapeHtml(ticket.tipo_entrada || 'General')}</strong>
+              <strong>${escapeHtml(ticket.tipo_entrada || 'Sin seleccionar')}</strong>
+            </div>
+            <div class="scanner-meta-item">
+              <span>Secci&oacute;n</span>
+              <strong>${escapeHtml(ticket.seccion_boleto || ticket.destino_boleto || 'Sin seleccionar')}</strong>
             </div>
           </div>
 

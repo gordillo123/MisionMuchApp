@@ -419,7 +419,7 @@
     }
 
     function getTipoEntrada(prizeData) {
-      return prizeData?.acceso || prizeData?.label || prizeData?.premio || prizeData?.title || 'Premio';
+      return prizeData?.tipo_entrada || prizeData?.acceso || prizeData?.label || prizeData?.premio || prizeData?.title || 'Premio';
     }
 
     function getPrizeDescriptor(prizeData) {
@@ -587,7 +587,13 @@
           'Content-Type': 'application/json',
           'x-user-id': String(idUsuario)
         },
-        body: JSON.stringify({ id_usuario: idUsuario, reclamar: true })
+        body: JSON.stringify({
+          id_usuario: idUsuario,
+          reclamar: true,
+          tipo_entrada: getTipoEntrada(prizeData),
+          destino_boleto: prizeData?.destino_boleto || prizeData?.ticketChoice?.key || '',
+          lugar: prizeData?.lugar || ''
+        })
       });
 
       if (!ticketRes.ok) {
@@ -605,8 +611,16 @@
         } catch (_) {}
       }
       prizeData.folio = boleto.folio;
+      prizeData.qr_token = boleto.qr_token || '';
+      prizeData.qr_data = boleto.qr_data || '';
+      prizeData.valido_desde = boleto.valido_desde || boleto.fecha_generacion || '';
+      prizeData.valido_hasta = boleto.valido_hasta || '';
+      prizeData.estado = boleto.estado || 'activo';
+      prizeData.tipo_entrada = boleto.tipo_entrada || getTipoEntrada(prizeData);
+      prizeData.destino_boleto = boleto.destino_boleto || prizeData.destino_boleto || '';
+      prizeData.seccion_boleto = boleto.seccion_boleto || prizeData.seccion_boleto || '';
 
-      return { winnerID: idUsuario, folio: boleto.folio };
+      return { winnerID: idUsuario, folio: boleto.folio, boleto };
     }
 
     // ---------- Submit ----------
@@ -686,6 +700,13 @@
         premio: tipoEntrada,
         titulo: prizeData.title || tipoEntrada,
         folio: prizeData.folio || '',
+        qr_token: prizeData.qr_token || '',
+        qr_data: prizeData.qr_data || '',
+        valido_desde: prizeData.valido_desde || '',
+        valido_hasta: prizeData.valido_hasta || '',
+        estado: prizeData.estado || 'activo',
+        destino: prizeData.destino_boleto || prizeData.ticketChoice?.key || '',
+        seccion: prizeData.seccion_boleto || '',
         ubicacion: prizeData.lugar || '',
         lugar: prizeData.lugar || '',
         sala: salaSlug
