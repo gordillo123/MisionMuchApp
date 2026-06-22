@@ -181,11 +181,9 @@ header h1 {
     display: block;
     object-fit: contain;
     filter:
-        drop-shadow(0 0 10px rgba(255, 255, 255, 0.45))
-        drop-shadow(0 0 18px rgba(109, 208, 240, 0.55))
-        drop-shadow(0 0 28px rgba(0, 180, 135, 0.35))
-        drop-shadow(0 0 22px rgba(255, 118, 180, 0.25))
-        drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45));
+        drop-shadow(0 0 6px rgba(255, 255, 255, 0.2))
+        drop-shadow(0 0 12px rgba(109, 208, 240, 0.3))
+        drop-shadow(0 3px 8px rgba(0, 0, 0, 0.35));
 }
 
 /* Ajustes responsivos para pantallas medianas */
@@ -420,10 +418,13 @@ header h1 {
     flex-wrap: wrap;
     gap: 1.4rem;
     margin-top: 1.75rem;
-    padding: 2.5rem 1rem;
-    background: #ffffff;
-    border-radius: 0;
-    box-shadow: none;
+    padding: 1.25rem 2rem;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
 }
 
 .partner-logo {
@@ -688,7 +689,7 @@ header h1 {
     .partner-logos {
         gap: 0.9rem 1.1rem;
         margin-top: clamp(0.65rem, 1.6svh, 1rem);
-        padding: 0;
+        padding: 0.75rem 1.25rem;
     }
 
     .partner-logo-much,
@@ -763,7 +764,7 @@ header h1 {
     .partner-logos {
         gap: 0.7rem 0.9rem;
         margin-top: 0.5rem;
-        padding: 0;
+        padding: 0.5rem 1rem;
     }
 
     .partner-logo-much,

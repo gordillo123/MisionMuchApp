@@ -213,7 +213,7 @@ window.APP_MODULES = {
         <div class="map-marker" style="left: 42%; top: 66%;" data-station="6">
           <span class="map-marker-number">6</span>
           <span class="map-marker-check" aria-hidden="true">&#10003;</span>
-          <span class="map-marker-label">SBELL</span>
+          <span class="map-marker-label">SBEEL</span>
         </div>
 
         <div class="map-avatar" id="mapAvatar">
