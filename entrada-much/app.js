@@ -159,7 +159,7 @@ const DAILY_TICKET_LIMIT = 50;
 
 // Background music helpers
 function ensureBgMusic() { try { if (!window.bgMusic) { window.bgMusic = new Audio('../Sonidos/musica fondo.mp3'); window.bgMusic.loop = true; window.bgMusic.volume = 0.18; window.bgMusic.preload = 'auto'; } } catch (e) {} }
-function playBgMusic() { try { ensureBgMusic(); window.bgMusic.play().catch(()=>{}); } catch (e) {} }
+function playBgMusic() { try { pauseBgMusic(); } catch (e) {} }
 function pauseBgMusic() { try { if (window.bgMusic && !window.bgMusic.paused) window.bgMusic.pause(); } catch (e) {} }
 
 // ⏰ FUNCIÓN CRÍTICA: Obtener hora exacta de México

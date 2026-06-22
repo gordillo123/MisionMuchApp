@@ -122,7 +122,7 @@ function ensureBgMusic() {
 }
 
 function playBgMusic() {
-  try { ensureBgMusic(); window.bgMusic.play().catch(() => {}); } catch (e) {}
+  try { pauseBgMusic(); } catch (e) {}
 }
 
 function pauseBgMusic() {

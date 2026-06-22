@@ -92,8 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function playBgMusic() {
         try {
-            ensureBgMusic();
-            window.bgMusic.play().catch(() => {});
+            pauseBgMusic();
         } catch (e) {}
     }
 
