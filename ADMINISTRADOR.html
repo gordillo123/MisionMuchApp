@@ -1815,7 +1815,10 @@
       selectedUserIdForRoles: null,
       currentPage: 1,
       pageSize: 10,
-      dateFilterApplyTimer: null
+      dateFilterApplyTimer: null,
+      playtimeConfig: null,
+      playtimeHistorial: null,
+      playtimeHistorialUser: null
     };
 
     const TABS_CONFIG = [
@@ -1827,6 +1830,7 @@
       { id: 'intentos', name: 'Intentos de Trivia', icon: '📝', desc: 'Respuestas enviadas por los usuarios en las trivias.', adminOnly: true },
       // { id: 'minijuegos', name: 'Minijuegos', icon: '🎮', desc: 'Registros de partidas del juego del dinosaurio.', adminOnly: true },
       { id: 'boletos', name: 'Boletos Ganados', icon: '🎟️', desc: 'Control de folios generados para los visitantes.', adminOnly: true },
+      { id: 'tiempo-juego', name: 'Configuración del tiempo de juego', icon: '⏱️', desc: 'Control de bloqueo entre participaciones y historial de premios.', adminOnly: true },
       // { id: 'movimientos', name: 'Movimientos de Boletos', icon: '🔄', desc: 'Log de auditoría específico para folios.', adminOnly: true },
       { id: 'taquilla', name: 'Taquilla y Escaneos', icon: '🔍', desc: 'Validación manual, escaneo de códigos QR e historial de lecturas.', adminOnly: false },
       { id: 'auditoria', name: 'Auditoría de Acciones', icon: '🛡️', desc: 'Logs de seguridad y cambios operacionales.', adminOnly: true }
@@ -2424,6 +2428,16 @@
             }));
             
             renderActiveView();
+          } else if (state.activeTab === 'tiempo-juego') {
+            const [resConfig, resUsuarios] = await Promise.all([
+              fetch(buildApiUrl('/api/admin/configuracion-juego', false), { headers: getHeaders() }),
+              fetch(buildApiUrl('/api/admin/bloqueos-juego', false), { headers: getHeaders() })
+            ]);
+            if (!resConfig.ok || !resUsuarios.ok) throw new Error('Error al cargar configuración del tiempo de juego.');
+
+            state.playtimeConfig = await resConfig.json();
+            state.records = await resUsuarios.json();
+            renderPlaytimeConfigView();
           } else {
             let endpoint = '';
             switch (state.activeTab) {
@@ -2657,6 +2671,9 @@
       } else if (state.activeTab === 'taquilla') {
         renderTaquillaView();
         return;
+      } else if (state.activeTab === 'tiempo-juego') {
+        renderPlaytimeConfigView();
+        return;
       }
 
       const filteredRecords = getFilteredRecords();
@@ -2797,6 +2814,8 @@
       state.searchTimeout = setTimeout(() => {
         if (state.activeTab === 'taquilla') {
           renderTaquillaLogsTable();
+        } else if (state.activeTab === 'tiempo-juego') {
+          renderPlaytimeConfigView();
         } else {
           const filtered = getFilteredRecords();
           const paginated = filtered.slice(0, state.pageSize);
@@ -2818,9 +2837,363 @@
       renderActiveView();
     }
 
+    function getPlaytimeEstadoLabel(estado) {
+      if (estado === 'bloqueado') return { text: 'Bloqueado', cls: 'tag-danger' };
+      if (estado === 'premio_pendiente') return { text: 'Premio pendiente', cls: 'tag-warning' };
+      return { text: 'Habilitado', cls: 'tag-success' };
+    }
+
+    function getUnidadLabel(unidad) {
+      if (unidad === 'dias') return 'Días';
+      if (unidad === 'meses') return 'Meses';
+      return 'Semanas';
+    }
+
+    function renderPlaytimeConfigView() {
+      const container = document.getElementById('viewContainers');
+      const config = state.playtimeConfig || { bloqueo_activo: true, cantidad: 1, unidad: 'semanas' };
+      const query = (state.queries['tiempo-juego'] || '').trim().toLowerCase();
+      const filter = state.filters['tiempo-juego'] || 'all';
+
+      let rows = Array.isArray(state.records) ? [...state.records] : [];
+      if (query) {
+        rows = rows.filter((row) => {
+          const haystack = [row.nombre, row.correo, row.estado_actual, row.estado_premio]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase();
+          return haystack.includes(query);
+        });
+      }
+      if (filter === 'bloqueado') {
+        rows = rows.filter((row) => row.bloqueado);
+      } else if (filter === 'habilitado') {
+        rows = rows.filter((row) => !row.bloqueado && row.estado_actual !== 'premio_pendiente');
+      } else if (filter === 'pendiente') {
+        rows = rows.filter((row) => row.estado_actual === 'premio_pendiente');
+      }
+
+      const totalRecords = rows.length;
+      const start = (state.currentPage - 1) * state.pageSize;
+      const paginated = rows.slice(start, start + state.pageSize);
+
+      container.innerHTML = `
+        <div class="panel" style="margin-bottom: 20px;">
+          <h3 style="margin: 0 0 16px; font-family: 'Fredoka', sans-serif; color: var(--accent);">Configuración del tiempo de juego</h3>
+          <p style="margin: 0 0 20px; color: var(--text-soft); font-size: 0.92rem;">
+            Define cuánto debe esperar un usuario después de reclamar su premio antes de volver a participar.
+            Los cambios aplican a los próximos reclamos, salvo que marques la opción de actualizar bloqueos actuales.
+          </p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; align-items: end;">
+            <div>
+              <label class="form-label" for="playtimeCantidad">Cantidad de tiempo</label>
+              <input class="form-input" id="playtimeCantidad" type="number" min="1" value="${Number(config.cantidad || 1)}">
+            </div>
+            <div>
+              <label class="form-label" for="playtimeUnidad">Unidad de tiempo</label>
+              <select class="form-input" id="playtimeUnidad">
+                <option value="dias" ${config.unidad === 'dias' ? 'selected' : ''}>Días</option>
+                <option value="semanas" ${config.unidad === 'semanas' || !config.unidad ? 'selected' : ''}>Semanas</option>
+                <option value="meses" ${config.unidad === 'meses' ? 'selected' : ''}>Meses</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="playtimeActivo" ${config.bloqueo_activo !== false ? 'checked' : ''} style="width: 18px; height: 18px;">
+                Activar bloqueo entre participaciones
+              </label>
+            </div>
+            <div>
+              <label class="form-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="playtimeAplicarActuales" style="width: 18px; height: 18px;">
+                Actualizar también bloqueos actuales
+              </label>
+            </div>
+            <div>
+              <button class="btn btn-solid" type="button" onclick="window.guardarConfigTiempoJuego()">Guardar cambios</button>
+            </div>
+          </div>
+          <p style="margin: 14px 0 0; font-size: 0.82rem; color: var(--text-dim);">
+            Valor actual: ${Number(config.cantidad || 1)} ${getUnidadLabel(config.unidad).toLowerCase()}${config.bloqueo_activo === false ? ' (bloqueo desactivado)' : ''}.
+            ${config.updated_at ? `Última actualización: ${formatDate(config.updated_at, true)}.` : ''}
+          </p>
+        </div>
+
+        <div class="panel">
+          <div class="toolbar">
+            <div class="search-wrap">
+              <span>🔎</span>
+              <input id="searchInput" type="search" placeholder="Buscar por nombre, correo o estado..." value="${escapeHtml(query)}" oninput="window.handleSearch(this.value)">
+            </div>
+            <div class="filter-chips">
+              <button class="filter-chip ${filter === 'all' ? 'active' : ''}" onclick="window.setTabFilter('all')">Todos</button>
+              <button class="filter-chip ${filter === 'bloqueado' ? 'active' : ''}" onclick="window.setTabFilter('bloqueado')">Bloqueados</button>
+              <button class="filter-chip ${filter === 'habilitado' ? 'active' : ''}" onclick="window.setTabFilter('habilitado')">Habilitados</button>
+              <button class="filter-chip ${filter === 'pendiente' ? 'active' : ''}" onclick="window.setTabFilter('pendiente')">Premio pendiente</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            ${paginated.length === 0 ? `
+              <div class="empty-state">
+                <span class="empty-state-icon">🔎</span>
+                <strong>Sin registros de participación</strong>
+                <span>No hay usuarios con premios o participaciones registradas todavía.</span>
+              </div>
+            ` : `
+              <table>
+                <thead>
+                  <tr>
+                    <th>Usuario</th>
+                    <th>Fecha en que jugó</th>
+                    <th>Fecha en que ganó</th>
+                    <th>Fecha de reclamo</th>
+                    <th>Puede volver a jugar</th>
+                    <th>Estado</th>
+                    <th>Tiempo restante</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${paginated.map((row) => {
+                    const estado = getPlaytimeEstadoLabel(row.estado_actual);
+                    const nombreSafe = escapeHtml(row.nombre || 'Sin nombre');
+                    const correoSafe = escapeHtml(row.correo || '');
+                    return `
+                      <tr>
+                        <td data-label="Usuario">
+                          <strong>${nombreSafe}</strong><br>
+                          <span style="font-size: 0.8rem; color: var(--text-dim);">${correoSafe}</span>
+                        </td>
+                        <td data-label="Fecha en que jugó">${formatDate(row.fecha_jugo, true)}</td>
+                        <td data-label="Fecha en que ganó">${formatDate(row.fecha_ganado, true)}</td>
+                        <td data-label="Fecha de reclamo">${formatDate(row.fecha_reclamado, true)}</td>
+                        <td data-label="Puede volver a jugar">${formatDate(row.fecha_puede_volver_jugar, true)}</td>
+                        <td data-label="Estado"><span class="tag ${estado.cls}">${estado.text}</span></td>
+                        <td data-label="Tiempo restante">${escapeHtml(row.tiempo_restante || '—')}</td>
+                        <td data-label="Acciones">
+                          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                            <button class="btn btn-soft" style="padding: 6px 10px; font-size: 0.75rem;" onclick="window.verHistorialTiempoJuego(${row.id_usuario}, '${nombreSafe.replace(/'/g, "\\'")}')">📜 Historial</button>
+                            ${row.bloqueado ? `
+                              <button class="btn btn-soft" style="padding: 6px 10px; font-size: 0.75rem;" onclick="window.desbloquearUsuarioTiempoJuego(${row.id_usuario}, '${nombreSafe.replace(/'/g, "\\'")}')">🔓 Desbloquear</button>
+                              <button class="btn btn-soft" style="padding: 6px 10px; font-size: 0.75rem;" onclick="window.cambiarFechaTiempoJuego(${row.id_usuario}, '${nombreSafe.replace(/'/g, "\\'")}', '${row.fecha_puede_volver_jugar || ''}')">📅 Cambiar fecha</button>
+                            ` : ''}
+                            ${row.id_premio && row.estado_premio === 'reclamado' ? `
+                              <button class="btn btn-solid" style="padding: 6px 10px; font-size: 0.75rem;" onclick="window.marcarPremioEntregado(${row.id_premio})">✅ Marcar entregado</button>
+                            ` : ''}
+                          </div>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            `}
+          </div>
+
+          <div id="paginationControlsContainer">
+            ${renderPaginationControls(totalRecords)}
+          </div>
+        </div>
+
+        <div id="playtimeHistorialPanel" style="display: none; margin-top: 20px;"></div>
+      `;
+    }
+
+    async function guardarConfigTiempoJuego() {
+      const cantidad = Number(document.getElementById('playtimeCantidad')?.value || 1);
+      const unidad = document.getElementById('playtimeUnidad')?.value || 'semanas';
+      const bloqueo_activo = Boolean(document.getElementById('playtimeActivo')?.checked);
+      const aplicar_bloqueos_actuales = Boolean(document.getElementById('playtimeAplicarActuales')?.checked);
+
+      if (!Number.isFinite(cantidad) || cantidad < 1) {
+        alert('La cantidad debe ser al menos 1.');
+        return;
+      }
+
+      try {
+        const res = await fetch(buildApiUrl('/api/admin/configuracion-juego', false), {
+          method: 'PUT',
+          headers: getHeaders(),
+          body: JSON.stringify({ cantidad, unidad, bloqueo_activo, aplicar_bloqueos_actuales })
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || 'No se pudo guardar la configuración.');
+        }
+        const data = await res.json();
+        state.playtimeConfig = data.config;
+        let msg = 'Configuración guardada correctamente.';
+        if (data.bloqueos_actualizados > 0) {
+          msg += ` Se actualizaron ${data.bloqueos_actualizados} bloqueo(s) activo(s).`;
+        }
+        alert(msg);
+        await loadTabContent(true);
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    async function desbloquearUsuarioTiempoJuego(idUsuario, nombre) {
+      if (!confirm(`¿Desbloquear manualmente a ${nombre}?`)) return;
+      try {
+        const res = await fetch(buildApiUrl(`/api/admin/bloqueos-juego/${idUsuario}/desbloquear`, false), {
+          method: 'POST',
+          headers: getHeaders()
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || 'No se pudo desbloquear al usuario.');
+        }
+        alert('Usuario desbloqueado correctamente.');
+        await loadTabContent(true);
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    async function cambiarFechaTiempoJuego(idUsuario, nombre, fechaActual) {
+      const sugerencia = fechaActual ? new Date(fechaActual).toISOString().slice(0, 16) : '';
+      const nuevaFecha = prompt(`Nueva fecha y hora en que ${nombre} podrá volver a jugar (formato local del navegador):`, sugerencia);
+      if (!nuevaFecha) return;
+
+      const parsed = new Date(nuevaFecha);
+      if (Number.isNaN(parsed.getTime())) {
+        alert('Fecha inválida.');
+        return;
+      }
+
+      try {
+        const res = await fetch(buildApiUrl(`/api/admin/bloqueos-juego/${idUsuario}/fecha`, false), {
+          method: 'PUT',
+          headers: getHeaders(),
+          body: JSON.stringify({ fecha_puede_volver: parsed.toISOString() })
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || 'No se pudo actualizar la fecha.');
+        }
+        alert('Fecha de desbloqueo actualizada.');
+        await loadTabContent(true);
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    async function verHistorialTiempoJuego(idUsuario, nombre) {
+      try {
+        const res = await fetch(buildApiUrl(`/api/admin/bloqueos-juego/${idUsuario}/historial`, false), {
+          headers: getHeaders()
+        });
+        if (!res.ok) throw new Error('No se pudo cargar el historial.');
+        const historial = await res.json();
+        state.playtimeHistorial = historial;
+        state.playtimeHistorialUser = { id: idUsuario, nombre };
+
+        const panel = document.getElementById('playtimeHistorialPanel');
+        if (!panel) return;
+
+        panel.style.display = 'block';
+        panel.innerHTML = `
+          <div class="panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h3 style="margin: 0; font-family: 'Fredoka', sans-serif; color: var(--accent);">Historial de ${escapeHtml(nombre)}</h3>
+              <button class="btn btn-soft" type="button" onclick="document.getElementById('playtimeHistorialPanel').style.display='none'">Cerrar</button>
+            </div>
+            <h4 style="margin: 0 0 10px; color: var(--text-soft);">Premios</h4>
+            <div class="table-wrap" style="margin-bottom: 20px;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Estado</th>
+                    <th>Ganado</th>
+                    <th>Reclamado</th>
+                    <th>Entregado</th>
+                    <th>Puede volver</th>
+                    <th>Folio</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${(historial.premios || []).length === 0 ? `
+                    <tr><td colspan="8" class="muted">Sin premios registrados.</td></tr>
+                  ` : (historial.premios || []).map((p) => `
+                    <tr>
+                      <td>#${p.id_premio}</td>
+                      <td><span class="tag tag-info">${escapeHtml(p.estado)}</span></td>
+                      <td>${formatDate(p.fecha_ganado, true)}</td>
+                      <td>${formatDate(p.fecha_reclamado, true)}</td>
+                      <td>${formatDate(p.fecha_entregado, true)}</td>
+                      <td>${formatDate(p.fecha_puede_volver_jugar, true)}</td>
+                      <td>${escapeHtml(p.folio || '—')}</td>
+                      <td>
+                        ${p.estado === 'reclamado' ? `<button class="btn btn-soft" style="padding: 4px 8px; font-size: 0.72rem;" onclick="window.marcarPremioEntregado(${p.id_premio})">Marcar entregado</button>` : '—'}
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+            <h4 style="margin: 0 0 10px; color: var(--text-soft);">Participaciones</h4>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Inicio</th>
+                    <th>Fin</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${(historial.participaciones || []).length === 0 ? `
+                    <tr><td colspan="4" class="muted">Sin participaciones registradas.</td></tr>
+                  ` : (historial.participaciones || []).map((part) => `
+                    <tr>
+                      <td>#${part.id_participacion}</td>
+                      <td>${formatDate(part.fecha_inicio, true)}</td>
+                      <td>${formatDate(part.fecha_fin, true)}</td>
+                      <td><span class="tag tag-info">${escapeHtml(part.estado)}</span></td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    async function marcarPremioEntregado(idPremio) {
+      if (!confirm('¿Marcar este premio como entregado?')) return;
+      try {
+        const res = await fetch(buildApiUrl(`/api/admin/premios/${idPremio}/entregado`, false), {
+          method: 'POST',
+          headers: getHeaders()
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || 'No se pudo marcar como entregado.');
+        }
+        alert('Premio marcado como entregado.');
+        await loadTabContent(true);
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
     window.loadTabContent = loadTabContent;
     window.handleSearch = handleSearch;
     window.setTabFilter = setTabFilter;
+    window.guardarConfigTiempoJuego = guardarConfigTiempoJuego;
+    window.desbloquearUsuarioTiempoJuego = desbloquearUsuarioTiempoJuego;
+    window.cambiarFechaTiempoJuego = cambiarFechaTiempoJuego;
+    window.verHistorialTiempoJuego = verHistorialTiempoJuego;
+    window.marcarPremioEntregado = marcarPremioEntregado;
 
     // Dynamic modular table templates mapping directly to MySQL schema
     function renderSpecificTable(rows) {

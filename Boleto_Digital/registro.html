@@ -587,15 +587,23 @@
           'Content-Type': 'application/json',
           'x-user-id': String(idUsuario)
         },
-        body: JSON.stringify({ id_usuario: idUsuario })
+        body: JSON.stringify({ id_usuario: idUsuario, reclamar: true })
       });
 
       if (!ticketRes.ok) {
-        const errData = await ticketRes.json();
-        throw new Error(errData.error || 'No se pudo generar el boleto en MySQL.');
+        const errData = await ticketRes.json().catch(() => ({}));
+        if (errData.error === 'usuario_bloqueado') {
+          throw new Error(errData.mensaje || 'Ya reclamaste tu premio. Debes esperar para volver a participar.');
+        }
+        throw new Error(errData.error || errData.mensaje || 'No se pudo generar el boleto en MySQL.');
       }
 
       const boleto = await ticketRes.json();
+      if (boleto.reclamo?.bloqueado && boleto.reclamo?.mensaje) {
+        try {
+          localStorage.setItem('much_playtime_block_msg', boleto.reclamo.mensaje);
+        } catch (_) {}
+      }
       prizeData.folio = boleto.folio;
 
       return { winnerID: idUsuario, folio: boleto.folio };

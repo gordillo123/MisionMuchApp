@@ -95,6 +95,88 @@ function asegurarUbicacionVigente() {
   }
 }
 
+let cachedPlaytimeEstado = null;
+let cachedPlaytimeAt = 0;
+const PLAYTIME_CACHE_MS = 15000;
+
+async function consultarEstadoBloqueoJuego(force = false) {
+  const user = obtenerUsuarioLocal();
+  if (!user) {
+    return { bloqueado: false, habilitado: true };
+  }
+
+  if (!force && cachedPlaytimeEstado && (Date.now() - cachedPlaytimeAt) < PLAYTIME_CACHE_MS) {
+    return cachedPlaytimeEstado;
+  }
+
+  try {
+    const userId = user.id_usuario || user.id;
+    const res = await fetch(`${API_BASE_URL}/api/juego/estado-bloqueo`, {
+      headers: { 'x-user-id': String(userId) }
+    });
+
+    if (!res.ok) {
+      return { bloqueado: false, habilitado: true };
+    }
+
+    const estado = await res.json();
+    cachedPlaytimeEstado = estado;
+    cachedPlaytimeAt = Date.now();
+    return estado;
+  } catch (error) {
+    console.error('Error consultando bloqueo de juego:', error);
+    return { bloqueado: false, habilitado: true };
+  }
+}
+
+function invalidarCacheBloqueoJuego() {
+  cachedPlaytimeEstado = null;
+  cachedPlaytimeAt = 0;
+}
+
+function mostrarAvisoBloqueoJuego(estado) {
+  const mensaje = estado?.mensaje || 'Ya reclamaste tu premio. Debes esperar para volver a participar.';
+  if (window.MuchStationCompletion?.showFloatingNotice) {
+    window.MuchStationCompletion.showFloatingNotice({
+      badge: '⏳ Participación pausada',
+      title: 'Aún no puedes jugar',
+      body: mensaje,
+      detailLabel: 'Tiempo restante',
+      detailValue: estado?.tiempo_restante || 'Bloqueado'
+    });
+  } else {
+    alert(mensaje);
+  }
+}
+
+async function asegurarJuegoPermitido() {
+  const estado = await consultarEstadoBloqueoJuego(true);
+  if (estado.bloqueado) {
+    mostrarAvisoBloqueoJuego(estado);
+    const error = new Error(estado.mensaje || 'usuario_bloqueado');
+    error.code = 'usuario_bloqueado';
+    throw error;
+  }
+  return estado;
+}
+
+async function manejarRespuestaBloqueoJuego(res) {
+  if (res.status !== 403) return false;
+  try {
+    const data = await res.json();
+    if (data.error === 'usuario_bloqueado') {
+      invalidarCacheBloqueoJuego();
+      mostrarAvisoBloqueoJuego(data);
+      const error = new Error(data.mensaje || 'usuario_bloqueado');
+      error.code = 'usuario_bloqueado';
+      throw error;
+    }
+  } catch (error) {
+    if (error.code === 'usuario_bloqueado') throw error;
+  }
+  return false;
+}
+
 async function consultarUltimaVerificacion() {
   const user = obtenerUsuarioLocal();
   const userId = user ? (user.id_usuario || user.id) : null;
@@ -417,6 +499,7 @@ async function comprobarEstacionActiva(estacionId) {
 // Guardar progreso del usuario en una estación
 async function guardarProgresoUsuario(estacionId, extra = {}) {
   asegurarUbicacionVigente();
+  await asegurarJuegoPermitido();
   const user = obtenerUsuarioLocal();
   if (!user) throw new Error('No hay usuario autenticado en local.');
 
@@ -442,7 +525,10 @@ async function guardarProgresoUsuario(estacionId, extra = {}) {
       })
     });
 
-    if (!res.ok) throw new Error('Error en el backend al guardar progreso.');
+    if (!res.ok) {
+      await manejarRespuestaBloqueoJuego(res);
+      throw new Error('Error en el backend al guardar progreso.');
+    }
     const data = await res.json();
     return data.progreso;
   } catch (error) {
@@ -454,6 +540,7 @@ async function guardarProgresoUsuario(estacionId, extra = {}) {
 // Inicializar progreso del usuario al entrar a una estación
 async function inicializarProgresoUsuario(estacionId) {
   asegurarUbicacionVigente();
+  await asegurarJuegoPermitido();
   const user = obtenerUsuarioLocal();
   if (!user) return null;
 
@@ -470,7 +557,10 @@ async function inicializarProgresoUsuario(estacionId) {
       })
     });
 
-    if (!res.ok) throw new Error('Error al inicializar progreso.');
+    if (!res.ok) {
+      await manejarRespuestaBloqueoJuego(res);
+      throw new Error('Error al inicializar progreso.');
+    }
     return await res.json();
   } catch (error) {
     console.error('Error en inicializarProgresoUsuario:', error.message);
@@ -481,6 +571,7 @@ async function inicializarProgresoUsuario(estacionId) {
 // Reiniciar todo el progreso del usuario en la base de datos MySQL
 async function reiniciarProgresoUsuario() {
   asegurarUbicacionVigente();
+  await asegurarJuegoPermitido();
   const user = obtenerUsuarioLocal();
   if (!user) return null;
   const userId = user.id_usuario || user.id;
@@ -497,7 +588,10 @@ async function reiniciarProgresoUsuario() {
       })
     });
 
-    if (!res.ok) throw new Error('Error al reiniciar progreso.');
+    if (!res.ok) {
+      await manejarRespuestaBloqueoJuego(res);
+      throw new Error('Error al reiniciar progreso.');
+    }
     return await res.json();
   } catch (error) {
     console.error('Error en reiniciarProgresoUsuario:', error.message);
@@ -508,6 +602,7 @@ async function reiniciarProgresoUsuario() {
 // Guardar intento en una estación
 async function guardarIntentoEstacion(estacionId, intento = {}) {
   asegurarUbicacionVigente();
+  await asegurarJuegoPermitido();
   const user = obtenerUsuarioLocal();
   if (!user) throw new Error('No hay usuario autenticado en local.');
 
@@ -528,7 +623,10 @@ async function guardarIntentoEstacion(estacionId, intento = {}) {
       })
     });
 
-    if (!res.ok) throw new Error('Error al registrar intento.');
+    if (!res.ok) {
+      await manejarRespuestaBloqueoJuego(res);
+      throw new Error('Error al registrar intento.');
+    }
     return await res.json();
   } catch (error) {
     console.error('Error en guardarIntentoEstacion:', error.message);
@@ -539,6 +637,7 @@ async function guardarIntentoEstacion(estacionId, intento = {}) {
 // Actualizar intento de estación existente
 async function actualizarIntentoEstacion(idIntento, intento = {}) {
   asegurarUbicacionVigente();
+  await asegurarJuegoPermitido();
   const user = obtenerUsuarioLocal();
   if (!user) throw new Error('No hay usuario autenticado en local.');
 
@@ -557,7 +656,10 @@ async function actualizarIntentoEstacion(idIntento, intento = {}) {
       })
     });
 
-    if (!res.ok) throw new Error('Error al actualizar intento.');
+    if (!res.ok) {
+      await manejarRespuestaBloqueoJuego(res);
+      throw new Error('Error al actualizar intento.');
+    }
     return await res.json();
   } catch (error) {
     console.error('Error en actualizarIntentoEstacion:', error.message);
@@ -568,6 +670,7 @@ async function actualizarIntentoEstacion(idIntento, intento = {}) {
 // Guardar partida minijuego en partidas_minijuego
 async function guardarPartidaMinijuego(partida = {}) {
   asegurarUbicacionVigente();
+  await asegurarJuegoPermitido();
   const user = obtenerUsuarioLocal();
   if (!user) throw new Error('No hay usuario autenticado en local.');
 
@@ -597,6 +700,7 @@ async function guardarPartidaMinijuego(partida = {}) {
 // Guardar respuesta del usuario individualmente
 async function guardarRespuestaUsuario(idIntento, estacionId, preguntaTexto, respuestaTexto, esCorrecta) {
   asegurarUbicacionVigente();
+  await asegurarJuegoPermitido();
   const user = obtenerUsuarioLocal();
   if (!user) return null;
 
@@ -626,8 +730,9 @@ async function guardarRespuestaUsuario(idIntento, estacionId, preguntaTexto, res
 }
 
 // Generar boleto final
-async function generarBoletoFinal() {
+async function generarBoletoFinal(reclamar = false) {
   asegurarUbicacionVigente();
+  await asegurarJuegoPermitido();
   const user = obtenerUsuarioLocal();
   if (!user) throw new Error('No hay usuario autenticado.');
 
@@ -639,12 +744,20 @@ async function generarBoletoFinal() {
         'x-user-id': String(user.id)
       },
       body: JSON.stringify({
-        id_usuario: user.id
+        id_usuario: user.id,
+        reclamar: Boolean(reclamar)
       })
     });
 
-    if (!res.ok) throw new Error('Error al generar el boleto.');
-    return await res.json();
+    if (!res.ok) {
+      await manejarRespuestaBloqueoJuego(res);
+      throw new Error('Error al generar el boleto.');
+    }
+    const data = await res.json();
+    if (reclamar) {
+      invalidarCacheBloqueoJuego();
+    }
+    return data;
   } catch (error) {
     console.error('Error al generar boleto final:', error.message);
     throw error;
@@ -687,6 +800,51 @@ window.comprobarUbicacionVigente = comprobarUbicacionVigente;
 window.consultarUltimaVerificacion = consultarUltimaVerificacion;
 window.intentarRestaurarVerificacionDesdeServidor = intentarRestaurarVerificacionDesdeServidor;
 window.comprobarEstacionActiva = comprobarEstacionActiva;
+window.consultarEstadoBloqueoJuego = consultarEstadoBloqueoJuego;
+window.asegurarJuegoPermitido = asegurarJuegoPermitido;
+window.mostrarAvisoBloqueoJuego = mostrarAvisoBloqueoJuego;
+window.invalidarCacheBloqueoJuego = invalidarCacheBloqueoJuego;
+
+function esPaginaDeEstacion() {
+  if (typeof window === 'undefined') return false;
+  const path = window.location.pathname.toLowerCase();
+  return path.includes('/juego_spinosaurio/')
+    || path.includes('/entrada-much/')
+    || path.includes('/sala-biodiversidad')
+    || path.includes('/sala_energia/')
+    || path.includes('/sala_desarrollo_sustentable/')
+    || path.includes('/sbeel_dinosaurios/')
+    || path.includes('/boleto_digital/');
+}
+
+if (typeof window !== 'undefined' && esPaginaDeEstacion()) {
+  window.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const estado = await consultarEstadoBloqueoJuego(true);
+      if (estado.bloqueado) {
+        mostrarAvisoBloqueoJuego(estado);
+        const params = new URLSearchParams();
+        params.set('reason', 'playtime_blocked');
+        if (estado.mensaje) params.set('msg', estado.mensaje);
+        const redirect = pathIncludesSubfolder() ? '../index.html' : 'index.html';
+        window.setTimeout(() => {
+          window.location.replace(`${redirect}?${params.toString()}`);
+        }, 2500);
+      }
+    } catch (_) {}
+  });
+}
+
+function pathIncludesSubfolder() {
+  const path = window.location.pathname.toLowerCase();
+  return path.includes('/juego_spinosaurio/')
+    || path.includes('/entrada-much/')
+    || path.includes('/sala-biodiversidad')
+    || path.includes('/sala_energia/')
+    || path.includes('/sala_desarrollo_sustentable/')
+    || path.includes('/sbeel_dinosaurios/')
+    || path.includes('/boleto_digital/');
+}
 
 export {
   initSupabase,

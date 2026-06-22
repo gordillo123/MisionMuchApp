@@ -6,8 +6,11 @@ const cors = require('cors');
 const path = require('path');
 const crypto = require('crypto');
 const pool = require('./db');
+const { createPlaytimeBlockService } = require('./playtime-block');
 const { OAuth2Client } = require('google-auth-library');
 require('dotenv').config();
+
+const playtime = createPlaytimeBlockService(pool);
 
 // Asegurar existencia de la tabla de verificación de ubicación
 (async () => {
@@ -36,6 +39,13 @@ require('dotenv').config();
     console.log('✅ Tabla verificaciones_ubicacion verificada/creada con éxito.');
   } catch (error) {
     console.error('❌ Error al verificar/crear la tabla verificaciones_ubicacion:', error.message);
+  }
+
+  try {
+    await playtime.ensureTables();
+    console.log('✅ Tablas de bloqueo de juego verificadas/creadas con éxito.');
+  } catch (error) {
+    console.error('❌ Error al verificar/crear tablas de bloqueo de juego:', error.message);
   }
 })();
 
@@ -207,6 +217,8 @@ async function permitirJugador(req, res, next) {
 
   next();
 }
+
+const verificarBloqueoJugador = playtime.middlewareVerificarBloqueo(obtenerIdUsuarioDePeticion);
 
 // ==========================================
 // 1. GET /api/health (Health check)
@@ -442,7 +454,7 @@ app.get('/api/preguntas/:id_estacion', async (req, res) => {
 // ==========================================
 // 5. POST /api/progreso/completar
 // ==========================================
-app.post('/api/progreso/completar', permitirJugador, async (req, res) => {
+app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, async (req, res) => {
   const { id_usuario, id_estacion, puntaje, aciertos, errores, aprobada } = req.body;
 
   if (!id_usuario || !id_estacion) {
@@ -577,8 +589,12 @@ app.post('/api/progreso/completar', permitirJugador, async (req, res) => {
         // Obtener el boleto insertado para retornarlo
         const [[nuevoBoleto]] = await connection.query('SELECT * FROM boletos WHERE id_boleto = ?', [newBoletoId]);
         boletoGenerado = nuevoBoleto;
+        await playtime.registrarGanado(id_usuario, newBoletoId, connection);
       } else {
         boletoGenerado = boletoExistente;
+        if (tieneTodoAprobado) {
+          await playtime.registrarGanado(id_usuario, boletoExistente.id_boleto, connection);
+        }
       }
     }
 
@@ -606,7 +622,7 @@ app.post('/api/progreso/completar', permitirJugador, async (req, res) => {
 // ==========================================
 // 5a. POST /api/progreso/inicializar
 // ==========================================
-app.post('/api/progreso/inicializar', permitirJugador, async (req, res) => {
+app.post('/api/progreso/inicializar', permitirJugador, verificarBloqueoJugador, async (req, res) => {
   const { id_usuario, id_estacion } = req.body;
 
   if (!id_usuario || !id_estacion) {
@@ -619,6 +635,8 @@ app.post('/api/progreso/inicializar', permitirJugador, async (req, res) => {
     if (!estacion || !estacion.activa) {
       return res.status(403).json({ error: 'La estación se encuentra inactiva.' });
     }
+
+    await playtime.asegurarParticipacionActiva(pool, id_usuario);
 
     // Intentar insertar registro inicial si no existe, o actualizar fecha_inicio solo si es NULL.
     // Esto evita duplicados y mantiene puntuaciones previas.
@@ -646,7 +664,7 @@ app.post('/api/progreso/inicializar', permitirJugador, async (req, res) => {
 // ==========================================
 // 5a-1. POST /api/progreso/reset
 // ==========================================
-app.post('/api/progreso/reset', permitirJugador, async (req, res) => {
+app.post('/api/progreso/reset', permitirJugador, verificarBloqueoJugador, async (req, res) => {
   const { id_usuario } = req.body;
 
   if (!id_usuario) {
@@ -684,7 +702,7 @@ app.post('/api/progreso/reset', permitirJugador, async (req, res) => {
 // ==========================================
 // 5b. POST /api/partidas-minijuego
 // ==========================================
-app.post('/api/partidas-minijuego', permitirJugador, async (req, res) => {
+app.post('/api/partidas-minijuego', permitirJugador, verificarBloqueoJugador, async (req, res) => {
   const { id_usuario, id_estacion, puntaje, aprobado } = req.body;
 
   if (!id_usuario) {
@@ -711,7 +729,7 @@ app.post('/api/partidas-minijuego', permitirJugador, async (req, res) => {
 // ==========================================
 // 6. POST /api/intentos
 // ==========================================
-app.post('/api/intentos', permitirJugador, async (req, res) => {
+app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, res) => {
   const { id_usuario, id_estacion, puntaje, aciertos, errores, aprobado } = req.body;
 
   if (!id_usuario || !id_estacion) {
@@ -743,7 +761,7 @@ app.post('/api/intentos', permitirJugador, async (req, res) => {
 // ==========================================
 // 6a. PUT /api/intentos/:id_intento
 // ==========================================
-app.put('/api/intentos/:id_intento', permitirJugador, async (req, res) => {
+app.put('/api/intentos/:id_intento', permitirJugador, verificarBloqueoJugador, async (req, res) => {
   const idIntento = req.params.id_intento;
   const { puntaje, aciertos, errores, aprobado } = req.body;
 
@@ -765,7 +783,7 @@ app.put('/api/intentos/:id_intento', permitirJugador, async (req, res) => {
 // ==========================================
 // 7. POST /api/respuestas-usuario
 // ==========================================
-app.post('/api/respuestas-usuario', permitirJugador, async (req, res) => {
+app.post('/api/respuestas-usuario', permitirJugador, verificarBloqueoJugador, async (req, res) => {
   const { id_intento, id_usuario, id_estacion, pregunta_texto, respuesta_texto, es_correcta } = req.body;
 
   if (!id_intento || !id_usuario || !id_estacion || !pregunta_texto || !respuesta_texto) {
@@ -867,8 +885,8 @@ app.get('/api/progreso/:id_usuario', permitirJugador, async (req, res) => {
 // ==========================================
 // 9. POST /api/boletos
 // ==========================================
-app.post('/api/boletos', permitirJugador, async (req, res) => {
-  const { id_usuario } = req.body;
+app.post('/api/boletos', permitirJugador, verificarBloqueoJugador, async (req, res) => {
+  const { id_usuario, reclamar } = req.body;
 
   if (!id_usuario) {
     return res.status(400).json({ error: 'Falta el id_usuario.' });
@@ -878,7 +896,6 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
   try {
     await connection.beginTransaction();
 
-    // 1. Verificar si el usuario ha completado las estaciones clave [2, 3, 4, 5, 6]
     const [progreso] = await connection.query(
       'SELECT id_estacion FROM progreso_usuario WHERE id_usuario = ? AND aprobada = TRUE',
       [id_usuario]
@@ -892,52 +909,60 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
       console.warn(`Usuario ${id_usuario} intenta generar boleto sin completar todo el recorrido. Estaciones aprobadas:`, estacionesAprobadas);
     }
 
-    // 2. Verificar si ya tiene un boleto existente
     const [[boletoExistente]] = await connection.query(
       'SELECT * FROM boletos WHERE id_usuario = ?',
       [id_usuario]
     );
 
-    if (boletoExistente) {
-      await connection.commit();
-      return res.json(boletoExistente);
+    let boletoRespuesta = boletoExistente;
+    let esNuevo = false;
+
+    if (!boletoExistente) {
+      const folio = await generarFolioUnico(connection);
+      const qrToken = crypto.randomBytes(16).toString('hex');
+      const host = req.get('host') || 'localhost:3000';
+      const qrData = `http://${host}/taquilla?token=${qrToken}`;
+
+      const [boletoResult] = await connection.query(
+        `INSERT INTO boletos (id_usuario, folio, qr_token, qr_data, estado, usado)
+         VALUES (?, ?, ?, ?, 'activo', FALSE)`,
+        [id_usuario, folio, qrToken, qrData]
+      );
+
+      const newBoletoId = boletoResult.insertId;
+
+      await connection.query(
+        `INSERT INTO movimientos_boleto (id_boleto, id_usuario, tipo_movimiento, observaciones)
+         VALUES (?, ?, 'generacion', 'Boleto generado al completar recorrido')`,
+        [newBoletoId, id_usuario]
+      );
+
+      const [[nuevoBoleto]] = await connection.query('SELECT * FROM boletos WHERE id_boleto = ?', [newBoletoId]);
+      boletoRespuesta = nuevoBoleto;
+      esNuevo = true;
+
+      await connection.query(
+        `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
+         VALUES (?, 'usuario', 'GENERAR_BOLETO', 'boletos', ?, 'Boleto generado al completar recorrido')`,
+        [id_usuario, String(newBoletoId)]
+      );
+
+      await playtime.registrarGanado(id_usuario, newBoletoId, connection);
     }
 
-    // 3. Generar Folio y QR token únicos
-    const folio = await generarFolioUnico(connection);
-    const qrToken = crypto.randomBytes(16).toString('hex');
-    const host = req.get('host') || 'localhost:3000';
-    const qrData = `http://${host}/taquilla?token=${qrToken}`;
-
-    // 4. Insertar en la BD
-    const [boletoResult] = await connection.query(
-      `INSERT INTO boletos (id_usuario, folio, qr_token, qr_data, estado, usado)
-       VALUES (?, ?, ?, ?, 'activo', FALSE)`,
-      [id_usuario, folio, qrToken, qrData]
-    );
-
-    const newBoletoId = boletoResult.insertId;
-
-
-
-    // Registrar movimiento de boleto
-    await connection.query(
-      `INSERT INTO movimientos_boleto (id_boleto, id_usuario, tipo_movimiento, observaciones)
-       VALUES (?, ?, 'generacion', 'Boleto generado al completar recorrido')`,
-      [newBoletoId, id_usuario]
-    );
-
-    const [[nuevoBoleto]] = await connection.query('SELECT * FROM boletos WHERE id_boleto = ?', [newBoletoId]);
-
-    // Registrar auditoría
-    await connection.query(
-      `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
-       VALUES (?, 'usuario', 'GENERAR_BOLETO', 'boletos', ?, 'Boleto generado al completar recorrido')`,
-      [id_usuario, String(newBoletoId)]
-    );
+    let reclamoInfo = null;
+    if (reclamar) {
+      reclamoInfo = await playtime.registrarReclamo(id_usuario, boletoRespuesta.id_boleto, connection);
+    }
 
     await connection.commit();
-    res.status(201).json(nuevoBoleto);
+
+    const payload = { ...boletoRespuesta };
+    if (reclamoInfo) {
+      payload.reclamo = reclamoInfo;
+    }
+
+    res.status(esNuevo ? 201 : 200).json(payload);
   } catch (error) {
     await connection.rollback();
     console.error('Error al generar boleto:', error.message);
@@ -1123,6 +1148,14 @@ app.post('/api/taquilla/boletos/:id_boleto/canjear', permitirTaquillaOAdmin, asy
        VALUES (?, 'taquilla', 'CANJEAR_BOLETO', 'boletos', ?, 'Boleto canjeado por operador')`,
       [idOperador, idBoleto]
     );
+
+    const [[premio]] = await pool.query(
+      'SELECT id_premio FROM premios WHERE id_boleto = ? ORDER BY id_premio DESC LIMIT 1',
+      [idBoleto]
+    );
+    if (premio) {
+      await playtime.marcarEntregado(premio.id_premio);
+    }
 
     res.json({ message: 'Boleto canjeado exitosamente.' });
   } catch (error) {
@@ -2160,6 +2193,98 @@ app.post('/api/verificaciones-ubicacion/invalidar', async (req, res) => {
     res.json({ message: 'Verificaciones invalidadas correctamente.' });
   } catch (error) {
     console.error('Error al invalidar verificaciones de ubicación:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// Bloqueo de tiempo de juego — jugador
+// ==========================================
+app.get('/api/juego/estado-bloqueo', permitirJugador, async (req, res) => {
+  try {
+    const idUsuario = obtenerIdUsuarioDePeticion(req);
+    const estado = await playtime.getEstadoBloqueo(idUsuario);
+    res.json(estado);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// Bloqueo de tiempo de juego — administración
+// ==========================================
+app.get('/api/admin/configuracion-juego', permitirAdmin, async (req, res) => {
+  try {
+    const config = await playtime.getConfig();
+    res.json(config);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/admin/configuracion-juego', permitirAdmin, async (req, res) => {
+  try {
+    const idAdmin = obtenerIdUsuarioDePeticion(req);
+    const { aplicar_bloqueos_actuales } = req.body;
+    const config = await playtime.updateConfig(req.body, idAdmin);
+
+    let bloqueosActualizados = 0;
+    if (aplicar_bloqueos_actuales) {
+      const result = await playtime.aplicarConfiguracionABloqueosActivos(idAdmin);
+      bloqueosActualizados = result.actualizados;
+    }
+
+    res.json({ config, bloqueos_actualizados: bloqueosActualizados });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/admin/bloqueos-juego', permitirAdmin, async (req, res) => {
+  try {
+    const usuarios = await playtime.listarUsuariosBloqueo();
+    res.json(usuarios);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/admin/bloqueos-juego/:id_usuario/historial', permitirAdmin, async (req, res) => {
+  try {
+    const historial = await playtime.historialPremiosUsuario(req.params.id_usuario);
+    res.json(historial);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/admin/bloqueos-juego/:id_usuario/desbloquear', permitirAdmin, async (req, res) => {
+  try {
+    const estado = await playtime.desbloquearUsuario(req.params.id_usuario);
+    res.json({ message: 'Usuario desbloqueado manualmente.', estado });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/admin/bloqueos-juego/:id_usuario/fecha', permitirAdmin, async (req, res) => {
+  try {
+    const { fecha_puede_volver } = req.body;
+    if (!fecha_puede_volver) {
+      return res.status(400).json({ error: 'Debe proporcionar fecha_puede_volver.' });
+    }
+    const estado = await playtime.actualizarFechaPermitida(req.params.id_usuario, fecha_puede_volver);
+    res.json({ message: 'Fecha de desbloqueo actualizada.', estado });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.post('/api/admin/premios/:id_premio/entregado', permitirAdmin, async (req, res) => {
+  try {
+    const premio = await playtime.marcarEntregado(req.params.id_premio);
+    res.json({ message: 'Premio marcado como entregado.', premio });
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });

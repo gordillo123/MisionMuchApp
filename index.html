@@ -11425,23 +11425,28 @@
         });
       }
 
-      window.startGameFlow = () => {
+      window.startGameFlow = async () => {
         if (redirectInternalUserIfNeeded()) return;
 
-        // 1. Si no hay sesión de Google, pedir login (Prioridad máxima)
         if (!googleUser) {
           closeMobileMenu();
           loginOverlay.classList.add('open');
           return;
         }
 
-        // 2. Si ya hay Google pero no hay avatar guardado, pedir avatar
+        if (window.asegurarJuegoPermitido) {
+          try {
+            await window.asegurarJuegoPermitido();
+          } catch (error) {
+            return;
+          }
+        }
+
         if (!selectedAvatar && !restoreSavedAvatar()) {
           openAvatarSelection();
           return;
         }
 
-        // 3. Si ya hay ambos, ir al mapa directamente
         showView('viewPrep');
         setTimeout(() => moveToStation(currentStation || 1), 500);
       };
@@ -12271,7 +12276,7 @@
         }
       }
 
-      function claimMissionReward() {
+      async function claimMissionReward() {
         const completed = getCompletedStations();
         if (!areAllRewardStationsCompleted(completed)) {
           window.MuchStationCompletion?.showFloatingNotice({
@@ -12282,6 +12287,14 @@
             detailValue: 'Terminar el recorrido'
           });
           return;
+        }
+
+        if (window.asegurarJuegoPermitido) {
+          try {
+            await window.asegurarJuegoPermitido();
+          } catch (error) {
+            return;
+          }
         }
 
         localStorage.setItem('much_quiz_prize', JSON.stringify(buildMissionPrize()));
@@ -12547,6 +12560,14 @@
         const btnComenzar = document.getElementById('btnComenzar');
         const originalHTML = btnComenzar ? btnComenzar.innerHTML : '🚀 ¡COMENZAR!';
 
+        if (window.asegurarJuegoPermitido) {
+          try {
+            await window.asegurarJuegoPermitido();
+          } catch (error) {
+            return;
+          }
+        }
+
         // Verificar ubicación vigente antes de comenzar cualquier estación
         let estadoUbi = window.comprobarUbicacionVigente ? window.comprobarUbicacionVigente() : { ok: false, message: 'Función de ubicación no disponible.' };
         
@@ -12756,6 +12777,21 @@
 
       const checkRedirectReason = () => {
         const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('reason') === 'playtime_blocked') {
+          const storedMsg = localStorage.getItem('much_playtime_block_msg');
+          const msg = urlParams.get('msg') || storedMsg || 'Ya reclamaste tu premio. Debes esperar para volver a participar.';
+          try { localStorage.removeItem('much_playtime_block_msg'); } catch (_) {}
+          window.setTimeout(() => {
+            window.MuchStationCompletion?.showFloatingNotice({
+              badge: '⏳ Participación pausada',
+              title: 'Aún no puedes jugar',
+              body: msg,
+              detailLabel: 'Estado',
+              detailValue: 'Bloqueado temporalmente'
+            });
+          }, 800);
+          return;
+        }
         if (urlParams.get('reason') === 'location_required') {
           const msg = urlParams.get('msg') || 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicación.';
           window.setTimeout(() => {
