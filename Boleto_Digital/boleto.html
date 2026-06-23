@@ -14,17 +14,43 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
+  <!-- Google Fonts Fredoka & Outfit -->
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Outfit:wght@300..900&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --ink: #0b1220;
+      /* Colors MUCH (Default) */
+      --ink: #0f172a;
       --muted: #64748b;
       --turquesa: #06b6d4;
       --fucsia: #d946ef;
       --paper: #ffffff;
-      --paper-line: #e5e7eb;
-      --chip-bg: #ecfeff;
-      --chip-ink: #075985;
-      --whatsapp: #25D366;
+      --border-color: #e2e8f0;
+      --divider-color: #cbd5e1;
+      --label-color: #64748b;
+      --value-color: #0f172a;
+      --accent-color: #0d9488;
+      
+      --congrats-bg: linear-gradient(135deg, #ecfeff 0%, #ccfbf1 100%);
+      --congrats-text: #0f766e;
+      --congrats-shadow: rgba(13, 148, 136, 0.1);
+      
+      --deadline-bg: #fffbeb;
+      --deadline-border: #fde68a;
+      --deadline-label-color: #b45309;
+      --deadline-value-color: #d97706;
+      
+      --restriction-bg: #f8fafc;
+      --restriction-border: #e2e8f0;
+      --restriction-text: #475569;
+      
+      --strip-bg: #ffffff;
+      --strip-border: #e2e8f0;
+
+      --notch-bg: #098177; /* Blends with MUCH page gradient background */
+      
+      --font-fredoka: 'Fredoka', system-ui, -apple-system, sans-serif;
+      --font-outfit: 'Outfit', system-ui, -apple-system, sans-serif;
     }
 
     * {
@@ -44,45 +70,68 @@
 
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: var(--font-outfit);
       color: var(--ink);
-      background: radial-gradient(1200px 800px at 20% 20%, rgba(255, 255, 255, .5), transparent 60%), linear-gradient(135deg, #0ea5b9, #ec4899, #38bdf8, #f472b6);
+      background: radial-gradient(1200px 800px at 20% 20%, rgba(255, 255, 255, .4), transparent 60%), linear-gradient(135deg, #0ea5b9, #ec4899, #38bdf8, #f472b6);
       background-size: 200% 200%;
       animation: bgmove 24s ease-in-out infinite;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 24px 16px;
+    }
+
+    /* Theme MUCH specific dynamic styling */
+    body.much-ticket {
+      color: #f8fafc;
+      background:
+        radial-gradient(circle at 16% 14%, rgba(109, 208, 240, .3), transparent 24%),
+        radial-gradient(circle at 86% 18%, rgba(255, 197, 73, .2), transparent 19%),
+        radial-gradient(circle at 76% 82%, rgba(255, 118, 180, .24), transparent 24%),
+        linear-gradient(145deg, #10182f, #172554 52%, #312e81);
+      background-size: 200% 200%;
+      animation: bgmove 24s ease-in-out infinite;
+      --ticket-bg: linear-gradient(155deg, rgba(15, 23, 42, .97), rgba(30, 41, 79, .97));
+      --border-color: rgba(109, 208, 240, .3);
+      --divider-color: rgba(109, 208, 240, .45);
+      --label-color: #6dd0f0;
+      --value-color: #f8fafc;
+      --accent-color: #ff76b4;
+      --muted-color: #cbd5e1;
+      --congrats-bg: linear-gradient(135deg, #ff76b4, #f23f3a 48%, #ffc549);
+      --congrats-text: #ffffff;
+      --congrats-shadow: rgba(255, 118, 180, .26);
+      --deadline-bg: rgba(255, 197, 73, .1);
+      --deadline-border: rgba(255, 197, 73, .46);
+      --deadline-label-color: #ffc549;
+      --deadline-value-color: #fde68a;
+      --restriction-bg: rgba(109, 208, 240, .08);
+      --restriction-border: rgba(109, 208, 240, .2);
+      --restriction-text: #e0f2fe;
+      --notch-bg: #111b39;
+    }
+
+    body.much-ticket::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,.8) 0 1px, transparent 1.6px),
+        radial-gradient(circle, rgba(109,208,240,.75) 0 1px, transparent 1.4px);
+      background-position: 0 0, 28px 40px;
+      background-size: 76px 76px, 124px 124px;
+      opacity: .48;
     }
 
     @keyframes bgmove {
-      0% {
-        background-position: 0% 50%
-      }
-
-      50% {
-        background-position: 100% 50%
-      }
-
-      100% {
-        background-position: 0% 50%
-      }
+      0% { background-position: 0% 50% }
+      50% { background-position: 100% 50% }
+      100% { background-position: 0% 50% }
     }
 
-    .ticket-shell {
-      width: 100%;
-      max-width: 600px;
-      margin-inline: auto;
-    }
-
-    .ticket-card {
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(2, 6, 23, .15);
-      border: 1px solid rgba(255, 255, 255, .4);
-      padding: 10px;
-    }
-
+    /* Theme Planetario space cosmos styling */
     body.planetarium-ticket {
       color: #e0f2fe;
       background:
@@ -90,6 +139,29 @@
         radial-gradient(circle at 84% 12%, rgba(250, 204, 21, .22), transparent 16%),
         radial-gradient(circle at 76% 78%, rgba(168, 85, 247, .3), transparent 22%),
         linear-gradient(135deg, #020617, #0f172a 46%, #1e1b4b);
+      --notch-bg: #0d1222; /* Blends with cosmos background */
+      
+      /* Planetarium variables */
+      --ticket-bg: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 27, 75, 0.95));
+      --border-color: rgba(125, 211, 252, 0.25);
+      --divider-color: rgba(125, 211, 252, 0.35);
+      --label-color: #38bdf8;
+      --value-color: #f8fafc;
+      --accent-color: #d946ef;
+      --muted-color: #94a3b8;
+      
+      --congrats-bg: linear-gradient(135deg, #1e1b4b 0%, #31105e 100%);
+      --congrats-text: #fef08a;
+      --congrats-shadow: rgba(168, 85, 247, 0.25);
+      
+      --deadline-bg: rgba(254, 240, 138, 0.07);
+      --deadline-border: rgba(254, 240, 138, 0.3);
+      --deadline-label-color: #fde047;
+      --deadline-value-color: #facc15;
+      
+      --restriction-bg: rgba(255, 255, 255, 0.04);
+      --restriction-border: rgba(255, 255, 255, 0.08);
+      --restriction-text: #e2e8f0;
     }
 
     body.planetarium-ticket::before {
@@ -103,269 +175,718 @@
       background-size: 72px 72px, 118px 118px;
       background-position: 0 0, 24px 36px;
       opacity: .55;
+      z-index: -1;
     }
 
-    body.planetarium-ticket .ticket-card {
+    .ticket-shell {
+      width: 100%;
+      max-width: 580px;
+      margin-inline: auto;
+    }
+
+    /* Ticket Card styling */
+    .ticket-card {
+      background: var(--ticket-bg, #ffffff);
+      border-radius: 24px;
+      box-shadow: 0 15px 40px rgba(2, 6, 23, .18);
+      border: 1px solid var(--border-color);
+      padding: 24px 20px;
       position: relative;
       overflow: hidden;
-      background: linear-gradient(145deg, rgba(15, 23, 42, .96), rgba(30, 27, 75, .96));
-      border: 1px solid rgba(125, 211, 252, .45);
-      box-shadow: 0 24px 60px rgba(2, 6, 23, .52), 0 0 34px rgba(56, 189, 248, .18);
+      transition: box-shadow 0.3s ease;
     }
 
-    body.planetarium-ticket .ticket-card::before {
+    /* MUCH grid paper theme decorations */
+    .much-decorations {
+      display: none;
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: 
+        linear-gradient(to right, rgba(13, 148, 136, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(13, 148, 136, 0.04) 1px, transparent 1px);
+      background-size: 20px 20px;
+      z-index: 0;
+    }
+    body.much-ticket .much-decorations {
+      display: block;
+    }
+
+    /* Planetarium theme Saturn planet decorations */
+    .planetarium-decorations {
+      display: none;
+    }
+    body.planetarium-ticket .planetarium-decorations {
+      display: block;
+    }
+    
+    .planetarium-ticket .ticket-card::before {
       content: "";
       position: absolute;
-      width: 220px;
-      height: 220px;
-      right: -92px;
-      top: -72px;
+      width: 160px;
+      height: 160px;
+      right: -45px;
+      top: -45px;
       border-radius: 50%;
-      background:
-        radial-gradient(circle at 35% 35%, #fef3c7 0 8%, #f59e0b 9% 34%, #7c2d12 35% 100%);
-      box-shadow: 0 0 0 14px rgba(56, 189, 248, .11);
-      opacity: .9;
+      background: radial-gradient(circle at 30% 30%, #fef08a 0 10%, #eab308 20% 60%, #7c2d12 100%);
+      box-shadow: 0 0 30px rgba(234, 179, 8, .25);
+      opacity: .85;
+      pointer-events: none;
+      z-index: 0;
     }
 
-    body.planetarium-ticket .ticket-card::after {
+    .planetarium-ticket .ticket-card::after {
       content: "";
       position: absolute;
-      width: 290px;
-      height: 78px;
-      right: -120px;
-      top: 28px;
-      border: 2px solid rgba(186, 230, 253, .72);
+      width: 250px;
+      height: 65px;
+      right: -85px;
+      top: 10px;
+      border: 3px solid rgba(186, 230, 253, .65);
       border-left-color: transparent;
       border-right-color: transparent;
       border-radius: 50%;
-      transform: rotate(-18deg);
-      opacity: .7;
+      transform: rotate(-20deg);
+      opacity: .65;
+      pointer-events: none;
+      z-index: 1;
     }
 
-    .ticket-paper {
-      border: 2px dashed var(--paper-line);
-      border-radius: 12px;
-      padding: 16px 12px;
+    /* Ticket Header Logos & Layout */
+    .ticket-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 18px;
+      border-bottom: 1.5px solid var(--border-color);
+      margin-bottom: 20px;
       position: relative;
+      z-index: 2;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-agencia {
+      height: clamp(48px, 8vw, 60px);
+      width: auto;
+      max-width: 210px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-sata {
+      height: clamp(34px, 5.5vw, 42px);
+      width: auto;
+      object-fit: contain;
+    }
+
+    .logo-destino {
+      height: clamp(34px, 5.5vw, 42px);
+      width: auto;
+      object-fit: contain;
+    }
+
+    .planetarium-access-kicker {
+      display: none;
+    }
+
+    body.planetarium-ticket .ticket-card {
+      border-color: rgba(125, 211, 252, 0.32);
+      box-shadow: 0 24px 70px rgba(2, 6, 23, 0.55), 0 0 0 1px rgba(125, 211, 252, 0.08);
+    }
+
+    body.planetarium-ticket .ticket-header {
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 14px;
+      padding-bottom: 16px;
+    }
+
+    body.planetarium-ticket .header-left {
+      width: 100%;
+      min-height: 88px;
+      padding: 0;
+      overflow: visible;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    body.planetarium-ticket .logo-agencia {
+      width: min(82%, 330px);
+      height: auto;
+      max-width: 330px;
+      max-height: 94px;
+      filter: none;
+    }
+
+    body.planetarium-ticket .header-right {
+      width: 100%;
+      justify-content: center;
+    }
+
+    body.planetarium-ticket .logo-sata {
+      display: none;
+    }
+
+    body.planetarium-ticket .logo-destino {
+      width: auto;
+      height: clamp(48px, 9vw, 62px);
+      max-width: 190px;
+      padding: 4px 10px;
+      border-radius: 14px;
       background: #fff;
-      overflow: hidden;
+      box-shadow: 0 8px 22px rgba(2, 6, 23, 0.25);
     }
 
-    body.planetarium-ticket .ticket-paper {
-      background: linear-gradient(180deg, rgba(15, 23, 42, .88), rgba(12, 18, 38, .95));
-      border-color: rgba(125, 211, 252, .5);
+    body.planetarium-ticket .planetarium-access-kicker {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: fit-content;
+      margin: 0 auto 12px;
+      padding: 7px 13px;
+      border: 1px solid rgba(125, 211, 252, 0.28);
+      border-radius: 999px;
+      background: rgba(14, 165, 233, 0.1);
+      color: #bae6fd;
+      font-family: var(--font-fredoka);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-align: center;
+      text-transform: uppercase;
     }
 
-    body.planetarium-ticket .ticket-title {
-      color: #fef08a;
-      font-size: clamp(1.32rem, 4vw, 2rem);
-      text-shadow: 0 0 18px rgba(250, 204, 21, .22);
+    body.much-ticket .ticket-card {
+      border-color: rgba(109, 208, 240, .32);
+      background: var(--ticket-bg);
+      box-shadow: 0 24px 70px rgba(2, 6, 23, .5), 0 0 0 1px rgba(255, 118, 180, .06);
     }
 
-    body.planetarium-ticket .label {
-      color: #7dd3fc;
+    body.much-ticket .ticket-header {
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding-bottom: 14px;
     }
 
-    body.planetarium-ticket .value {
+    body.much-ticket .header-left {
+      width: 100%;
+      min-height: 88px;
+      padding: 0;
+      background: transparent;
+    }
+
+    body.much-ticket .logo-agencia {
+      width: min(82%, 330px);
+      height: auto;
+      max-width: 330px;
+      max-height: 94px;
+      filter: none;
+    }
+
+    body.much-ticket .header-right {
+      width: 100%;
+      justify-content: center;
+    }
+
+    body.much-ticket .logo-sata {
+      display: none;
+    }
+
+    body.much-ticket .logo-destino {
+      width: auto;
+      height: clamp(48px, 9vw, 62px);
+      max-width: 190px;
+      padding: 4px 10px;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 8px 22px rgba(2, 6, 23, .24);
+    }
+
+    body.much-ticket .planetarium-access-kicker {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: fit-content;
+      margin: 0 auto 12px;
+      padding: 7px 13px;
+      border: 1px solid rgba(109, 208, 240, .34);
+      border-radius: 999px;
+      background: rgba(109, 208, 240, .1);
+      color: #bae6fd;
+      font-family: var(--font-fredoka);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    body.much-ticket .main-group {
+      justify-content: center;
+      padding: 4px 0 16px;
+      text-align: center;
+    }
+
+    body.much-ticket .name-value {
+      color: #ffc549;
+    }
+
+    body.much-ticket .info-group {
+      border-color: rgba(109, 208, 240, .18);
+      background: rgba(15, 23, 42, .34);
+    }
+
+    body.much-ticket #qrcode {
+      border-color: #6dd0f0;
+      box-shadow: 0 12px 32px rgba(2, 6, 23, .35), 0 0 24px rgba(255, 118, 180, .14);
+    }
+
+    body.much-ticket .btn-download {
+      background: linear-gradient(135deg, #ff76b4, #f23f3a 52%, #ffc549);
+      box-shadow: 0 4px 14px rgba(255, 118, 180, .28);
+    }
+
+    body.much-ticket .btn-link {
+      border-color: rgba(109, 208, 240, .25);
+      background: rgba(30, 41, 79, .82);
       color: #f8fafc;
     }
 
-    body.planetarium-ticket .folio {
-      color: #082f49;
-      background: #e0f2fe;
-      border-color: #7dd3fc;
+    body.planetarium-ticket [data-hide-for-planetarium] {
+      display: none !important;
     }
 
-    body.planetarium-ticket .row {
-      border-bottom-color: rgba(125, 211, 252, .22);
+    /* Congrats Banner */
+    .congrats-banner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--congrats-bg);
+      color: var(--congrats-text);
+      padding: 12px 18px;
+      border-radius: 16px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px var(--congrats-shadow);
+      position: relative;
+      z-index: 2;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    body.planetarium-ticket .logo-box {
-      border-color: rgba(125, 211, 252, .35);
-      background: rgba(255, 255, 255, .96);
+    .congrats-text {
+      font-family: var(--font-fredoka);
+      font-size: clamp(1rem, 3.4vw, 1.2rem);
+      font-weight: 700;
+      margin: 0;
+      line-height: 1.25;
+    }
+
+    .congrats-sparkle {
+      font-size: 1.2rem;
+      animation: float 2.5s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    /* Info Section & Grid */
+    .ticket-info-section {
+      position: relative;
+      z-index: 2;
+    }
+
+    .info-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 6px 0;
+    }
+
+    .main-group {
+      border-bottom: 1.5px solid var(--border-color);
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .beneficiary-box {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .folio-badge-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .info-label {
+      font-family: var(--font-outfit);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--label-color);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .info-value {
+      font-family: var(--font-outfit);
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--value-color);
+      line-height: 1.35;
+    }
+
+    .name-value {
+      font-size: clamp(1.15rem, 4vw, 1.35rem);
+      color: var(--accent-color);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+    }
+
+    .folio-badge {
+      display: inline-block;
+      background: var(--congrats-bg);
+      color: var(--congrats-text);
+      font-weight: 800;
+      font-size: 0.75rem;
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 20px;
+      margin-bottom: 10px;
+    }
+
+    body.planetarium-ticket .main-group {
+      justify-content: center;
+      padding: 4px 0 16px;
+      text-align: center;
+    }
+
+    body.planetarium-ticket .beneficiary-box {
+      min-width: 0;
+    }
+
+    body.planetarium-ticket .name-value {
+      color: #fef08a;
+      font-size: clamp(1.25rem, 5vw, 1.55rem);
+    }
+
+    body.planetarium-ticket .info-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    body.planetarium-ticket .info-group {
+      padding: 11px 13px;
+      border: 1px solid rgba(125, 211, 252, 0.16);
+      border-radius: 13px;
+      background: rgba(15, 23, 42, 0.38);
+    }
+
+    body.planetarium-ticket .highlighted-group {
+      grid-column: 1 / -1;
+      padding: 13px 15px;
+      border-style: solid;
+      box-shadow: 0 0 22px rgba(250, 204, 21, 0.08);
+    }
+
+    .highlighted-group {
+      background: var(--deadline-bg);
+      border: 1px dashed var(--deadline-border);
+      padding: 8px 12px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .label-deadline {
+      color: var(--deadline-label-color);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .value-deadline {
+      color: var(--deadline-value-color);
+      font-weight: 800;
+      font-size: 0.95rem;
+    }
+
+    .break-all {
+      word-break: break-all;
+    }
+
+    /* Ticket Divider & Stub */
+    .ticket-divider {
+      height: 2px;
+      border-top: 2px dashed var(--divider-color);
+      margin: 20px -20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .ticket-divider::before,
+    .ticket-divider::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--notch-bg, #0b1220);
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.15);
+      z-index: 2;
+    }
+
+    .ticket-divider::before {
+      left: -10px;
+    }
+
+    .ticket-divider::after {
+      right: -10px;
+    }
+
+    .ticket-stub {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .qr-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0;
+    }
+
+    #qrcode {
+      padding: 10px;
+      background: white;
+      border: 1.5px solid var(--border-color);
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
     }
 
     body.planetarium-ticket #qrcode {
-      border-color: #7dd3fc;
-      box-shadow: 0 0 0 6px rgba(56, 189, 248, .13);
+      padding: 12px;
+      border: 3px solid #bae6fd;
+      box-shadow: 0 12px 32px rgba(2, 6, 23, 0.36), 0 0 24px rgba(56, 189, 248, 0.16);
     }
 
+    .alfanumerico-box {
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    .alfa-label {
+      font-family: var(--font-outfit);
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--label-color);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .alfa-value {
+      font-family: var(--font-outfit);
+      font-size: clamp(1.15rem, 5vw, 1.35rem);
+      font-weight: 900;
+      letter-spacing: 2.5px;
+      color: var(--accent-color);
+      margin-top: 1px;
+    }
+
+    .qr-hint {
+      font-family: var(--font-outfit);
+      font-size: 0.75rem;
+      color: var(--muted-color);
+      text-align: center;
+      margin: 4px 0 14px 0;
+      max-width: 90%;
+    }
+
+    .ticket-restriction {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--restriction-bg);
+      border: 1px solid var(--restriction-border);
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-family: var(--font-fredoka);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--restriction-text);
+      margin-bottom: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    .restriction-icon {
+      font-size: 0.95rem;
+    }
+
+    /* Note message description */
+    .note {
+      font-family: var(--font-outfit);
+      font-size: 0.76rem;
+      text-align: center;
+      color: var(--muted-color);
+      background: rgba(14, 165, 233, .05);
+      border: 1px solid rgba(14, 165, 233, .12);
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      line-height: 1.3;
+    }
+
+    body.planetarium-ticket .note {
+      background: rgba(56, 189, 248, .05);
+      border-color: rgba(56, 189, 248, .15);
+      color: #94a3b8;
+    }
+
+    /* Bottom Brand Strip */
+    .brand-strip {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: space-around;
+      gap: clamp(0.45rem, 2vw, 1rem);
+      width: calc(100% + 40px);
+      min-height: 56px;
+      margin: 12px -20px -24px;
+      padding: 8px clamp(12px, 4vw, 24px);
+      border: 0;
+      border-radius: 0 0 23px 23px;
+      background: #fff;
+      box-shadow: 0 -5px 18px rgba(2, 6, 23, 0.12);
+    }
+
+    .brand-strip img {
+      display: block;
+      flex: 0 1 auto;
+      width: auto;
+      height: clamp(28px, 5vw, 38px);
+      max-width: clamp(76px, 19vw, 128px);
+      object-fit: contain;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
+    }
+
+    .brand-strip .brand-much {
+      order: 1;
+      height: clamp(34px, 5.5vw, 46px);
+      max-width: clamp(90px, 22vw, 150px);
+    }
+
+    .brand-strip img[alt="SATA"] {
+      order: 2;
+    }
+
+    .brand-strip .brand-sbeel {
+      order: 3;
+      height: clamp(34px, 5.5vw, 46px);
+      max-width: clamp(90px, 22vw, 150px);
+    }
+
+    .brand-strip .brand-planetario {
+      order: 4;
+      height: clamp(30px, 5vw, 42px);
+      max-width: clamp(80px, 20vw, 135px);
+    }
+
+    /* Status Pill */
     .status-pill {
       display: inline-flex;
       align-items: center;
-      width: fit-content;
-      min-height: 30px;
+      justify-content: center;
       padding: 4px 10px;
-      border-radius: 999px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-pill.available {
       background: #dcfce7;
       color: #166534;
-      font-weight: 900;
+      border: 1px solid #bbf7d0;
     }
 
     .status-pill.used {
       background: #fef3c7;
       color: #92400e;
+      border: 1px solid #fde68a;
     }
 
     .status-pill.expired {
       background: #fee2e2;
       color: #991b1b;
+      border: 1px solid #fecaca;
     }
 
-    .message {
-      margin: 14px 0 0;
-      padding: 12px;
-      border-radius: 12px;
-      background: rgba(14, 165, 233, .1);
-      border: 1px solid rgba(14, 165, 233, .24);
-      color: inherit;
-      font-weight: 800;
-      text-align: center;
-    }
-
-    .ticket-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-      border-bottom: 1px solid #f1f5f9;
-      padding: 8px 8px 14px;
-    }
-
-    .logo-box {
-      width: 80px;
-      height: 80px;
-      min-width: 80px;
-      flex-shrink: 0;
-      background: #fff;
-      border: 1px solid #eef2ff;
-      border-radius: 10px;
-      padding: 6px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .ticket-logo {
-      max-width: 100%;
-      max-height: 100%;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-    }
-
-    .center {
-      flex: 1;
-      text-align: center;
-      min-width: 0;
-    }
-
-    .ticket-title {
-      font-weight: 800;
-      color: var(--fucsia);
-      font-size: 1.1rem;
-      margin: 0;
-      line-height: 1.1;
-    }
-
-    .folio {
-      display: inline-block;
-      background: var(--chip-bg);
-      color: var(--chip-ink);
-      font-weight: 700;
-      font-size: 0.75rem;
-      padding: 4px 8px;
-      border-radius: 6px;
-      border: 1px solid #bae6fd;
-      margin-top: 6px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
-    }
-
-    .rows {
-      margin-top: 8px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0 16px;
-    }
-
-    .row {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      padding: 8px 0;
-      border-bottom: 1px dashed #eef2ff;
-    }
-
-    .row-full {
-      grid-column: 1 / -1;
-    }
-
-    .label {
-      font-size: 0.75rem;
-      color: var(--muted);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .value {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--ink);
-      line-height: 1.3;
-    }
-
-    .qr-section {
-      display: flex;
-      justify-content: center;
-      margin: 20px 0 10px;
-    }
-
-    #qrcode {
-      padding: 8px;
-      background: white;
-      border: 2px solid #e5e7eb;
-      border-radius: 12px;
-    }
-
-    .qr-hint {
-      text-align: center;
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-bottom: 16px;
-    }
-
-    .note {
-      background: #f8fafc;
-      border: 1px dashed #cbd5e1;
-      padding: 10px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      text-align: center;
-      color: #475569;
-      margin-bottom: 16px;
-    }
-
+    /* Actions styling */
     .actions {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       flex-direction: column;
-      margin-top: 20px;
+      margin-top: 24px;
     }
 
     .btn {
       appearance: none;
       border: 0;
       cursor: pointer;
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 14px;
+      font-family: var(--font-fredoka);
       font-weight: 700;
-      font-size: 1rem;
+      font-size: 0.95rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -373,39 +894,985 @@
       text-decoration: none;
       width: 100%;
       text-align: center;
+      transition: transform 0.2s, opacity 0.2s;
     }
 
-    .btn-print {
-      background: var(--turquesa);
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-download {
+      background: linear-gradient(135deg, #06b6d4, #0891b2);
       color: #fff;
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
     }
 
     .btn-link {
       background: #fff;
       color: #0f172a;
-      border: 2px solid #e2e8f0;
+      border: 1.5px solid #e2e8f0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
     }
 
-    .btn-download {
-      background: linear-gradient(135deg, var(--turquesa), #0891b2);
+    body.planetarium-ticket .btn-link {
+      background: rgba(30, 41, 59, 0.5);
+      color: #f8fafc;
+      border-color: rgba(125, 211, 252, 0.2);
+    }
+
+    .actions .btn {
+      flex: 1 1 0;
+      width: auto;
+      min-width: 0;
+    }
+
+    .btn-exit {
+      border: 1px solid rgba(248, 113, 113, .42);
+      background: linear-gradient(135deg, #ef4444, #be123c);
       color: #fff;
-      box-shadow: 0 4px 10px rgba(6, 182, 212, 0.3);
+      box-shadow: 0 4px 12px rgba(190, 18, 60, .2);
     }
 
-    .btn-whatsapp {
-      background: var(--whatsapp);
-      color: #fff;
-      box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+    .exit-farewell-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      visibility: hidden;
+      opacity: 0;
+      background: rgba(2, 6, 23, .78);
+      backdrop-filter: blur(10px);
+      transition: opacity .22s ease, visibility .22s ease;
     }
 
-    @media (min-width: 600px) {
-      .actions {
-        flex-direction: row;
+    .exit-farewell-overlay.open {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .exit-farewell-card {
+      position: relative;
+      width: min(100%, 370px);
+      padding: 24px 20px 20px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      background: var(--ticket-bg, #fff);
+      color: var(--value-color);
+      text-align: center;
+      box-shadow: 0 28px 80px rgba(2, 6, 23, .58);
+      transform: translateY(12px) scale(.97);
+      transition: transform .22s ease;
+    }
+
+    .exit-farewell-overlay.open .exit-farewell-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .exit-farewell-close {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      background: rgba(15, 23, 42, .16);
+      color: var(--value-color);
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+
+    .exit-farewell-icon {
+      display: grid;
+      place-items: center;
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 22px;
+      background: var(--congrats-bg);
+      font-size: 2rem;
+      box-shadow: 0 10px 25px var(--congrats-shadow);
+    }
+
+    .exit-farewell-kicker {
+      margin: 0 0 4px;
+      color: var(--label-color);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .exit-farewell-title {
+      margin: 0;
+      color: var(--value-color);
+      font-family: var(--font-fredoka);
+      font-size: clamp(1.55rem, 7vw, 2rem);
+      line-height: 1.08;
+    }
+
+    .exit-farewell-copy {
+      margin: 10px auto 14px;
+      color: var(--muted-color, var(--muted));
+      font-size: .9rem;
+      line-height: 1.4;
+    }
+
+    .exit-return-date {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-bottom: 16px;
+      padding: 13px 14px;
+      border: 1px solid var(--deadline-border);
+      border-radius: 15px;
+      background: var(--deadline-bg);
+    }
+
+    .exit-return-date span {
+      color: var(--deadline-label-color);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .exit-return-date strong {
+      color: var(--deadline-value-color);
+      font-family: var(--font-fredoka);
+      font-size: 1.15rem;
+      line-height: 1.2;
+    }
+
+    .exit-farewell-actions {
+      display: grid;
+      gap: 9px;
+    }
+
+    .exit-confirm,
+    .exit-cancel {
+      min-height: 44px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-family: var(--font-fredoka);
+      font-size: .9rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .exit-confirm {
+      border: 0;
+      background: var(--congrats-bg);
+      color: var(--congrats-text);
+      box-shadow: 0 6px 16px var(--congrats-shadow);
+    }
+
+    .exit-cancel {
+      border: 1px solid var(--border-color);
+      background: transparent;
+      color: var(--value-color);
+    }
+
+    body.exit-farewell-open {
+      overflow: hidden !important;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      body {
+        align-items: flex-start;
+        padding: 12px 10px 20px;
+      }
+      .ticket-card {
+        padding: 16px 14px;
+        border-radius: 20px;
+      }
+      .ticket-header {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        text-align: center;
+        padding-bottom: 14px;
+      }
+      .logo-agencia {
+        height: 52px;
+      }
+      .header-right {
+        width: 100%;
+        justify-content: center;
+      }
+      .main-group {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+        padding-bottom: 12px;
+      }
+      .beneficiary-box {
+        width: 100%;
+      }
+      .folio-badge-container {
+        align-items: center;
+        width: 100%;
+      }
+      .info-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .highlighted-group {
+        padding: 8px 10px;
+      }
+      .brand-strip {
+        width: calc(100% + 28px);
+        gap: 0.35rem;
+        margin-right: -14px;
+        margin-left: -14px;
+        padding: 7px 12px;
+      }
+      .brand-strip img {
+        height: 24px;
+        max-width: 76px;
+        padding: 0;
+      }
+      .brand-strip .brand-much {
+        height: 29px;
+        max-width: 88px;
+      }
+      .brand-strip .brand-sbeel {
+        height: 29px;
+        max-width: 88px;
+      }
+      .brand-strip .brand-planetario {
+        height: 26px;
+        max-width: 78px;
+      }
+      .ticket-divider {
+        margin: 16px -14px;
+      }
+      body.planetarium-ticket .header-left {
+        min-height: 82px;
+        padding: 0;
+      }
+      body.planetarium-ticket .logo-agencia {
+        width: min(88%, 300px);
+        height: auto;
+        max-height: 82px;
+      }
+      body.planetarium-ticket .logo-destino {
+        height: 48px;
+        max-width: 160px;
+      }
+      body.planetarium-ticket .info-grid {
+        grid-template-columns: 1fr;
+      }
+      body.planetarium-ticket .highlighted-group {
+        grid-column: auto;
+      }
+    }
+
+    /* Planetario compacto: boleto completo visible en una pantalla móvil, sin scroll. */
+    @media (max-width: 480px) and (max-height: 950px) {
+      body.planetarium-ticket {
+        width: 100%;
+        height: 100dvh;
+        min-height: 100dvh;
+        padding: 6px;
+        align-items: center;
+        overflow: hidden;
       }
 
-      .btn {
-        width: auto;
-        flex: 1;
+      body.planetarium-ticket .ticket-shell {
+        display: flex;
+        flex-direction: column;
+        justify-content: stretch;
+        width: 100%;
+        height: calc(100dvh - 12px);
+        max-height: calc(100dvh - 12px);
+        overflow: hidden;
+        border: 1px solid rgba(125, 211, 252, 0.32);
+        border-radius: 17px;
+        background: var(--ticket-bg);
+        box-shadow: 0 24px 70px rgba(2, 6, 23, 0.5);
+      }
+
+      body.planetarium-ticket .ticket-card {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 0;
+        padding: 8px 10px;
+        overflow: hidden;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      body.planetarium-ticket .ticket-header {
+        flex-direction: column;
+        gap: 3px;
+        margin-bottom: 5px;
+        padding-bottom: 5px;
+      }
+
+      body.planetarium-ticket .header-left {
+        width: 100%;
+        min-height: 82px;
+        padding: 0;
+      }
+
+      body.planetarium-ticket .logo-agencia {
+        width: min(86%, 285px);
+        height: auto;
+        max-width: 285px;
+        max-height: 84px;
+      }
+
+      body.planetarium-ticket .header-right {
+        width: 100%;
+      }
+
+      body.planetarium-ticket .logo-destino {
+        height: 42px;
+        max-width: 138px;
+        padding: 2px 5px;
+        border-radius: 8px;
+      }
+
+      body.planetarium-ticket .planetarium-access-kicker {
+        gap: 5px;
+        margin-bottom: 5px;
+        padding: 3px 8px;
+        font-size: 0.58rem;
+      }
+
+      body.planetarium-ticket .congrats-banner {
+        gap: 5px;
+        margin-bottom: 5px;
+        padding: 7px 8px;
+        border-radius: 11px;
+      }
+
+      body.planetarium-ticket .congrats-text {
+        font-size: 0.82rem;
+        line-height: 1.12;
+      }
+
+      body.planetarium-ticket .congrats-sparkle {
+        font-size: 0.8rem;
+      }
+
+      body.planetarium-ticket .main-group {
+        gap: 2px;
+        margin-bottom: 5px;
+        padding: 2px 0 6px;
+      }
+
+      body.planetarium-ticket .info-label {
+        font-size: 0.56rem;
+        letter-spacing: 0.45px;
+      }
+
+      body.planetarium-ticket .info-value {
+        font-size: 0.72rem;
+        line-height: 1.16;
+      }
+
+      body.planetarium-ticket .name-value {
+        font-size: 0.98rem;
+        line-height: 1.05;
+      }
+
+      body.planetarium-ticket .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "access deadline";
+        gap: 5px;
+        margin-bottom: 0;
+      }
+
+      body.planetarium-ticket .planetarium-access-detail {
+        grid-area: access;
+      }
+
+      body.planetarium-ticket .planetarium-status-detail {
+        grid-area: status;
+      }
+
+      body.planetarium-ticket .planetarium-deadline-detail {
+        grid-area: deadline;
+      }
+
+      body.planetarium-ticket .info-group,
+      body.planetarium-ticket .highlighted-group {
+        padding: 5px 7px;
+        border-radius: 9px;
+      }
+
+      body.planetarium-ticket .value-deadline {
+        font-size: 0.76rem;
+      }
+
+      body.planetarium-ticket .status-pill {
+        padding: 2px 7px;
+        font-size: 0.56rem;
+      }
+
+      body.planetarium-ticket .ticket-divider {
+        margin: 6px -10px;
+      }
+
+      body.planetarium-ticket .qr-section {
+        gap: 2px;
+        margin: 1px 0;
+      }
+
+      body.planetarium-ticket #qrcode {
+        padding: 5px;
+        border-width: 2px;
+        border-radius: 11px;
+      }
+
+      body.planetarium-ticket .alfanumerico-box {
+        margin-top: 1px;
+        line-height: 1;
+      }
+
+      body.planetarium-ticket .alfa-label {
+        font-size: 0.52rem;
+      }
+
+      body.planetarium-ticket .alfa-value {
+        margin-top: 0;
+        font-size: 0.95rem;
+        letter-spacing: 1.8px;
+      }
+
+      body.planetarium-ticket .qr-hint {
+        margin: 1px 0 4px;
+        font-size: 0.57rem;
+        line-height: 1.1;
+      }
+
+      body.planetarium-ticket .ticket-restriction {
+        gap: 5px;
+        margin-bottom: 4px;
+        padding: 5px 8px;
+        border-radius: 8px;
+        font-size: 0.62rem;
+      }
+
+      body.planetarium-ticket .restriction-icon {
+        font-size: 0.7rem;
+      }
+
+      body.planetarium-ticket .note {
+        display: none;
+      }
+
+      body.planetarium-ticket .brand-strip {
+        flex-wrap: nowrap;
+        justify-content: space-around;
+        width: calc(100% + 20px);
+        min-height: 48px;
+        gap: 0.25rem;
+        margin: 2px -10px -8px;
+        padding: 5px 10px;
+        border-radius: 0;
+      }
+
+      body.planetarium-ticket .brand-strip img {
+        height: 26px;
+        max-width: 78px;
+        padding: 0;
+        border-radius: 0;
+      }
+
+      body.planetarium-ticket .brand-strip .brand-much,
+      body.planetarium-ticket .brand-strip .brand-sbeel {
+        height: 31px;
+        max-width: 92px;
+      }
+
+      body.planetarium-ticket .brand-strip .brand-planetario {
+        height: 28px;
+        max-width: 82px;
+      }
+
+      body.planetarium-ticket .actions {
+        flex-direction: row;
+        flex: 0 0 auto;
+        gap: 6px;
+        margin: 0;
+        padding: 6px 8px 8px;
+        background: rgba(15, 23, 42, 0.92);
+      }
+
+      body.planetarium-ticket .btn {
+        min-height: 36px;
+        padding: 7px 5px;
+        border-radius: 9px;
+        font-size: 0.68rem;
+        line-height: 1.1;
+      }
+    }
+
+    /* Escala legible para teléfonos altos: aprovecha el espacio sin generar scroll. */
+    @media (max-width: 480px) and (min-height: 701px) and (max-height: 950px) {
+      body.planetarium-ticket .ticket-card {
+        padding: 10px 12px;
+      }
+
+      body.planetarium-ticket .ticket-header {
+        gap: 4px;
+        margin-bottom: 7px;
+        padding-bottom: 7px;
+      }
+
+      body.planetarium-ticket .header-left {
+        min-height: 104px;
+      }
+
+      body.planetarium-ticket .logo-agencia {
+        width: min(92%, 340px);
+        max-width: 340px;
+        max-height: 104px;
+      }
+
+      body.planetarium-ticket .logo-destino {
+        height: 48px;
+        max-width: 158px;
+      }
+
+      body.planetarium-ticket .planetarium-access-kicker {
+        margin-bottom: 7px;
+        padding: 4px 11px;
+        font-size: 0.68rem;
+      }
+
+      body.planetarium-ticket .congrats-banner {
+        margin-bottom: 7px;
+        padding: 9px 12px;
+      }
+
+      body.planetarium-ticket .congrats-text {
+        font-size: 1rem;
+      }
+
+      body.planetarium-ticket .congrats-sparkle {
+        font-size: 0.95rem;
+      }
+
+      body.planetarium-ticket .main-group {
+        margin-bottom: 7px;
+        padding-bottom: 8px;
+      }
+
+      body.planetarium-ticket .info-label {
+        font-size: 0.68rem;
+        letter-spacing: 0.55px;
+      }
+
+      body.planetarium-ticket .info-value {
+        font-size: 0.9rem;
+      }
+
+      body.planetarium-ticket .name-value {
+        font-size: 1.18rem;
+      }
+
+      body.planetarium-ticket .info-grid {
+        gap: 7px;
+      }
+
+      body.planetarium-ticket .info-group,
+      body.planetarium-ticket .highlighted-group {
+        padding: 8px 10px;
+        border-radius: 11px;
+      }
+
+      body.planetarium-ticket .value-deadline {
+        font-size: 0.92rem;
+      }
+
+      body.planetarium-ticket .ticket-divider {
+        margin: 8px -12px;
+      }
+
+      body.planetarium-ticket #qrcode {
+        padding: 7px;
+        border-radius: 13px;
+      }
+
+      body.planetarium-ticket .alfa-label {
+        font-size: 0.62rem;
+      }
+
+      body.planetarium-ticket .alfa-value {
+        font-size: 1.22rem;
+        letter-spacing: 2.2px;
+      }
+
+      body.planetarium-ticket .qr-hint {
+        margin-bottom: 6px;
+        font-size: 0.66rem;
+      }
+
+      body.planetarium-ticket .ticket-restriction {
+        margin-bottom: 6px;
+        padding: 7px 11px;
+        font-size: 0.76rem;
+      }
+
+      body.planetarium-ticket .restriction-icon {
+        font-size: 0.82rem;
+      }
+
+      body.planetarium-ticket .brand-strip {
+        width: calc(100% + 24px);
+        min-height: 58px;
+        margin: 3px -12px -10px;
+        padding: 7px 14px;
+      }
+
+      body.planetarium-ticket .brand-strip img {
+        height: 30px;
+        max-width: 86px;
+      }
+
+      body.planetarium-ticket .brand-strip .brand-much,
+      body.planetarium-ticket .brand-strip .brand-sbeel {
+        height: 36px;
+        max-width: 102px;
+      }
+
+      body.planetarium-ticket .brand-strip .brand-planetario {
+        height: 32px;
+        max-width: 90px;
+      }
+
+      body.planetarium-ticket .actions {
+        gap: 8px;
+        padding: 7px 9px 9px;
+      }
+
+      body.planetarium-ticket .btn {
+        min-height: 42px;
+        padding: 9px 7px;
+        font-size: 0.78rem;
+      }
+    }
+
+    /* Estructura compartida de los boletos finales MUCH y Planetario. */
+    @media (max-width: 480px) and (max-height: 950px) {
+      body.streamlined-ticket {
+        width: 100%;
+        height: 100dvh;
+        min-height: 100dvh;
+        padding: 6px;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      body.streamlined-ticket .ticket-shell {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: calc(100dvh - 12px);
+        max-height: calc(100dvh - 12px);
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        border-radius: 17px;
+        background: var(--ticket-bg);
+        box-shadow: 0 24px 70px rgba(2, 6, 23, .5);
+      }
+
+      body.streamlined-ticket .ticket-card {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 0;
+        padding: 8px 10px;
+        overflow: hidden;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      body.streamlined-ticket .ticket-header {
+        flex-direction: column;
+        gap: 3px;
+        margin-bottom: 5px;
+        padding-bottom: 5px;
+      }
+
+      body.streamlined-ticket .header-left {
+        width: 100%;
+        min-height: 82px;
+        padding: 0;
+        background: transparent;
+      }
+
+      body.streamlined-ticket .logo-agencia {
+        width: min(86%, 285px);
+        height: auto;
+        max-width: 285px;
+        max-height: 84px;
+      }
+
+      body.streamlined-ticket .header-right {
+        width: 100%;
+        justify-content: center;
+      }
+
+      body.streamlined-ticket .logo-sata {
+        display: none;
+      }
+
+      body.streamlined-ticket .logo-destino {
+        height: 42px;
+        max-width: 138px;
+        padding: 2px 5px;
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      body.streamlined-ticket .planetarium-access-kicker {
+        gap: 5px;
+        margin-bottom: 5px;
+        padding: 3px 8px;
+        font-size: .58rem;
+      }
+
+      body.streamlined-ticket .congrats-banner {
+        gap: 5px;
+        margin-bottom: 5px;
+        padding: 7px 8px;
+        border-radius: 11px;
+      }
+
+      body.streamlined-ticket .congrats-text {
+        font-size: .82rem;
+        line-height: 1.12;
+      }
+
+      body.streamlined-ticket .main-group {
+        gap: 2px;
+        margin-bottom: 5px;
+        padding: 2px 0 6px;
+      }
+
+      body.streamlined-ticket .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "access deadline";
+        gap: 5px;
+        margin-bottom: 0;
+      }
+
+      body.streamlined-ticket .planetarium-access-detail {
+        grid-area: access;
+      }
+
+      body.streamlined-ticket .planetarium-deadline-detail {
+        grid-area: deadline;
+      }
+
+      body.streamlined-ticket .info-group,
+      body.streamlined-ticket .highlighted-group {
+        padding: 5px 7px;
+        border: 1px solid var(--border-color);
+        border-radius: 9px;
+      }
+
+      body.streamlined-ticket .ticket-divider {
+        margin: 6px -10px;
+      }
+
+      body.streamlined-ticket .qr-section {
+        gap: 2px;
+        margin: 1px 0;
+      }
+
+      body.streamlined-ticket #qrcode {
+        padding: 5px;
+        border-width: 2px;
+        border-radius: 11px;
+      }
+
+      body.streamlined-ticket .note {
+        display: none;
+      }
+
+      body.streamlined-ticket .brand-strip {
+        flex-wrap: nowrap;
+        justify-content: space-around;
+        width: calc(100% + 20px);
+        min-height: 48px;
+        gap: .25rem;
+        margin: 2px -10px -8px;
+        padding: 5px 10px;
+        border-radius: 0;
+      }
+
+      body.streamlined-ticket .brand-strip img {
+        height: 26px;
+        max-width: 78px;
+      }
+
+      body.streamlined-ticket .brand-strip .brand-much,
+      body.streamlined-ticket .brand-strip .brand-sbeel {
+        height: 31px;
+        max-width: 92px;
+      }
+
+      body.streamlined-ticket .brand-strip .brand-planetario {
+        height: 28px;
+        max-width: 82px;
+      }
+
+      body.streamlined-ticket .actions {
+        display: flex;
+        flex: 0 0 auto;
+        flex-direction: row;
+        gap: 6px;
+        margin: 0;
+        padding: 6px 8px 8px;
+        background: rgba(15, 23, 42, .92);
+      }
+
+      body.streamlined-ticket .btn {
+        min-height: 36px;
+        padding: 7px 5px;
+        border-radius: 9px;
+        font-size: .64rem;
+        line-height: 1.1;
+      }
+    }
+
+    @media (max-width: 480px) and (min-height: 701px) and (max-height: 950px) {
+      body.streamlined-ticket .ticket-card {
+        padding: 10px 12px;
+      }
+
+      body.streamlined-ticket .header-left {
+        min-height: 104px;
+      }
+
+      body.streamlined-ticket .logo-agencia {
+        width: min(92%, 340px);
+        max-width: 340px;
+        max-height: 104px;
+      }
+
+      body.streamlined-ticket .logo-destino {
+        height: 48px;
+        max-width: 158px;
+      }
+
+      body.streamlined-ticket .planetarium-access-kicker {
+        padding: 4px 11px;
+        font-size: .68rem;
+      }
+
+      body.streamlined-ticket .congrats-banner {
+        padding: 9px 12px;
+      }
+
+      body.streamlined-ticket .congrats-text {
+        font-size: 1rem;
+      }
+
+      body.streamlined-ticket .info-label {
+        font-size: .68rem;
+      }
+
+      body.streamlined-ticket .info-value {
+        font-size: .9rem;
+      }
+
+      body.streamlined-ticket .name-value {
+        font-size: 1.18rem;
+      }
+
+      body.streamlined-ticket .info-group,
+      body.streamlined-ticket .highlighted-group {
+        padding: 8px 10px;
+      }
+
+      body.streamlined-ticket .value-deadline {
+        font-size: .92rem;
+      }
+
+      body.streamlined-ticket #qrcode {
+        padding: 7px;
+        border-radius: 13px;
+      }
+
+      body.streamlined-ticket .alfa-label {
+        font-size: .62rem;
+      }
+
+      body.streamlined-ticket .alfa-value {
+        font-size: 1.22rem;
+      }
+
+      body.streamlined-ticket .qr-hint {
+        font-size: .66rem;
+      }
+
+      body.streamlined-ticket .ticket-restriction {
+        padding: 7px 11px;
+        font-size: .76rem;
+      }
+
+      body.streamlined-ticket .brand-strip {
+        width: calc(100% + 24px);
+        min-height: 58px;
+        margin: 3px -12px -10px;
+        padding: 7px 14px;
+      }
+
+      body.streamlined-ticket .brand-strip img {
+        height: 30px;
+        max-width: 86px;
+      }
+
+      body.streamlined-ticket .brand-strip .brand-much,
+      body.streamlined-ticket .brand-strip .brand-sbeel {
+        height: 36px;
+        max-width: 102px;
+      }
+
+      body.streamlined-ticket .brand-strip .brand-planetario {
+        height: 32px;
+        max-width: 90px;
+      }
+
+      body.streamlined-ticket .actions {
+        gap: 8px;
+        padding: 7px 9px 9px;
+      }
+
+      body.streamlined-ticket .btn {
+        min-height: 42px;
+        font-size: .72rem;
+      }
+    }
+
+    @media (max-width: 480px) and (max-height: 620px) {
+      body.streamlined-ticket .ticket-shell {
+        transform: scale(0.88);
+        transform-origin: center;
       }
     }
 
@@ -414,8 +1881,11 @@
         display: none;
       }
 
-      .ticket-paper {
+      .ticket-card {
         border: 2px solid #000;
+        box-shadow: none;
+        background: white;
+        color: black;
       }
 
       body {
@@ -428,60 +1898,141 @@
 <body>
   <div class="ticket-shell">
     <div class="ticket-card" id="boletoCaptura">
-      <div class="ticket-paper">
-        <div class="ticket-head">
-          <div class="logo-box"><img class="ticket-logo" src="logo-sata.png" alt="SATA" crossorigin="anonymous"
-              onerror="this.parentElement.style.display='none'"></div>
-          <div class="center">
-            <h2 id="tTitle" class="ticket-title">MUCH · Premio</h2>
-            <div id="tFolio" class="folio">Cargando...</div>
+      <div class="much-decorations" aria-hidden="true"></div>
+      <div class="planetarium-decorations" aria-hidden="true"></div>
+
+      <!-- Ticket Header with Logos -->
+      <div class="ticket-header">
+        <div class="header-left">
+          <img class="logo-agencia" src="Logo-Ag-14.png" alt="Agencia Digital" crossorigin="anonymous"
+            onerror="this.style.display='none'">
+        </div>
+        <div class="header-right">
+          <img class="logo-sata" src="logo-sata.png" alt="SATA" crossorigin="anonymous"
+            onerror="this.style.display='none'">
+          <img id="tDynamicLogo" class="logo-destino" src="logo-much.png" alt="Destino" crossorigin="anonymous"
+            onerror="this.style.display='none'">
+        </div>
+      </div>
+
+      <div class="planetarium-access-kicker" aria-label="Acceso exclusivo al Planetario">
+        <span aria-hidden="true">✦</span>
+        <span id="ticketAccessKickerText">Acceso exclusivo · Planetario Tuxtla</span>
+      </div>
+
+      <!-- Congrats Banner -->
+      <div class="congrats-banner">
+        <span class="congrats-sparkle" aria-hidden="true">✨</span>
+        <h2 id="tCongrats" class="congrats-text">¡Felicidades, ganaste un boleto!</h2>
+        <span class="congrats-sparkle" aria-hidden="true">✨</span>
+      </div>
+
+      <!-- Ticket Info Section -->
+      <div class="ticket-info-section">
+        <!-- Beneficiary and Folio -->
+        <div class="main-group">
+          <div class="beneficiary-box">
+            <span class="info-label">Beneficiario</span>
+            <div id="tNombre" class="info-value name-value">—</div>
           </div>
-          <div class="logo-box"><img class="ticket-logo" src="logo-much.png" alt="MUCH" crossorigin="anonymous"
-              onerror="this.parentElement.style.display='none'"></div>
+          <div class="folio-badge-container" data-hide-for-planetarium>
+            <span class="info-label">ID Folio</span>
+            <div id="tFolio" class="folio-badge">Cargando...</div>
+          </div>
         </div>
 
-        <div class="rows">
-          <div class="row row-full">
-            <div class="label">Beneficiario:</div>
-            <div id="tNombre" class="value">—</div>
+        <!-- Info Grid -->
+        <div class="info-grid">
+          <div class="info-group" data-hide-for-planetarium>
+            <span class="info-label">Tipo de Premio</span>
+            <div id="tPremio" class="info-value">—</div>
           </div>
-          <div class="row">
-            <div class="label">Tipo de premio:</div>
-            <div id="tPremio" class="value">—</div>
+          <div class="info-group planetarium-access-detail">
+            <span id="tLugarLabel" class="info-label">Lugar Seleccionado</span>
+            <div id="tLugar" class="info-value">—</div>
           </div>
-          <div class="row">
-            <div class="label">Fecha de emisi&oacute;n:</div>
-            <div id="tFecha" class="value">—</div>
+          <div class="info-group" data-hide-for-planetarium>
+            <span class="info-label">Fecha de Emisión</span>
+            <div id="tFecha" class="info-value">—</div>
           </div>
-          <div class="row">
-            <div class="label">Ubicación:</div>
-            <div id="tLugar" class="value">MUCH</div>
+          <div class="info-group highlighted-group planetarium-deadline-detail">
+            <span class="info-label label-deadline">⚠️ Fecha Límite de Uso</span>
+            <div id="tVencimiento" class="info-value value-deadline">—</div>
           </div>
-          <div class="row">
-            <div class="label">Teléfono:</div>
-            <div id="tTel" class="value">—</div>
+          <div class="info-group" data-hide-for-planetarium>
+            <span class="info-label">Correo Electrónico</span>
+            <div id="tCorreo" class="info-value break-all">—</div>
           </div>
-          <div class="row row-full">
-            <div class="label">Correo:</div>
-            <div id="tCorreo" class="value" style="word-break: break-all;">—</div>
+          <div class="info-group" data-hide-for-planetarium>
+            <span class="info-label">Número de Teléfono</span>
+            <div id="tTel" class="info-value">—</div>
+          </div>
+          <div class="info-group planetarium-status-detail" data-hide-for-planetarium>
+            <span class="info-label">Estado del Boleto</span>
+            <div id="tEstado" class="info-value">—</div>
           </div>
         </div>
+      </div>
 
+      <!-- Tear-off separator -->
+      <div class="ticket-divider"></div>
+
+      <!-- Ticket Stub Section -->
+      <div class="ticket-stub">
         <div class="qr-section">
           <div id="qrcode"></div>
-          <div id="tAlfanumerico" style="margin-top: 12px; font-weight: 900; font-size: 1.25rem; letter-spacing: 1px; color: var(--ink);"></div>
+          <div class="alfanumerico-box">
+            <span class="alfa-label">Código Alfanumérico</span>
+            <div id="tAlfanumerico" class="alfa-value">—</div>
+          </div>
         </div>
-        <p class="qr-hint">Presenta el Código QR o este Folio Alfanumérico en Taquilla</p>
+        
+        <p class="qr-hint">Presenta este Código QR o Folio Alfanumérico en Taquilla</p>
 
-        <div class="note">⚠️ Válido por una sola entrada. Sujeto a disponibilidad y horarios del museo.</div>
+        <!-- Restriction text (Point 6) -->
+        <div class="ticket-restriction">
+          <span class="restriction-icon" aria-hidden="true">🎫</span>
+          <span id="ticketRestrictionText" class="restriction-text">Válido únicamente para 1 persona</span>
+        </div>
+
+        <!-- Description Note -->
+        <div class="note">Felicidades por completar tu recorrido.</div>
+
+        <!-- Bottom Brand strip (Point 8) -->
+        <div class="brand-strip" aria-label="Logos institucionales">
+          <img src="../entrada-much/logo-much.png" alt="MUCH · Museo Chiapas" class="brand-much">
+          <img src="../entrada-much/logo-sata.png" alt="SATA">
+          <img src="../Sbeel_Dinosaurios/logo-sbeel-dinosaurios.png" alt="SBEEL" class="brand-sbeel">
+          <img src="../assets/logo-planetario-tuxtla.svg" alt="Planetario Tuxtla" class="brand-planetario">
+        </div>
       </div>
     </div>
 
+    <!-- Actions block -->
     <div class="actions">
       <button id="btnDownloadImage" class="btn btn-download">📥 Descargar Boleto (Imagen)</button>
       <a class="btn btn-link" href="../index.html">🏠 Volver al mapa</a>
+      <button id="btnExitTicket" class="btn btn-exit" type="button">🚪 Salir</button>
     </div>
   </div>
+
+  <section id="exitFarewellOverlay" class="exit-farewell-overlay" aria-hidden="true">
+    <div class="exit-farewell-card" role="dialog" aria-modal="true" aria-labelledby="exitFarewellTitle">
+      <button id="btnCloseFarewell" class="exit-farewell-close" type="button" aria-label="Cerrar">&times;</button>
+      <div class="exit-farewell-icon" aria-hidden="true">🚀</div>
+      <p class="exit-farewell-kicker">Misión completada</p>
+      <h2 id="exitFarewellTitle" class="exit-farewell-title">¡Gracias por jugar!</h2>
+      <p class="exit-farewell-copy">Fue increíble compartir esta aventura contigo. Sigue explorando, aprendiendo y descubriendo.</p>
+      <div class="exit-return-date">
+        <span>Nos vemos el</span>
+        <strong id="exitReturnDate">Próximamente</strong>
+      </div>
+      <div class="exit-farewell-actions">
+        <button id="btnConfirmExit" class="exit-confirm" type="button">Volver al inicio</button>
+        <button id="btnCancelExit" class="exit-cancel" type="button">Seguir viendo mi boleto</button>
+      </div>
+    </div>
+  </section>
 
   <script>
     (function () {
@@ -497,55 +2048,95 @@
       const isPlanetario = /planetario/i.test(rawAccess) || /planetario/i.test(qs.get('destino') || '');
       const acceso = isPlanetario ? 'Planetario' : rawAccess;
       const titulo = qs.get('titulo') || acceso || 'MUCH · Premio';
-      const ubicacion = qs.get('ubicacion') || qs.get('lugar') || (isPlanetario ? 'Planetario Tuxtla' : 'Museo Chiapas');
+      const ubicacion = isPlanetario
+        ? 'Planetario Tuxtla'
+        : 'Museo Chiapas de Ciencia y Tecnología';
       const fechaEmision = parseDate(qs.get('valido_desde'));
       const fechaVencimiento = parseDate(qs.get('valido_hasta'), new Date(fechaEmision.getTime() + 7 * 24 * 60 * 60 * 1000));
+      const fmtDeadline = new Intl.DateTimeFormat('es-MX', { dateStyle: 'long' });
       const estadoRaw = (qs.get('estado') || 'activo').toLowerCase();
       const estadoVisible = estadoRaw === 'canjeado' || estadoRaw === 'usado'
         ? 'Utilizado'
         : (estadoRaw === 'vencido' ? 'Vencido' : 'Disponible');
 
+      // Theme toggle and dynamic configuration
+      const congratsText = el('tCongrats');
+      const dynamicLogo = el('tDynamicLogo');
+
       if (isPlanetario) {
         document.body.classList.add('planetarium-ticket');
-        const logos = document.querySelectorAll('.ticket-logo');
-        if (logos[1]) {
-          logos[1].src = '../assets/logo-planetario-tuxtla.svg';
-          logos[1].alt = 'Planetario Tuxtla';
+        document.body.dataset.ticketDestination = 'planetario';
+        document.title = 'Boleto al Planetario · Planetario Tuxtla';
+        if (congratsText) {
+          congratsText.textContent = '¡Felicidades, ganaste un boleto al Planetario!';
+        }
+        if (dynamicLogo) {
+          dynamicLogo.src = '../assets/logo-planetario-tuxtla.svg';
+          dynamicLogo.alt = 'Planetario Tuxtla';
+        }
+      } else {
+        document.body.classList.add('much-ticket');
+        document.body.dataset.ticketDestination = 'much';
+        document.title = 'Boleto MUCH · Museo Chiapas';
+        if (congratsText) {
+          congratsText.textContent = '¡Felicidades, ganaste un boleto al MUCH!';
+        }
+        if (dynamicLogo) {
+          dynamicLogo.src = 'logo-much.png';
+          dynamicLogo.alt = 'Museo MUCH';
         }
       }
 
-      el('tTitle').textContent = titulo;
+      document.body.classList.add('streamlined-ticket');
+      document.querySelectorAll('[data-hide-for-planetarium]').forEach((field) => field.remove());
+      if (el('tLugarLabel')) el('tLugarLabel').textContent = 'Acceso';
+      if (el('ticketRestrictionText')) {
+        el('ticketRestrictionText').textContent = 'Este boleto es válido para una sola persona';
+      }
+      if (el('ticketAccessKickerText')) {
+        el('ticketAccessKickerText').textContent = isPlanetario
+          ? 'Acceso exclusivo · Planetario Tuxtla'
+          : 'Acceso exclusivo · Museo MUCH';
+      }
+      const accessKicker = document.querySelector('.planetarium-access-kicker');
+      if (accessKicker) {
+        accessKicker.setAttribute('aria-label', isPlanetario
+          ? 'Acceso exclusivo al Planetario Tuxtla'
+          : 'Acceso exclusivo al Museo MUCH');
+      }
+      if (el('btnDownloadImage')) el('btnDownloadImage').textContent = '📥 Descargar boleto';
+
+      // Populate elements directly
+      if (el('tTitle')) el('tTitle').textContent = titulo;
+      
       const folioBoleto = qs.get('folio') || 'Folio: ...';
-      el('tFolio').textContent = folioBoleto;
+      if (el('tFolio')) el('tFolio').textContent = folioBoleto;
+      
       const elAlfa = el('tAlfanumerico');
       if (elAlfa) elAlfa.textContent = folioBoleto.replace('Folio:', '').trim();
-      el('tNombre').textContent = qs.get('nombre') || '—';
-      el('tPremio').textContent = acceso;
-      el('tFecha').textContent = fmtFull.format(fechaEmision);
-      el('tLugar').innerHTML = ubicacion;
-      const rows = document.querySelector('.rows');
-      const placeBefore = document.getElementById('tLugar')?.closest('.row');
-      if (rows && placeBefore && !document.getElementById('tVencimiento')) {
-        const vencimientoRow = document.createElement('div');
-        vencimientoRow.className = 'row';
-        vencimientoRow.innerHTML = `<div class="label">Fecha de vencimiento:</div><div id="tVencimiento" class="value">${fmtFull.format(fechaVencimiento)}</div>`;
-        rows.insertBefore(vencimientoRow, placeBefore);
-
-        const estadoRow = document.createElement('div');
-        estadoRow.className = 'row';
-        const statusClass = estadoVisible === 'Utilizado' ? 'used' : (estadoVisible === 'Vencido' ? 'expired' : '');
-        estadoRow.innerHTML = `<div class="label">Estado:</div><div id="tEstado" class="value"><span class="status-pill ${statusClass}">${estadoVisible}</span></div>`;
-        rows.insertBefore(estadoRow, placeBefore);
+      
+      if (el('tNombre')) el('tNombre').textContent = qs.get('nombre') || '—';
+      if (el('tPremio')) el('tPremio').textContent = acceso;
+      if (el('tFecha')) el('tFecha').textContent = fmtFull.format(fechaEmision);
+      if (el('tLugar')) el('tLugar').textContent = ubicacion;
+      if (el('tVencimiento')) {
+        el('tVencimiento').textContent = fmtDeadline.format(fechaVencimiento);
+      }
+      
+      if (el('tEstado')) {
+        const statusClass = estadoVisible === 'Utilizado' ? 'used' : (estadoVisible === 'Vencido' ? 'expired' : 'available');
+        el('tEstado').innerHTML = `<span class="status-pill ${statusClass}">${estadoVisible}</span>`;
       }
 
       const note = document.querySelector('.note');
       if (note) {
         note.textContent = isPlanetario
-          ? 'Felicidades, explorador. Este boleto es exclusivo para el Planetario y se valida una sola vez en Taquilla.'
+          ? 'Boleto exclusivo para Planetario Tuxtla. Preséntalo en Taquilla para validar tu acceso.'
           : 'Felicidades por completar tu misión científica. Válido por una sola entrada.';
       }
-      el('tCorreo').textContent = qs.get('correo') || '—';
-      el('tTel').textContent = qs.get('telefono') || '—';
+      
+      if (el('tCorreo')) el('tCorreo').textContent = qs.get('correo') || '—';
+      if (el('tTel')) el('tTel').textContent = qs.get('telefono') || '—';
     })();
   </script>
 
@@ -555,32 +2146,118 @@
       const params = new URLSearchParams(window.location.search);
       const container = document.getElementById("qrcode");
 
-      // Buscamos 'folio' (que es lo que manda registro.html) o 'ticket' como respaldo
       const folio = params.get('folio') || params.get('ticket');
       const qrToken = params.get('qr_token') || params.get('token') || '';
       const qrData = params.get('qr_data') || '';
+      const isPlanetario = document.body.dataset.ticketDestination === 'planetario';
+      const isStreamlinedTicket = document.body.classList.contains('streamlined-ticket');
+      const compactTicket = isStreamlinedTicket
+        && window.matchMedia('(max-width: 480px) and (max-height: 950px)').matches;
+      const spaciousTicket = isStreamlinedTicket
+        && window.matchMedia('(max-width: 480px) and (min-height: 701px) and (max-height: 950px)').matches;
+
+      const farewellOverlay = document.getElementById('exitFarewellOverlay');
+      const exitButton = document.getElementById('btnExitTicket');
+      const closeFarewellButton = document.getElementById('btnCloseFarewell');
+      const cancelExitButton = document.getElementById('btnCancelExit');
+      const confirmExitButton = document.getElementById('btnConfirmExit');
+      const exitReturnDate = document.getElementById('exitReturnDate');
+
+      function capitalizeDateLabel(value) {
+        const text = String(value || '').trim();
+        return text ? text.charAt(0).toUpperCase() + text.slice(1) : '';
+      }
+
+      function formatReturnDate(value) {
+        const date = value ? new Date(value) : null;
+        if (!date || Number.isNaN(date.getTime())) return '';
+        return capitalizeDateLabel(new Intl.DateTimeFormat('es-MX', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        }).format(date));
+      }
+
+      function getReturnDateLabel() {
+        const explicitText = params.get('fecha_volver_texto');
+        if (explicitText) return capitalizeDateLabel(explicitText);
+
+        const explicitDate = formatReturnDate(params.get('fecha_volver'));
+        if (explicitDate) return explicitDate;
+
+        try {
+          const storedMessage = localStorage.getItem('much_playtime_block_msg') || '';
+          const match = storedMessage.match(/(?:volver a jugar el|nos vemos el)\s+([^\n.]+)/i);
+          if (match?.[1]) return capitalizeDateLabel(match[1]);
+        } catch (_) {}
+
+        const ticketDeadline = formatReturnDate(params.get('valido_hasta'));
+        if (ticketDeadline) return ticketDeadline;
+
+        const fallback = new Date();
+        fallback.setDate(fallback.getDate() + 7);
+        return formatReturnDate(fallback);
+      }
+
+      function closeFarewell() {
+        if (!farewellOverlay) return;
+        farewellOverlay.classList.remove('open');
+        farewellOverlay.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('exit-farewell-open');
+        exitButton?.focus({ preventScroll: true });
+      }
+
+      function openFarewell() {
+        if (!farewellOverlay) return;
+        const returnDate = getReturnDateLabel();
+        if (exitReturnDate) exitReturnDate.textContent = returnDate;
+
+        try {
+          localStorage.setItem(
+            'much_playtime_block_msg',
+            `¡Gracias por jugar! Tu misión fue completada con éxito. Nos vemos el ${returnDate}. ¡Tu próxima aventura te estará esperando!`
+          );
+        } catch (_) {}
+
+        farewellOverlay.classList.add('open');
+        farewellOverlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('exit-farewell-open');
+        window.setTimeout(() => confirmExitButton?.focus({ preventScroll: true }), 60);
+      }
+
+      exitButton?.addEventListener('click', openFarewell);
+      closeFarewellButton?.addEventListener('click', closeFarewell);
+      cancelExitButton?.addEventListener('click', closeFarewell);
+      farewellOverlay?.addEventListener('click', (event) => {
+        if (event.target === farewellOverlay) closeFarewell();
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && farewellOverlay?.classList.contains('open')) closeFarewell();
+      });
+      confirmExitButton?.addEventListener('click', () => {
+        try { sessionStorage.setItem('much_internal_navigation', 'true'); } catch (_) {}
+        window.location.href = '../index.html?reason=playtime_blocked';
+      });
 
       if ((folio || qrToken || qrData) && container) {
-        // Detectamos si es local o producción para crear el link correcto
         const isLocal = window.location.href.includes('localhost') || window.location.href.includes('127.0.0.1');
 
-        // AJUSTA '/Boleto_Digital'
         const baseUrl = isLocal
           ? window.location.origin + '/Boleto_Digital'
           : 'https://gordillo123.github.io/MisionMuchApp/Boleto_Digital';
 
-        // Link final que leerá el guardia
         const validationUrl = qrData || (qrToken
           ? `${baseUrl}/validar.html?token=${encodeURIComponent(qrToken)}`
           : `${baseUrl}/validar.html?folio=${encodeURIComponent(folio)}`);
 
-        console.log("QR apunta a:", validationUrl); // Debug
+        console.log("QR apunta a:", validationUrl);
 
         container.innerHTML = '';
         new QRCode(container, {
           text: validationUrl,
-          width: 128,
-          height: 128,
+          width: spaciousTicket ? 190 : (compactTicket ? 154 : (isStreamlinedTicket ? 172 : 136)),
+          height: spaciousTicket ? 190 : (compactTicket ? 154 : (isStreamlinedTicket ? 172 : 136)),
           colorDark: "#000000",
           colorLight: "#ffffff",
           correctLevel: QRCode.CorrectLevel.M
@@ -588,8 +2265,6 @@
       } else {
         container.innerHTML = '<span style="font-size:0.75rem;color:#94a3b8;">Código no disponible</span>';
       }
-
-
 
       // 3. DESCARGAR IMAGEN DIRECTAMENTE
       const btnDownload = document.getElementById('btnDownloadImage');
@@ -604,14 +2279,14 @@
             // ── Forzar ancho fijo para que la captura salga "cuadradita" ──
             const origWidth = element.style.width;
             const origMaxW = element.style.maxWidth;
-            element.style.width = '600px';
-            element.style.maxWidth = '600px';
+            element.style.width = '580px';
+            element.style.maxWidth = '580px';
 
             const canvas = await html2canvas(element, {
               scale: 3,
-              backgroundColor: '#ffffff',
+              backgroundColor: null, // transparent for nice corners
               useCORS: true,
-              windowWidth: 600
+              windowWidth: 580
             });
 
             // ── Restaurar estilos originales ──
@@ -619,7 +2294,7 @@
             element.style.maxWidth = origMaxW;
 
             canvas.toBlob((blob) => {
-              const fileName = `Boleto_MUCH_${folio || Date.now()}.png`;
+              const fileName = `Boleto_${isPlanetario ? 'Planetario' : 'MUCH'}_${folio || Date.now()}.png`;
               downloadImage(blob, fileName);
               btnDownload.textContent = '¡Descargado! 📥';
               setTimeout(() => { btnDownload.textContent = originalText; btnDownload.disabled = false; }, 2000);
@@ -632,7 +2307,7 @@
       }
 
       function downloadImage(blob, fileName) {
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName || 'Boleto_MUCH.png'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName || 'Boleto.png'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
       }
     });
   </script>

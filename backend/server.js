@@ -12,6 +12,9 @@ require('dotenv').config();
 
 const playtime = createPlaytimeBlockService(pool);
 const TICKET_VALIDITY_DAYS = Math.max(1, Number(process.env.TICKET_VALIDITY_DAYS || process.env.BOLETO_VALIDEZ_DIAS || 7));
+// HERRAMIENTA TEMPORAL: retirar esta bandera y sus usos al concluir las pruebas del boleto.
+const STATION_COMPLETION_TEST_MODE_ENABLED = process.env.NODE_ENV !== 'production'
+  && /^(1|true|yes|on)$/i.test(process.env.ENABLE_STATION_COMPLETION_TEST_MODE || '');
 
 function tieneTexto(value) {
   return typeof value === 'string' && value.trim().length > 0;
@@ -124,6 +127,12 @@ app.use(express.json());
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
+});
+
+// HERRAMIENTA TEMPORAL: permite al frontend saber si debe mostrar el boton de pruebas.
+app.get('/api/testing/station-completion', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.json({ enabled: STATION_COMPLETION_TEST_MODE_ENABLED });
 });
 
 // Middleware de roles y simulación de usuario actual
@@ -1007,7 +1016,7 @@ app.get('/api/progreso/:id_usuario', permitirJugador, async (req, res) => {
 // 9. POST /api/boletos
 // ==========================================
 app.post('/api/boletos', permitirJugador, async (req, res) => {
-  const { id_usuario, reclamar, tipo_entrada, destino_boleto, lugar } = req.body;
+  const { id_usuario, reclamar, tipo_entrada, destino_boleto, lugar, modo_prueba } = req.body;
 
   if (!id_usuario) {
     return res.status(400).json({ error: 'Falta el id_usuario.' });
@@ -1025,11 +1034,17 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
     const estacionesAprobadas = progreso.map(p => p.id_estacion);
     const estacionesObligatorias = [2, 3, 4, 5, 6];
     const tieneTodoAprobado = estacionesObligatorias.every(id => estacionesAprobadas.includes(id));
+    // HERRAMIENTA TEMPORAL: omite solo esta validacion; no escribe progreso ni puntajes falsos.
+    const usaSimulacionDePruebas = STATION_COMPLETION_TEST_MODE_ENABLED && modo_prueba === true;
 
-    if (!tieneTodoAprobado) {
+    if (!tieneTodoAprobado && !usaSimulacionDePruebas) {
       console.warn(`Usuario ${id_usuario} intenta generar boleto sin completar todo el recorrido. Estaciones aprobadas:`, estacionesAprobadas);
       await connection.rollback();
       return res.status(403).json({ error: 'Debes completar todas las estaciones antes de reclamar tu boleto.' });
+    }
+
+    if (usaSimulacionDePruebas) {
+      console.warn(`[Pruebas] Generando boleto para el usuario ${id_usuario} sin alterar su progreso real.`);
     }
 
     const recibioSeleccionBoleto = [tipo_entrada, destino_boleto, lugar].some(tieneTexto);
@@ -1047,7 +1062,8 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
       seccion_boleto: seccionBoleto,
       lugar: lugarBoleto,
       valido_desde: fechaEmisionBoleto.toISOString(),
-      valido_hasta: fechaVencimientoBoleto.toISOString()
+      valido_hasta: fechaVencimientoBoleto.toISOString(),
+      ...(usaSimulacionDePruebas ? { modo_prueba: true, puntaje_simulado: 55 } : {})
     } : null;
     const hasTicketMetadata = Boolean(ticketMetadata);
     const ticketObservaciones = hasTicketMetadata ? JSON.stringify(ticketMetadata) : null;
@@ -1087,8 +1103,14 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
 
       await connection.query(
         `INSERT INTO movimientos_boleto (id_boleto, id_usuario, tipo_movimiento, observaciones)
-         VALUES (?, ?, 'generacion', 'Boleto generado al completar recorrido')`,
-        [newBoletoId, id_usuario]
+         VALUES (?, ?, 'generacion', ?)`,
+        [
+          newBoletoId,
+          id_usuario,
+          usaSimulacionDePruebas
+            ? 'Boleto generado con la herramienta temporal de pruebas'
+            : 'Boleto generado al completar recorrido'
+        ]
       );
 
       const [[nuevoBoleto]] = await connection.query('SELECT * FROM boletos WHERE id_boleto = ?', [newBoletoId]);
@@ -1097,8 +1119,14 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
 
       await connection.query(
         `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
-         VALUES (?, 'usuario', 'GENERAR_BOLETO', 'boletos', ?, 'Boleto generado al completar recorrido')`,
-        [id_usuario, String(newBoletoId)]
+         VALUES (?, 'usuario', 'GENERAR_BOLETO', 'boletos', ?, ?)`,
+        [
+          id_usuario,
+          String(newBoletoId),
+          usaSimulacionDePruebas
+            ? 'Boleto generado con simulacion temporal de estaciones completadas'
+            : 'Boleto generado al completar recorrido'
+        ]
       );
 
       await playtime.registrarGanado(id_usuario, newBoletoId, connection);
