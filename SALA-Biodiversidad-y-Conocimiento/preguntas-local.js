@@ -6,38 +6,3074 @@ window.MUCH_PREGUNTAS_BIODIVERSIDAD = [
   {"text":"🗺️ ¿Cuál fue la ruta de salida de África hacia América?","options":["Atlántico","Bering","Pacífico","Mediterráneo"],"correctIndex":1,"points":10},
   {"text":"🦴 ¿En qué continente comenzó la migración humana?","options":["Asia","África","Europa","Oceanía"],"correctIndex":1,"points":10},
   {"text":"🇲🇦 ¿Dónde se halló evidencia de Homo sapiens de 350 mil años?","options":["Egipto","Marruecos","Kenia","Sudáfrica"],"correctIndex":1,"points":10},
-  {"text":"🌽 ¿Qué importancia tuvo el maíz en Mesoamérica?","options":["Base de la dieta y economía","Solo ritual","Adorno","Moneda"],"correctIndex":0,"points":10},
+  {"text":"🌽 ¿Qué importancia tuvo el maíz en Mesoamérica?","options":["Base de la dieta y economía","Solo tuvo un uso ritual","Adorno","Moneda"],"correctIndex":0,"points":10},
   {"text":"🌱 ¿Qué son los teocintles?","options":["Progenitores silvestres del maíz","Plantas medicinales","Frijoles","Cactus"],"correctIndex":0,"points":10},
   {"text":"🇲🇽 ¿Cuántas razas de maíz existen en México?","options":["20","40","60","100"],"correctIndex":2,"points":10},
-  {"text":"🍲 ¿Cuántos platillos existen con base en maíz en México?","options":["200","600+","50","100"],"correctIndex":1,"points":10},
+  {"text":"🍲 ¿Cuántos platillos a base de maíz existen en México?","options":["200","Más de 600","50","100"],"correctIndex":1,"points":10},
   {"text":"👑 ¿Qué figura mítica se relaciona con el maíz?","options":["Centéotl","Tláloc","Huitzilopochtli","Quetzalcóatl"],"correctIndex":0,"points":10},
   {"text":"🌿 ¿Qué cultivos acompañan al maíz en la milpa?","options":["Trigo","Frijol y calabaza","Arroz","Papa"],"correctIndex":1,"points":10},
-  {"text":"🚜 ¿Por qué la agricultura fue una revolución?","options":["Permitió civilizaciones estables","Generó guerras","Por comercio","Por religión"],"correctIndex":0,"points":10},
+  {"text":"🚜 ¿Por qué la agricultura fue una revolución?","options":["Permitió civilizaciones estables","Generó guerras","Por el comercio","Por la religión"],"correctIndex":0,"points":10},
   {"text":"🔄 ¿Qué significa que los cultivos tengan plasticidad?","options":["Adaptarse a cambios ambientales","Duran poco","Son frágiles","Producen plástico"],"correctIndex":0,"points":10},
   {"text":"👨‍🌾 ¿Qué ecosistema agrícola de México es sostenible?","options":["La milpa","Plantaciones","Invernaderos","Pastizales"],"correctIndex":0,"points":10},
   {"text":"💧 ¿Qué son los servicios ambientales?","options":["Beneficios de la naturaleza","Servicios médicos","Productos de fábrica","Servicios públicos"],"correctIndex":0,"points":10},
   {"text":"🏙️ ¿Por qué son importantes los servicios ambientales en ciudades?","options":["Mantienen equilibrio y salud","Turismo","Decoración","Comercio"],"correctIndex":0,"points":10},
-  {"text":"🌬️ Ejemplo de servicio ambiental:","options":["Oxígeno","Plástico","Dinero","Hierro"],"correctIndex":0,"points":10},
+  {"text":"🌬️ ¿Cuál es un ejemplo de servicio ambiental?","options":["Oxígeno","Plástico","Dinero","Hierro"],"correctIndex":0,"points":10},
   {"text":"🔥 ¿Qué amenaza los servicios ambientales?","options":["Uso excesivo de recursos","Educación","Turismo","Deporte"],"correctIndex":0,"points":10},
   {"text":"🌳 ¿Qué ecosistemas garantizan servicios?","options":["Bosques y selvas","Calles","Fábricas","Carreteras"],"correctIndex":0,"points":10},
   {"text":"⛔ ¿Qué ocurre si se deterioran los ecosistemas?","options":["Se reducen beneficios","Hay más dinero","Nada","Mejora la vida"],"correctIndex":0,"points":10},
-  {"text":"🦠 ¿Qué organismos participan en servicios ambientales?","options":["Animales, plantas, hongos","Solo humanos","Solo plantas","Robots"],"correctIndex":0,"points":10},
+  {"text":"🦠 ¿Qué organismos participan en servicios ambientales?","options":["Animales, plantas y hongos","Solo humanos","Solo plantas","Robots"],"correctIndex":0,"points":10},
   {"text":"💎 ¿Por qué son invaluables los servicios ambientales?","options":["Son vitales para la vida","Se venden","Son moda","Se compran"],"correctIndex":0,"points":10},
   {"text":"🌄 ¿Por qué Chiapas es un estado biodiverso?","options":["Muchos ecosistemas y especies","Es pequeño","Es árido","Por minería"],"correctIndex":0,"points":10},
-  {"text":"🏞️ Ecosistemas de Chiapas:","options":["Bosques, selvas, ríos","Desiertos","Tundra","Sabana"],"correctIndex":0,"points":10},
+  {"text":"🏞️ ¿Cuáles son algunos ecosistemas de Chiapas?","options":["Bosques, selvas y ríos","Desiertos","Tundra","Sabana"],"correctIndex":0,"points":10},
   {"text":"📊 ¿Cuántos estados destacan por biodiversidad junto con Chiapas?","options":["3","10","5","1"],"correctIndex":0,"points":10},
   {"text":"🔍 ¿Qué efecto tienen los descubrimientos de nuevas especies en Chiapas?","options":["Enriquecen listados biológicos","Nada","Reducen especies","Causan problemas"],"correctIndex":0,"points":10},
-  {"text":"🎨 ¿Qué significa que Chiapas tenga vida de todos colores?","options":["Gran diversidad","Poca fauna","Solo aves","Un mito"],"correctIndex":0,"points":10},
+  {"text":"🎨 ¿Qué significa que Chiapas tenga vida de todos los colores?","options":["Gran diversidad","Poca fauna","Solo aves","Un mito"],"correctIndex":0,"points":10},
   {"text":"🦅 ¿Qué ave rapaz gigante habita en Chiapas?","options":["Águila harpía","Águila real","Cóndor","Águila pescadora"],"correctIndex":0,"points":10},
-  {"text":"🦧 ¿Qué mono habita en la Selva Lacandona?","options":["Mono araña","Mono ardilla","Mono titi","Mono capuchino"],"correctIndex":0,"points":10},
+  {"text":"🦧 ¿Qué mono habita en la Selva Lacandona?","options":["Mono araña","Mono ardilla","Mono tití","Mono capuchino"],"correctIndex":0,"points":10},
   {"text":"☕ ¿Qué producto de Chiapas es famoso mundialmente?","options":["Café","Té","Vino","Maíz"],"correctIndex":0,"points":10},
-  {"text":"🎶 Instrumento musical típico de Chiapas:","options":["Marimba","Tambor","Guitarra","Violín"],"correctIndex":0,"points":10},
-  {"text":"🎉 Fiesta tradicional de Chiapa de Corzo reconocida por UNESCO:","options":["Parachicos","Carnaval","Guelaguetza","Danza de los Viejitos"],"correctIndex":0,"points":10},
+  {"text":"🎶 ¿Cuál es un instrumento musical típico de Chiapas?","options":["Marimba","Tambor","Guitarra","Violín"],"correctIndex":0,"points":10},
+  {"text":"🎉 ¿Qué fiesta tradicional de Chiapa de Corzo fue reconocida por la UNESCO?","options":["Parachicos","Carnaval","Guelaguetza","Danza de los Viejitos"],"correctIndex":0,"points":10},
   {"text":"💧 ¿Qué cañón emblemático está en Chiapas?","options":["Cañón del Sumidero","Colorado","Cobre","Apurímac"],"correctIndex":0,"points":10},
-  {"text":"🏛️ Gobernante maya enterrado en el Templo de las Inscripciones:","options":["Pakal el Grande","Moctezuma","Kukulkán","Itzamná"],"correctIndex":0,"points":10},
-  {"text":"🏺 Zona arqueológica rival de Palenque:","options":["Toniná","Bonampak","Uxmal","Monte Albán"],"correctIndex":0,"points":10},
-  {"text":"🦚 Ave considerada extinta y redescubierta en Chiapas:","options":["Guacamaya","Quetzal","Tucán","Loro"],"correctIndex":1,"points":10},
+  {"text":"🏛️ ¿Qué gobernante maya fue enterrado en el Templo de las Inscripciones?","options":["Pakal el Grande","Moctezuma","Kukulkán","Itzamná"],"correctIndex":0,"points":10},
+  {"text":"🏺 ¿Qué zona arqueológica fue rival de Palenque?","options":["Toniná","Bonampak","Uxmal","Monte Albán"],"correctIndex":0,"points":10},
+  {"text":"🦚 ¿Qué ave, considerada extinta, fue redescubierta en Chiapas?","options":["Guacamaya","Quetzal","Tucán","Loro"],"correctIndex":1,"points":10},
   {"text":"🐆 ¿Qué significa la palabra BALAM en maya?","options":["Jaguar","Puma","León","Tigre"],"correctIndex":0,"points":10},
-  {"text":"⚡ Presa hidroeléctrica junto al Cañón del Sumidero:","options":["Chicoasén","La Angostura","Peñitas","Malpaso"],"correctIndex":0,"points":10},
-  {"text":"🌊 Reserva natural costera de Chiapas con manglares:","options":["La Encrucijada","Sian Kaan","Calakmul","Vizcaíno"],"correctIndex":0,"points":10}
+  {"text":"⚡ ¿Qué presa hidroeléctrica se encuentra junto al Cañón del Sumidero?","options":["Chicoasén","La Angostura","Peñitas","Malpaso"],"correctIndex":0,"points":10},
+  {"text":"🌊 ¿Qué reserva natural costera de Chiapas tiene manglares?","options":["La Encrucijada","Sian Ka'an","Calakmul","Vizcaíno"],"correctIndex":0,"points":10},
+  {"text":"🌸 ¿Cuál es la familia de plantas más diversa en Chiapas?","options":["Orquídeas","Cactus","Pastos","Margaritas"],"correctIndex":0,"points":10},
+  {"text":"🗣️ ¿Qué lengua indígena es muy hablada en Los Altos de Chiapas?","options":["Tsotsil","Zapoteco","Maya","Rarámuri"],"correctIndex":0,"points":10},
+  {"text":"🗓️ ¿En qué año la UNESCO reconoció a los Parachicos?","options":["2010","2001","2020","2015"],"correctIndex":0,"points":10},
+  {"text":"🌐 ¿Qué tecnología se usa en los planetarios modernos?","options":["Proyección fulldome de 360°","Televisión","Holograma","Proyector plano"],"correctIndex":0,"points":10},
+  {"text":"🏔️ ¿Cuál es el volcán más alto de Chiapas?","options":["Tacaná","Popocatépetl","Toluca","Nevado de Colima"],"correctIndex":0,"points":10},
+  {"text":"🌊 ¿Qué lagos de Chiapas son famosos por sus colores?","options":["Montebello","Bacalar","Xochimilco","Zempoala"],"correctIndex":0,"points":10},
+  {"text":"🌍 ¿Qué continente es la cuna de la humanidad?","options":["América","Asia","África","Europa"],"correctIndex":2,"points":10},
+  {"text":"🦴 ¿Hace cuántos años ya estaba establecido el Homo sapiens en el Viejo Mundo?","options":["15 mil","100 mil","35 mil","70 mil"],"correctIndex":2,"points":10},
+  {"text":"🌐 ¿Qué ruta siguió el Homo sapiens para llegar a América?","options":["Atlántico","Pacífico","Estrecho de Bering","Mediterráneo"],"correctIndex":2,"points":10},
+  {"text":"🇨🇱 ¿Dónde se halló evidencia humana de hace 14 500 años?","options":["Monte Verde, Chile","Patagonia","Brasil","Perú"],"correctIndex":0,"points":10},
+  {"text":"🇧🇷 ¿Qué región de Brasil tiene evidencias de ocupación humana de hace 16 200 años?","options":["Amazonas","Centro-este","Noreste","Sur"],"correctIndex":1,"points":10},
+  {"text":"🇦🇷 ¿En qué región de Argentina hay evidencias de ocupación humana de hace 14 800 años?","options":["La Pampa","Patagonia","Córdoba","Buenos Aires"],"correctIndex":0,"points":10},
+  {"text":"🍃 ¿Qué partes del maíz se usaban además del grano?","options":["Solo el grano","Raíz","Hojas y tallo","Flores"],"correctIndex":2,"points":10},
+  {"text":"🌽 ¿Cuántos años lleva domesticado el maíz?","options":["5 000","Más de 10 000","1 000","20 000"],"correctIndex":1,"points":10},
+  {"text":"🌱 ¿Qué plantas acompañan al maíz en la milpa?","options":["Frijol y calabaza","Café y cacao","Trigo y avena","Arroz y lenteja"],"correctIndex":0,"points":10},
+  {"text":"🥗 ¿Qué país tiene la mayor diversidad de teocintles?","options":["Guatemala","México","Honduras","Perú"],"correctIndex":1,"points":10},
+  {"text":"👩‍🌾 ¿Qué beneficio trajo la domesticación de plantas?","options":["Más frutos y mayor resistencia","Decoración","Comercio","Religión"],"correctIndex":0,"points":10},
+  {"text":"📖 ¿Qué figura aparece en códices prehispánicos vinculada al maíz?","options":["Centéotl","Tláloc","Itzamná","Quetzalcóatl"],"correctIndex":0,"points":10},
+  {"text":"🏺 ¿Qué zona arqueológica es famosa por sus murales?","options":["Bonampak","Uxmal","Monte Albán","Chichén Itzá"],"correctIndex":0,"points":10},
+  {"text":"🏛️ ¿Qué ciudad maya fue rival de Palenque?","options":["Toniná","Bonampak","Tikal","Uxmal"],"correctIndex":0,"points":10},
+  {"text":"🪵 ¿Qué ecosistema mexicano es tan sostenible como uno natural?","options":["La milpa","Plantaciones de café","Cultivos de caña","Bosques de pino"],"correctIndex":0,"points":10},
+  {"text":"🔋 ¿Qué permitió la agricultura a gran escala?","options":["Crecimiento de civilizaciones","Más guerras","Menos alimentos","Desigualdad"],"correctIndex":0,"points":10},
+  {"text":"🌳 ¿Cuál es un ejemplo de servicio ambiental?","options":["Agua","Celular","Computadora","Edificio"],"correctIndex":0,"points":10},
+  {"text":"🔥 ¿Qué amenaza gravemente a los ecosistemas?","options":["Sobreexplotación","Ciencia","Educación","Turismo"],"correctIndex":0,"points":10},
+  {"text":"🌎 ¿Qué pregunta plantea el panel de servicios ambientales?","options":["¿Y tú, por dónde empezarías?","¿Quieres viajar?","¿Qué comerás hoy?","¿Cuántos bosques hay?"],"correctIndex":0,"points":10},
+  {"text":"📊 ¿De qué dependen los servicios ambientales?","options":["Acciones humanas","De los autos","Del comercio","Del turismo"],"correctIndex":0,"points":10},
+  {"text":"🦠 ¿Qué organismos generan servicios ambientales?","options":["Plantas, animales, hongos y microbios","Solo humanos","Solo bacterias","Solo plantas"],"correctIndex":0,"points":10},
+  {"text":"💎 ¿Por qué no se pueden valorar económicamente los servicios ambientales?","options":["Son fundamentales para la vida","No sirven","Son baratos","No existen"],"correctIndex":0,"points":10},
+  {"text":"🌄 ¿Qué ecosistemas están presentes en Chiapas?","options":["Selvas y bosques fríos","Desiertos","Tundras","Praderas"],"correctIndex":0,"points":10},
+  {"text":"🦅 ¿Qué ave rapaz habita en las selvas de Chiapas?","options":["Águila harpía","Águila calva","Cóndor","Halconcillo"],"correctIndex":0,"points":10},
+  {"text":"🦧 ¿Qué especie de mono habita en Chiapas?","options":["Mono araña","Mono tití","Mono ardilla","Mono capuchino"],"correctIndex":0,"points":10},
+  {"text":"☕ ¿Cuál es un producto emblemático de Chiapas?","options":["Café","Cacao","Té","Maíz"],"correctIndex":0,"points":10},
+  {"text":"🎶 ¿Cuál es el instrumento tradicional de Chiapas?","options":["Marimba","Tambor","Piano","Guitarra"],"correctIndex":0,"points":10},
+  {"text":"🎉 ¿Qué fiesta chiapaneca fue reconocida por la UNESCO?","options":["Parachicos","Guelaguetza","Carnaval de Veracruz","Danza de los Viejitos"],"correctIndex":0,"points":10},
+  {"text":"🗣️ ¿Cuál es la lengua indígena más hablada en Los Altos de Chiapas?","options":["Tsotsil","Zapoteco","Maya","Otomí"],"correctIndex":0,"points":10},
+  {"text":"🗣️ ¿Cuál es otra lengua maya importante en Chiapas?","options":["Tseltal","Náhuatl","Mixteco","Zapoteco"],"correctIndex":0,"points":10},
+  {"text":"🌐 ¿Qué tecnología utilizan los planetarios modernos?","options":["Proyección fulldome de 360°","Televisión","Radio","Realidad virtual"],"correctIndex":0,"points":10},
+  {"text":"🏔️ ¿Cuál es el volcán más alto de Chiapas?","options":["Tacaná","Iztaccíhuatl","Popocatépetl","Toluca"],"correctIndex":0,"points":10},
+  {"text":"🌊 ¿Qué lagos de Chiapas destacan por sus colores?","options":["Montebello","Bacalar","Texcoco","Zempoala"],"correctIndex":0,"points":10},
+  {"text":"💧 ¿Qué presa se encuentra junto al Cañón del Sumidero?","options":["Chicoasén","Peñitas","Angostura","Malpaso"],"correctIndex":0,"points":10},
+  {"text":"🌊 ¿Qué reserva natural de Chiapas tiene manglares?","options":["La Encrucijada","Calakmul","Vizcaíno","Xochimilco"],"correctIndex":0,"points":10},
+  {"text":"🌸 ¿Cuáles son las plantas más diversas en Chiapas?","options":["Orquídeas","Cactus","Pastos","Rosas"],"correctIndex":0,"points":10},
+  {"text":"🦚 ¿Qué ave sagrada, considerada extinta, fue hallada en Chiapas?","options":["Quetzal","Guacamaya","Tucán","Loro"],"correctIndex":0,"points":10},
+  {"text":"🐆 ¿Qué significa «balam» en maya?","options":["Jaguar","Puma","Tigre","León"],"correctIndex":0,"points":10},
+  {"text":"📅 ¿Hace cuántos años se cruzó el estrecho de Bering?","options":["Entre 15 000 y 15 500","20 mil","10 mil","5 mil"],"correctIndex":0,"points":10},
+  {"text":"🇺🇸 ¿Dónde hay evidencia humana de hace 14 300 años?","options":["Oregón, EE. UU.","Texas","Florida","Alaska"],"correctIndex":0,"points":10},
+  {"text":"🇲🇽 ¿Dónde se hallaron restos humanos de hace 10 460 años en Chiapas?","options":["Cueva de Santa Marta","Bonampak","Palenque","Toniná"],"correctIndex":0,"points":10},
+  {"text":"🇲🇽 ¿Qué antigüedad tienen los restos de Los Grifos, Chiapas?","options":["9 540","15 000","20 000","3 000"],"correctIndex":0,"points":10},
+  {"text":"🇲🇽 ¿Qué municipio de Chiapas tiene la Cueva de Santa Marta?","options":["Ocozocoautla","San Cristóbal","Tuxtla","Tapachula"],"correctIndex":0,"points":10},
+  {"text":"🇲🇽 ¿Qué municipio tiene la Cueva de Los Grifos?","options":["Ocozocoautla","Palenque","Chamula","Tila"],"correctIndex":0,"points":10},
+  {"text":"🇵🇹 ¿Dónde se hallaron fósiles de Homo sapiens de 44 mil años?","options":["Portugal","Grecia","Alemania","Francia"],"correctIndex":0,"points":10},
+  {"text":"🇮🇹 ¿En qué país europeo hay restos de Homo sapiens de 40 mil años?","options":["Italia","Suecia","España","Polonia"],"correctIndex":0,"points":10},
+  {"text":"🇬🇧 ¿En qué país hay evidencia humana de 40 mil años?","options":["Reino Unido","Dinamarca","Irlanda","Suiza"],"correctIndex":0,"points":10},
+  {"text":"🕰️ ¿Qué permitió al Homo sapiens expandirse por el planeta?","options":["La búsqueda de mejores condiciones","Guerras","Azar","Religión"],"correctIndex":0,"points":10},
+  {"text":"🌍 ¿Qué especie humana se considera antecesora directa del Homo sapiens?","options":["Homo erectus","Neandertal","Homo habilis","Australopithecus"],"correctIndex":0,"points":10},
+  {"text":"🦴 ¿En qué país se hallaron fósiles de Homo sapiens de 350 mil años?","options":["Marruecos","Egipto","Sudáfrica","Nigeria"],"correctIndex":0,"points":10},
+  {"text":"🌡️ ¿Qué evento climático favoreció la dispersión humana fuera de África?","options":["Sequías","Glaciaciones","Huracanes","Volcanes"],"correctIndex":0,"points":10},
+  {"text":"🌐 ¿Qué estrecho permitió el paso de Asia a América?","options":["Bering","Gibraltar","Magallanes","Malaca"],"correctIndex":0,"points":10},
+  {"text":"🏹 ¿Qué herramientas ayudaron al Homo sapiens a sobrevivir?","options":["Lanzas y arcos","Teléfonos","Autos","Computadoras"],"correctIndex":0,"points":10},
+  {"text":"🍞 ¿Qué cereal fue fundamental en Mesoamérica?","options":["Maíz","Trigo","Arroz","Cebada"],"correctIndex":0,"points":10},
+  {"text":"🌽 ¿Qué significa teocintle?","options":["Progenitor silvestre del maíz","Un tipo de frijol","Una calabaza","Hierba de río"],"correctIndex":0,"points":10},
+  {"text":"🧑‍🌾 ¿Cuántas razas de maíz existen en México?","options":["60","100","30","10"],"correctIndex":0,"points":10},
+  {"text":"🥘 ¿Cuántos platillos en México usan maíz como base?","options":["Más de 600","100","50","200"],"correctIndex":0,"points":10},
+  {"text":"🗿 ¿Qué dios mexica estaba relacionado con el maíz?","options":["Centéotl","Huitzilopochtli","Tezcatlipoca","Tláloc"],"correctIndex":0,"points":10},
+  {"text":"🥒 ¿Qué cultivos acompañan al maíz en la milpa?","options":["Frijol y calabaza","Papas y trigo","Cebada y avena","Café y cacao"],"correctIndex":0,"points":10},
+  {"text":"🌻 ¿Qué significa agricultura sustentable?","options":["Aprovechar los recursos sin dañar el ambiente","Usar rápido","Destruir ecosistemas","Ignorar recursos"],"correctIndex":0,"points":10},
+  {"text":"📈 ¿Qué permitió la agricultura a gran escala?","options":["Civilizaciones","Extinción humana","Huracanes","Animales domésticos"],"correctIndex":0,"points":10},
+  {"text":"🌳 ¿Qué es un servicio ambiental?","options":["Beneficio natural","Impuesto","Plaga","Construcción"],"correctIndex":0,"points":10},
+  {"text":"💨 ¿Cuál es un ejemplo de servicio ambiental?","options":["Oxígeno","Automóvil","Teléfono","Luz artificial"],"correctIndex":0,"points":10},
+  {"text":"🚰 ¿Qué amenaza los servicios ambientales?","options":["Explotación excesiva","Educación","Turismo responsable","Arte"],"correctIndex":0,"points":10},
+  {"text":"🔄 ¿Qué depende de las acciones humanas?","options":["Equilibrio ambiental","El sol","La luna","El viento"],"correctIndex":0,"points":10},
+  {"text":"🦠 ¿Qué organismos participan en los servicios ambientales?","options":["Plantas y animales","Máquinas","Computadoras","Robots"],"correctIndex":0,"points":10},
+  {"text":"🤑 ¿Por qué no se pueden comprar servicios ambientales?","options":["No tienen precio","Son baratos","Son ilimitados","No existen"],"correctIndex":0,"points":10},
+  {"text":"🌄 ¿Cuáles son los principales ecosistemas de Chiapas?","options":["Bosques y selvas","Desiertos","Tundras","Sabana africana"],"correctIndex":0,"points":10},
+  {"text":"🦋 ¿Por qué Chiapas es un estado biodiverso?","options":["Variedad de ecosistemas y especies","Solo tiene selva","Tiene desiertos","Es pequeño"],"correctIndex":0,"points":10},
+  {"text":"🦅 ¿Qué ave rapaz gigante habita en Chiapas?","options":["Águila harpía","Águila calva","Cóndor","Águila pescadora"],"correctIndex":0,"points":10},
+  {"text":"🦧 ¿Qué mono es característico de la Selva Lacandona?","options":["Mono araña","Mono ardilla","Mono capuchino","Mono tití"],"correctIndex":0,"points":10},
+  {"text":"🎶 ¿Qué instrumento musical identifica a Chiapas?","options":["Marimba","Piano","Violín","Trompeta"],"correctIndex":0,"points":10},
+  {"text":"☕ ¿Qué producto chiapaneco es reconocido mundialmente?","options":["Café","Trigo","Arroz","Vino"],"correctIndex":0,"points":10},
+  {"text":"🎉 ¿Qué fiesta tradicional de Chiapa de Corzo fue reconocida por la UNESCO?","options":["Parachicos","Guelaguetza","Carnaval","Danza del venado"],"correctIndex":0,"points":10},
+  {"text":"🗣️ ¿Qué lengua indígena se habla en Los Altos de Chiapas?","options":["Tsotsil","Zapoteco","Maya","Otomí"],"correctIndex":0,"points":10},
+  {"text":"🗣️ ¿Cuál es otra lengua maya importante en Chiapas?","options":["Tseltal","Mixteco","Rarámuri","Purépecha"],"correctIndex":0,"points":10},
+  {"text":"🏔️ ¿Cuál es el volcán más alto de Chiapas?","options":["Tacaná","Iztaccíhuatl","Popocatépetl","Toluca"],"correctIndex":0,"points":10},
+  {"text":"🌊 ¿Qué lagos de Chiapas destacan por sus colores?","options":["Montebello","Bacalar","Texcoco","Zempoala"],"correctIndex":0,"points":10},
+  {"text":"💧 ¿Qué presa se encuentra junto al Cañón del Sumidero?","options":["Chicoasén","Peñitas","Angostura","Malpaso"],"correctIndex":0,"points":10},
+  {"text":"❄️ ¿Cuál es la estación más fría del año?","options":["Invierno","Primavera","Verano","Otoño"],"correctIndex":0,"points":10},
+  {"text": "🔍 ¿Qué efecto tienen los descubrimientos de nuevas especies en Chiapas?","options": ["Enriquecen listados biológicos", "Nada", "Reducen especies", "Causan problemas"],"correctIndex": 0,"points": 10 },
+  {"text": "🎨 ¿Qué significa que Chiapas tenga vida de todos los colores?",
+    "options": ["Gran diversidad", "Poca fauna", "Solo aves", "Un mito"],
+    "correctIndex": 0,
+    "points": 1
+  },
+  {
+    "text": "🦅 ¿Qué ave rapaz gigante habita en Chiapas?",
+    "options": ["Águila harpía", "Águila real", "Cóndor", "Águila pescadora"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦧 ¿Qué mono habita en la Selva Lacandona?",
+    "options": ["Mono araña", "Mono ardilla", "Mono tití", "Mono capuchino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "☕ ¿Qué producto de Chiapas es famoso mundialmente?",
+    "options": ["Café", "Té", "Vino", "Maíz"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎶 ¿Cuál es un instrumento musical típico de Chiapas?",
+    "options": ["Marimba", "Tambor", "Guitarra", "Violín"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎉 ¿Qué fiesta tradicional de Chiapa de Corzo fue reconocida por la UNESCO?",
+    "options": ["Parachicos", "Carnaval", "Guelaguetza", "Danza de los Viejitos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💧 ¿Qué cañón emblemático está en Chiapas?",
+    "options": ["Cañón del Sumidero", "Colorado", "Cobre", "Apurímac"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏛️ ¿Qué gobernante maya fue enterrado en el Templo de las Inscripciones?",
+    "options": ["Pakal el Grande", "Moctezuma", "Kukulkán", "Itzamná"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏺 ¿Qué zona arqueológica fue rival de Palenque?",
+    "options": ["Toniná", "Bonampak", "Uxmal", "Monte Albán"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦚 ¿Qué ave, considerada extinta, fue redescubierta en Chiapas?",
+    "options": ["Guacamaya", "Quetzal", "Tucán", "Loro"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "🐆 ¿Qué significa la palabra BALAM en maya?",
+    "options": ["Jaguar", "Puma", "León", "Tigre"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "⚡ ¿Qué presa hidroeléctrica se encuentra junto al Cañón del Sumidero?",
+    "options": ["Chicoasén", "La Angostura", "Peñitas", "Malpaso"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué reserva natural costera de Chiapas tiene manglares?",
+    "options": ["La Encrucijada", "Sian Ka'an", "Calakmul", "Vizcaíno"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌸 ¿Cuál es la familia de plantas más diversa en Chiapas?",
+    "options": ["Orquídeas", "Cactus", "Pastos", "Margaritas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Qué lengua indígena es muy hablada en Los Altos de Chiapas?",
+    "options": ["Tsotsil", "Zapoteco", "Maya", "Rarámuri"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ Además del tsotsil, ¿qué otra lengua se habla en Chiapas?",
+    "options": ["Tseltal", "Náhuatl", "Mixteco", "Zapoteco"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗓️ ¿En qué año la UNESCO reconoció a los Parachicos?",
+    "options": ["2010", "2001", "2020", "2015"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué tecnología se usa en los planetarios modernos?",
+    "options": ["Proyección fulldome de 360°", "Televisión", "Holograma", "Proyector plano"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏔️ ¿Cuál es el volcán más alto de Chiapas?",
+    "options": ["Tacaná", "Popocatépetl", "Toluca", "Nevado de Colima"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué lagos de Chiapas son famosos por sus colores?",
+    "options": ["Montebello", "Bacalar", "Xochimilco", "Zempoala"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌍 ¿Qué continente es la cuna de la humanidad?",
+    "options": ["América", "Asia", "África", "Europa"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🦴 ¿Hace cuántos años ya estaba establecido el Homo sapiens en el Viejo Mundo?",
+    "options": ["15 mil", "100 mil", "35 mil", "70 mil"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué ruta siguió el Homo sapiens para llegar a América?",
+    "options": ["Atlántico", "Pacífico", "Estrecho de Bering", "Mediterráneo"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🇨🇱 ¿Dónde se halló evidencia humana de hace 14 500 años?",
+    "options": ["Monte Verde, Chile", "Patagonia", "Brasil", "Perú"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇧🇷 ¿Qué región de Brasil tiene evidencias de ocupación humana de hace 16 200 años?",
+    "options": ["Amazonas", "Centro-este", "Noreste", "Sur"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "🇦🇷 ¿En qué región de Argentina hay evidencias de ocupación humana de hace 14 800 años?",
+    "options": ["La Pampa", "Patagonia", "Córdoba", "Buenos Aires"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🍃 ¿Qué partes del maíz se usaban además del grano?",
+    "options": ["Solo el grano", "Raíz", "Hojas y tallo", "Flores"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🌽 ¿Cuántos años lleva domesticado el maíz?",
+    "options": ["5 000", "Más de 10 000", "1 000", "20 000"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "🌱 ¿Qué plantas acompañan al maíz en la milpa?",
+    "options": ["Frijol y calabaza", "Café y cacao", "Trigo y avena", "Arroz y lenteja"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥗 ¿Qué país tiene la mayor diversidad de teocintles?",
+    "options": ["Guatemala", "México", "Honduras", "Perú"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "👩‍🌾 ¿Qué beneficio trajo la domesticación de plantas?",
+    "options": ["Más frutos y mayor resistencia", "Decoración", "Comercio", "Religión"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📖 ¿Qué figura aparece en códices prehispánicos vinculada al maíz?",
+    "options": ["Centéotl", "Tláloc", "Itzamná", "Quetzalcóatl"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏺 ¿Qué zona arqueológica es famosa por sus murales?",
+    "options": ["Bonampak", "Uxmal", "Monte Albán", "Chichén Itzá"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏛️ ¿Qué ciudad maya fue rival de Palenque?",
+    "options": ["Toniná", "Bonampak", "Tikal", "Uxmal"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🪵 ¿Qué ecosistema mexicano es tan sostenible como uno natural?",
+    "options": ["La milpa", "Plantaciones de café", "Cultivos de caña", "Bosques de pino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔋 ¿Qué permitió la agricultura a gran escala?",
+    "options": ["Crecimiento de civilizaciones", "Más guerras", "Menos alimentos", "Desigualdad"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌳 ¿Cuál es un ejemplo de servicio ambiental?",
+    "options": ["Agua", "Celular", "Computadora", "Edificio"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔥 ¿Qué amenaza gravemente a los ecosistemas?",
+    "options": ["Sobreexplotación", "Ciencia", "Educación", "Turismo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌎 ¿Qué pregunta plantea el panel de servicios ambientales?",
+    "options": ["¿Y tú, por dónde empezarías?", "¿Quieres viajar?", "¿Qué comerás hoy?", "¿Cuántos bosques hay?"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📊 ¿De qué dependen los servicios ambientales?",
+    "options": ["Acciones humanas", "De los autos", "Del comercio", "Del turismo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦠 ¿Qué organismos generan servicios ambientales?",
+    "options": ["Plantas, animales, hongos y microbios", "Solo humanos", "Solo bacterias", "Solo plantas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💎 ¿Por qué no se pueden valorar económicamente los servicios ambientales?",
+    "options": ["Son fundamentales para la vida", "No sirven", "Son baratos", "No existen"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌄 ¿Qué ecosistemas están presentes en Chiapas?",
+    "options": ["Selvas y bosques fríos", "Desiertos", "Tundras", "Praderas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦅 ¿Qué ave rapaz habita en las selvas de Chiapas?",
+    "options": ["Águila harpía", "Águila calva", "Cóndor", "Halconcillo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦧 ¿Qué especie de mono habita en Chiapas?",
+    "options": ["Mono araña", "Mono tití", "Mono ardilla", "Mono capuchino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "☕ ¿Cuál es un producto emblemático de Chiapas?",
+    "options": ["Café", "Cacao", "Té", "Maíz"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎶 ¿Cuál es el instrumento tradicional de Chiapas?",
+    "options": ["Marimba", "Tambor", "Piano", "Guitarra"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎉 ¿Qué fiesta chiapaneca fue reconocida por la UNESCO?",
+    "options": ["Parachicos", "Guelaguetza", "Carnaval de Veracruz", "Danza de los Viejitos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Cuál es la lengua indígena más hablada en Los Altos de Chiapas?",
+    "options": ["Tsotsil", "Zapoteco", "Maya", "Otomí"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Cuál es otra lengua maya importante en Chiapas?",
+    "options": ["Tseltal", "Náhuatl", "Mixteco", "Zapoteco"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué tecnología utilizan los planetarios modernos?",
+    "options": ["Proyección fulldome de 360°", "Televisión", "Radio", "Realidad virtual"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏔️ ¿Cuál es el volcán más alto de Chiapas?",
+    "options": ["Tacaná", "Iztaccíhuatl", "Popocatépetl", "Toluca"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué lagos de Chiapas destacan por sus colores?",
+    "options": ["Montebello", "Bacalar", "Texcoco", "Zempoala"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💧 ¿Qué presa se encuentra junto al Cañón del Sumidero?",
+    "options": ["Chicoasén", "Peñitas", "Angostura", "Malpaso"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué reserva natural de Chiapas tiene manglares?",
+    "options": ["La Encrucijada", "Calakmul", "Vizcaíno", "Xochimilco"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌸 ¿Cuáles son las plantas más diversas en Chiapas?",
+    "options": ["Orquídeas", "Cactus", "Pastos", "Rosas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦚 ¿Qué ave sagrada, considerada extinta, fue hallada en Chiapas?",
+    "options": ["Quetzal", "Guacamaya", "Tucán", "Loro"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🐆 ¿Qué significa «balam» en maya?",
+    "options": ["Jaguar", "Puma", "Tigre", "León"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📅 ¿Hace cuántos años se cruzó el estrecho de Bering?",
+    "options": ["Entre 15 000 y 15 500", "20 mil", "10 mil", "5 mil"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇺🇸 ¿Dónde hay evidencia humana de hace 14 300 años?",
+    "options": ["Oregón, EE. UU.", "Texas", "Florida", "Alaska"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Dónde se hallaron restos humanos de hace 10 460 años en Chiapas?",
+    "options": ["Cueva de Santa Marta", "Bonampak", "Palenque", "Toniná"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué antigüedad tienen los restos de Los Grifos, Chiapas?",
+    "options": ["9 540", "15 000", "20 000", "3 000"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué municipio de Chiapas tiene la Cueva de Santa Marta?",
+    "options": ["Ocozocoautla", "San Cristóbal", "Tuxtla", "Tapachula"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué municipio tiene la Cueva de Los Grifos?",
+    "options": ["Ocozocoautla", "Palenque", "Chamula", "Tila"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇵🇹 ¿Dónde se hallaron fósiles de Homo sapiens de 44 mil años?",
+    "options": ["Portugal", "Grecia", "Alemania", "Francia"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇮🇹 ¿En qué país europeo hay restos de Homo sapiens de 40 mil años?",
+    "options": ["Italia", "Suecia", "España", "Polonia"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇬🇧 ¿En qué país hay evidencia humana de 40 mil años?",
+    "options": ["Reino Unido", "Dinamarca", "Irlanda", "Suiza"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🕰️ ¿Qué permitió al Homo sapiens expandirse por el planeta?",
+    "options": ["La búsqueda de mejores condiciones", "Guerras", "Azar", "Religión"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌍 ¿Qué especie humana se considera antecesora directa del Homo sapiens?",
+    "options": ["Homo erectus", "Neandertal", "Homo habilis", "Australopithecus"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦴 ¿En qué país se hallaron fósiles de Homo sapiens de 350 mil años?",
+    "options": ["Marruecos", "Egipto", "Sudáfrica", "Nigeria"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌡️ ¿Qué evento climático favoreció la dispersión humana fuera de África?",
+    "options": ["Sequías", "Glaciaciones", "Huracanes", "Volcanes"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué estrecho permitió el paso de Asia a América?",
+    "options": ["Bering", "Gibraltar", "Magallanes", "Malaca"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏹 ¿Qué herramientas ayudaron al Homo sapiens a sobrevivir?",
+    "options": ["Lanzas y arcos", "Teléfonos", "Autos", "Computadoras"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🍞 ¿Qué cereal fue fundamental en Mesoamérica?",
+    "options": ["Maíz", "Trigo", "Arroz", "Cebada"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌽 ¿Qué significa teocintle?",
+    "options": ["Progenitor silvestre del maíz", "Un tipo de frijol", "Una calabaza", "Hierba de río"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🧑‍🌾 ¿Cuántas razas de maíz existen en México?",
+    "options": ["60", "100", "30", "10"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥘 ¿Cuántos platillos en México usan maíz como base?",
+    "options": ["Más de 600", "100", "50", "200"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗿 ¿Qué dios mexica estaba relacionado con el maíz?",
+    "options": ["Centéotl", "Huitzilopochtli", "Tezcatlipoca", "Tláloc"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥒 ¿Qué cultivos acompañan al maíz en la milpa?",
+    "options": ["Frijol y calabaza", "Papas y trigo", "Cebada y avena", "Café y cacao"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌻 ¿Qué significa agricultura sustentable?",
+    "options": ["Aprovechar los recursos sin dañar el ambiente", "Usar rápido", "Destruir ecosistemas", "Ignorar recursos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📈 ¿Qué permitió la agricultura a gran escala?",
+    "options": ["Civilizaciones", "Extinción humana", "Huracanes", "Animales domésticos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌳 ¿Qué es un servicio ambiental?",
+    "options": ["Beneficio natural", "Impuesto", "Plaga", "Construcción"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💨 ¿Cuál es un ejemplo de servicio ambiental?",
+    "options": ["Oxígeno", "Automóvil", "Teléfono", "Luz artificial"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🚰 ¿Qué amenaza los servicios ambientales?",
+    "options": ["Explotación excesiva", "Educación", "Turismo responsable", "Arte"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔄 ¿Qué depende de las acciones humanas?",
+    "options": ["Equilibrio ambiental", "El sol", "La luna", "El viento"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦠 ¿Qué organismos participan en los servicios ambientales?",
+    "options": ["Plantas y animales", "Máquinas", "Computadoras", "Robots"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🤑 ¿Por qué no se pueden comprar servicios ambientales?",
+    "options": ["No tienen precio", "Son baratos", "Son ilimitados", "No existen"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌄 ¿Cuáles son los principales ecosistemas de Chiapas?",
+    "options": ["Bosques y selvas", "Desiertos", "Tundras", "Sabana africana"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦋 ¿Por qué Chiapas es un estado biodiverso?",
+    "options": ["Variedad de ecosistemas y especies", "Solo tiene selva", "Tiene desiertos", "Es pequeño"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦅 ¿Qué ave rapaz gigante habita en Chiapas?",
+    "options": ["Águila harpía", "Águila calva", "Cóndor", "Águila pescadora"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦧 ¿Qué mono es característico de la Selva Lacandona?",
+    "options": ["Mono araña", "Mono ardilla", "Mono capuchino", "Mono tití"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎶 ¿Qué instrumento musical identifica a Chiapas?",
+    "options": ["Marimba", "Piano", "Violín", "Trompeta"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "☕ ¿Qué producto chiapaneco es reconocido mundialmente?",
+    "options": ["Café", "Trigo", "Arroz", "Vino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎉 ¿Qué fiesta tradicional de Chiapa de Corzo fue reconocida por la UNESCO?",
+    "options": ["Parachicos", "Guelaguetza", "Carnaval", "Danza del venado"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Qué lengua indígena se habla en Los Altos de Chiapas?",
+    "options": ["Tsotsil", "Zapoteco", "Maya", "Otomí"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Cuál es otra lengua maya importante en Chiapas?",
+    "options": ["Tseltal", "Mixteco", "Rarámuri", "Purépecha"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué tecnología utilizan los planetarios modernos?",
+    "options": ["Proyección fulldome de 360°", "Televisión", "Radio", "Realidad virtual"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏔️ ¿Cuál es el volcán más alto de Chiapas?",
+    "options": ["Tacaná", "Iztaccíhuatl", "Popocatépetl", "Toluca"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué lagos de Chiapas destacan por sus colores?",
+    "options": ["Montebello", "Bacalar", "Texcoco", "Zempoala"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌍 ¿Qué continente es la cuna de la humanidad?",
+    "options": ["América", "Asia", "África", "Europa"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🦴 ¿Hace cuántos años ya estaba establecido el Homo sapiens en el Viejo Mundo?",
+    "options": ["15 mil", "100 mil", "35 mil", "70 mil"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué ruta siguió el Homo sapiens para llegar a América?",
+    "options": ["Atlántico", "Pacífico", "Estrecho de Bering", "Mediterráneo"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🇨🇱 ¿Dónde se halló evidencia humana de hace 14 500 años?",
+    "options": ["Monte Verde, Chile", "Patagonia", "Brasil", "Perú"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇧🇷 ¿Qué región de Brasil tiene evidencias de ocupación humana de hace 16 200 años?",
+    "options": ["Amazonas", "Centro-este", "Noreste", "Sur"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "🇦🇷 ¿En qué región de Argentina hay evidencias de ocupación humana de hace 14 800 años?",
+    "options": ["La Pampa", "Patagonia", "Córdoba", "Buenos Aires"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🍃 ¿Qué partes del maíz se usaban además del grano?",
+    "options": ["Solo el grano", "Raíz", "Hojas y tallo", "Flores"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🌽 ¿Cuántos años lleva domesticado el maíz?",
+    "options": ["5 000", "Más de 10 000", "1 000", "20 000"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "🌱 ¿Qué plantas acompañan al maíz en la milpa?",
+    "options": ["Frijol y calabaza", "Café y cacao", "Trigo y avena", "Arroz y lenteja"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥗 ¿Qué país tiene la mayor diversidad de teocintles?",
+    "options": ["Guatemala", "México", "Honduras", "Perú"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "👩‍🌾 ¿Qué beneficio trajo la domesticación de plantas?",
+    "options": ["Más frutos y mayor resistencia", "Decoración", "Comercio", "Religión"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📖 ¿Qué figura aparece en códices prehispánicos vinculada al maíz?",
+    "options": ["Centéotl", "Tláloc", "Itzamná", "Quetzalcóatl"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏺 ¿Qué zona arqueológica es famosa por sus murales?",
+    "options": ["Bonampak", "Uxmal", "Monte Albán", "Chichén Itzá"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏛️ ¿Qué ciudad maya fue rival de Palenque?",
+    "options": ["Toniná", "Bonampak", "Tikal", "Uxmal"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🪵 ¿Qué ecosistema mexicano es tan sostenible como uno natural?",
+    "options": ["La milpa", "Plantaciones de café", "Cultivos de caña", "Bosques de pino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔋 ¿Qué permitió la agricultura a gran escala?",
+    "options": ["Crecimiento de civilizaciones", "Más guerras", "Menos alimentos", "Desigualdad"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌳 ¿Cuál es un ejemplo de servicio ambiental?",
+    "options": ["Agua", "Celular", "Computadora", "Edificio"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔥 ¿Qué amenaza gravemente a los ecosistemas?",
+    "options": ["Sobreexplotación", "Ciencia", "Educación", "Turismo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌎 ¿Qué pregunta plantea el panel de servicios ambientales?",
+    "options": ["¿Y tú, por dónde empezarías?", "¿Quieres viajar?", "¿Qué comerás hoy?", "¿Cuántos bosques hay?"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📊 ¿De qué dependen los servicios ambientales?",
+    "options": ["Acciones humanas", "De los autos", "Del comercio", "Del turismo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦠 ¿Qué organismos generan servicios ambientales?",
+    "options": ["Plantas, animales, hongos y microbios", "Solo humanos", "Solo bacterias", "Solo plantas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💎 ¿Por qué no se pueden valorar económicamente los servicios ambientales?",
+    "options": ["Son fundamentales para la vida", "No sirven", "Son baratos", "No existen"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌄 ¿Qué ecosistemas están presentes en Chiapas?",
+    "options": ["Selvas y bosques fríos", "Desiertos", "Tundras", "Praderas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦅 ¿Qué ave rapaz habita en las selvas de Chiapas?",
+    "options": ["Águila harpía", "Águila calva", "Cóndor", "Halconcillo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦧 ¿Qué especie de mono habita en Chiapas?",
+    "options": ["Mono araña", "Mono tití", "Mono ardilla", "Mono capuchino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "☕ ¿Cuál es un producto emblemático de Chiapas?",
+    "options": ["Café", "Cacao", "Té", "Maíz"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎶 ¿Cuál es el instrumento tradicional de Chiapas?",
+    "options": ["Marimba", "Tambor", "Piano", "Guitarra"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎉 ¿Qué fiesta chiapaneca fue reconocida por la UNESCO?",
+    "options": ["Parachicos", "Guelaguetza", "Carnaval de Veracruz", "Danza de los Viejitos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Qué lengua indígena se habla en Los Altos de Chiapas?",
+    "options": ["Tsotsil", "Zapoteco", "Maya", "Otomí"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Cuál es otra lengua maya importante en Chiapas?",
+    "options": ["Tseltal", "Mixteco", "Rarámuri", "Purépecha"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué tecnología utilizan los planetarios modernos?",
+    "options": ["Proyección fulldome de 360°", "Televisión", "Radio", "Realidad virtual"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏔️ ¿Cuál es el volcán más alto de Chiapas?",
+    "options": ["Tacaná", "Iztaccíhuatl", "Popocatépetl", "Toluca"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué lagos de Chiapas destacan por sus colores?",
+    "options": ["Montebello", "Bacalar", "Texcoco", "Zempoala"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌍 ¿Qué continente es la cuna de la humanidad?",
+    "options": ["América", "Asia", "África", "Europa"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🦴 ¿Hace cuántos años ya estaba establecido el Homo sapiens en el Viejo Mundo?",
+    "options": ["15 mil", "100 mil", "35 mil", "70 mil"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué ruta siguió el Homo sapiens para llegar a América?",
+    "options": ["Atlántico", "Pacífico", "Estrecho de Bering", "Mediterráneo"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🇨🇱 ¿Dónde se halló evidencia humana de hace 14 500 años?",
+    "options": ["Monte Verde, Chile", "Patagonia", "Brasil", "Perú"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇧🇷 ¿Qué región de Brasil tiene evidencias de ocupación humana de hace 16 200 años?",
+    "options": ["Amazonas", "Centro-este", "Noreste", "Sur"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "🇦🇷 ¿En qué región de Argentina hay evidencias de ocupación humana de hace 14 800 años?",
+    "options": ["La Pampa", "Patagonia", "Córdoba", "Buenos Aires"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🍃 ¿Qué partes del maíz se usaban además del grano?",
+    "options": ["Solo el grano", "Raíz", "Hojas y tallo", "Flores"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🌽 ¿Cuántos años lleva domesticado el maíz?",
+    "options": ["5 000", "Más de 10 000", "1 000", "20 000"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "🌱 ¿Qué plantas acompañan al maíz en la milpa?",
+    "options": ["Frijol y calabaza", "Café y cacao", "Trigo y avena", "Arroz y lenteja"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥗 ¿Qué país tiene la mayor diversidad de teocintles?",
+    "options": ["Guatemala", "México", "Honduras", "Perú"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "👩‍🌾 ¿Qué beneficio trajo la domesticación de plantas?",
+    "options": ["Más frutos y mayor resistencia", "Decoración", "Comercio", "Religión"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📖 ¿Qué figura aparece en códices prehispánicos vinculada al maíz?",
+    "options": ["Centéotl", "Tláloc", "Itzamná", "Quetzalcóatl"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏺 ¿Qué zona arqueológica es famosa por sus murales?",
+    "options": ["Bonampak", "Uxmal", "Monte Albán", "Chichén Itzá"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏛️ ¿Qué ciudad maya fue rival de Palenque?",
+    "options": ["Toniná", "Bonampak", "Tikal", "Uxmal"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🪵 ¿Qué ecosistema mexicano es tan sostenible como uno natural?",
+    "options": ["La milpa", "Plantaciones de café", "Cultivos de caña", "Bosques de pino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔋 ¿Qué permitió la agricultura a gran escala?",
+    "options": ["Crecimiento de civilizaciones", "Más guerras", "Menos alimentos", "Desigualdad"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌳 ¿Cuál es un ejemplo de servicio ambiental?",
+    "options": ["Agua", "Celular", "Computadora", "Edificio"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔥 ¿Qué amenaza gravemente a los ecosistemas?",
+    "options": ["Sobreexplotación", "Ciencia", "Educación", "Turismo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌎 ¿Qué pregunta plantea el panel de servicios ambientales?",
+    "options": ["¿Y tú, por dónde empezarías?", "¿Quieres viajar?", "¿Qué comerás hoy?", "¿Cuántos bosques hay?"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📊 ¿De qué dependen los servicios ambientales?",
+    "options": ["Acciones humanas", "De los autos", "Del comercio", "Del turismo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦠 ¿Qué organismos generan servicios ambientales?",
+    "options": ["Plantas, animales, hongos y microbios", "Solo humanos", "Solo bacterias", "Solo plantas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💎 ¿Por qué no se pueden valorar económicamente los servicios ambientales?",
+    "options": ["Son fundamentales para la vida", "No sirven", "Son baratos", "No existen"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌄 ¿Qué ecosistemas están presentes en Chiapas?",
+    "options": ["Selvas y bosques fríos", "Desiertos", "Tundras", "Praderas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦅 ¿Qué ave rapaz habita en las selvas de Chiapas?",
+    "options": ["Águila harpía", "Águila calva", "Cóndor", "Halconcillo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦧 ¿Qué especie de mono habita en Chiapas?",
+    "options": ["Mono araña", "Mono tití", "Mono ardilla", "Mono capuchino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "☕ ¿Cuál es un producto emblemático de Chiapas?",
+    "options": ["Café", "Cacao", "Té", "Maíz"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎶 ¿Cuál es el instrumento tradicional de Chiapas?",
+    "options": ["Marimba", "Tambor", "Piano", "Guitarra"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎉 ¿Qué fiesta chiapaneca fue reconocida por la UNESCO?",
+    "options": ["Parachicos", "Guelaguetza", "Carnaval de Veracruz", "Danza de los Viejitos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Qué lengua indígena se habla en Los Altos de Chiapas?",
+    "options": ["Tsotsil", "Zapoteco", "Maya", "Otomí"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Cuál es otra lengua maya importante en Chiapas?",
+    "options": ["Tseltal", "Mixteco", "Rarámuri", "Purépecha"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué tecnología utilizan los planetarios modernos?",
+    "options": ["Proyección fulldome de 360°", "Televisión", "Radio", "Realidad virtual"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏔️ ¿Cuál es el volcán más alto de Chiapas?",
+    "options": ["Tacaná", "Iztaccíhuatl", "Popocatépetl", "Toluca"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué lagos de Chiapas destacan por sus colores?",
+    "options": ["Montebello", "Bacalar", "Texcoco", "Zempoala"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌍 ¿Qué continente es la cuna de la humanidad?",
+    "options": ["América", "Asia", "África", "Europa"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🦴 ¿Hace cuántos años ya estaba establecido el Homo sapiens en el Viejo Mundo?",
+    "options": ["15 mil", "100 mil", "35 mil", "70 mil"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué ruta siguió el Homo sapiens para llegar a América?",
+    "options": ["Atlántico", "Pacífico", "Estrecho de Bering", "Mediterráneo"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🇨🇱 ¿Dónde se halló evidencia humana de hace 14 500 años?",
+    "options": ["Monte Verde, Chile", "Patagonia", "Brasil", "Perú"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇧🇷 ¿Qué región de Brasil tiene evidencias de ocupación humana de hace 16 200 años?",
+    "options": ["Amazonas", "Centro-este", "Noreste", "Sur"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "🇦🇷 ¿En qué región de Argentina hay evidencias de ocupación humana de hace 14 800 años?",
+    "options": ["La Pampa", "Patagonia", "Córdoba", "Buenos Aires"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🍃 ¿Qué partes del maíz se usaban además del grano?",
+    "options": ["Solo el grano", "Raíz", "Hojas y tallo", "Flores"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🌽 ¿Cuántos años lleva domesticado el maíz?",
+    "options": ["5 000", "Más de 10 000", "1 000", "20 000"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "🌱 ¿Qué plantas acompañan al maíz en la milpa?",
+    "options": ["Frijol y calabaza", "Café y cacao", "Trigo y avena", "Arroz y lenteja"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥗 ¿Qué país tiene la mayor diversidad de teocintles?",
+    "options": ["Guatemala", "México", "Honduras", "Perú"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "👩‍🌾 ¿Qué beneficio trajo la domesticación de plantas?",
+    "options": ["Más frutos y mayor resistencia", "Decoración", "Comercio", "Religión"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📖 ¿Qué figura aparece en códices prehispánicos vinculada al maíz?",
+    "options": ["Centéotl", "Tláloc", "Itzamná", "Quetzalcóatl"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏺 ¿Qué zona arqueológica es famosa por sus murales?",
+    "options": ["Bonampak", "Uxmal", "Monte Albán", "Chichén Itzá"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏛️ ¿Qué ciudad maya fue rival de Palenque?",
+    "options": ["Toniná", "Bonampak", "Tikal", "Uxmal"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🪵 ¿Qué ecosistema mexicano es tan sostenible como uno natural?",
+    "options": ["La milpa", "Plantaciones de café", "Cultivos de caña", "Bosques de pino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔋 ¿Qué permitió la agricultura a gran escala?",
+    "options": ["Crecimiento de civilizaciones", "Más guerras", "Menos alimentos", "Desigualdad"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌳 ¿Cuál es un ejemplo de servicio ambiental?",
+    "options": ["Agua", "Celular", "Computadora", "Edificio"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔥 ¿Qué amenaza gravemente a los ecosistemas?",
+    "options": ["Sobreexplotación", "Ciencia", "Educación", "Turismo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌎 ¿Qué pregunta plantea el panel de servicios ambientales?",
+    "options": ["¿Y tú, por dónde empezarías?", "¿Quieres viajar?", "¿Qué comerás hoy?", "¿Cuántos bosques hay?"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📊 ¿De qué dependen los servicios ambientales?",
+    "options": ["Acciones humanas", "De los autos", "Del comercio", "Del turismo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦠 ¿Qué organismos generan servicios ambientales?",
+    "options": ["Plantas, animales, hongos y microbios", "Solo humanos", "Solo bacterias", "Solo plantas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💎 ¿Por qué no se pueden valorar económicamente los servicios ambientales?",
+    "options": ["Son fundamentales para la vida", "No sirven", "Son baratos", "No existen"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌄 ¿Qué ecosistemas están presentes en Chiapas?",
+    "options": ["Selvas y bosques fríos", "Desiertos", "Tundras", "Praderas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦅 ¿Qué ave rapaz habita en las selvas de Chiapas?",
+    "options": ["Águila harpía", "Águila calva", "Cóndor", "Halconcillo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦧 ¿Qué especie de mono habita en Chiapas?",
+    "options": ["Mono araña", "Mono tití", "Mono ardilla", "Mono capuchino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "☕ ¿Cuál es un producto emblemático de Chiapas?",
+    "options": ["Café", "Cacao", "Té", "Maíz"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎶 ¿Cuál es el instrumento tradicional de Chiapas?",
+    "options": ["Marimba", "Tambor", "Piano", "Guitarra"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎉 ¿Qué fiesta chiapaneca fue reconocida por la UNESCO?",
+    "options": ["Parachicos", "Guelaguetza", "Carnaval de Veracruz", "Danza de los Viejitos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Qué lengua indígena se habla en Los Altos de Chiapas?",
+    "options": ["Tsotsil", "Zapoteco", "Maya", "Otomí"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Cuál es otra lengua maya importante en Chiapas?",
+    "options": ["Tseltal", "Mixteco", "Rarámuri", "Purépecha"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué tecnología utilizan los planetarios modernos?",
+    "options": ["Proyección fulldome de 360°", "Televisión", "Radio", "Realidad virtual"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏔️ ¿Cuál es el volcán más alto de Chiapas?",
+    "options": ["Tacaná", "Iztaccíhuatl", "Popocatépetl", "Toluca"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué lagos de Chiapas destacan por sus colores?",
+    "options": ["Montebello", "Bacalar", "Texcoco", "Zempoala"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌍 ¿Qué continente es la cuna de la humanidad?",
+    "options": ["América", "Asia", "África", "Europa"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🦴 ¿Hace cuántos años ya estaba establecido el Homo sapiens en el Viejo Mundo?",
+    "options": ["15 mil", "100 mil", "35 mil", "70 mil"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué ruta siguió el Homo sapiens para llegar a América?",
+    "options": ["Atlántico", "Pacífico", "Estrecho de Bering", "Mediterráneo"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🇨🇱 ¿Dónde se halló evidencia humana de hace 14 500 años?",
+    "options": ["Monte Verde, Chile", "Patagonia", "Brasil", "Perú"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇧🇷 ¿Qué región de Brasil tiene evidencias de ocupación humana de hace 16 200 años?",
+    "options": ["Amazonas", "Centro-este", "Noreste", "Sur"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "🇦🇷 ¿En qué región de Argentina hay evidencias de ocupación humana de hace 14 800 años?",
+    "options": ["La Pampa", "Patagonia", "Córdoba", "Buenos Aires"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🍃 ¿Qué partes del maíz se usaban además del grano?",
+    "options": ["Solo el grano", "Raíz", "Hojas y tallo", "Flores"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🌽 ¿Cuántos años lleva domesticado el maíz?",
+    "options": ["5 000", "Más de 10 000", "1 000", "20 000"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "🌱 ¿Qué plantas acompañan al maíz en la milpa?",
+    "options": ["Frijol y calabaza", "Café y cacao", "Trigo y avena", "Arroz y lenteja"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥗 ¿Qué país tiene la mayor diversidad de teocintles?",
+    "options": ["Guatemala", "México", "Honduras", "Perú"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "👩‍🌾 ¿Qué beneficio trajo la domesticación de plantas?",
+    "options": ["Más frutos y mayor resistencia", "Decoración", "Comercio", "Religión"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📖 ¿Qué figura aparece en códices prehispánicos vinculada al maíz?",
+    "options": ["Centéotl", "Tláloc", "Itzamná", "Quetzalcóatl"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏺 ¿Qué zona arqueológica es famosa por sus murales?",
+    "options": ["Bonampak", "Uxmal", "Monte Albán", "Chichén Itzá"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏛️ ¿Qué ciudad maya fue rival de Palenque?",
+    "options": ["Toniná", "Bonampak", "Tikal", "Uxmal"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🪵 ¿Qué ecosistema mexicano es tan sostenible como uno natural?",
+    "options": ["La milpa", "Plantaciones de café", "Cultivos de caña", "Bosques de pino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔋 ¿Qué permitió la agricultura a gran escala?",
+    "options": ["Crecimiento de civilizaciones", "Más guerras", "Menos alimentos", "Desigualdad"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌳 ¿Cuál es un ejemplo de servicio ambiental?",
+    "options": ["Agua", "Celular", "Computadora", "Edificio"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔥 ¿Qué amenaza gravemente a los ecosistemas?",
+    "options": ["Sobreexplotación", "Ciencia", "Educación", "Turismo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌎 ¿Qué pregunta plantea el panel de servicios ambientales?",
+    "options": ["¿Y tú, por dónde empezarías?", "¿Quieres viajar?", "¿Qué comerás hoy?", "¿Cuántos bosques hay?"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📊 ¿De qué dependen los servicios ambientales?",
+    "options": ["Acciones humanas", "De los autos", "Del comercio", "Del turismo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦠 ¿Qué organismos generan servicios ambientales?",
+    "options": ["Plantas, animales, hongos y microbios", "Solo humanos", "Solo bacterias", "Solo plantas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💎 ¿Por qué no se pueden valorar económicamente los servicios ambientales?",
+    "options": ["Son fundamentales para la vida", "No sirven", "Son baratos", "No existen"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌄 ¿Qué ecosistemas están presentes en Chiapas?",
+    "options": ["Selvas y bosques fríos", "Desiertos", "Tundras", "Praderas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦅 ¿Qué ave rapaz habita en las selvas de Chiapas?",
+    "options": ["Águila harpía", "Águila calva", "Cóndor", "Halconcillo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦧 ¿Qué especie de mono habita en Chiapas?",
+    "options": ["Mono araña", "Mono tití", "Mono ardilla", "Mono capuchino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "☕ ¿Cuál es un producto emblemático de Chiapas?",
+    "options": ["Café", "Cacao", "Té", "Maíz"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎶 ¿Cuál es el instrumento tradicional de Chiapas?",
+    "options": ["Marimba", "Tambor", "Piano", "Guitarra"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎉 ¿Qué fiesta chiapaneca fue reconocida por la UNESCO?",
+    "options": ["Parachicos", "Guelaguetza", "Carnaval de Veracruz", "Danza de los Viejitos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Qué lengua indígena se habla en Los Altos de Chiapas?",
+    "options": ["Tsotsil", "Zapoteco", "Maya", "Otomí"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Cuál es otra lengua maya importante en Chiapas?",
+    "options": ["Tseltal", "Mixteco", "Rarámuri", "Purépecha"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué tecnología utilizan los planetarios modernos?",
+    "options": ["Proyección fulldome de 360°", "Televisión", "Radio", "Realidad virtual"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏔️ ¿Cuál es el volcán más alto de Chiapas?",
+    "options": ["Tacaná", "Iztaccíhuatl", "Popocatépetl", "Toluca"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué lagos de Chiapas destacan por sus colores?",
+    "options": ["Montebello", "Bacalar", "Texcoco", "Zempoala"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌍 ¿Qué continente es la cuna de la humanidad?",
+    "options": ["América", "Asia", "África", "Europa"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🦴 ¿Hace cuántos años ya estaba establecido el Homo sapiens en el Viejo Mundo?",
+    "options": ["15 mil", "100 mil", "35 mil", "70 mil"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué ruta siguió el Homo sapiens para llegar a América?",
+    "options": ["Atlántico", "Pacífico", "Estrecho de Bering", "Mediterráneo"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🇨🇱 ¿Dónde se halló evidencia humana de hace 14 500 años?",
+    "options": ["Monte Verde, Chile", "Patagonia", "Brasil", "Perú"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇧🇷 ¿Qué región de Brasil tiene evidencias de ocupación humana de hace 16 200 años?",
+    "options": ["Amazonas", "Centro-este", "Noreste", "Sur"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "🇦🇷 ¿En qué región de Argentina hay evidencias de ocupación humana de hace 14 800 años?",
+    "options": ["La Pampa", "Patagonia", "Córdoba", "Buenos Aires"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🍃 ¿Qué partes del maíz se usaban además del grano?",
+    "options": ["Solo el grano", "Raíz", "Hojas y tallo", "Flores"],
+    "correctIndex": 2,
+    "points": 10
+  },
+  {
+    "text": "🌽 ¿Cuántos años lleva domesticado el maíz?",
+    "options": ["5 000", "Más de 10 000", "1 000", "20 000"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "🌱 ¿Qué plantas acompañan al maíz en la milpa?",
+    "options": ["Frijol y calabaza", "Café y cacao", "Trigo y avena", "Arroz y lenteja"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥗 ¿Qué país tiene la mayor diversidad de teocintles?",
+    "options": ["Guatemala", "México", "Honduras", "Perú"],
+    "correctIndex": 1,
+    "points": 10
+  },
+  {
+    "text": "👩‍🌾 ¿Qué beneficio trajo la domesticación de plantas?",
+    "options": ["Más frutos y mayor resistencia", "Decoración", "Comercio", "Religión"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📖 ¿Qué figura aparece en códices prehispánicos vinculada al maíz?",
+    "options": ["Centéotl", "Tláloc", "Itzamná", "Quetzalcóatl"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏺 ¿Qué zona arqueológica es famosa por sus murales?",
+    "options": ["Bonampak", "Uxmal", "Monte Albán", "Chichén Itzá"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏛️ ¿Qué ciudad maya fue rival de Palenque?",
+    "options": ["Toniná", "Bonampak", "Tikal", "Uxmal"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🪵 ¿Qué ecosistema mexicano es tan sostenible como uno natural?",
+    "options": ["La milpa", "Plantaciones de café", "Cultivos de caña", "Bosques de pino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔋 ¿Qué permitió la agricultura a gran escala?",
+    "options": ["Crecimiento de civilizaciones", "Más guerras", "Menos alimentos", "Desigualdad"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌳 ¿Cuál es un ejemplo de servicio ambiental?",
+    "options": ["Agua", "Celular", "Computadora", "Edificio"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔥 ¿Qué amenaza gravemente a los ecosistemas?",
+    "options": ["Sobreexplotación", "Ciencia", "Educación", "Turismo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌎 ¿Qué pregunta plantea el panel de servicios ambientales?",
+    "options": ["¿Y tú, por dónde empezarías?", "¿Quieres viajar?", "¿Qué comerás hoy?", "¿Cuántos bosques hay?"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📊 ¿De qué dependen los servicios ambientales?",
+    "options": ["Acciones humanas", "De los autos", "Del comercio", "Del turismo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦠 ¿Qué organismos generan servicios ambientales?",
+    "options": ["Plantas, animales, hongos y microbios", "Solo humanos", "Solo bacterias", "Solo plantas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💎 ¿Por qué no se pueden valorar económicamente los servicios ambientales?",
+    "options": ["Son fundamentales para la vida", "No sirven", "Son baratos", "No existen"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌄 ¿Qué ecosistemas están presentes en Chiapas?",
+    "options": ["Selvas y bosques fríos", "Desiertos", "Tundras", "Praderas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦅 ¿Qué ave rapaz habita en las selvas de Chiapas?",
+    "options": ["Águila harpía", "Águila calva", "Cóndor", "Halconcillo"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦧 ¿Qué especie de mono habita en Chiapas?",
+    "options": ["Mono araña", "Mono tití", "Mono ardilla", "Mono capuchino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "☕ ¿Cuál es un producto emblemático de Chiapas?",
+    "options": ["Café", "Cacao", "Té", "Maíz"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎶 ¿Cuál es el instrumento tradicional de Chiapas?",
+    "options": ["Marimba", "Tambor", "Piano", "Guitarra"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎉 ¿Qué fiesta chiapaneca fue reconocida por la UNESCO?",
+    "options": ["Parachicos", "Guelaguetza", "Carnaval de Veracruz", "Danza de los Viejitos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Qué lengua indígena se habla en Los Altos de Chiapas?",
+    "options": ["Tsotsil", "Zapoteco", "Maya", "Otomí"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Cuál es otra lengua maya importante en Chiapas?",
+    "options": ["Tseltal", "Mixteco", "Rarámuri", "Purépecha"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué tecnología utilizan los planetarios modernos?",
+    "options": ["Proyección fulldome de 360°", "Televisión", "Radio", "Realidad virtual"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏔️ ¿Cuál es el volcán más alto de Chiapas?",
+    "options": ["Tacaná", "Iztaccíhuatl", "Popocatépetl", "Toluca"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué lagos de Chiapas destacan por sus colores?",
+    "options": ["Montebello", "Bacalar", "Texcoco", "Zempoala"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💧 ¿Qué presa se encuentra junto al Cañón del Sumidero?",
+    "options": ["Chicoasén", "Peñitas", "Angostura", "Malpaso"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué reserva natural de Chiapas tiene manglares?",
+    "options": ["La Encrucijada", "Calakmul", "Vizcaíno", "Xochimilco"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌸 ¿Cuáles son las plantas más diversas en Chiapas?",
+    "options": ["Orquídeas", "Cactus", "Pastos", "Rosas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦚 ¿Qué ave sagrada, considerada extinta, fue hallada en Chiapas?",
+    "options": ["Quetzal", "Guacamaya", "Tucán", "Loro"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🐆 ¿Qué significa «balam» en maya?",
+    "options": ["Jaguar", "Puma", "Tigre", "León"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📅 ¿Hace cuántos años se cruzó el estrecho de Bering?",
+    "options": ["Entre 15 000 y 15 500", "20 mil", "10 mil", "5 mil"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇺🇸 ¿Dónde hay evidencia humana de hace 14 300 años?",
+    "options": ["Oregón, EE. UU.", "Texas", "Florida", "Alaska"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Dónde se hallaron restos humanos de hace 10 460 años en Chiapas?",
+    "options": ["Cueva de Santa Marta", "Bonampak", "Palenque", "Toniná"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué antigüedad tienen los restos de Los Grifos, Chiapas?",
+    "options": ["9 540", "15 000", "20 000", "3 000"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué municipio de Chiapas tiene la Cueva de Santa Marta?",
+    "options": ["Ocozocoautla", "San Cristóbal", "Tuxtla", "Tapachula"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué municipio tiene la Cueva de Los Grifos?",
+    "options": ["Ocozocoautla", "Palenque", "Chamula", "Tila"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇵🇹 ¿Dónde se hallaron fósiles de Homo sapiens de 44 mil años?",
+    "options": ["Portugal", "Grecia", "Alemania", "Francia"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇮🇹 ¿En qué país europeo hay restos de Homo sapiens de 40 mil años?",
+    "options": ["Italia", "Suecia", "España", "Polonia"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇬🇧 ¿En qué país hay evidencia humana de 40 mil años?",
+    "options": ["Reino Unido", "Dinamarca", "Irlanda", "Suiza"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🕰️ ¿Qué permitió al Homo sapiens expandirse por el planeta?",
+    "options": ["La búsqueda de mejores condiciones", "Guerras", "Azar", "Religión"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌍 ¿Qué especie humana se considera antecesora directa del Homo sapiens?",
+    "options": ["Homo erectus", "Neandertal", "Homo habilis", "Australopithecus"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦴 ¿En qué país se hallaron fósiles de Homo sapiens de 350 mil años?",
+    "options": ["Marruecos", "Egipto", "Sudáfrica", "Nigeria"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌡️ ¿Qué evento climático favoreció la dispersión humana fuera de África?",
+    "options": ["Sequías", "Glaciaciones", "Huracanes", "Volcanes"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué estrecho permitió el paso de Asia a América?",
+    "options": ["Bering", "Gibraltar", "Magallanes", "Malaca"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏹 ¿Qué herramientas ayudaron al Homo sapiens a sobrevivir?",
+    "options": ["Lanzas y arcos", "Teléfonos", "Autos", "Computadoras"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🍞 ¿Qué cereal fue fundamental en Mesoamérica?",
+    "options": ["Maíz", "Trigo", "Arroz", "Cebada"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌽 ¿Qué significa teocintle?",
+    "options": ["Progenitor silvestre del maíz", "Un tipo de frijol", "Una calabaza", "Hierba de río"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🧑‍🌾 ¿Cuántas razas de maíz existen en México?",
+    "options": ["60", "100", "30", "10"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥘 ¿Cuántos platillos en México usan maíz como base?",
+    "options": ["Más de 600", "100", "50", "200"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗿 ¿Qué dios mexica estaba relacionado con el maíz?",
+    "options": ["Centéotl", "Huitzilopochtli", "Tezcatlipoca", "Tláloc"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥒 ¿Qué cultivos acompañan al maíz en la milpa?",
+    "options": ["Frijol y calabaza", "Papas y trigo", "Cebada y avena", "Café y cacao"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌻 ¿Qué significa agricultura sustentable?",
+    "options": ["Aprovechar los recursos sin dañar el ambiente", "Usar rápido", "Destruir ecosistemas", "Ignorar recursos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📈 ¿Qué permitió la agricultura a gran escala?",
+    "options": ["Civilizaciones", "Extinción humana", "Huracanes", "Animales domésticos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌳 ¿Qué es un servicio ambiental?",
+    "options": ["Beneficio natural", "Impuesto", "Plaga", "Construcción"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💨 ¿Cuál es un ejemplo de servicio ambiental?",
+    "options": ["Oxígeno", "Automóvil", "Teléfono", "Luz artificial"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🚰 ¿Qué amenaza los servicios ambientales?",
+    "options": ["Explotación excesiva", "Educación", "Turismo responsable", "Arte"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔄 ¿Qué depende de las acciones humanas?",
+    "options": ["Equilibrio ambiental", "El sol", "La luna", "El viento"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦠 ¿Qué organismos participan en los servicios ambientales?",
+    "options": ["Plantas y animales", "Máquinas", "Computadoras", "Robots"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🤑 ¿Por qué no se pueden comprar servicios ambientales?",
+    "options": ["No tienen precio", "Son baratos", "Son ilimitados", "No existen"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌄 ¿Cuáles son los principales ecosistemas de Chiapas?",
+    "options": ["Bosques y selvas", "Desiertos", "Tundras", "Sabana africana"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦋 ¿Por qué Chiapas es un estado biodiverso?",
+    "options": ["Variedad de ecosistemas y especies", "Solo tiene selva", "Tiene desiertos", "Es pequeño"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦅 ¿Qué ave rapaz gigante habita en Chiapas?",
+    "options": ["Águila harpía", "Águila calva", "Cóndor", "Águila pescadora"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦧 ¿Qué mono es característico de la Selva Lacandona?",
+    "options": ["Mono araña", "Mono ardilla", "Mono capuchino", "Mono tití"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎶 ¿Qué instrumento musical identifica a Chiapas?",
+    "options": ["Marimba", "Piano", "Violín", "Trompeta"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "☕ ¿Qué producto chiapaneco es reconocido mundialmente?",
+    "options": ["Café", "Trigo", "Arroz", "Vino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎉 ¿Qué fiesta tradicional de Chiapa de Corzo fue reconocida por la UNESCO?",
+    "options": ["Parachicos", "Guelaguetza", "Carnaval", "Danza del venado"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Qué lengua indígena se habla en Los Altos de Chiapas?",
+    "options": ["Tsotsil", "Zapoteco", "Maya", "Otomí"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Cuál es otra lengua maya importante en Chiapas?",
+    "options": ["Tseltal", "Mixteco", "Rarámuri", "Purépecha"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏔️ ¿Cuál es el volcán más alto de Chiapas?",
+    "options": ["Tacaná", "Iztaccíhuatl", "Popocatépetl", "Toluca"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué lagos de Chiapas destacan por sus colores?",
+    "options": ["Montebello", "Bacalar", "Texcoco", "Zempoala"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💧 ¿Qué presa se encuentra junto al Cañón del Sumidero?",
+    "options": ["Chicoasén", "Peñitas", "Angostura", "Malpaso"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué reserva natural de Chiapas tiene manglares?",
+    "options": ["La Encrucijada", "Calakmul", "Vizcaíno", "Xochimilco"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌸 ¿Cuáles son las plantas más diversas en Chiapas?",
+    "options": ["Orquídeas", "Cactus", "Pastos", "Rosas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦚 ¿Qué ave sagrada, considerada extinta, fue hallada en Chiapas?",
+    "options": ["Quetzal", "Guacamaya", "Tucán", "Loro"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🐆 ¿Qué significa «balam» en maya?",
+    "options": ["Jaguar", "Puma", "Tigre", "León"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📅 ¿Hace cuántos años se cruzó el estrecho de Bering?",
+    "options": ["Entre 15 000 y 15 500", "20 mil", "10 mil", "5 mil"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇺🇸 ¿Dónde hay evidencia humana de hace 14 300 años?",
+    "options": ["Oregón, EE. UU.", "Texas", "Florida", "Alaska"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Dónde se hallaron restos humanos de hace 10 460 años en Chiapas?",
+    "options": ["Cueva de Santa Marta", "Bonampak", "Palenque", "Toniná"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué antigüedad tienen los restos de Los Grifos, Chiapas?",
+    "options": ["9 540", "15 000", "20 000", "3 000"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué municipio de Chiapas tiene la Cueva de Santa Marta?",
+    "options": ["Ocozocoautla", "San Cristóbal", "Tuxtla", "Tapachula"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué municipio tiene la Cueva de Los Grifos?",
+    "options": ["Ocozocoautla", "Palenque", "Chamula", "Tila"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇵🇹 ¿Dónde se hallaron fósiles de Homo sapiens de 44 mil años?",
+    "options": ["Portugal", "Grecia", "Alemania", "Francia"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇮🇹 ¿En qué país europeo hay restos de Homo sapiens de 40 mil años?",
+    "options": ["Italia", "Suecia", "España", "Polonia"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇬🇧 ¿En qué país hay evidencia humana de 40 mil años?",
+    "options": ["Reino Unido", "Dinamarca", "Irlanda", "Suiza"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🕰️ ¿Qué permitió al Homo sapiens expandirse por el planeta?",
+    "options": ["La búsqueda de mejores condiciones", "Guerras", "Azar", "Religión"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌍 ¿Qué especie humana se considera antecesora directa del Homo sapiens?",
+    "options": ["Homo erectus", "Neandertal", "Homo habilis", "Australopithecus"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦴 ¿En qué país se hallaron fósiles de Homo sapiens de 350 mil años?",
+    "options": ["Marruecos", "Egipto", "Sudáfrica", "Nigeria"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌡️ ¿Qué evento climático favoreció la dispersión humana fuera de África?",
+    "options": ["Sequías", "Glaciaciones", "Huracanes", "Volcanes"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué estrecho permitió el paso de Asia a América?",
+    "options": ["Bering", "Gibraltar", "Magallanes", "Malaca"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏹 ¿Qué herramientas ayudaron al Homo sapiens a sobrevivir?",
+    "options": ["Lanzas y arcos", "Teléfonos", "Autos", "Computadoras"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🍞 ¿Qué cereal fue fundamental en Mesoamérica?",
+    "options": ["Maíz", "Trigo", "Arroz", "Cebada"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌽 ¿Qué significa teocintle?",
+    "options": ["Progenitor silvestre del maíz", "Un tipo de frijol", "Una calabaza", "Hierba de río"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🧑‍🌾 ¿Cuántas razas de maíz existen en México?",
+    "options": ["60", "100", "30", "10"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥘 ¿Cuántos platillos en México usan maíz como base?",
+    "options": ["Más de 600", "100", "50", "200"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗿 ¿Qué dios mexica estaba relacionado con el maíz?",
+    "options": ["Centéotl", "Huitzilopochtli", "Tezcatlipoca", "Tláloc"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥒 ¿Qué cultivos acompañan al maíz en la milpa?",
+    "options": ["Frijol y calabaza", "Papas y trigo", "Cebada y avena", "Café y cacao"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌻 ¿Qué significa agricultura sustentable?",
+    "options": ["Aprovechar los recursos sin dañar el ambiente", "Usar rápido", "Destruir ecosistemas", "Ignorar recursos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📈 ¿Qué permitió la agricultura a gran escala?",
+    "options": ["Civilizaciones", "Extinción humana", "Huracanes", "Animales domésticos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌳 ¿Qué es un servicio ambiental?",
+    "options": ["Beneficio natural", "Impuesto", "Plaga", "Construcción"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💨 ¿Cuál es un ejemplo de servicio ambiental?",
+    "options": ["Oxígeno", "Automóvil", "Teléfono", "Luz artificial"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🚰 ¿Qué amenaza los servicios ambientales?",
+    "options": ["Explotación excesiva", "Educación", "Turismo responsable", "Arte"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔄 ¿Qué depende de las acciones humanas?",
+    "options": ["Equilibrio ambiental", "El sol", "La luna", "El viento"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦠 ¿Qué organismos participan en los servicios ambientales?",
+    "options": ["Plantas y animales", "Máquinas", "Computadoras", "Robots"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🤑 ¿Por qué no se pueden comprar servicios ambientales?",
+    "options": ["No tienen precio", "Son baratos", "Son ilimitados", "No existen"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌄 ¿Cuáles son los principales ecosistemas de Chiapas?",
+    "options": ["Bosques y selvas", "Desiertos", "Tundras", "Sabana africana"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦋 ¿Por qué Chiapas es un estado biodiverso?",
+    "options": ["Variedad de ecosistemas y especies", "Solo tiene selva", "Tiene desiertos", "Es pequeño"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦅 ¿Qué ave rapaz gigante habita en Chiapas?",
+    "options": ["Águila harpía", "Águila calva", "Cóndor", "Águila pescadora"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦧 ¿Qué mono es característico de la Selva Lacandona?",
+    "options": ["Mono araña", "Mono ardilla", "Mono capuchino", "Mono tití"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎶 ¿Qué instrumento musical identifica a Chiapas?",
+    "options": ["Marimba", "Piano", "Violín", "Trompeta"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "☕ ¿Qué producto chiapaneco es reconocido mundialmente?",
+    "options": ["Café", "Trigo", "Arroz", "Vino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎉 ¿Qué fiesta tradicional de Chiapa de Corzo fue reconocida por la UNESCO?",
+    "options": ["Parachicos", "Guelaguetza", "Carnaval", "Danza del venado"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Qué lengua indígena se habla en Los Altos de Chiapas?",
+    "options": ["Tsotsil", "Zapoteco", "Maya", "Otomí"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Cuál es otra lengua maya importante en Chiapas?",
+    "options": ["Tseltal", "Mixteco", "Rarámuri", "Purépecha"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏔️ ¿Cuál es el volcán más alto de Chiapas?",
+    "options": ["Tacaná", "Iztaccíhuatl", "Popocatépetl", "Toluca"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué lagos de Chiapas destacan por sus colores?",
+    "options": ["Montebello", "Bacalar", "Texcoco", "Zempoala"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💧 ¿Qué presa se encuentra junto al Cañón del Sumidero?",
+    "options": ["Chicoasén", "Peñitas", "Angostura", "Malpaso"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué reserva natural de Chiapas tiene manglares?",
+    "options": ["La Encrucijada", "Calakmul", "Vizcaíno", "Xochimilco"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌸 ¿Cuáles son las plantas más diversas en Chiapas?",
+    "options": ["Orquídeas", "Cactus", "Pastos", "Rosas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦚 ¿Qué ave sagrada, considerada extinta, fue hallada en Chiapas?",
+    "options": ["Quetzal", "Guacamaya", "Tucán", "Loro"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🐆 ¿Qué significa «balam» en maya?",
+    "options": ["Jaguar", "Puma", "Tigre", "León"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📅 ¿Hace cuántos años se cruzó el estrecho de Bering?",
+    "options": ["Entre 15 000 y 15 500", "20 mil", "10 mil", "5 mil"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇺🇸 ¿Dónde hay evidencia humana de hace 14 300 años?",
+    "options": ["Oregón, EE. UU.", "Texas", "Florida", "Alaska"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Dónde se hallaron restos humanos de hace 10 460 años en Chiapas?",
+    "options": ["Cueva de Santa Marta", "Bonampak", "Palenque", "Toniná"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué antigüedad tienen los restos de Los Grifos, Chiapas?",
+    "options": ["9 540", "15 000", "20 000", "3 000"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué municipio de Chiapas tiene la Cueva de Santa Marta?",
+    "options": ["Ocozocoautla", "San Cristóbal", "Tuxtla", "Tapachula"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué municipio tiene la Cueva de Los Grifos?",
+    "options": ["Ocozocoautla", "Palenque", "Chamula", "Tila"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇵🇹 ¿Dónde se hallaron fósiles de Homo sapiens de 44 mil años?",
+    "options": ["Portugal", "Grecia", "Alemania", "Francia"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇮🇹 ¿En qué país europeo hay restos de Homo sapiens de 40 mil años?",
+    "options": ["Italia", "Suecia", "España", "Polonia"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇬🇧 ¿En qué país hay evidencia humana de 40 mil años?",
+    "options": ["Reino Unido", "Dinamarca", "Irlanda", "Suiza"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🕰️ ¿Qué permitió al Homo sapiens expandirse por el planeta?",
+    "options": ["La búsqueda de mejores condiciones", "Guerras", "Azar", "Religión"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌍 ¿Qué especie humana se considera antecesora directa del Homo sapiens?",
+    "options": ["Homo erectus", "Neandertal", "Homo habilis", "Australopithecus"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦴 ¿En qué país se hallaron fósiles de Homo sapiens de 350 mil años?",
+    "options": ["Marruecos", "Egipto", "Sudáfrica", "Nigeria"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌡️ ¿Qué evento climático favoreció la dispersión humana fuera de África?",
+    "options": ["Sequías", "Glaciaciones", "Huracanes", "Volcanes"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué estrecho permitió el paso de Asia a América?",
+    "options": ["Bering", "Gibraltar", "Magallanes", "Malaca"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏹 ¿Qué herramientas ayudaron al Homo sapiens a sobrevivir?",
+    "options": ["Lanzas y arcos", "Teléfonos", "Autos", "Computadoras"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🍞 ¿Qué cereal fue fundamental en Mesoamérica?",
+    "options": ["Maíz", "Trigo", "Arroz", "Cebada"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌽 ¿Qué significa teocintle?",
+    "options": ["Progenitor silvestre del maíz", "Un tipo de frijol", "Una calabaza", "Hierba de río"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🧑‍🌾 ¿Cuántas razas de maíz existen en México?",
+    "options": ["60", "100", "30", "10"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥘 ¿Cuántos platillos en México usan maíz como base?",
+    "options": ["Más de 600", "100", "50", "200"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗿 ¿Qué dios mexica estaba relacionado con el maíz?",
+    "options": ["Centéotl", "Huitzilopochtli", "Tezcatlipoca", "Tláloc"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥒 ¿Qué cultivos acompañan al maíz en la milpa?",
+    "options": ["Frijol y calabaza", "Papas y trigo", "Cebada y avena", "Café y cacao"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌻 ¿Qué significa agricultura sustentable?",
+    "options": ["Aprovechar los recursos sin dañar el ambiente", "Usar rápido", "Destruir ecosistemas", "Ignorar recursos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📈 ¿Qué permitió la agricultura a gran escala?",
+    "options": ["Civilizaciones", "Extinción humana", "Huracanes", "Animales domésticos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌳 ¿Qué es un servicio ambiental?",
+    "options": ["Beneficio natural", "Impuesto", "Plaga", "Construcción"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💨 ¿Cuál es un ejemplo de servicio ambiental?",
+    "options": ["Oxígeno", "Automóvil", "Teléfono", "Luz artificial"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🚰 ¿Qué amenaza los servicios ambientales?",
+    "options": ["Explotación excesiva", "Educación", "Turismo responsable", "Arte"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔄 ¿Qué depende de las acciones humanas?",
+    "options": ["Equilibrio ambiental", "El sol", "La luna", "El viento"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦠 ¿Qué organismos participan en los servicios ambientales?",
+    "options": ["Plantas y animales", "Máquinas", "Computadoras", "Robots"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🤑 ¿Por qué no se pueden comprar servicios ambientales?",
+    "options": ["No tienen precio", "Son baratos", "Son ilimitados", "No existen"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌄 ¿Cuáles son los principales ecosistemas de Chiapas?",
+    "options": ["Bosques y selvas", "Desiertos", "Tundras", "Sabana africana"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦋 ¿Por qué Chiapas es un estado biodiverso?",
+    "options": ["Variedad de ecosistemas y especies", "Solo tiene selva", "Tiene desiertos", "Es pequeño"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦅 ¿Qué ave rapaz gigante habita en Chiapas?",
+    "options": ["Águila harpía", "Águila calva", "Cóndor", "Águila pescadora"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦧 ¿Qué mono es característico de la Selva Lacandona?",
+    "options": ["Mono araña", "Mono ardilla", "Mono capuchino", "Mono tití"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎶 ¿Qué instrumento musical identifica a Chiapas?",
+    "options": ["Marimba", "Piano", "Violín", "Trompeta"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "☕ ¿Qué producto chiapaneco es reconocido mundialmente?",
+    "options": ["Café", "Trigo", "Arroz", "Vino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎉 ¿Qué fiesta tradicional de Chiapa de Corzo fue reconocida por la UNESCO?",
+    "options": ["Parachicos", "Guelaguetza", "Carnaval", "Danza del venado"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Qué lengua indígena se habla en Los Altos de Chiapas?",
+    "options": ["Tsotsil", "Zapoteco", "Maya", "Otomí"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Cuál es otra lengua maya importante en Chiapas?",
+    "options": ["Tseltal", "Mixteco", "Rarámuri", "Purépecha"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏔️ ¿Cuál es el volcán más alto de Chiapas?",
+    "options": ["Tacaná", "Iztaccíhuatl", "Popocatépetl", "Toluca"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué lagos de Chiapas destacan por sus colores?",
+    "options": ["Montebello", "Bacalar", "Texcoco", "Zempoala"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💧 ¿Qué presa se encuentra junto al Cañón del Sumidero?",
+    "options": ["Chicoasén", "Peñitas", "Angostura", "Malpaso"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué reserva natural de Chiapas tiene manglares?",
+    "options": ["La Encrucijada", "Calakmul", "Vizcaíno", "Xochimilco"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌸 ¿Cuáles son las plantas más diversas en Chiapas?",
+    "options": ["Orquídeas", "Cactus", "Pastos", "Rosas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦚 ¿Qué ave sagrada, considerada extinta, fue hallada en Chiapas?",
+    "options": ["Quetzal", "Guacamaya", "Tucán", "Loro"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🐆 ¿Qué significa «balam» en maya?",
+    "options": ["Jaguar", "Puma", "Tigre", "León"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📅 ¿Hace cuántos años se cruzó el estrecho de Bering?",
+    "options": ["Entre 15 000 y 15 500", "20 mil", "10 mil", "5 mil"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇺🇸 ¿Dónde hay evidencia humana de hace 14 300 años?",
+    "options": ["Oregón, EE. UU.", "Texas", "Florida", "Alaska"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Dónde se hallaron restos humanos de hace 10 460 años en Chiapas?",
+    "options": ["Cueva de Santa Marta", "Bonampak", "Palenque", "Toniná"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué antigüedad tienen los restos de Los Grifos, Chiapas?",
+    "options": ["9 540", "15 000", "20 000", "3 000"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué municipio de Chiapas tiene la Cueva de Santa Marta?",
+    "options": ["Ocozocoautla", "San Cristóbal", "Tuxtla", "Tapachula"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué municipio tiene la Cueva de Los Grifos?",
+    "options": ["Ocozocoautla", "Palenque", "Chamula", "Tila"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇵🇹 ¿Dónde se hallaron fósiles de Homo sapiens de 44 mil años?",
+    "options": ["Portugal", "Grecia", "Alemania", "Francia"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇮🇹 ¿En qué país europeo hay restos de Homo sapiens de 40 mil años?",
+    "options": ["Italia", "Suecia", "España", "Polonia"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇬🇧 ¿En qué país hay evidencia humana de 40 mil años?",
+    "options": ["Reino Unido", "Dinamarca", "Irlanda", "Suiza"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🕰️ ¿Qué permitió al Homo sapiens expandirse por el planeta?",
+    "options": ["La búsqueda de mejores condiciones", "Guerras", "Azar", "Religión"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌍 ¿Qué especie humana se considera antecesora directa del Homo sapiens?",
+    "options": ["Homo erectus", "Neandertal", "Homo habilis", "Australopithecus"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦴 ¿En qué país se hallaron fósiles de Homo sapiens de 350 mil años?",
+    "options": ["Marruecos", "Egipto", "Sudáfrica", "Nigeria"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌡️ ¿Qué evento climático favoreció la dispersión humana fuera de África?",
+    "options": ["Sequías", "Glaciaciones", "Huracanes", "Volcanes"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué estrecho permitió el paso de Asia a América?",
+    "options": ["Bering", "Gibraltar", "Magallanes", "Malaca"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏹 ¿Qué herramientas ayudaron al Homo sapiens a sobrevivir?",
+    "options": ["Lanzas y arcos", "Teléfonos", "Autos", "Computadoras"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🍞 ¿Qué cereal fue fundamental en Mesoamérica?",
+    "options": ["Maíz", "Trigo", "Arroz", "Cebada"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌽 ¿Qué significa teocintle?",
+    "options": ["Progenitor silvestre del maíz", "Un tipo de frijol", "Una calabaza", "Hierba de río"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🧑‍🌾 ¿Cuántas razas de maíz existen en México?",
+    "options": ["60", "100", "30", "10"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥘 ¿Cuántos platillos en México usan maíz como base?",
+    "options": ["Más de 600", "100", "50", "200"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗿 ¿Qué dios mexica estaba relacionado con el maíz?",
+    "options": ["Centéotl", "Huitzilopochtli", "Tezcatlipoca", "Tláloc"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥒 ¿Qué cultivos acompañan al maíz en la milpa?",
+    "options": ["Frijol y calabaza", "Papas y trigo", "Cebada y avena", "Café y cacao"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌻 ¿Qué significa agricultura sustentable?",
+    "options": ["Aprovechar los recursos sin dañar el ambiente", "Usar rápido", "Destruir ecosistemas", "Ignorar recursos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📈 ¿Qué permitió la agricultura a gran escala?",
+    "options": ["Civilizaciones", "Extinción humana", "Huracanes", "Animales domésticos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌳 ¿Qué es un servicio ambiental?",
+    "options": ["Beneficio natural", "Impuesto", "Plaga", "Construcción"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💨 ¿Cuál es un ejemplo de servicio ambiental?",
+    "options": ["Oxígeno", "Automóvil", "Teléfono", "Luz artificial"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🚰 ¿Qué amenaza los servicios ambientales?",
+    "options": ["Explotación excesiva", "Educación", "Turismo responsable", "Arte"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔄 ¿Qué depende de las acciones humanas?",
+    "options": ["Equilibrio ambiental", "El sol", "La luna", "El viento"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦠 ¿Qué organismos participan en los servicios ambientales?",
+    "options": ["Plantas y animales", "Máquinas", "Computadoras", "Robots"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🤑 ¿Por qué no se pueden comprar servicios ambientales?",
+    "options": ["No tienen precio", "Son baratos", "Son ilimitados", "No existen"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌄 ¿Cuáles son los principales ecosistemas de Chiapas?",
+    "options": ["Bosques y selvas", "Desiertos", "Tundras", "Sabana africana"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦋 ¿Por qué Chiapas es un estado biodiverso?",
+    "options": ["Variedad de ecosistemas y especies", "Solo tiene selva", "Tiene desiertos", "Es pequeño"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦅 ¿Qué ave rapaz gigante habita en Chiapas?",
+    "options": ["Águila harpía", "Águila calva", "Cóndor", "Águila pescadora"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦧 ¿Qué mono es característico de la Selva Lacandona?",
+    "options": ["Mono araña", "Mono ardilla", "Mono capuchino", "Mono tití"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎶 ¿Qué instrumento musical identifica a Chiapas?",
+    "options": ["Marimba", "Piano", "Violín", "Trompeta"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "☕ ¿Qué producto chiapaneco es reconocido mundialmente?",
+    "options": ["Café", "Trigo", "Arroz", "Vino"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🎉 ¿Qué fiesta tradicional de Chiapa de Corzo fue reconocida por la UNESCO?",
+    "options": ["Parachicos", "Guelaguetza", "Carnaval", "Danza del venado"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Qué lengua indígena se habla en Los Altos de Chiapas?",
+    "options": ["Tsotsil", "Zapoteco", "Maya", "Otomí"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗣️ ¿Cuál es otra lengua maya importante en Chiapas?",
+    "options": ["Tseltal", "Mixteco", "Rarámuri", "Purépecha"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏔️ ¿Cuál es el volcán más alto de Chiapas?",
+    "options": ["Tacaná", "Iztaccíhuatl", "Popocatépetl", "Toluca"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué lagos de Chiapas destacan por sus colores?",
+    "options": ["Montebello", "Bacalar", "Texcoco", "Zempoala"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💧 ¿Qué presa se encuentra junto al Cañón del Sumidero?",
+    "options": ["Chicoasén", "Peñitas", "Angostura", "Malpaso"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué reserva natural de Chiapas tiene manglares?",
+    "options": ["La Encrucijada", "Calakmul", "Vizcaíno", "Xochimilco"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌸 ¿Cuáles son las plantas más diversas en Chiapas?",
+    "options": ["Orquídeas", "Cactus", "Pastos", "Rosas"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦚 ¿Qué ave sagrada, considerada extinta, fue hallada en Chiapas?",
+    "options": ["Quetzal", "Guacamaya", "Tucán", "Loro"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🐆 ¿Qué significa «balam» en maya?",
+    "options": ["Jaguar", "Puma", "Tigre", "León"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📅 ¿Hace cuántos años se cruzó el estrecho de Bering?",
+    "options": ["Entre 15 000 y 15 500", "20 mil", "10 mil", "5 mil"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇺🇸 ¿Dónde hay evidencia humana de hace 14 300 años?",
+    "options": ["Oregón, EE. UU.", "Texas", "Florida", "Alaska"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Dónde se hallaron restos humanos de hace 10 460 años en Chiapas?",
+    "options": ["Cueva de Santa Marta", "Bonampak", "Palenque", "Toniná"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué antigüedad tienen los restos de Los Grifos, Chiapas?",
+    "options": ["9 540", "15 000", "20 000", "3 000"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué municipio de Chiapas tiene la Cueva de Santa Marta?",
+    "options": ["Ocozocoautla", "San Cristóbal", "Tuxtla", "Tapachula"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇲🇽 ¿Qué municipio tiene la Cueva de Los Grifos?",
+    "options": ["Ocozocoautla", "Palenque", "Chamula", "Tila"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇵🇹 ¿Dónde se hallaron fósiles de Homo sapiens de 44 mil años?",
+    "options": ["Portugal", "Grecia", "Alemania", "Francia"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇮🇹 ¿En qué país europeo hay restos de Homo sapiens de 40 mil años?",
+    "options": ["Italia", "Suecia", "España", "Polonia"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🇬🇧 ¿En qué país hay evidencia humana de 40 mil años?",
+    "options": ["Reino Unido", "Dinamarca", "Irlanda", "Suiza"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🕰️ ¿Qué permitió al Homo sapiens expandirse por el planeta?",
+    "options": ["La búsqueda de mejores condiciones", "Guerras", "Azar", "Religión"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌍 ¿Qué especie humana se considera antecesora directa del Homo sapiens?",
+    "options": ["Homo erectus", "Neandertal", "Homo habilis", "Australopithecus"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦴 ¿En qué país se hallaron fósiles de Homo sapiens de 350 mil años?",
+    "options": ["Marruecos", "Egipto", "Sudáfrica", "Nigeria"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌡️ ¿Qué evento climático favoreció la dispersión humana fuera de África?",
+    "options": ["Sequías", "Glaciaciones", "Huracanes", "Volcanes"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌐 ¿Qué estrecho permitió el paso de Asia a América?",
+    "options": ["Bering", "Gibraltar", "Magallanes", "Malaca"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🏹 ¿Qué herramientas ayudaron al Homo sapiens a sobrevivir?",
+    "options": ["Lanzas y arcos", "Teléfonos", "Autos", "Computadoras"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🍞 ¿Qué cereal fue fundamental en Mesoamérica?",
+    "options": ["Maíz", "Trigo", "Arroz", "Cebada"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌽 ¿Qué significa teocintle?",
+    "options": ["Progenitor silvestre del maíz", "Un tipo de frijol", "Una calabaza", "Hierba de río"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🧑‍🌾 ¿Cuántas razas de maíz existen en México?",
+    "options": ["60", "100", "30", "10"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥘 ¿Cuántos platillos en México usan maíz como base?",
+    "options": ["Más de 600", "100", "50", "200"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🗿 ¿Qué dios mexica estaba relacionado con el maíz?",
+    "options": ["Centéotl", "Huitzilopochtli", "Tezcatlipoca", "Tláloc"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🥒 ¿Qué cultivos acompañan al maíz en la milpa?",
+    "options": ["Frijol y calabaza", "Papas y trigo", "Cebada y avena", "Café y cacao"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌻 ¿Qué significa agricultura sustentable?",
+    "options": ["Aprovechar los recursos sin dañar el ambiente", "Usar rápido", "Destruir ecosistemas", "Ignorar recursos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "📈 ¿Qué permitió la agricultura a gran escala?",
+    "options": ["Civilizaciones", "Extinción humana", "Huracanes", "Animales domésticos"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🌳 ¿Qué es un servicio ambiental?",
+    "options": ["Beneficio natural", "Impuesto", "Plaga", "Construcción"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "💨 ¿Cuál es un ejemplo de servicio ambiental?",
+    "options": ["Oxígeno", "Automóvil", "Teléfono", "Luz artificial"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🚰 ¿Qué amenaza los servicios ambientales?",
+    "options": ["Explotación excesiva", "Educación", "Turismo responsable", "Arte"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🔄 ¿Qué depende de las acciones humanas?",
+    "options": ["Equilibrio ambiental", "El sol", "La luna", "El viento"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🦠 ¿Qué organismos participan en los servicios ambientales?",
+    "options": ["Plantas y animales", "Máquinas", "Computadoras", "Robots"],
+    "correctIndex": 0,
+    "points": 10
+  },
+  {
+    "text": "🤑 ¿Por qué no se pueden comprar servicios ambientales?",
+    "options": ["No tienen precio", "Son baratos", "Son ilimitados", "No existen"],
+    "correctIndex": 0,"points": 10
+  },
+  {
+    "text": "🌄 ¿Cuáles son los principales ecosistemas de Chiapas?",
+    "options": ["Bosques y selvas", "Desiertos", "Tundras", "Sabana africana"],
+    "correctIndex": 0,"points": 10
+  },
+  {
+    "text": "🦋 ¿Por qué Chiapas es un estado biodiverso?",
+    "options": ["Variedad de ecosistemas y especies", "Solo tiene selva", "Tiene desiertos", "Es pequeño"],
+    "correctIndex": 0, "points": 10
+  },
+  {
+    "text": "🦅 ¿Qué ave rapaz gigante habita en Chiapas?",
+    "options": ["Águila harpía", "Águila calva", "Cóndor", "Águila pescadora"],
+    "correctIndex": 0,"points": 10
+  },
+  {
+    "text": "🦧 ¿Qué mono es característico de la Selva Lacandona?",
+    "options": ["Mono araña", "Mono ardilla", "Mono capuchino", "Mono tití"],
+    "correctIndex": 0, "points": 10
+  },
+  {
+    "text": "🎶 ¿Qué instrumento musical identifica a Chiapas?",
+    "options": ["Marimba", "Piano", "Violín", "Trompeta"],
+    "correctIndex": 0,"points": 10
+  },
+  {
+    "text": "☕ ¿Qué producto chiapaneco es reconocido mundialmente?",
+    "options": ["Café", "Trigo", "Arroz", "Vino"],
+    "correctIndex": 0,"points": 10
+  },
+  {
+    "text": "🎉 ¿Qué fiesta tradicional de Chiapa de Corzo fue reconocida por la UNESCO?",
+    "options": ["Parachicos", "Guelaguetza", "Carnaval", "Danza del venado"],
+    "correctIndex": 0,"points": 10
+  },
+  {
+    "text": "🗣️ ¿Qué lengua indígena se habla en Los Altos de Chiapas?",
+    "options": ["Tsotsil", "Zapoteco", "Maya", "Otomí"],
+    "correctIndex": 0,"points": 10
+  },
+  {
+    "text": "🗣️ ¿Cuál es otra lengua maya importante en Chiapas?",
+    "options": ["Tseltal", "Mixteco", "Rarámuri", "Purépecha"],
+    "correctIndex": 0,"points": 10
+  },
+  {
+    "text": "🏔️ ¿Cuál es el volcán más alto de Chiapas?",
+    "options": ["Tacaná", "Iztaccíhuatl", "Popocatépetl", "Toluca"],
+    "correctIndex": 0,"points": 10
+  },
+  {
+    "text": "🌊 ¿Qué lagos de Chiapas destacan por sus colores?","options": ["Montebello", "Bacalar", "Texcoco", "Zempoala"],"correctIndex": 0,"points": 10
+  },
+  {
+    "text": "💧 ¿Qué presa se encuentra junto al Cañón del Sumidero?",
+    "options": ["Chicoasén", "Peñitas", "Angostura", "Malpaso"],
+    "correctIndex": 0, "points": 10
+  },
+  {
+    "text": "🌊 ¿Qué reserva natural de Chiapas tiene manglares?",
+    "options": ["La Encrucijada", "Calakmul", "Vizcaíno", "Xochimilco"],
+    "correctIndex": 0,"points": 10
+  },
+  {
+    "text": "🌸 ¿Cuáles son las plantas más diversas en Chiapas?",
+    "options": ["Orquídeas", "Cactus", "Pastos", "Rosas"],
+    "correctIndex": 0,"points": 10
+  },
+  {
+    "text": "🦚 ¿Qué ave sagrada, considerada extinta, fue hallada en Chiapas?",
+    "options": ["Quetzal", "Guacamaya", "Tucán", "Loro"],
+    "correctIndex": 0,"points": 10
+  },
+  {
+    "text": "🐆 ¿Qué significa «balam» en maya?",
+    "options": ["Jaguar", "Puma", "Tigre", "León"],
+    "correctIndex": 0,"points": 10
+  },
+  {
+    "text": "❄️ ¿Cuál es la estación más fría del año?",
+    "options": ["Invierno", "Primavera", "Verano", "Otoño"],
+    "correctIndex": 0,"points": 10
+  }
 ];

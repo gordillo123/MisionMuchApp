@@ -469,8 +469,9 @@
 
         <div class="qr-section">
           <div id="qrcode"></div>
+          <div id="tAlfanumerico" style="margin-top: 12px; font-weight: 900; font-size: 1.25rem; letter-spacing: 1px; color: var(--ink);"></div>
         </div>
-        <p class="qr-hint">Presenta este código al personal para validar</p>
+        <p class="qr-hint">Presenta el Código QR o este Folio Alfanumérico en Taquilla</p>
 
         <div class="note">⚠️ Válido por una sola entrada. Sujeto a disponibilidad y horarios del museo.</div>
       </div>
@@ -478,9 +479,7 @@
 
     <div class="actions">
       <button id="btnDownloadImage" class="btn btn-download">📥 Descargar Boleto (Imagen)</button>
-      <button id="btnShareImage" class="btn btn-whatsapp">📤 Compartir Boleto (Imagen)</button>
-      <button class="btn btn-print" onclick="window.print()">🖨️ Imprimir</button>
-      <a class="btn btn-link" href="../index.html">🏠 Inicio</a>
+      <a class="btn btn-link" href="../index.html">🏠 Volver al mapa</a>
     </div>
   </div>
 
@@ -516,7 +515,10 @@
       }
 
       el('tTitle').textContent = titulo;
-      el('tFolio').textContent = qs.get('folio') || 'Folio: ...';
+      const folioBoleto = qs.get('folio') || 'Folio: ...';
+      el('tFolio').textContent = folioBoleto;
+      const elAlfa = el('tAlfanumerico');
+      if (elAlfa) elAlfa.textContent = folioBoleto.replace('Folio:', '').trim();
       el('tNombre').textContent = qs.get('nombre') || '—';
       el('tPremio').textContent = acceso;
       el('tFecha').textContent = fmtFull.format(fechaEmision);
@@ -587,56 +589,7 @@
         container.innerHTML = '<span style="font-size:0.75rem;color:#94a3b8;">Código no disponible</span>';
       }
 
-      // 2. COMPARTIR IMAGEN
-      const btnShare = document.getElementById('btnShareImage');
-      if (btnShare) {
-        btnShare.addEventListener('click', async () => {
-          const originalText = btnShare.textContent;
-          btnShare.textContent = 'Generando... 📸';
-          btnShare.disabled = true;
-          try {
-            const element = document.getElementById('boletoCaptura');
 
-            // ── Forzar ancho fijo para que la captura salga "cuadradita" ──
-            const origWidth = element.style.width;
-            const origMaxW = element.style.maxWidth;
-            element.style.width = '600px';
-            element.style.maxWidth = '600px';
-
-            const canvas = await html2canvas(element, {
-              scale: 3,
-              backgroundColor: '#ffffff',
-              useCORS: true,
-              windowWidth: 600
-            });
-
-            // ── Restaurar estilos originales ──
-            element.style.width = origWidth;
-            element.style.maxWidth = origMaxW;
-
-            canvas.toBlob(async (blob) => {
-              const fileName = `Boleto_MUCH_${folio || Date.now()}.png`;
-              const file = new File([blob], fileName, { type: "image/png" });
-
-              // Intento de compartir nativo (celular)
-              if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                  await navigator.share({ files: [file], title: 'Mi Boleto MUCH', text: '¡Gané una entrada!' });
-                  btnShare.textContent = '¡Enviado!';
-                } catch (err) { downloadImage(blob, fileName); }
-              } else {
-                // Descarga en PC
-                downloadImage(blob, fileName);
-                alert("Imagen descargada. Compártela manualmente.");
-              }
-              setTimeout(() => { btnShare.textContent = originalText; btnShare.disabled = false; }, 2000);
-            }, 'image/png');
-          } catch (err) {
-            console.error(err); alert("Error al crear imagen.");
-            btnShare.textContent = originalText; btnShare.disabled = false;
-          }
-        });
-      }
 
       // 3. DESCARGAR IMAGEN DIRECTAMENTE
       const btnDownload = document.getElementById('btnDownloadImage');

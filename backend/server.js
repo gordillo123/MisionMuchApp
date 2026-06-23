@@ -644,6 +644,7 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
     const tieneTodoAprobado = estacionesObligatorias.every(id => estacionesAprobadas.includes(id));
 
     let boletoGenerado = null;
+    let bloqueoFinalizacion = null;
 
     if (tieneTodoAprobado) {
       console.log(`🎉 Usuario ${id_usuario} ha completado todo el recorrido!`);
@@ -696,11 +697,11 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
         // Obtener el boleto insertado para retornarlo
         const [[nuevoBoleto]] = await connection.query('SELECT * FROM boletos WHERE id_boleto = ?', [newBoletoId]);
         boletoGenerado = nuevoBoleto;
-        await playtime.registrarGanado(id_usuario, newBoletoId, connection);
+        bloqueoFinalizacion = await playtime.registrarGanado(id_usuario, newBoletoId, connection);
       } else {
         boletoGenerado = boletoExistente;
         if (tieneTodoAprobado) {
-          await playtime.registrarGanado(id_usuario, boletoExistente.id_boleto, connection);
+          bloqueoFinalizacion = await playtime.registrarGanado(id_usuario, boletoExistente.id_boleto, connection);
         }
       }
     }
@@ -712,10 +713,23 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
       [id_usuario, id_estacion]
     );
 
+    const fechaPuedeVolver = bloqueoFinalizacion?.fecha_puede_volver_jugar
+      ? new Date(bloqueoFinalizacion.fecha_puede_volver_jugar)
+      : null;
+    const finalizacion = bloqueoFinalizacion ? {
+      recorrido_completado: true,
+      fecha_finalizacion: bloqueoFinalizacion.fecha_finalizacion || bloqueoFinalizacion.fecha_ganado,
+      fecha_puede_volver: fechaPuedeVolver ? fechaPuedeVolver.toISOString() : null,
+      fecha_puede_volver_texto: fechaPuedeVolver ? playtime.formatFechaMX(fechaPuedeVolver) : null,
+      dias_bloqueo: bloqueoFinalizacion.cantidad_bloqueo,
+      mensaje: fechaPuedeVolver ? playtime.buildMensajeBloqueo(fechaPuedeVolver) : null
+    } : null;
+
     res.json({ 
       message: 'Progreso guardado correctamente.', 
-      progreso: { ...progresoFinal, boletoGenerado },
-      boletoGenerado 
+      progreso: { ...progresoFinal, boletoGenerado, finalizacion },
+      boletoGenerado,
+      finalizacion
     });
   } catch (error) {
     await connection.rollback();
@@ -992,7 +1006,7 @@ app.get('/api/progreso/:id_usuario', permitirJugador, async (req, res) => {
 // ==========================================
 // 9. POST /api/boletos
 // ==========================================
-app.post('/api/boletos', permitirJugador, verificarBloqueoJugador, async (req, res) => {
+app.post('/api/boletos', permitirJugador, async (req, res) => {
   const { id_usuario, reclamar, tipo_entrada, destino_boleto, lugar } = req.body;
 
   if (!id_usuario) {
@@ -1014,6 +1028,8 @@ app.post('/api/boletos', permitirJugador, verificarBloqueoJugador, async (req, r
 
     if (!tieneTodoAprobado) {
       console.warn(`Usuario ${id_usuario} intenta generar boleto sin completar todo el recorrido. Estaciones aprobadas:`, estacionesAprobadas);
+      await connection.rollback();
+      return res.status(403).json({ error: 'Debes completar todas las estaciones antes de reclamar tu boleto.' });
     }
 
     const recibioSeleccionBoleto = [tipo_entrada, destino_boleto, lugar].some(tieneTexto);
@@ -2468,14 +2484,9 @@ app.get('/api/admin/configuracion-juego', permitirAdmin, async (req, res) => {
 app.put('/api/admin/configuracion-juego', permitirAdmin, async (req, res) => {
   try {
     const idAdmin = obtenerIdUsuarioDePeticion(req);
-    const { aplicar_bloqueos_actuales } = req.body;
     const config = await playtime.updateConfig(req.body, idAdmin);
-
-    let bloqueosActualizados = 0;
-    if (aplicar_bloqueos_actuales) {
-      const result = await playtime.aplicarConfiguracionABloqueosActivos(idAdmin);
-      bloqueosActualizados = result.actualizados;
-    }
+    const result = await playtime.aplicarConfiguracionABloqueosActivos(idAdmin);
+    const bloqueosActualizados = result.actualizados;
 
     res.json({ config, bloqueos_actualizados: bloqueosActualizados });
   } catch (error) {

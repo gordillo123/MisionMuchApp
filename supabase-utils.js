@@ -99,6 +99,25 @@ let cachedPlaytimeEstado = null;
 let cachedPlaytimeAt = 0;
 const PLAYTIME_CACHE_MS = 15000;
 
+function sincronizarCicloJuegoLocal(estado) {
+  const cicloId = estado?.ciclo_juego_id;
+  if (!cicloId) return false;
+
+  const cicloGuardado = localStorage.getItem('much_playtime_cycle_id');
+  if (cicloGuardado === cicloId) return false;
+
+  localStorage.setItem('much_playtime_cycle_id', cicloId);
+  localStorage.setItem('much_completed_stations', '{}');
+  localStorage.setItem('much_current_station', '1');
+  localStorage.removeItem('much_quiz_prize');
+  localStorage.removeItem('much_mission_reward_claimed');
+  localStorage.removeItem('much_mission_reward_ticket_choice');
+  sessionStorage.removeItem('much_current_attempt_id');
+  sessionStorage.removeItem('much_quiz_final_data');
+  window.dispatchEvent(new CustomEvent('much:newPlayCycle', { detail: estado }));
+  return true;
+}
+
 async function consultarEstadoBloqueoJuego(force = false) {
   const user = obtenerUsuarioLocal();
   if (!user) {
@@ -120,7 +139,11 @@ async function consultarEstadoBloqueoJuego(force = false) {
     }
 
     const estado = await res.json();
+    sincronizarCicloJuegoLocal(estado);
     cachedPlaytimeEstado = estado;
+    cachedPlaytimeAt = Date.now();
+    return estado;
+  } catch (error) {
     cachedPlaytimeAt = Date.now();
     return estado;
   } catch (error) {
@@ -135,14 +158,35 @@ function invalidarCacheBloqueoJuego() {
 }
 
 function mostrarAvisoBloqueoJuego(estado) {
-  const mensaje = estado?.mensaje || 'Ya reclamaste tu premio. Debes esperar para volver a participar.';
+  const fecha = estado?.fecha_puede_volver_texto || '';
+  const mensaje = estado?.mensaje || (fecha
+    ? `¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrás volver a jugar el ${fecha}.`
+    : 'Tu misión ya fue completada. Debes esperar para comenzar una nueva aventura.');
   if (window.MuchStationCompletion?.showFloatingNotice) {
     window.MuchStationCompletion.showFloatingNotice({
-      badge: '⏳ Participación pausada',
-      title: 'Aún no puedes jugar',
-      body: mensaje,
-      detailLabel: 'Tiempo restante',
-      detailValue: estado?.tiempo_restante || 'Bloqueado'
+      badge: '⏳ Misión completada',
+      title: '¡Aventura completada!',
+      body: mensaje.replace(/\n/g, '<br>'),
+      ctaLabel: 'Entendido'
+    });
+  } else {
+    alert(mensaje);
+  }
+}
+
+function mostrarAvisoFinalizacionJuego(finalizacion) {
+  if (!finalizacion?.recorrido_completado || !finalizacion.fecha_puede_volver_texto) return;
+  const fecha = finalizacion.fecha_puede_volver_texto;
+  const mensaje = `¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrás volver a jugar el ${fecha}.`;
+  localStorage.setItem('much_playtime_block_msg', finalizacion.mensaje || mensaje);
+  invalidarCacheBloqueoJuego();
+
+  if (window.MuchStationCompletion?.showFloatingNotice) {
+    window.MuchStationCompletion.showFloatingNotice({
+      badge: '🏆 Aventura completada',
+      title: '¡Aventura completada!',
+      body: mensaje.replace(/\n/g, '<br>'),
+      ctaLabel: 'Ver mi recompensa'
     });
   } else {
     alert(mensaje);
@@ -530,6 +574,9 @@ async function guardarProgresoUsuario(estacionId, extra = {}) {
       throw new Error('Error en el backend al guardar progreso.');
     }
     const data = await res.json();
+    if (data.finalizacion) {
+      mostrarAvisoFinalizacionJuego(data.finalizacion);
+    }
     return data.progreso;
   } catch (error) {
     console.error('Error en guardarProgresoUsuario:', error.message);
@@ -803,6 +850,7 @@ window.comprobarEstacionActiva = comprobarEstacionActiva;
 window.consultarEstadoBloqueoJuego = consultarEstadoBloqueoJuego;
 window.asegurarJuegoPermitido = asegurarJuegoPermitido;
 window.mostrarAvisoBloqueoJuego = mostrarAvisoBloqueoJuego;
+window.mostrarAvisoFinalizacionJuego = mostrarAvisoFinalizacionJuego;
 window.invalidarCacheBloqueoJuego = invalidarCacheBloqueoJuego;
 
 function esPaginaDeEstacion() {

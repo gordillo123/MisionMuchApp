@@ -15,6 +15,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
     :root {
       --card-bg: #23272f;
       --card-br: 18px;
@@ -35,7 +38,8 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      padding: 30px;
+      min-height: 100dvh;
+      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
       background: #181a20;
       color: #fff;
     }
@@ -45,17 +49,18 @@
       background: var(--card-bg);
       border-radius: var(--card-br);
       box-shadow: var(--shadow-soft);
-      padding: 24px 22px 26px;
+      padding: clamp(16px, 4vh, 28px) clamp(16px, 5vw, 26px);
       width: 100%;
-      max-width: 520px;
+      max-width: 560px;
+      max-height: calc(100dvh - 32px);
+      overflow-y: auto;
       border: 1px solid var(--gris-300);
     }
 
     .back-btn {
-      position: absolute;
-      top: 18px;
-      left: 18px;
+      position: relative;
       display: inline-flex;
+      margin-bottom: 16px;
       align-items: center;
       gap: 8px;
       padding: 9px 14px 9px 10px;
@@ -89,34 +94,64 @@
     .logo-wrap {
       display: flex;
       justify-content: center;
-      margin-bottom: 10px;
+      margin-bottom: 16px;
     }
 
     .brand-logo {
-      width: clamp(120px, 42vw, 220px);
-      max-width: 70%;
-      height: auto;
+      width: auto;
+      height: clamp(75px, 16vh, 130px);
+      max-width: 95%;
       display: block;
       image-rendering: -webkit-optimize-contrast;
       -ms-interpolation-mode: bicubic;
-      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, .35));
+    }
+
+    .brand-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(10px, 3vw, 20px);
+      margin-top: clamp(16px, 3vh, 26px);
+      padding: 12px 18px;
+      border-radius: 16px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .brand-strip img {
+      display: block;
+      flex: 0 1 auto;
+      width: auto;
+      height: clamp(28px, 5vw, 40px);
+      max-width: clamp(60px, 18vw, 120px);
+      object-fit: contain;
+    }
+
+    .brand-strip .brand-much,
+    .brand-strip .brand-sbeel {
+      height: clamp(32px, 6vw, 46px);
+    }
+
+    .brand-strip .brand-planetario {
+      height: clamp(28px, 5vw, 40px);
     }
 
     h2 {
       text-align: center;
-      margin: 8px 0 14px;
+      margin: clamp(4px, 1.5vh, 10px) 0 clamp(8px, 2vh, 16px);
       color: var(--fucsia);
-      line-height: 1.2;
+      line-height: 1.15;
     }
 
     p.lead {
       text-align: center;
-      margin: 0 0 18px;
+      margin: 0 0 clamp(10px, 2.5vh, 20px);
       color: #cbd5e1;
     }
 
     .form-group {
-      margin-bottom: 18px;
+      margin-bottom: clamp(12px, 3vh, 20px);
     }
 
     .form-group label {
@@ -128,13 +163,14 @@
 
     .form-group input {
       width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid var(--gris-300);
-      font-size: 16px;
+      padding: clamp(10px, 2.5vh, 14px);
+      border-radius: 12px;
+      border: 2px solid var(--gris-600);
+      font-size: clamp(15px, 4vw, 16px);
       background: #0f1218;
       color: #fff;
       outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .form-group input:focus {
@@ -164,13 +200,14 @@
       background: linear-gradient(90deg, var(--turquesa), var(--fucsia));
       color: #fff;
       font-weight: 800;
-      padding: 14px;
+      padding: clamp(12px, 3vh, 16px);
       border: 0;
-      border-radius: 12px;
+      border-radius: 14px;
       width: 100%;
       cursor: pointer;
-      font-size: 18px;
+      font-size: clamp(16px, 4.5vw, 18px);
       transition: opacity .2s, transform .02s;
+      margin-top: clamp(6px, 1.5vh, 12px);
     }
 
     .submit-btn:active {
@@ -182,22 +219,52 @@
       cursor: not-allowed;
     }
 
-    @media (max-width: 360px) {
+    @media (max-width: 380px), (max-height: 700px) {
       .registro-container {
-        padding: 18px 16px 22px;
+        padding: 16px 14px 20px;
       }
 
       h2 {
-        font-size: 1.15rem;
+        font-size: clamp(1.15rem, 5vw, 1.35rem);
       }
 
       .brand-logo {
-        width: clamp(110px, 50vw, 180px);
+        height: clamp(65px, 14dvh, 110px);
+        max-width: 95vw;
       }
 
       .back-btn {
         position: static;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
+        align-self: flex-start;
+      }
+      
+      .brand-strip {
+        gap: 8px;
+        width: 100%;
+        margin-top: 16px;
+        padding: 8px 12px;
+      }
+
+      .brand-strip img,
+      .brand-strip .brand-much,
+      .brand-strip .brand-sbeel,
+      .brand-strip .brand-planetario {
+        flex: 1 1 0;
+        width: 0;
+        height: clamp(20px, 5dvh, 32px);
+        min-width: 0;
+        max-width: none;
+      }
+      
+      .form-group label {
+        margin-bottom: 4px;
+        font-size: 0.92rem;
+      }
+      
+      .hint, .error-msg {
+        font-size: 0.8rem;
+        margin-top: 4px;
       }
     }
 
@@ -286,18 +353,18 @@
     </button>
 
     <div class="logo-wrap">
-      <img src="./logo-much.png" alt="MUCH · Museo de Ciencia y Tecnología" class="brand-logo">
+      <img src="../Juego_Spinosaurio/logo-agencia.png" alt="Agencia Digital" class="brand-logo">
     </div>
 
-    <h2>Regístrate para reclamar tu premio 🐆</h2>
+    <h2>Regístrate para reclamar tu recompensa 🐆</h2>
     <p class="lead">Gracias por visitar el MUCH</p>
 
     <form id="registroForm" autocomplete="off" novalidate>
       <div class="form-group">
         <label for="nombre">Nombre completo</label>
         <input type="text" id="nombre" name="nombre" required inputmode="text" minlength="6" maxlength="80"
-          placeholder="Ej. Celi Glescanni" title="Escribe tu nombre completo (mínimo 2 palabras)." />
-        <div class="hint">Usa al menos dos palabras. Se permiten acentos y espacios.</div>
+          placeholder="Ej. Jose Navarro Solorzano" title="Escribe tu nombre completo (mínimo 2 palabras)." />
+        <div class="hint">Se permiten acentos y espacios. Escribe tu nombre y al menos un apellido para personalizar tu boleto.</div>
         <div class="error-msg" id="err-nombre"></div>
       </div>
 
@@ -319,6 +386,13 @@
 
       <button type="submit" id="submitBtn" class="submit-btn">Obtener mi Boleto</button>
     </form>
+
+    <div class="brand-strip">
+      <img src="../entrada-much/logo-much.png" alt="MUCH" class="brand-much">
+      <img src="../entrada-much/logo-sata.png" alt="SATA">
+      <img src="../Sbeel_Dinosaurios/logo-sbeel-dinosaurios.png" alt="SBEEL" class="brand-sbeel">
+      <img src="../assets/logo-planetario-tuxtla.svg" alt="Planetario Tuxtla" class="brand-planetario">
+    </div>
   </div>
 
   <!-- WELCOME MODAL -->

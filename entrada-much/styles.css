@@ -27,6 +27,12 @@
   --shadow-btn: 0 10px 20px -5px rgba(16, 185, 129, 0.3); /* Green shadow matching primary */
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: 'Fredoka', system-ui, -apple-system, sans-serif;
@@ -853,6 +859,46 @@ body {
 .question-timer {
   font-size: clamp(1.3rem, 5vw, 2.45rem);
   min-width: clamp(116px, 28vw, 210px);
+}
+
+/* La estación 1 comparte la misma franja de logos institucionales del mapa. */
+.station-logo-strip {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.4rem, 1.4vw, 0.8rem);
+  width: min(100%, 620px);
+  margin: 0 auto 0.45rem;
+  padding: 0.35rem 0.55rem;
+}
+
+.station-logo-strip img {
+  display: block;
+  flex: 0 1 auto;
+  width: auto;
+  height: clamp(28px, 4.5vw, 40px);
+  max-width: clamp(70px, 18vw, 120px);
+  object-fit: contain;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.98);
+  padding: 4px 8px;
+}
+
+.station-logo-strip .station-logo-much,
+.station-logo-strip .station-logo-sbeel {
+  height: clamp(34px, 5.5vw, 46px);
+  max-width: clamp(90px, 22vw, 150px);
+}
+
+.station-logo-strip .station-logo-sbeel {
+  padding: 0;
+  background: transparent;
+}
+
+.station-logo-strip .station-logo-planetario {
+  height: clamp(30px, 5vw, 42px);
+  max-width: clamp(80px, 20vw, 135px);
 }
 
 /* Larger score/status area */

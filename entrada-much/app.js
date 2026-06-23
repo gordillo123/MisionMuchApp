@@ -543,7 +543,7 @@ class UIManager {
       if (this.e && this.e.qIndex) this.e.qIndex.textContent = '1';
       if (this.e && this.e.pointsEl) this.e.pointsEl.textContent = '0';
       if (this.e && this.e.correctCount) this.e.correctCount.textContent = '0';
-      if (this.e && this.e.questionTimer) this.e.questionTimer.textContent = `⏳ ${this.questionCountdown}s`;
+      if (this.e && this.e.questionTimer) this.e.questionTimer.textContent = `⏳ ${this.questionCountdown} s`;
       setTimeout(() => window.location.reload(), 100);
       return;
     }
@@ -559,7 +559,7 @@ class UIManager {
 
   updateQuestionTimerDisplay() {
     if (!this.e.questionTimer) return;
-    this.e.questionTimer.textContent = `⏳ ${this.questionCountdown}s`;
+    this.e.questionTimer.textContent = `⏳ ${this.questionCountdown} s`;
     this.e.questionTimer.classList.toggle('low', this.questionCountdown <= 5 && this.questionCountdown > 3);
     this.e.questionTimer.classList.toggle('urgent', this.questionCountdown <= 3);
   }
@@ -651,7 +651,7 @@ class UIManager {
       }
     })();
 
-    if (e.questionTimer) e.questionTimer.textContent = '⏳ 0s';
+    if (e.questionTimer) e.questionTimer.textContent = '⏳ 0 s';
     this.sound.wrong();
 
     setTimeout(() => {
@@ -825,7 +825,7 @@ class UIManager {
 
     e.nextBtn.textContent = s.idx === QUESTIONS.length - 1 ? 'Finalizar 🎉' : 'Siguiente ➡️';
     this.updateScoreboard();
-    if (e.hint) e.hint.textContent = 'Tip: solo puedes elegir una respuesta';
+    if (e.hint) e.hint.textContent = 'Consejo: solo puedes elegir una respuesta.';
     this.startQuestionTimer();
   }
 
@@ -922,11 +922,11 @@ function verifyStationActive(estacionId) {
     .then(progreso => progreso.comprobarEstacionActiva(estacionId))
     .then(active => {
       if (!active) {
-        alert('Esta estacion se encuentra inactiva o cerrada.');
+        alert('Esta estación se encuentra inactiva o cerrada.');
         window.location.href = '../index.html';
       }
     })
-    .catch(err => console.warn('No se pudo verificar el estado de la estacion:', err));
+    .catch(err => console.warn('No se pudo verificar el estado de la estación:', err));
 }
 
 // === INICIALIZAR MINI-MAPA ===

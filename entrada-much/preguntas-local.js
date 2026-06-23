@@ -1,6 +1,6 @@
 window.MUCH_PREGUNTAS_ENTRADA = [
   {
-    "text": "📅 ¿En qué año se inauguró el Museo Chiapas (MUCH)?",
+    "text": "📅 ¿En qué año se inauguró el Museo Chiapas de Ciencia y Tecnología (MUCH)?",
     "options": ["1994", "2003", "2010", "2015"],
     "correctIndex": 1,
     "points": 10
@@ -19,7 +19,7 @@ window.MUCH_PREGUNTAS_ENTRADA = [
   },
   {
     "text": "🌳 ¿Cuál es el nombre del árbol que se encuentra en la fuente?",
-    "options": ["Roble", "Mago", "Guaya", "Aguacate"],
+    "options": ["Roble", "Mango", "Guaya", "Aguacate"],
     "correctIndex": 3,
     "points": 10
   },
@@ -49,25 +49,25 @@ window.MUCH_PREGUNTAS_ENTRADA = [
   },
   {
     "text": "🧬 ¿Qué significan las siglas MUCH?",
-    "options": ["Museo Chiapas de Ciencia y Tecnología", "Museo de la Comunidad Humana", "Muestra de Ciencia y Humana", "Mundo Científico e Histórico"],
+    "options": ["Museo Chiapas de Ciencia y Tecnología", "Museo de la Comunidad Humana", "Muestra de Ciencia y Humanidad", "Mundo Científico e Histórico"],
     "correctIndex": 0,
     "points": 10
   },
   {
     "text": "📍 ¿En qué reserva o parque natural se encuentra ubicado el MUCH?",
-    "options": ["Reserva de la Biósfera El Triunfo", "Parque Nacional Cañón del Sumidero", "Reserva El Zapotal", "Parque Joyyo Mayu"],
+    "options": ["Reserva de la Biosfera El Triunfo", "Parque Nacional Cañón del Sumidero", "Reserva El Zapotal", "Parque Joyyo Mayu"],
     "correctIndex": 2,
     "points": 10
   },
   {
     "text": "🐒 ¿Cuál es el zoológico vecino que comparte la reserva El Zapotal con el MUCH?",
-    "options": ["ZooMAT (Zoológico Miguel Álvarez del Toro)", "Zoológico de Chapultepec", "Zoológico Guadalajara", "Zoo de Tuxtla"],
+    "options": ["ZooMAT (Zoológico Miguel Álvarez del Toro)", "Zoológico de Chapultepec", "Zoológico de Guadalajara", "Zoo de Tuxtla"],
     "correctIndex": 0,
     "points": 10
   },
   {
     "text": "🦖 ¿Cuál es el dinosaurio carnívoro gigante cuyo fósil o representación da la bienvenida al museo?",
-    "options": ["Tiranosaurio Rex", "Espinosaurio", "Velociraptor", "Triceratops"],
+    "options": ["Tiranosaurio rex", "Espinosaurio", "Velociraptor", "Triceratops"],
     "correctIndex": 1,
     "points": 10
   }

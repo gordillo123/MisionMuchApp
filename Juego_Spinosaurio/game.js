@@ -758,10 +758,10 @@ function startQuestionTimer(seconds) {
     stopQuestionTimer();
     questionSecondsLeft = typeof seconds === 'number' ? seconds : QUESTION_SECONDS;
     const timerEl = document.getElementById('quizTimer');
-    if (timerEl) { timerEl.style.display = 'block'; timerEl.textContent = questionSecondsLeft + 's'; }
+    if (timerEl) { timerEl.style.display = 'block'; timerEl.textContent = questionSecondsLeft + ' s'; }
     questionTimerInterval = setInterval(() => {
       questionSecondsLeft--;
-      if (timerEl) timerEl.textContent = questionSecondsLeft + 's';
+      if (timerEl) timerEl.textContent = questionSecondsLeft + ' s';
       if (questionSecondsLeft <= 0) {
         stopQuestionTimer();
         handleQuestionTimeout();
@@ -779,7 +779,7 @@ function stopQuestionTimer() {
 
 function handleQuestionTimeout() {
   try {
-    const msg = document.getElementById('quizMsg'); if (msg) { msg.textContent = 'Tiempo agotado. Incorrecto.'; msg.className = 'quiz-msg err'; }
+    const msg = document.getElementById('quizMsg'); if (msg) { msg.textContent = 'Se acabó el tiempo. La respuesta se considera incorrecta.'; msg.className = 'quiz-msg err'; }
     var inputs = document.querySelectorAll('input[name="q1"]'); inputs.forEach(inp => inp.disabled = true);
     try { document.getElementById('btnQuizNext').style.display = 'none'; } catch (e) {}
     try { document.getElementById('btnQuizOk').textContent = 'Volver a jugar'; } catch (e) {}
@@ -844,7 +844,7 @@ async function validarQuiz() {
   }
 
   if (!sel) {
-    window.MuchStationCompletion?.clearInline(msg, "Selecciona una opcion 😉");
+    window.MuchStationCompletion?.clearInline(msg, 'Selecciona una opción. 😉');
     msg.className = "quiz-msg err";
     return;
   }

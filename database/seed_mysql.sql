@@ -22,13 +22,13 @@ ON DUPLICATE KEY UPDATE nombre=VALUES(nombre), descripcion=VALUES(descripcion), 
 INSERT INTO preguntas (id_pregunta, id_estacion, pregunta, activa) VALUES
 (1, 5, '¿Qué es el desarrollo sustentable?', 1),
 (2, 5, '¿Cuál de las siguientes es una fuente de energía renovable?', 1),
-(3, 5, '¿Qué significan las 3R en el cuidado del medio ambiente?', 1)
+(3, 5, '¿Qué significan las tres erres en el cuidado del ambiente?', 1)
 ON DUPLICATE KEY UPDATE pregunta=VALUES(pregunta), id_estacion=VALUES(id_estacion);
 
 -- Respuestas para Pregunta 1
 INSERT INTO respuestas (id_respuesta, id_pregunta, texto_respuesta, es_correcta, activa) VALUES
 (1, 1, 'Gastar todos los recursos naturales lo más rápido posible.', 0, 1),
-(2, 1, 'Satisfacer las necesidades actuales sin comprometer las capacidades de las futuras generaciones.', 1, 1),
+(2, 1, 'Satisfacer las necesidades actuales sin comprometer la capacidad de las generaciones futuras.', 1, 1),
 (3, 1, 'Ignorar el medio ambiente a favor del desarrollo industrial ilimitado.', 0, 1)
 ON DUPLICATE KEY UPDATE texto_respuesta=VALUES(texto_respuesta), es_correcta=VALUES(es_correcta);
 
@@ -41,9 +41,9 @@ ON DUPLICATE KEY UPDATE texto_respuesta=VALUES(texto_respuesta), es_correcta=VAL
 
 -- Respuestas para Pregunta 3
 INSERT INTO respuestas (id_respuesta, id_pregunta, texto_respuesta, es_correcta, activa) VALUES
-(7, 3, 'Reducir, Reutilizar y Reciclar.', 1, 1),
-(8, 3, 'Recuperar, Reponer y Reparar.', 0, 1),
-(9, 3, 'Rentar, Regalar y Recibir.', 0, 1)
+(7, 3, 'Reducir, reutilizar y reciclar.', 1, 1),
+(8, 3, 'Recuperar, reponer y reparar.', 0, 1),
+(9, 3, 'Rentar, regalar y recibir.', 0, 1)
 ON DUPLICATE KEY UPDATE texto_respuesta=VALUES(texto_respuesta), es_correcta=VALUES(es_correcta);
 
 
@@ -106,6 +106,6 @@ ON DUPLICATE KEY UPDATE texto_respuesta=VALUES(texto_respuesta), es_correcta=VAL
 
 -- 6. Insertar algunas imágenes para rompecabezas (id_imagen)
 INSERT INTO imagenes_rompecabezas (id_imagen, titulo, ruta_imagen, descripcion, activa) VALUES
-(1, 'Spinosaurio MUCH', 'assets/rompecabezas/spino.png', 'Imagen del espinosaurio oficial para el armado en el reto SBEEL', 1),
+(1, 'Espinosaurio MUCH', 'assets/rompecabezas/spino.png', 'Imagen del espinosaurio oficial para armar en el reto SBEEL', 1),
 (2, 'Triceratops MUCH', 'assets/rompecabezas/tricera.png', 'Imagen de triceratops animado para el reto secundario', 1)
 ON DUPLICATE KEY UPDATE titulo=VALUES(titulo), ruta_imagen=VALUES(ruta_imagen), descripcion=VALUES(descripcion);

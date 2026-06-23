@@ -1928,6 +1928,19 @@
       return withTime ? dateTimeFormatter.format(parsed) : dateFormatter.format(parsed);
     }
 
+    function formatPlaytimeDate(value) {
+      if (!value) return 'Sin fecha';
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) return 'Sin fecha';
+      return new Intl.DateTimeFormat('es-MX', {
+        timeZone: 'America/Mexico_City',
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      }).format(parsed).replace(',', '');
+    }
+
     function getLocalDateInputValue(date = new Date()) {
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -2923,15 +2936,9 @@
       return { text: 'Habilitado', cls: 'tag-success' };
     }
 
-    function getUnidadLabel(unidad) {
-      if (unidad === 'dias') return 'Días';
-      if (unidad === 'meses') return 'Meses';
-      return 'Semanas';
-    }
-
     function renderPlaytimeConfigView() {
       const container = document.getElementById('viewContainers');
-      const config = state.playtimeConfig || { bloqueo_activo: true, cantidad: 1, unidad: 'semanas' };
+      const config = state.playtimeConfig || { bloqueo_activo: true, cantidad: 7, unidad: 'dias' };
       const query = (state.queries['tiempo-juego'] || '').trim().toLowerCase();
       const filter = state.filters['tiempo-juego'] || 'all';
 
@@ -2961,21 +2968,13 @@
         <div class="panel" style="margin-bottom: 20px;">
           <h3 style="margin: 0 0 16px; font-family: 'Fredoka', sans-serif; color: var(--accent);">Configuración del tiempo de juego</h3>
           <p style="margin: 0 0 20px; color: var(--text-soft); font-size: 0.92rem;">
-            Define cuánto debe esperar un usuario después de reclamar su premio antes de volver a participar.
-            Los cambios aplican a los próximos reclamos, salvo que marques la opción de actualizar bloqueos actuales.
+            Define cuántos días debe esperar un usuario desde que completa todas las estaciones.
+            Al guardar, las fechas de desbloqueo activas se recalculan automáticamente desde la fecha real de finalización.
           </p>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; align-items: end;">
             <div>
-              <label class="form-label" for="playtimeCantidad">Cantidad de tiempo</label>
-              <input class="form-input" id="playtimeCantidad" type="number" min="1" value="${Number(config.cantidad || 1)}">
-            </div>
-            <div>
-              <label class="form-label" for="playtimeUnidad">Unidad de tiempo</label>
-              <select class="form-input" id="playtimeUnidad">
-                <option value="dias" ${config.unidad === 'dias' ? 'selected' : ''}>Días</option>
-                <option value="semanas" ${config.unidad === 'semanas' || !config.unidad ? 'selected' : ''}>Semanas</option>
-                <option value="meses" ${config.unidad === 'meses' ? 'selected' : ''}>Meses</option>
-              </select>
+              <label class="form-label" for="playtimeCantidad">Días de bloqueo</label>
+              <input class="form-input" id="playtimeCantidad" type="number" min="1" max="3650" step="1" value="${Number(config.cantidad || 7)}">
             </div>
             <div>
               <label class="form-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
@@ -2984,17 +2983,11 @@
               </label>
             </div>
             <div>
-              <label class="form-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                <input type="checkbox" id="playtimeAplicarActuales" style="width: 18px; height: 18px;">
-                Actualizar también bloqueos actuales
-              </label>
-            </div>
-            <div>
               <button class="btn btn-solid" type="button" onclick="window.guardarConfigTiempoJuego()">Guardar cambios</button>
             </div>
           </div>
           <p style="margin: 14px 0 0; font-size: 0.82rem; color: var(--text-dim);">
-            Valor actual: ${Number(config.cantidad || 1)} ${getUnidadLabel(config.unidad).toLowerCase()}${config.bloqueo_activo === false ? ' (bloqueo desactivado)' : ''}.
+            Valor actual: ${Number(config.cantidad || 7)} día${Number(config.cantidad || 7) === 1 ? '' : 's'}${config.bloqueo_activo === false ? ' (bloqueo desactivado)' : ''}.
             ${config.updated_at ? `Última actualización: ${formatDate(config.updated_at, true)}.` : ''}
           </p>
         </div>
@@ -3026,7 +3019,7 @@
                   <tr>
                     <th>Usuario</th>
                     <th>Fecha en que jugó</th>
-                    <th>Fecha en que ganó</th>
+                    <th>Finalizó el recorrido</th>
                     <th>Fecha de reclamo</th>
                     <th>Puede volver a jugar</th>
                     <th>Estado</th>
@@ -3046,9 +3039,9 @@
                           <span style="font-size: 0.8rem; color: var(--text-dim);">${correoSafe}</span>
                         </td>
                         <td data-label="Fecha en que jugó">${formatDate(row.fecha_jugo, true)}</td>
-                        <td data-label="Fecha en que ganó">${formatDate(row.fecha_ganado, true)}</td>
+                        <td data-label="Finalizó el recorrido">${formatPlaytimeDate(row.fecha_finalizacion || row.fecha_ganado)}</td>
                         <td data-label="Fecha de reclamo">${formatDate(row.fecha_reclamado, true)}</td>
-                        <td data-label="Puede volver a jugar">${formatDate(row.fecha_puede_volver_jugar, true)}</td>
+                        <td data-label="Puede volver a jugar"><strong>${formatPlaytimeDate(row.fecha_puede_volver_jugar)}</strong></td>
                         <td data-label="Estado"><span class="tag ${estado.cls}">${estado.text}</span></td>
                         <td data-label="Tiempo restante">${escapeHtml(row.tiempo_restante || '—')}</td>
                         <td data-label="Acciones">
@@ -3081,13 +3074,12 @@
     }
 
     async function guardarConfigTiempoJuego() {
-      const cantidad = Number(document.getElementById('playtimeCantidad')?.value || 1);
-      const unidad = document.getElementById('playtimeUnidad')?.value || 'semanas';
+      const cantidad = Number(document.getElementById('playtimeCantidad')?.value || 7);
+      const unidad = 'dias';
       const bloqueo_activo = Boolean(document.getElementById('playtimeActivo')?.checked);
-      const aplicar_bloqueos_actuales = Boolean(document.getElementById('playtimeAplicarActuales')?.checked);
 
-      if (!Number.isFinite(cantidad) || cantidad < 1) {
-        alert('La cantidad debe ser al menos 1.');
+      if (!Number.isInteger(cantidad) || cantidad < 1 || cantidad > 3650) {
+        alert('La cantidad debe ser un número entero entre 1 y 3650 días.');
         return;
       }
 
@@ -3095,7 +3087,7 @@
         const res = await fetch(buildApiUrl('/api/admin/configuracion-juego', false), {
           method: 'PUT',
           headers: getHeaders(),
-          body: JSON.stringify({ cantidad, unidad, bloqueo_activo, aplicar_bloqueos_actuales })
+          body: JSON.stringify({ cantidad, unidad, bloqueo_activo })
         });
         if (!res.ok) {
           const err = await res.json();

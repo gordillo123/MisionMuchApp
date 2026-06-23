@@ -3,7 +3,8 @@
 
 const TZ = process.env.TZ || 'America/Mexico_City';
 
-const UNIDADES_VALIDAS = new Set(['dias', 'semanas', 'meses']);
+const DIAS_BLOQUEO_POR_DEFECTO = 7;
+const MS_POR_DIA = 24 * 60 * 60 * 1000;
 
 function formatFechaHoraMX(date) {
   if (!date) return '';
@@ -29,25 +30,31 @@ function formatFechaHoraMXPartes(date) {
   return { fecha, hora };
 }
 
+function formatFechaMX(date) {
+  if (!date) return '';
+  const value = date instanceof Date ? date : new Date(date);
+  if (Number.isNaN(value.getTime())) return '';
+
+  const parts = new Intl.DateTimeFormat('es-MX', {
+    timeZone: TZ,
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }).formatToParts(value);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.weekday} ${values.day} de ${values.month} de ${values.year}`;
+}
+
 function buildMensajeBloqueo(fechaPuedeVolver) {
-  const { fecha, hora } = formatFechaHoraMXPartes(fechaPuedeVolver);
-  return `Ya reclamaste tu premio. Podrás volver a participar el día ${fecha} a las ${hora}.`;
+  return `¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrás volver a jugar el ${formatFechaMX(fechaPuedeVolver)}.`;
 }
 
 function calcularFechaDesbloqueo(fechaBase, config) {
   const base = fechaBase instanceof Date ? new Date(fechaBase.getTime()) : new Date(fechaBase);
-  const cantidad = Math.max(1, Number(config.cantidad) || 1);
-  const unidad = UNIDADES_VALIDAS.has(config.unidad) ? config.unidad : 'semanas';
-
-  if (unidad === 'dias') {
-    base.setDate(base.getDate() + cantidad);
-  } else if (unidad === 'semanas') {
-    base.setDate(base.getDate() + (cantidad * 7));
-  } else if (unidad === 'meses') {
-    base.setMonth(base.getMonth() + cantidad);
-  }
-
-  return base;
+  if (Number.isNaN(base.getTime())) throw new Error('Fecha base inválida.');
+  const cantidad = Math.max(1, Math.trunc(Number(config?.cantidad) || DIAS_BLOQUEO_POR_DEFECTO));
+  return new Date(base.getTime() + (cantidad * MS_POR_DIA));
 }
 
 function msRestantes(fechaPuedeVolver) {
@@ -75,8 +82,8 @@ function createPlaytimeBlockService(pool) {
       CREATE TABLE IF NOT EXISTS configuracion_juego (
         id_config INT AUTO_INCREMENT PRIMARY KEY,
         bloqueo_activo BOOLEAN NOT NULL DEFAULT TRUE,
-        cantidad INT NOT NULL DEFAULT 1,
-        unidad ENUM('dias', 'semanas', 'meses') NOT NULL DEFAULT 'semanas',
+        cantidad INT NOT NULL DEFAULT 7,
+        unidad ENUM('dias', 'semanas', 'meses') NOT NULL DEFAULT 'dias',
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by INT NULL,
         CONSTRAINT fk_config_updated_by FOREIGN KEY (updated_by) REFERENCES usuarios (id_usuario) ON DELETE SET NULL
@@ -107,9 +114,11 @@ function createPlaytimeBlockService(pool) {
         fecha_ganado TIMESTAMP NULL,
         fecha_reclamado TIMESTAMP NULL,
         fecha_entregado TIMESTAMP NULL,
+        fecha_finalizacion TIMESTAMP NULL,
         fecha_puede_volver_jugar TIMESTAMP NULL,
         cantidad_bloqueo INT NULL,
         unidad_bloqueo ENUM('dias', 'semanas', 'meses') NULL,
+        ciclo_reiniciado_at TIMESTAMP NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         CONSTRAINT fk_premios_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
@@ -121,26 +130,57 @@ function createPlaytimeBlockService(pool) {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
-    const [[exists]] = await pool.query('SELECT id_config FROM configuracion_juego LIMIT 1');
+    const [fechaFinalizacionColumn] = await pool.query(
+      "SHOW COLUMNS FROM premios LIKE 'fecha_finalizacion'"
+    );
+    if (fechaFinalizacionColumn.length === 0) {
+      await pool.query('ALTER TABLE premios ADD COLUMN fecha_finalizacion TIMESTAMP NULL AFTER fecha_entregado');
+    }
+
+    const [cicloReiniciadoColumn] = await pool.query(
+      "SHOW COLUMNS FROM premios LIKE 'ciclo_reiniciado_at'"
+    );
+    if (cicloReiniciadoColumn.length === 0) {
+      await pool.query('ALTER TABLE premios ADD COLUMN ciclo_reiniciado_at TIMESTAMP NULL AFTER unidad_bloqueo');
+    }
+
+    const [[exists]] = await pool.query('SELECT id_config, cantidad, unidad FROM configuracion_juego LIMIT 1');
     if (!exists) {
       await pool.query(
-        `INSERT INTO configuracion_juego (bloqueo_activo, cantidad, unidad) VALUES (TRUE, 1, 'semanas')`
+        `INSERT INTO configuracion_juego (bloqueo_activo, cantidad, unidad) VALUES (TRUE, 7, 'dias')`
+      );
+    } else if (exists.unidad !== 'dias') {
+      const diasEquivalentes = exists.unidad === 'semanas'
+        ? Number(exists.cantidad) * 7
+        : Number(exists.cantidad) * 30;
+      await pool.query(
+        `UPDATE configuracion_juego SET cantidad = ?, unidad = 'dias' WHERE id_config = ?`,
+        [Math.max(1, Math.min(3650, diasEquivalentes)), exists.id_config]
       );
     }
+
+    await pool.query(
+      `UPDATE premios
+       SET fecha_finalizacion = fecha_ganado
+       WHERE fecha_finalizacion IS NULL AND fecha_ganado IS NOT NULL`
+    );
   }
 
   async function getConfig() {
     const [[row]] = await pool.query(
       'SELECT * FROM configuracion_juego ORDER BY id_config ASC LIMIT 1'
     );
-    return row || { bloqueo_activo: true, cantidad: 1, unidad: 'semanas' };
+    return row || { bloqueo_activo: true, cantidad: DIAS_BLOQUEO_POR_DEFECTO, unidad: 'dias' };
   }
 
   async function updateConfig(data, updatedBy = null) {
     const config = await getConfig();
     const bloqueoActivo = data.bloqueo_activo !== undefined ? Boolean(data.bloqueo_activo) : Boolean(config.bloqueo_activo);
-    const cantidad = Math.max(1, Number(data.cantidad ?? config.cantidad ?? 1));
-    const unidad = UNIDADES_VALIDAS.has(data.unidad) ? data.unidad : (config.unidad || 'semanas');
+    const cantidad = Number(data.cantidad ?? config.cantidad ?? DIAS_BLOQUEO_POR_DEFECTO);
+    if (!Number.isInteger(cantidad) || cantidad < 1 || cantidad > 3650) {
+      throw new Error('La cantidad de días debe ser un número entero entre 1 y 3650.');
+    }
+    const unidad = 'dias';
 
     await pool.query(
       `UPDATE configuracion_juego
@@ -152,36 +192,92 @@ function createPlaytimeBlockService(pool) {
     return getConfig();
   }
 
-  async function getUltimoPremioReclamado(idUsuario) {
-    const [[premio]] = await pool.query(
+  async function getUltimoPremioFinalizado(idUsuario, connection = null) {
+    const conn = connection || pool;
+    const [[premio]] = await conn.query(
       `SELECT * FROM premios
-       WHERE id_usuario = ? AND fecha_reclamado IS NOT NULL
-       ORDER BY fecha_reclamado DESC
+       WHERE id_usuario = ?
+         AND fecha_puede_volver_jugar IS NOT NULL
+         AND COALESCE(fecha_finalizacion, fecha_ganado) IS NOT NULL
+       ORDER BY COALESCE(fecha_finalizacion, fecha_ganado, created_at) DESC
        LIMIT 1`,
       [idUsuario]
     );
     return premio || null;
   }
 
+  async function prepararNuevoCiclo(idUsuario, premio) {
+    if (!premio || premio.ciclo_reiniciado_at) return false;
+
+    const connection = await pool.getConnection();
+    try {
+      await connection.beginTransaction();
+      const [[actual]] = await connection.query(
+        'SELECT * FROM premios WHERE id_premio = ? FOR UPDATE',
+        [premio.id_premio]
+      );
+      if (!actual || actual.ciclo_reiniciado_at || !actual.fecha_puede_volver_jugar
+          || Date.now() < new Date(actual.fecha_puede_volver_jugar).getTime()) {
+        await connection.commit();
+        return false;
+      }
+
+      await connection.query('DELETE FROM progreso_usuario WHERE id_usuario = ?', [idUsuario]);
+      await connection.query(
+        'UPDATE premios SET ciclo_reiniciado_at = CURRENT_TIMESTAMP WHERE id_premio = ?',
+        [actual.id_premio]
+      );
+      await connection.query(
+        `UPDATE participaciones SET estado = 'habilitado'
+         WHERE id_participacion = ? AND estado IN ('ganado', 'reclamado')`,
+        [actual.id_participacion]
+      );
+      await connection.commit();
+      return true;
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+
   async function getEstadoBloqueo(idUsuario) {
     const config = await getConfig();
     const habilitado = { bloqueado: false, habilitado: true, config };
+    let premio = await getUltimoPremioFinalizado(idUsuario);
 
     if (!config.bloqueo_activo) {
-      return { ...habilitado, motivo: 'bloqueo_desactivado' };
+      if (!premio) return { ...habilitado, motivo: 'bloqueo_desactivado' };
+      await pool.query(
+        `UPDATE premios SET fecha_puede_volver_jugar = CURRENT_TIMESTAMP
+         WHERE id_premio = ? AND ciclo_reiniciado_at IS NULL`,
+        [premio.id_premio]
+      );
+      premio = await getUltimoPremioFinalizado(idUsuario);
+      const nuevoCicloIniciado = await prepararNuevoCiclo(idUsuario, premio);
+      return {
+        ...habilitado,
+        motivo: 'bloqueo_desactivado',
+        nuevo_ciclo_iniciado: nuevoCicloIniciado,
+        ciclo_juego_id: `premio-${premio.id_premio}-${new Date(premio.fecha_puede_volver_jugar).getTime()}`
+      };
     }
 
-    const premio = await getUltimoPremioReclamado(idUsuario);
     if (!premio || !premio.fecha_puede_volver_jugar) {
-      return { ...habilitado, premio_pendiente: premio?.estado === 'pendiente' ? premio : null };
+      return habilitado;
     }
 
     const fechaPuedeVolver = new Date(premio.fecha_puede_volver_jugar);
     if (Date.now() >= fechaPuedeVolver.getTime()) {
+      const nuevoCicloIniciado = await prepararNuevoCiclo(idUsuario, premio);
+      if (nuevoCicloIniciado) premio = await getUltimoPremioFinalizado(idUsuario);
       return {
         ...habilitado,
         premio_anterior: premio,
-        motivo: 'tiempo_cumplido'
+        motivo: 'tiempo_cumplido',
+        nuevo_ciclo_iniciado: nuevoCicloIniciado,
+        ciclo_juego_id: `premio-${premio.id_premio}-${new Date(premio.fecha_puede_volver_jugar).getTime()}`
       };
     }
 
@@ -192,7 +288,7 @@ function createPlaytimeBlockService(pool) {
       config,
       premio,
       fecha_puede_volver: fechaPuedeVolver.toISOString(),
-      fecha_puede_volver_texto: formatFechaHoraMX(fechaPuedeVolver),
+      fecha_puede_volver_texto: formatFechaMX(fechaPuedeVolver),
       tiempo_restante: formatTiempoRestante(restanteMs),
       tiempo_restante_ms: restanteMs,
       mensaje: buildMensajeBloqueo(fechaPuedeVolver)
@@ -225,6 +321,7 @@ function createPlaytimeBlockService(pool) {
 
   async function registrarGanado(idUsuario, idBoleto = null, connection = null) {
     const conn = connection || pool;
+    const config = await getConfig();
     const participacion = await asegurarParticipacionActiva(conn, idUsuario);
 
     await conn.query(
@@ -234,21 +331,48 @@ function createPlaytimeBlockService(pool) {
     );
 
     const [[premioPendiente]] = await conn.query(
-      `SELECT * FROM premios WHERE id_usuario = ? AND estado = 'pendiente' ORDER BY id_premio DESC LIMIT 1`,
-      [idUsuario]
+      `SELECT * FROM premios
+       WHERE id_usuario = ? AND id_participacion = ? AND estado = 'pendiente'
+       ORDER BY id_premio DESC LIMIT 1`,
+      [idUsuario, participacion.id_participacion]
     );
 
     if (premioPendiente) {
-      if (idBoleto && !premioPendiente.id_boleto) {
-        await conn.query('UPDATE premios SET id_boleto = ? WHERE id_premio = ?', [idBoleto, premioPendiente.id_premio]);
-      }
-      return premioPendiente;
+      await conn.query(
+        `UPDATE premios
+         SET id_boleto = COALESCE(id_boleto, ?),
+             fecha_ganado = COALESCE(fecha_ganado, CURRENT_TIMESTAMP),
+             fecha_finalizacion = COALESCE(fecha_finalizacion, CURRENT_TIMESTAMP),
+             fecha_puede_volver_jugar = COALESCE(
+               fecha_puede_volver_jugar,
+               CASE WHEN ? THEN DATE_ADD(CURRENT_TIMESTAMP, INTERVAL ? DAY) ELSE NULL END
+             ),
+             cantidad_bloqueo = COALESCE(cantidad_bloqueo, ?),
+             unidad_bloqueo = COALESCE(unidad_bloqueo, 'dias')
+         WHERE id_premio = ?`,
+        [idBoleto, config.bloqueo_activo, config.cantidad, config.cantidad, premioPendiente.id_premio]
+      );
+      const [[actualizado]] = await conn.query('SELECT * FROM premios WHERE id_premio = ?', [premioPendiente.id_premio]);
+      return actualizado;
     }
 
     const [result] = await conn.query(
-      `INSERT INTO premios (id_usuario, id_participacion, id_boleto, estado, fecha_ganado)
-       VALUES (?, ?, ?, 'pendiente', CURRENT_TIMESTAMP)`,
-      [idUsuario, participacion.id_participacion, idBoleto]
+      `INSERT INTO premios
+        (id_usuario, id_participacion, id_boleto, estado, fecha_ganado, fecha_finalizacion,
+         fecha_puede_volver_jugar, cantidad_bloqueo, unidad_bloqueo)
+       VALUES (
+         ?, ?, ?, 'pendiente', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
+         CASE WHEN ? THEN DATE_ADD(CURRENT_TIMESTAMP, INTERVAL ? DAY) ELSE NULL END,
+         ?, 'dias'
+       )`,
+      [
+        idUsuario,
+        participacion.id_participacion,
+        idBoleto,
+        config.bloqueo_activo,
+        config.cantidad,
+        config.cantidad
+      ]
     );
 
     const [[premio]] = await conn.query('SELECT * FROM premios WHERE id_premio = ?', [result.insertId]);
@@ -258,9 +382,6 @@ function createPlaytimeBlockService(pool) {
   async function registrarReclamo(idUsuario, idBoleto = null, connection = null) {
     const conn = connection || pool;
     const config = await getConfig();
-    const ahora = new Date();
-    const fechaPuedeVolver = calcularFechaDesbloqueo(ahora, config);
-
     const participacion = await asegurarParticipacionActiva(conn, idUsuario);
 
     let [[premio]] = await conn.query(
@@ -271,51 +392,38 @@ function createPlaytimeBlockService(pool) {
     );
 
     if (!premio) {
-      const [result] = await conn.query(
-        `INSERT INTO premios (id_usuario, id_participacion, id_boleto, estado, fecha_ganado, fecha_reclamado,
-          fecha_puede_volver_jugar, cantidad_bloqueo, unidad_bloqueo)
-         VALUES (?, ?, ?, 'reclamado', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?)`,
-        [
-          idUsuario,
-          participacion.id_participacion,
-          idBoleto,
-          config.bloqueo_activo ? fechaPuedeVolver : null,
-          config.cantidad,
-          config.unidad
-        ]
-      );
-      [[premio]] = await conn.query('SELECT * FROM premios WHERE id_premio = ?', [result.insertId]);
-    } else {
-      await conn.query(
-        `UPDATE premios
-         SET estado = 'reclamado',
-             id_boleto = COALESCE(?, id_boleto),
-             fecha_reclamado = CURRENT_TIMESTAMP,
-             fecha_puede_volver_jugar = ?,
-             cantidad_bloqueo = ?,
-             unidad_bloqueo = ?
-         WHERE id_premio = ?`,
-        [
-          idBoleto,
-          config.bloqueo_activo ? fechaPuedeVolver : null,
-          config.cantidad,
-          config.unidad,
-          premio.id_premio
-        ]
-      );
-      [[premio]] = await conn.query('SELECT * FROM premios WHERE id_premio = ?', [premio.id_premio]);
+      premio = await registrarGanado(idUsuario, idBoleto, conn);
     }
 
     await conn.query(
-      `UPDATE participaciones SET estado = 'reclamado', fecha_fin = CURRENT_TIMESTAMP WHERE id_participacion = ?`,
-      [participacion.id_participacion]
+      `UPDATE premios
+       SET estado = 'reclamado',
+           id_boleto = COALESCE(?, id_boleto),
+           fecha_reclamado = COALESCE(fecha_reclamado, CURRENT_TIMESTAMP),
+           fecha_puede_volver_jugar = CASE 
+             WHEN estado = 'pendiente' THEN ? 
+             ELSE fecha_puede_volver_jugar 
+           END
+       WHERE id_premio = ?`,
+      [idBoleto, calcularFechaDesbloqueo(new Date(), config), premio.id_premio]
     );
+    [[premio]] = await conn.query('SELECT * FROM premios WHERE id_premio = ?', [premio.id_premio]);
+
+    await conn.query(
+      `UPDATE participaciones SET estado = 'reclamado', fecha_fin = CURRENT_TIMESTAMP WHERE id_participacion = ?`,
+      [premio.id_participacion || participacion.id_participacion]
+    );
+
+    const fechaPuedeVolver = premio.fecha_puede_volver_jugar
+      ? new Date(premio.fecha_puede_volver_jugar)
+      : null;
 
     return {
       premio,
-      bloqueado: Boolean(config.bloqueo_activo),
-      fecha_puede_volver: config.bloqueo_activo ? fechaPuedeVolver.toISOString() : null,
-      mensaje: config.bloqueo_activo ? buildMensajeBloqueo(fechaPuedeVolver) : null
+      bloqueado: Boolean(config.bloqueo_activo && fechaPuedeVolver),
+      fecha_puede_volver: fechaPuedeVolver ? fechaPuedeVolver.toISOString() : null,
+      fecha_puede_volver_texto: fechaPuedeVolver ? formatFechaMX(fechaPuedeVolver) : null,
+      mensaje: fechaPuedeVolver ? buildMensajeBloqueo(fechaPuedeVolver) : null
     };
   }
 
@@ -333,13 +441,7 @@ function createPlaytimeBlockService(pool) {
     await pool.query(
       `UPDATE premios
        SET fecha_puede_volver_jugar = CURRENT_TIMESTAMP
-       WHERE id_usuario = ? AND fecha_reclamado IS NOT NULL AND fecha_puede_volver_jugar > CURRENT_TIMESTAMP`,
-      [idUsuario]
-    );
-
-    await pool.query(
-      `INSERT INTO participaciones (id_usuario, estado, fecha_fin)
-       VALUES (?, 'habilitado', CURRENT_TIMESTAMP)`,
+       WHERE id_usuario = ? AND fecha_puede_volver_jugar > CURRENT_TIMESTAMP`,
       [idUsuario]
     );
 
@@ -352,9 +454,9 @@ function createPlaytimeBlockService(pool) {
       throw new Error('Fecha inválida.');
     }
 
-    const premio = await getUltimoPremioReclamado(idUsuario);
+    const premio = await getUltimoPremioFinalizado(idUsuario);
     if (!premio) {
-      throw new Error('El usuario no tiene premios reclamados.');
+      throw new Error('El usuario no tiene recorridos finalizados.');
     }
 
     await pool.query(
@@ -368,24 +470,21 @@ function createPlaytimeBlockService(pool) {
   async function aplicarConfiguracionABloqueosActivos(updatedBy = null) {
     const config = await getConfig();
     const [premios] = await pool.query(
-      `SELECT id_premio, fecha_reclamado FROM premios
-       WHERE fecha_reclamado IS NOT NULL
+      `SELECT id_premio, COALESCE(fecha_finalizacion, fecha_ganado) AS fecha_finalizacion
+       FROM premios
+       WHERE COALESCE(fecha_finalizacion, fecha_ganado) IS NOT NULL
          AND fecha_puede_volver_jugar IS NOT NULL
          AND fecha_puede_volver_jugar > CURRENT_TIMESTAMP`
     );
 
     for (const premio of premios) {
-      const nuevaFecha = calcularFechaDesbloqueo(premio.fecha_reclamado, config);
+      const nuevaFecha = calcularFechaDesbloqueo(premio.fecha_finalizacion, config);
       await pool.query(
         `UPDATE premios
          SET fecha_puede_volver_jugar = ?, cantidad_bloqueo = ?, unidad_bloqueo = ?
          WHERE id_premio = ?`,
-        [nuevaFecha, config.cantidad, config.unidad, premio.id_premio]
+        [nuevaFecha, config.cantidad, 'dias', premio.id_premio]
       );
-    }
-
-    if (updatedBy) {
-      await updateConfig(config, updatedBy);
     }
 
     return { actualizados: premios.length, config };
@@ -402,6 +501,7 @@ function createPlaytimeBlockService(pool) {
          p.fecha_ganado,
          p.fecha_reclamado,
          p.fecha_entregado,
+         p.fecha_finalizacion,
          p.fecha_puede_volver_jugar,
          part.fecha_inicio AS fecha_jugo,
          part.id_participacion
@@ -410,14 +510,14 @@ function createPlaytimeBlockService(pool) {
          AND p.id_premio = (
            SELECT p2.id_premio FROM premios p2
            WHERE p2.id_usuario = u.id_usuario
-           ORDER BY COALESCE(p2.fecha_reclamado, p2.fecha_ganado, p2.created_at) DESC
+           ORDER BY COALESCE(p2.fecha_finalizacion, p2.fecha_ganado, p2.created_at) DESC
            LIMIT 1
          )
        LEFT JOIN participaciones part ON part.id_participacion = p.id_participacion
        WHERE EXISTS (
          SELECT 1 FROM premios px WHERE px.id_usuario = u.id_usuario
        )
-       ORDER BY COALESCE(p.fecha_reclamado, p.fecha_ganado, u.fecha_registro) DESC`
+       ORDER BY COALESCE(p.fecha_finalizacion, p.fecha_ganado, u.fecha_registro) DESC`
     );
 
     const config = await getConfig();
@@ -427,7 +527,7 @@ function createPlaytimeBlockService(pool) {
       let tiempoRestante = '—';
       let estadoActual = 'habilitado';
 
-      if (row.fecha_reclamado && row.fecha_puede_volver_jugar && config.bloqueo_activo) {
+      if (row.fecha_finalizacion && row.fecha_puede_volver_jugar && config.bloqueo_activo) {
         const fechaVolver = new Date(row.fecha_puede_volver_jugar);
         const restante = msRestantes(fechaVolver);
         bloqueado = restante > 0;
@@ -509,9 +609,16 @@ function createPlaytimeBlockService(pool) {
     historialPremiosUsuario,
     middlewareVerificarBloqueo,
     buildMensajeBloqueo,
+    formatFechaMX,
     formatFechaHoraMX,
     calcularFechaDesbloqueo
   };
 }
 
-module.exports = { createPlaytimeBlockService };
+module.exports = {
+  DIAS_BLOQUEO_POR_DEFECTO,
+  createPlaytimeBlockService,
+  buildMensajeBloqueo,
+  calcularFechaDesbloqueo,
+  formatFechaMX
+};

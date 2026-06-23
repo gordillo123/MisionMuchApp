@@ -467,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
             completed[STATION_ID] = true;
             localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
         } catch (e) {
-            console.warn('No se pudo marcar estacion completa:', e);
+            console.warn('No se pudo marcar la estación como completa:', e);
         }
     }
 
@@ -621,7 +621,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         stationId: '6',
                         badge: 'Nuevo intento',
                         title: 'Sigue explorando, vas muy bien',
-                        body: 'El tiempo se termino esta vez, pero ya tienes otra oportunidad para completar el reto. Respira, observa con calma y vuelve a intentarlo.',
+                        body: 'El tiempo se terminó esta vez, pero ya tienes otra oportunidad para completar el reto. Respira, observa con calma y vuelve a intentarlo.',
                         nextStationName: 'Nuevo intento',
                         detailLabel: 'Tu siguiente paso',
                         detailValue: 'Cierra este mensaje para volver a intentarlo',

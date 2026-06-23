@@ -84,15 +84,13 @@
         details.innerHTML = `
           <span class="label">Participante</span>
           <p style="font-size:18px; color:white; font-weight:bold">${data.nombre_usuario || 'Sin nombre'}</p>
-          <span class="label">Folio</span>
+          <span class="label">Folio Alfanumérico</span>
           <p style="font-family:monospace; color:#22d3ee; font-size:16px">${data.folio}</p>
-          <span class="label">Correo</span>
-          <p style="font-size:14px; color:#cbd5e1">${data.correo_usuario || 'Sin correo'}</p>
-          <span class="label">Tipo de boleto</span>
-          <p style="font-size:14px; color:#bae6fd">${data.tipo_entrada || 'Sin seleccionar'}</p>
+          <span class="label">Ubicación / Tipo</span>
+          <p style="font-size:14px; color:#bae6fd">${data.ubicacion || data.destino_boleto || data.tipo_entrada || 'Museo Chiapas'}</p>
           <span class="label">Fecha Generación</span>
           <p>${new Date(data.fecha_generacion).toLocaleDateString('es-MX', { hour: '2-digit', minute: '2-digit' })}</p>
-          <span class="label">Fecha de vencimiento</span>
+          <span class="label">Fecha Límite (Vencimiento)</span>
           <p>${data.valido_hasta ? new Date(data.valido_hasta).toLocaleDateString('es-MX', { hour: '2-digit', minute: '2-digit' }) : 'Sin fecha'}</p>
         `;
 
@@ -116,35 +114,41 @@
           btnCanjear.style.display = 'none';
           
         } else {
-          // CANJE AUTOMÁTICO AL CARGAR LA PÁGINA
-          statusBox.textContent = 'Cargando...';
+          statusBox.textContent = 'DISPONIBLE';
           statusBox.className = 'status valid';
-          
-          try {
-            // Simulamos x-user-id como 1 (Administrador) para fines de validación rápida
-            const updateRes = await fetch(`${API_BASE_URL}/api/taquilla/boletos/${data.id_boleto}/canjear`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'x-user-id': '1' // ID de administrador o taquilla por defecto para el log
-              },
-              body: JSON.stringify({ observaciones: 'Canje automático vía escaneo QR rápido' })
-            });
+          btnCanjear.style.display = 'block';
 
-            if (!updateRes.ok) {
-              const errData = await updateRes.json();
-              throw new Error(errData.error || 'Error de canje en el backend.');
+          btnCanjear.onclick = async () => {
+            btnCanjear.disabled = true;
+            btnCanjear.textContent = 'Validando...';
+            try {
+              // Simulamos x-user-id como 1 (Administrador) para fines de validación rápida
+              const updateRes = await fetch(`${API_BASE_URL}/api/taquilla/boletos/${data.id_boleto}/canjear`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-user-id': '1' // ID de administrador o taquilla por defecto para el log
+                },
+                body: JSON.stringify({ observaciones: 'Canje manual vía escaneo QR rápido' })
+              });
+
+              if (!updateRes.ok) {
+                const errData = await updateRes.json();
+                throw new Error(errData.error || 'Error de canje en el backend.');
+              }
+
+              statusBox.textContent = '✅ VALIDADO';
+              statusBox.className = 'status valid';
+              details.innerHTML += `<p style="color:#22c55e; font-weight:bold; margin-top:10px; border-top:1px solid #333; padding-top:10px">¡Entrada canjeada con éxito!</p>`;
+              btnCanjear.style.display = 'none';
+            } catch (err) {
+              statusBox.textContent = '❌ ERROR';
+              statusBox.className = 'status invalid';
+              details.innerHTML += `<p style="color:#ef4444; font-weight:bold; margin-top:10px;">Error al canjear: ${err.message}</p>`;
+              btnCanjear.textContent = 'REINTENTAR';
+              btnCanjear.disabled = false;
             }
-
-            statusBox.textContent = '✅ VALIDADO';
-            statusBox.className = 'status valid';
-            details.innerHTML += `<p style="color:#22c55e; font-weight:bold; margin-top:10px; border-top:1px solid #333; padding-top:10px">¡Entrada canjeada con éxito!</p>`;
-          } catch (err) {
-            statusBox.textContent = '❌ ERROR';
-            statusBox.className = 'status invalid';
-            details.innerHTML += `<p style="color:#ef4444; font-weight:bold; margin-top:10px;">Error al canjear: ${err.message}</p>`;
-          }
-          btnCanjear.style.display = 'none';
+          };
         }
 
       } catch (e) {
