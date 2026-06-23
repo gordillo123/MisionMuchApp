@@ -11,33 +11,33 @@
   var STATION_MESSAGES = {
     '1': {
       badge: 'Aventura iniciada',
-      title: 'Tu misión científica ya comenzó',
+      title: 'Tu misión MUCH ya comenzó',
       body: 'Excelente trabajo, explorador. Ya entraste al recorrido del MUCH y estás listo para descubrir estaciones, dinosaurios y nuevas aventuras.'
     },
     '2': {
       badge: 'Estación completada',
       title: '¡Excelente trabajo, explorador!',
-      body: 'Has completado <strong>Espinosaurio</strong> y sigues avanzando en tu misión científica. Sigue aprendiendo y descubriendo nuevas aventuras.'
+      body: 'Has completado <strong>Espinosaurio</strong> y sigues avanzando en tu misión MUCH. Sigue aprendiendo y descubriendo nuevas aventuras.'
     },
     '3': {
       badge: 'Estación completada',
       title: '¡Excelente trabajo, explorador!',
-      body: 'Has completado <strong>Biodiversidad y Conocimiento</strong> y tu aventura científica sigue creciendo. Cada respuesta te acerca a un nuevo descubrimiento.'
+      body: 'Has completado <strong>Biodiversidad y Conocimiento</strong> y tu aventura MUCH sigue creciendo. Cada respuesta te acerca a un nuevo descubrimiento.'
     },
     '4': {
       badge: 'Estación completada',
       title: '¡Excelente trabajo, explorador!',
-      body: 'Has completado <strong>Sala de Energía</strong> y sigues iluminando tu misión científica. Continúa explorando para descubrir más sorpresas del museo.'
+      body: 'Has completado <strong>Sala de Energía</strong> y sigues iluminando tu misión MUCH. Continúa explorando para descubrir más sorpresas del museo.'
     },
     '5': {
       badge: 'Estación completada',
       title: '¡Excelente trabajo, explorador!',
-      body: 'Has completado <strong>Desarrollo Sustentable</strong> y estás cada vez más cerca de terminar tu aventura científica. Sigue aprendiendo con entusiasmo.'
+      body: 'Has completado <strong>Desarrollo Sustentable</strong> y estás cada vez más cerca de terminar tu aventura MUCH. Sigue aprendiendo con entusiasmo.'
     },
     '6': {
       badge: 'Misión completada',
       title: '¡Excelente trabajo, explorador!',
-      body: 'Has completado <strong>Sbeel Dinosaurios</strong> y cerraste tu misión científica con gran talento. Sigue celebrando todo lo que descubriste en el museo.'
+      body: 'Has completado <strong>Sbeel Dinosaurios</strong> y cerraste tu misión MUCH con gran talento. Sigue celebrando todo lo que descubriste en el museo.'
     }
   };
 
@@ -93,7 +93,7 @@
       payload = {
         badge: (stationCopy && stationCopy.badge) || 'Misión completada',
         title: (stationCopy && stationCopy.title) || '¡Excelente trabajo, explorador!',
-        body: (stationCopy && stationCopy.body) || ('Has completado <strong>' + stationName + '</strong> y cerraste tu misión científica con éxito. Tu recompensa final ya está lista para reclamarse.'),
+        body: (stationCopy && stationCopy.body) || ('Has completado <strong>' + stationName + '</strong> y cerraste tu misión MUCH con éxito. Tu recompensa final ya está lista para reclamarse.'),
         detailLabel: 'Tu siguiente paso',
         detailValue: 'Regresa al mapa',
         ctaLabel: 'Volver al mapa',
@@ -103,7 +103,7 @@
       payload = {
         badge: (stationCopy && stationCopy.badge) || 'Estación completada',
         title: (stationCopy && stationCopy.title) || '¡Excelente trabajo, explorador!',
-        body: (stationCopy && stationCopy.body) || ('Has completado <strong>' + stationName + '</strong> y sigues avanzando en tu misión científica. Sigue aprendiendo y descubriendo nuevas aventuras.'),
+        body: (stationCopy && stationCopy.body) || ('Has completado <strong>' + stationName + '</strong> y sigues avanzando en tu misión MUCH. Sigue aprendiendo y descubriendo nuevas aventuras.'),
         detailLabel: 'Siguiente aventura',
         detailValue: nextStationName || 'Continúa explorando',
         ctaLabel: 'Volver al mapa y continuar',
