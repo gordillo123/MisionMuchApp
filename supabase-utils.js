@@ -145,10 +145,8 @@ async function consultarEstadoBloqueoJuego(force = false) {
     return estado;
   } catch (error) {
     cachedPlaytimeAt = Date.now();
-    return estado;
-  } catch (error) {
     console.error('Error consultando bloqueo de juego:', error);
-    return { bloqueado: false, habilitado: true };
+    return cachedPlaytimeEstado || { bloqueado: false, habilitado: true };
   }
 }
 
