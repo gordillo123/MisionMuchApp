@@ -369,6 +369,9 @@ body {
   font-weight: 700;
   line-height: 1.35;
   color: #1a365d;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .question-text .emoji-icon {
@@ -385,16 +388,19 @@ body {
   font-size: 1rem;
   font-weight: 600;
   color: #374151;
-  text-align: center;
+  text-align: left;
   /* Centered text */
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   /* Centered flex content */
   gap: 12px;
   transition: all 0.2s ease;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
   width: 100%;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .option-btn:hover {
@@ -438,11 +444,14 @@ body {
 
 /* Ensure text span also centers if it wraps */
 .option-btn span:not(.emoji) {
-  text-align: center;
+  text-align: left;
   flex: 1;
   /* Allow text to take space but respect flex center of parent */
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* === ACTION BUTTON === */

@@ -337,6 +337,9 @@ body {
   font-weight: 700;
   line-height: 1.35;
   color: #2c3e50;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* === OPTIONS LIST === */
@@ -348,14 +351,17 @@ body {
   font-size: 1rem;
   font-weight: 600;
   color: #374151;
-  text-align: center;
+  text-align: left;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 12px;
   transition: all 0.2s ease;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
   width: 100%;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .option-btn:hover {
@@ -399,10 +405,13 @@ body {
 
 /* Centering the text inside option buttons */
 .option-btn span:not(.emoji) {
-  text-align: center;
+  text-align: left;
   flex: 1;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* === ACTION BUTTON === */

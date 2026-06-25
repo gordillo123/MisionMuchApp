@@ -849,38 +849,31 @@ async function validarQuiz() {
     return;
   }
 
-  if (Number(sel.value) === quizAnswerIndex) {
-    var btnNext = null;
-    try {
-      btnNext = document.getElementById('btnQuizNext');
-      if (btnNext) {
-        btnNext.style.display = 'none';
-      }
-    } catch (e) {}
+  // Deshabilitar radio buttons y aplicar estilos visuales de correcto/incorrecto
+  var labels = document.querySelectorAll('.quiz-opt');
+  labels.forEach((label, idx) => {
+    var radio = label.querySelector('input');
+    if (radio) radio.disabled = true;
+    if (idx === quizAnswerIndex) {
+      label.style.background = '#d1fae5';
+      label.style.borderColor = '#10b981';
+      label.style.color = '#065f46';
+      label.style.transition = 'all 0.3s ease';
+    } else if (idx === Number(sel.value)) {
+      label.style.background = '#fee2e2';
+      label.style.borderColor = '#ef4444';
+      label.style.color = '#991b1b';
+      label.style.transition = 'all 0.3s ease';
+    }
+  });
 
-    // Mostrar aviso flotante de estación completada y cerrar la pregunta
-    try {
-      window.MuchStationCompletion?.showFloatingNotice({
-        stationId: '2',
-        passed: true,
-        onReturnToMap: function () {
-          const mapParams = new URLSearchParams(window.location.search);
-          mapParams.set('view', 'prep');
-          window.location.href = '../index.html?' + mapParams.toString();
-        }
-      });
-    } catch (e) { console.warn('No se pudo mostrar aviso flotante:', e); }
+  if (Number(sel.value) === quizAnswerIndex) {
+    window.MuchStationCompletion?.clearInline(msg);
+    msg.textContent = '¡Respuesta Correcta! Estación completada con éxito. 🎉';
+    msg.className = "quiz-msg ok";
 
     playVictoryMusic();
-    navigatingToRegistro = true;
-    quizVisible = false;
-    // Cerrar overlay de pregunta
-    try { document.getElementById('quizOverlay').classList.remove('show'); } catch (e) {}
-    document.body.classList.remove('quiz-mode');
-
-    // Deshabilitar radio buttons para evitar cambios
-    var inputs = document.querySelectorAll('input[name="q1"]');
-    inputs.forEach(inp => inp.disabled = true);
+    playCompletionSound();
 
     // Marcar completado y avanzar avatar, guardando solo una vez por estación
     var alreadyCompleted = isStationCompleted(STATION_ID);
@@ -889,41 +882,159 @@ async function validarQuiz() {
       await guardarSpinosaurioEnSupabase(Number(score), true);
       await registrarQuizEnSupabase(Number(score));
     }
-    playCompletionSound();
     localStorage.setItem('much_current_station', '3');
-    try { playBgMusic(); } catch (e) {}
+    navigatingToRegistro = true;
+
+    // Retrasar el cierre 1.8 segundos para que se aprecien los triggers sonoros/visuales
+    setTimeout(() => {
+      quizVisible = false;
+      try { document.getElementById('quizOverlay').classList.remove('show'); } catch (e) {}
+      document.body.classList.remove('quiz-mode');
+
+      try {
+        window.MuchStationCompletion?.showFloatingNotice({
+          stationId: '2',
+          passed: true,
+          onReturnToMap: function () {
+            const mapParams = new URLSearchParams(window.location.search);
+            mapParams.set('view', 'prep');
+            window.location.href = '../index.html?' + mapParams.toString();
+          }
+        });
+      } catch (e) {
+        window.location.href = '../index.html?view=prep';
+      }
+    }, 1800);
+
   } else {
-    // Mostrar aviso flotante de respuesta incorrecta y cerrar la pregunta
+    window.MuchStationCompletion?.clearInline(msg);
+    msg.textContent = 'Respuesta incorrecta. El Spinosaurio es incompleto.';
+    msg.className = "quiz-msg err";
+    playIncorrectSound();
+
+    // Forzar la estación a Incompleta (en local y BD), borrando progreso previo
+    try {
+      const completed = JSON.parse(localStorage.getItem(COMPLETED_STATIONS_KEY) || '{}');
+      delete completed[STATION_ID];
+      localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
+    } catch (e) {}
+
+    await guardarSpinosaurioEnSupabase(0, false);
+    await registrarQuizEnSupabase(0);
+
+    // Retrasar 1.8 segundos para los efectos visuales/sonoros antes de mostrar el aviso flotante
+    setTimeout(() => {
+      quizVisible = false;
+      try { document.getElementById('quizOverlay').classList.remove('show'); } catch (e) {}
+      document.body.classList.remove('quiz-mode');
+
+      try {
+        window.MuchStationCompletion?.showFloatingNotice({
+          stationId: '2',
+          passed: false,
+          onReturnToMap: function () {
+            location.reload();
+          }
+        });
+      } catch (e) {
+        btnOk.textContent = "Volver a jugar";
+        btnOk.style.display = 'inline-block';
+      }
+    }, 1800);
+  }
+}
+
+var cheatCount = 0;
+var cheatOverlay = null;
+
+function handleCheatChange() {
+  if (navigatingToRegistro || !quizVisible) return;
+  cheatCount++;
+  stopQuestionTimer();
+  if (cheatCount >= 2) {
+    blockCheatScreen();
+  } else {
+    marcarIncorrectoPorTrampa();
+  }
+}
+
+async function marcarIncorrectoPorTrampa() {
+  quizVisible = false;
+  playIncorrectSound();
+  var msg = document.getElementById("quizMsg");
+  if (msg) {
+    msg.textContent = "¡SE DETECTÓ CAMBIO DE PANTALLA! Pregunta marcada como INCORRECTA.";
+    msg.className = "quiz-msg err";
+  }
+  var labels = document.querySelectorAll('.quiz-opt');
+  labels.forEach(label => {
+    var radio = label.querySelector('input');
+    if (radio) radio.disabled = true;
+  });
+  try {
+    const completed = JSON.parse(localStorage.getItem(COMPLETED_STATIONS_KEY) || '{}');
+    delete completed[STATION_ID];
+    localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
+  } catch (e) {}
+  await guardarSpinosaurioEnSupabase(0, false);
+  await registrarQuizEnSupabase(0);
+  setTimeout(() => {
+    try { document.getElementById('quizOverlay').classList.remove('show'); } catch (e) {}
+    document.body.classList.remove('quiz-mode');
     try {
       window.MuchStationCompletion?.showFloatingNotice({
         stationId: '2',
         passed: false,
         onReturnToMap: function () {
-          const mapParams = new URLSearchParams(window.location.search);
-          mapParams.set('view', 'prep');
-          window.location.href = '../index.html?' + mapParams.toString();
+          location.reload();
         }
       });
-    } catch (e) { console.warn('No se pudo mostrar aviso flotante:', e); }
-    msg.className = "quiz-msg err";
-    playIncorrectSound();
+    } catch (e) {
+      location.reload();
+    }
+  }, 2500);
+}
 
-    var inputs = document.querySelectorAll('input[name="q1"]');
-    inputs.forEach(inp => inp.disabled = true);
-
-    // Cerrar overlay de pregunta
-    try { document.getElementById('quizOverlay').classList.remove('show'); } catch (e) {}
-    document.body.classList.remove('quiz-mode');
-
-    // Convertir el botón confirmar en 'Volver a jugar' en caso de que quieran intentarlo
-    btnOk.textContent = "Volver a jugar";
+function blockCheatScreen() {
+  if (!cheatOverlay) {
+    cheatOverlay = document.createElement("div");
+    cheatOverlay.style.position = "fixed";
+    cheatOverlay.style.inset = "0";
+    cheatOverlay.style.background = "#b91c1c";
+    cheatOverlay.style.color = "#fff";
+    cheatOverlay.style.zIndex = "99999";
+    cheatOverlay.style.display = "flex";
+    cheatOverlay.style.flexDirection = "column";
+    cheatOverlay.style.alignItems = "center";
+    cheatOverlay.style.justifyContent = "center";
+    cheatOverlay.style.padding = "20px";
+    cheatOverlay.style.textAlign = "center";
+    cheatOverlay.style.fontFamily = "'Outfit', sans-serif";
+    document.body.appendChild(cheatOverlay);
   }
+  cheatOverlay.innerHTML = `
+    <h1 style="font-size: clamp(24px, 6vw, 42px); font-weight: 900; margin-bottom: 12px; letter-spacing: 1px;">🚫 PANTALLA BLOQUEADA</h1>
+    <p style="font-size: clamp(16px, 4vw, 22px); max-width: 600px; line-height: 1.4; margin-bottom: 20px;">
+      Se ha detectado cambio de pantalla de manera persistente. Los puntos de esta estación han sido invalidados.
+    </p>
+    <div style="font-size: clamp(30px, 8vw, 48px); font-weight: 900;" id="cheatCountdown">10 s</div>
+  `;
+  try { document.getElementById('quizOverlay').classList.remove('show'); } catch (e) {}
+  document.body.classList.remove('quiz-mode');
+  var seconds = 10;
+  var interval = setInterval(() => {
+    seconds--;
+    var cd = document.getElementById("cheatCountdown");
+    if (cd) cd.textContent = seconds + " s";
+    if (seconds <= 0) {
+      clearInterval(interval);
+      location.reload();
+    }
+  }, 1000);
 }
 
 function antiCheatGuard() {
-  if (navigatingToRegistro || !quizVisible) return;
-  try { document.getElementById("quizOverlay").classList.remove("show"); } catch (e) { }
-  location.reload(); // Recarga para asegurar que vuelva a mostrar la portada
+  handleCheatChange();
 }
 function blockShortcutsDuringQuiz(e) {
   if (!quizVisible) return;
