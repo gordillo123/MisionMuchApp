@@ -245,6 +245,61 @@ if (document.readyState === "complete" || document.readyState === "interactive")
   document.addEventListener("DOMContentLoaded", Init);
 }
 
+var LOCKOUT_UNTIL_KEY = 'much_lockout_until_2';
+var CHEAT_COUNT_KEY = 'much_cheat_count_2';
+
+function checkLockoutActive() {
+  try {
+    const lockoutUntil = localStorage.getItem(LOCKOUT_UNTIL_KEY);
+    if (lockoutUntil && Date.now() < Number(lockoutUntil)) {
+      return true;
+    }
+  } catch (e) {
+    console.warn(e);
+  }
+  return false;
+}
+
+function showLockoutScreen() {
+  const lockoutUntil = Number(localStorage.getItem(LOCKOUT_UNTIL_KEY));
+  const overlay = document.createElement('div');
+  overlay.id = 'lockoutOverlay';
+  overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.98); z-index: 1000000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-family: system-ui, -apple-system, sans-serif; text-align: center; padding: 20px;';
+  
+  overlay.innerHTML = `
+    <div style="font-size: clamp(3rem, 10vh, 5rem); margin-bottom: 20px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));">⚠️</div>
+    <h2 style="font-size: clamp(1.8rem, 5vh, 2.5rem); margin-bottom: 12px; color: #ef4444; font-weight: 900; letter-spacing: 0.5px;">Acceso Bloqueado Temporalmente</h2>
+    <p style="font-size: clamp(1rem, 3vh, 1.25rem); max-width: 550px; margin-bottom: 24px; line-height: 1.6; color: #cbd5e1; font-weight: 500;">
+      Se ha detectado un cambio de pantalla persistente (búsqueda de respuestas). El acceso a esta estación se ha bloqueado temporalmente por seguridad.
+    </p>
+    <div id="lockoutCountdown" style="font-size: clamp(2rem, 6vh, 3.5rem); font-weight: 900; color: #f59e0b; background: rgba(245, 158, 11, 0.1); border: 2px solid rgba(245, 158, 11, 0.3); padding: 8px 32px; border-radius: 999px; margin-bottom: 24px; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.15);">--s</div>
+    <button id="btnLockoutExit" style="appearance: none; border: 2px solid rgba(255, 255, 255, 0.5); cursor: pointer; padding: 12px 24px; border-radius: 14px; font-weight: 800; font-size: 16px; color: white; background: rgba(255,255,255,0.1); transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">Volver al mapa</button>
+  `;
+  document.body.appendChild(overlay);
+
+  // Bind exit button
+  document.getElementById('btnLockoutExit').addEventListener('click', function() {
+    const mapParams = new URLSearchParams(window.location.search);
+    mapParams.set('view', 'prep');
+    window.location.href = '../index.html?' + mapParams.toString();
+  });
+
+  const timerInterval = setInterval(() => {
+    const timeLeft = Math.ceil((lockoutUntil - Date.now()) / 1000);
+    const countdownEl = document.getElementById('lockoutCountdown');
+    if (countdownEl) {
+      countdownEl.textContent = timeLeft + 's';
+    }
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      localStorage.removeItem(LOCKOUT_UNTIL_KEY);
+      localStorage.setItem(CHEAT_COUNT_KEY, '0');
+      overlay.remove();
+      location.reload();
+    }
+  }, 1000);
+}
+
 async function inicializarProgresoSpinosaurio() {
   try {
     const progreso = await import('../supabase-utils.js');
@@ -262,6 +317,11 @@ async function inicializarProgresoSpinosaurio() {
 }
 
 function Init() {
+  if (checkLockoutActive()) {
+    showLockoutScreen();
+    return;
+  }
+
   updateOrientationGate();
   window.addEventListener("resize", updateOrientationGate, { passive: true });
   window.addEventListener("orientationchange", function () {
