@@ -606,9 +606,10 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
     let nuevoFechaCompletado = isPassed ? new Date() : null;
 
     if (progresoExistente) {
-      // Mantener completada / aprobada si ya era true
-      nuevoCompletada = progresoExistente.completada || isPassed;
-      nuevoAprobada = progresoExistente.aprobada || isPassed;
+      // Por requerimiento, el estado se actualiza con el resultado de la partida actual.
+      // Si el jugador falla, la estación se registra como incompleta.
+      nuevoCompletada = isPassed;
+      nuevoAprobada = isPassed;
 
       // Mantener la mejor puntuación histórica
       if (progresoExistente.puntaje >= nuevoPuntaje) {

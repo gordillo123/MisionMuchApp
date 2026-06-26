@@ -814,6 +814,11 @@ class UIManager {
         completed['4'] = true;
         localStorage.setItem('much_completed_stations', JSON.stringify(completed));
       } else {
+        // Asegurar que se marque como incompleta en localStorage
+        let completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
+        completed['4'] = false;
+        localStorage.setItem('much_completed_stations', JSON.stringify(completed));
+
         e.finalTitle.classList.remove('visually-hidden');
         e.finalTitle.textContent = 'Sigue explorando ✨';
         window.MuchStationCompletion?.clearInline(

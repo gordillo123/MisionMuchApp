@@ -796,6 +796,11 @@ class UIManager {
         }
         return;
       } else {
+        // Asegurar que se marque como incompleta en localStorage
+        let completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
+        completed['1'] = false;
+        localStorage.setItem('much_completed_stations', JSON.stringify(completed));
+
         e.finalTitle.classList.remove('visually-hidden');
         e.finalTitle.textContent = 'Buen intento 👀';
         window.MuchStationCompletion?.clearInline(e.finalMsg, 'Sigue explorando el museo.');

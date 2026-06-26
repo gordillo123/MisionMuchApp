@@ -114,7 +114,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             await progreso.inicializarProgresoUsuario(6);
-            console.log('Progreso de SBEEL inicializado en MySQL.');
+            
+            // Forzar el estado de la estación a Incompleta en localStorage y base de datos
+            const completed = JSON.parse(localStorage.getItem(COMPLETED_STATIONS_KEY) || '{}');
+            completed[STATION_ID] = false;
+            localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
+
+            await progreso.guardarProgresoUsuario(STATION_ID, {
+                puntaje: 0,
+                aciertos: 0,
+                errores: 1,
+                aprobada: false
+            });
+            console.log('Progreso de SBEEL inicializado como Incompleto.');
         } catch (error) {
             console.error('Error al inicializar progreso de SBEEL:', error);
         }
