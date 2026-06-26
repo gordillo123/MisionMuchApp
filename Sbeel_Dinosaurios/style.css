@@ -419,9 +419,9 @@ header h1 {
     gap: 1.4rem;
     margin-top: 1.75rem;
     padding: 1.25rem 2rem;
-    background: rgba(255, 255, 255, 0.15);
+    background: #ffffff;
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);

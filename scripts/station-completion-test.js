@@ -55,6 +55,20 @@
     }
   }
 
+  function completeStationsWithAppFunction() {
+    if (!window.MuchStationCompletion?.markCompletedLocally) return false;
+
+    TEST_STATIONS.forEach((stationId, index) => {
+      window.MuchStationCompletion.markCompletedLocally({
+        stationId,
+        nextStationId: TEST_STATIONS[index + 1] || '6',
+        passed: true
+      });
+    });
+
+    return true;
+  }
+
   function snapshotRealProgress() {
     return {
       completedStations: localStorage.getItem(COMPLETED_STATIONS_KEY),
@@ -199,12 +213,13 @@
       ? previousState.original
       : snapshotRealProgress();
 
-    const completed = readCompletedStations();
-    TEST_STATIONS.forEach((stationId) => {
-      completed[stationId] = true;
-    });
-
-    localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
+    if (!completeStationsWithAppFunction()) {
+      const completed = readCompletedStations();
+      TEST_STATIONS.forEach((stationId) => {
+        completed[stationId] = true;
+      });
+      localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
+    }
     localStorage.setItem(CURRENT_STATION_KEY, '6');
     localStorage.removeItem(REWARD_CLAIMED_KEY);
     localStorage.removeItem(REWARD_CHOICE_KEY);
