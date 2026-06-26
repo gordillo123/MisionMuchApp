@@ -182,7 +182,7 @@
     wrapper.innerHTML = `
       <span class="station-completion-test-tool__label">Temporal · Solo pruebas</span>
       <button id="btnCompleteStationsForTest" class="station-completion-test-tool__button" type="button">
-        Completar estaciones para prueba
+        Completar todas las estaciones
       </button>
       <span id="stationCompletionTestStatus" class="station-completion-test-tool__status" aria-live="polite">
         Simula 6 estaciones y 55 puntos sin modificar el progreso de la base de datos.
@@ -221,7 +221,7 @@
     });
 
     button.disabled = true;
-    button.textContent = 'Estaciones completadas para prueba';
+    button.textContent = 'Todas las estaciones completadas';
     status.textContent = 'Simulación activa: 6 palomitas, 55 puntos y premio final desbloqueado.';
 
     window.dispatchEvent(new CustomEvent('much:returnToMap', {
