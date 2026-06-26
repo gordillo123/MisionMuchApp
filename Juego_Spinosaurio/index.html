@@ -1540,6 +1540,56 @@
         height: clamp(18px, 4.8svh, 24px);
       }
     }
+
+    /* Ajuste solicitado para portada: logos superiores limpios y agencia mas grande. */
+    .portada-overlay {
+      overflow: hidden !important;
+    }
+
+    .portada-top-logos img {
+      background: transparent !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+      filter: drop-shadow(0 5px 8px rgba(15, 23, 42, 0.24));
+    }
+
+    .portada-agency-logo {
+      width: clamp(280px, 38vw, 430px);
+      max-width: min(78vw, 430px);
+      max-height: clamp(86px, 24svh, 122px);
+      margin-bottom: clamp(4px, 1.2svh, 10px);
+    }
+
+    @media (orientation: landscape) and (max-height: 650px) {
+      .portada-card {
+        overflow: hidden;
+        padding-top: clamp(50px, 12svh, 64px);
+        padding-bottom: max(8px, env(safe-area-inset-bottom));
+      }
+
+      .portada-agency-logo {
+        width: clamp(280px, 40vw, 430px);
+        max-width: min(64vw, 430px);
+        max-height: clamp(88px, 24svh, 112px);
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 430px) {
+      .portada-agency-logo {
+        max-height: clamp(82px, 23svh, 100px);
+      }
+
+      .portada-title {
+        margin-bottom: clamp(6px, 1.5svh, 10px);
+      }
+
+      .portada-sub,
+      .portada-actions {
+        margin-bottom: clamp(7px, 1.7svh, 10px);
+      }
+    }
   </style>
 </head>
 
