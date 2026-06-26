@@ -530,7 +530,7 @@
     @media (max-width: 768px) {
       .nav-slogan {
         font-size: 0.8rem;
-        max-width: calc(100% - 132px); /* Deja espacio para sonido y hamburguesa */
+        max-width: calc(100% - 148px); /* Deja espacio para sonido y hamburguesa */
         gap: 0.4rem;
       }
       .nav-slogan .slogan-divider {
@@ -540,7 +540,7 @@
       .landing-sound-toggle {
         position: fixed;
         top: 0.7rem;
-        right: 3.65rem;
+        right: 4.05rem;
         z-index: 1010;
         width: 42px;
         height: 42px;
@@ -553,7 +553,7 @@
     @media (max-width: 480px) {
       .nav-slogan {
         font-size: 0.72rem;
-        max-width: calc(100% - 128px);
+        max-width: calc(100% - 144px);
         gap: 0.25rem;
       }
       .nav-slogan .slogan-divider {
@@ -561,7 +561,7 @@
       }
 
       .landing-sound-toggle {
-        right: 3.45rem;
+        right: 3.85rem;
       }
     }
 
@@ -3817,6 +3817,9 @@
 
     .prep-logo-strip img[alt="SATA"] {
       order: 2;
+      height: clamp(24px, 4.4vw, 34px);
+      max-width: clamp(62px, 14vw, 98px);
+      opacity: 0.72;
     }
 
     .prep-logo-strip .prep-logo-sbeel {
@@ -3841,8 +3844,8 @@
 
     .prep-agency-standalone {
       display: block;
-      height: clamp(100px, 18vw, 150px);
-      max-width: clamp(280px, 68vw, 520px);
+      height: clamp(118px, 20vw, 172px);
+      max-width: clamp(300px, 72vw, 580px);
       object-fit: contain;
       background: transparent !important;
       border: none !important;
@@ -3852,12 +3855,12 @@
       backdrop-filter: none !important;
       -webkit-backdrop-filter: none !important;
       transition: transform 0.2s ease;
-      filter: none;
+      filter: drop-shadow(0 8px 18px rgba(15, 23, 42, 0.18));
     }
 
     .prep-agency-standalone:hover {
       transform: scale(1.04);
-      filter: none;
+      filter: drop-shadow(0 10px 24px rgba(15, 23, 42, 0.22));
     }
 
     @media (max-width: 520px) {
@@ -3879,6 +3882,12 @@
         padding: 3px 5px;
       }
 
+      .prep-logo-strip img[alt="SATA"] {
+        height: 22px;
+        max-width: 70px;
+        opacity: 0.68;
+      }
+
       .prep-logo-strip .prep-logo-sbeel {
         height: 32px;
         max-width: 96px;
@@ -3894,9 +3903,9 @@
       }
 
       .prep-agency-standalone {
-        height: 85px;
-        max-width: 320px;
-        filter: none !important;
+        height: 100px;
+        max-width: 340px;
+        filter: drop-shadow(0 6px 14px rgba(15, 23, 42, 0.16)) !important;
       }
     }
 
@@ -10273,17 +10282,21 @@
     }
 
     .mission-reward-brand-top {
-      margin-bottom: clamp(4px, 1.5dvh, 14px);
-      padding: 4px 18px;
-      width: 100%;
+      margin-bottom: clamp(8px, 2dvh, 18px);
+      padding: 8px 24px;
+      width: min(100%, 620px);
+      background: #ffffff;
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
     }
 
     .mission-reward-brand-top img {
       display: block;
       width: auto;
-      height: clamp(75px, 16dvh, 130px);
-      max-width: 95%;
+      height: clamp(92px, 18dvh, 155px);
+      max-width: 100%;
       object-fit: contain;
+      filter: drop-shadow(0 6px 14px rgba(15, 23, 42, 0.16));
     }
 
     /* ── Barra de logos inferior ── */
@@ -10304,6 +10317,12 @@
       height: clamp(34px, 7vw, 50px);
       max-width: clamp(80px, 20vw, 140px);
       object-fit: contain;
+    }
+
+    .mission-reward-brand-strip .mission-brand-sata {
+      height: clamp(26px, 5vw, 38px);
+      max-width: clamp(64px, 14vw, 104px);
+      opacity: 0.68;
     }
 
     .mission-reward-brand-strip .mission-brand-much,
@@ -10676,7 +10695,7 @@
       }
 
       .mission-reward-brand-top img {
-        height: clamp(60px, 14dvh, 100px);
+        height: clamp(70px, 15dvh, 112px);
         max-width: 95vw;
       }
 
@@ -10696,6 +10715,12 @@
         height: clamp(26px, 6dvh, 36px);
         min-width: 0;
         max-width: none;
+      }
+
+      .mission-reward-brand-strip .mission-brand-sata {
+        flex: 0.78 1 0;
+        height: clamp(22px, 5dvh, 30px);
+        opacity: 0.65;
       }
 
       .mission-reward-avatar-stage {
@@ -11810,6 +11835,8 @@
           progreso.forEach(p => {
             if (p.aprobada || p.completada) {
               completedMap[String(p.id_estacion)] = true;
+            } else {
+              delete completedMap[String(p.id_estacion)];
             }
           });
 
@@ -13197,7 +13224,7 @@
             </div>
             <div class="mission-reward-brand-strip" aria-label="Logos institucionales">
               <img src="entrada-much/logo-much.png" alt="MUCH · Museo Chiapas" class="mission-brand-much">
-              <img src="entrada-much/logo-sata.png" alt="SATA">
+              <img src="entrada-much/logo-sata.png" alt="SATA" class="mission-brand-sata">
               <img src="Sbeel_Dinosaurios/logo-sbeel-dinosaurios.png" alt="SBEEL Dinosaurios" class="mission-brand-sbeel">
               <img src="assets/logo-planetario-tuxtla.svg" alt="Planetario Tuxtla" class="mission-brand-planetario">
             </div>
@@ -14782,8 +14809,6 @@
     // Inicializar
     showAdminLogin();
   </script>
-  <!-- HERRAMIENTA TEMPORAL: eliminar junto con scripts/station-completion-test.js al terminar las pruebas. -->
-  <script src="scripts/station-completion-test.js?v=2"></script>
   <script src="scripts/bg-music.js"></script>
   <script src="scripts/orientation-manager.js"></script>
   <script>

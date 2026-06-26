@@ -589,6 +589,15 @@ async function inicializarProgresoUsuario(estacionId) {
   const user = obtenerUsuarioLocal();
   if (!user) return null;
 
+  // Limpiar el estado de completado en el almacenamiento local al iniciar la estación
+  try {
+    const completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
+    delete completed[String(estacionId)];
+    localStorage.setItem('much_completed_stations', JSON.stringify(completed));
+  } catch (e) {
+    console.warn('No se pudo limpiar estado local al inicializar:', e);
+  }
+
   try {
     const res = await fetch(`${API_BASE_URL}/api/progreso/inicializar`, {
       method: 'POST',

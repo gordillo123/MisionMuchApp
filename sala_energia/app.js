@@ -470,7 +470,6 @@ class UIManager {
     this.render();
     this.clock();
     this.startFocusDetection();
-    document.addEventListener('visibilitychange', () => this.handleVisibilityChange());
     window.addEventListener('pagehide', () => this.handlePageHide());
     window.addEventListener('beforeunload', () => this.handlePageHide());
   }
@@ -501,33 +500,113 @@ class UIManager {
   }
 
   startFocusDetection() {
-    // Anti-trampas desactivado: no invalidamos la ronda al cambiar de pestaña.
+    window.addEventListener('blur', () => {
+      this.markAsIncorrectCheat();
+    }, { passive: true });
+    
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        this.markAsIncorrectCheat();
+      }
+    });
   }
 
-  handleVisibilityChange() {
-    if (document.hidden) {
-      // Ventana oculta: reiniciar progreso de sesión inmediatamente
-      if (this.questionTimer) {
-        clearTimeout(this.questionTimer);
-        this.questionTimer = null;
+  async markAsIncorrectCheat() {
+    const s = this.state, { e } = this;
+    if (s.locked || s.idx >= QUESTIONS.length) return;
+
+    this.stopQuestionTimer();
+    s.locked = true;
+    s.selected = -1; // -1 indica trampa / foco perdido
+    const q = QUESTIONS[s.idx], correctIdx = q.correctIndex;
+    
+    [...e.options.querySelectorAll('.option-btn')].forEach((btn, idx) => {
+      btn.disabled = true;
+      if (idx === correctIdx) btn.classList.add('option-btn--correct');
+    });
+
+    if (e.status) e.status.textContent = '❌ ¡Incorrecto! (Se detectó cambio de pantalla)';
+    this.playIncorrectSound();
+    
+    s.answers.push({ qIndex: s.idx, question: q.text, choice: 'Trampa (Foco perdido)', correct: false });
+    this.updateScoreboard();
+
+    // Guardar respuesta de trampa en tiempo real en la base de datos
+    try {
+      const attemptId = sessionStorage.getItem('much_current_attempt_id');
+      if (attemptId) {
+        const progreso = await import('../supabase-utils.js');
+        await progreso.guardarRespuestaUsuario(attemptId, 4, q.text, 'Trampa (Foco perdido)', false);
       }
-      this.progressManager.resetProgress();
-      this.state = { idx: 0, selected: null, points: 0, correct: 0, locked: false, answers: [] };
-      this.currentQuestionDeadline = null;
-      this.questionCountdown = QUESTION_SECONDS;
-      if (this.e && this.e.status) this.e.status.textContent = '';
-      if (this.e && this.e.options) this.e.options.innerHTML = '';
-      if (this.e && this.e.qIndex) this.e.qIndex.textContent = '1';
-      if (this.e && this.e.pointsEl) this.e.pointsEl.textContent = '0';
-      if (this.e && this.e.correctCount) this.e.correctCount.textContent = '0';
-      if (this.e && this.e.questionTimer) this.e.questionTimer.textContent = `⏳ ${this.questionCountdown} s`;
-      setTimeout(() => window.location.reload(), 100);
-      return;
+    } catch (err) {
+      console.error("Error al guardar respuesta de trampa:", err);
     }
 
-    if (this.state.idx < QUESTIONS.length && !this.state.locked) {
-      this.startQuestionTimer();
+    // Incrementar contador de trampas
+    let cheatCount = Number(sessionStorage.getItem('much_cheat_count') || '0') + 1;
+    sessionStorage.setItem('much_cheat_count', String(cheatCount));
+
+    if (cheatCount >= 2) {
+      this.blockCheatScreen();
+    } else {
+      setTimeout(() => {
+        this.advanceToNextQuestion();
+      }, 3000);
     }
+  }
+
+  async blockCheatScreen() {
+    const overlay = document.createElement("div");
+    overlay.style.position = "fixed";
+    overlay.style.inset = "0";
+    overlay.style.background = "#b91c1c";
+    overlay.style.color = "#fff";
+    overlay.style.zIndex = "99999";
+    overlay.style.display = "flex";
+    overlay.style.flexDirection = "column";
+    overlay.style.alignItems = "center";
+    overlay.style.justifyContent = "center";
+    overlay.style.padding = "20px";
+    overlay.style.textAlign = "center";
+    overlay.style.fontFamily = "'Outfit', sans-serif";
+    document.body.appendChild(overlay);
+
+    overlay.innerHTML = `
+      <h1 style="font-size: clamp(24px, 6vw, 42px); font-weight: 900; margin-bottom: 12px; letter-spacing: 1px;">🚫 PANTALLA BLOQUEADA</h1>
+      <p style="font-size: clamp(16px, 4vw, 22px); max-width: 600px; line-height: 1.4; margin-bottom: 20px;">
+        Se ha detectado cambio de pantalla de manera persistente. Los puntos de esta estación han sido invalidados.
+      </p>
+      <div style="font-size: clamp(30px, 8vw, 48px); font-weight: 900;" id="cheatCountdown">15 s</div>
+    `;
+
+    // Force station incomplete!
+    try {
+      const completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
+      delete completed['4'];
+      localStorage.setItem('much_completed_stations', JSON.stringify(completed));
+      
+      const progreso = await import('../supabase-utils.js');
+      await progreso.guardarProgresoUsuario('4', {
+        puntaje: 0,
+        aciertos: 0,
+        errores: QUESTIONS.length,
+        aprobada: false
+      });
+    } catch (e) {
+      console.warn('Error al invalidar estación por trampa:', e);
+    }
+
+    let seconds = 15;
+    const interval = setInterval(() => {
+      seconds--;
+      const cd = document.getElementById("cheatCountdown");
+      if (cd) cd.textContent = seconds + " s";
+      if (seconds <= 0) {
+        clearInterval(interval);
+        this.progressManager.resetProgress();
+        location.reload();
+      }
+    }, 1000);
   }
 
   handlePageHide() {

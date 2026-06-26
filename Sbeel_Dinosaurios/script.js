@@ -567,6 +567,29 @@ document.addEventListener('DOMContentLoaded', () => {
         resetGame();
     });
 
+    async function marcarIncompletoYSalir() {
+        if (!solvedOnTime) {
+            try {
+                // Guardar en local
+                const completed = JSON.parse(localStorage.getItem(COMPLETED_STATIONS_KEY) || '{}');
+                delete completed[STATION_ID];
+                localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
+                
+                // Guardar en Supabase/BD
+                const progreso = await import('../supabase-utils.js');
+                await progreso.guardarProgresoUsuario(STATION_ID, {
+                    puntaje: 0,
+                    aciertos: 0,
+                    errores: 1,
+                    aprobada: false
+                });
+            } catch (e) {
+                console.warn('Error al marcar Sbeel incompleto al salir:', e);
+            }
+        }
+        window.location.href = '../index.html?view=prep';
+    }
+
     closeModalBtn.addEventListener('click', () => {
         try {
             closeModalBtn.style.transform = 'translateY(2px)';
@@ -576,7 +599,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeModalBtn.style.opacity = '';
             }, 160);
         } catch (e) {}
-        setTimeout(() => { window.location.href = '../index.html?view=prep'; }, 180);
+        setTimeout(() => { marcarIncompletoYSalir(); }, 180);
     });
 
     const retryModalBtn = document.getElementById('retry-modal-btn');
@@ -596,7 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 backBtn.style.opacity = '';
             }, 160);
         } catch (e) {}
-        setTimeout(() => { window.location.href = '../index.html?view=prep'; }, 180);
+        setTimeout(() => { marcarIncompletoYSalir(); }, 180);
     });
 
     function formatTime(seconds) {

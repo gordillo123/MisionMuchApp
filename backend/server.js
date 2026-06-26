@@ -606,13 +606,12 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
     let nuevoFechaCompletado = isPassed ? new Date() : null;
 
     if (progresoExistente) {
-      // Por requerimiento, el estado se actualiza con el resultado de la partida actual.
-      // Si el jugador falla, la estación se registra como incompleta.
-      nuevoCompletada = isPassed;
-      nuevoAprobada = isPassed;
+      // Mantener completada / aprobada si ya era true
+      nuevoCompletada = progresoExistente.completada || isPassed;
+      nuevoAprobada = progresoExistente.aprobada || isPassed;
 
-      // Mantener la mejor puntuación histórica
-      if (progresoExistente.puntaje >= nuevoPuntaje) {
+      // Mantener la mejor puntuación histórica solo si aprobamos el intento actual
+      if (isPassed && progresoExistente.puntaje >= nuevoPuntaje) {
         nuevoPuntaje = progresoExistente.puntaje;
         nuevosAciertos = progresoExistente.aciertos;
         nuevosErrores = progresoExistente.errores;
@@ -769,13 +768,17 @@ app.post('/api/progreso/inicializar', permitirJugador, verificarBloqueoJugador, 
 
     await playtime.asegurarParticipacionActiva(pool, id_usuario);
 
-    // Intentar insertar registro inicial si no existe, o actualizar fecha_inicio solo si es NULL.
-    // Esto evita duplicados y mantiene puntuaciones previas.
     await pool.query(
       `INSERT INTO progreso_usuario 
         (id_usuario, id_estacion, completada, aprobada, puntaje, aciertos, errores, fecha_inicio, fecha_completado)
        VALUES (?, ?, FALSE, FALSE, 0, 0, 0, CURRENT_TIMESTAMP, NULL)
        ON DUPLICATE KEY UPDATE 
+         completada = FALSE,
+         aprobada = FALSE,
+         fecha_completado = NULL,
+         puntaje = 0,
+         aciertos = 0,
+         errores = 0,
          fecha_inicio = COALESCE(fecha_inicio, CURRENT_TIMESTAMP)`,
       [id_usuario, id_estacion]
     );
