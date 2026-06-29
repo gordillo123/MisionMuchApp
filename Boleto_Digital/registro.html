@@ -407,6 +407,80 @@
 
   <script>
     const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
+
+    // Verificar si hay un boleto guardado o si el usuario logueado ya tiene uno
+    (async function checkExistingTicketOnLoad() {
+      try {
+        const cachedTicketRaw = localStorage.getItem('much_user_ticket');
+        if (cachedTicketRaw) {
+          const cachedTicket = JSON.parse(cachedTicketRaw);
+          if (cachedTicket && cachedTicket.folio) {
+            console.log('[REGISTRO] Boleto detectado en Local Storage:', cachedTicket.folio);
+            const res = await fetch(`${API_BASE_URL}/api/boletos/${encodeURIComponent(cachedTicket.folio)}`);
+            if (res.ok) {
+              const dbBoleto = await res.json();
+              console.log('[REGISTRO] Boleto verificado con base de datos:', dbBoleto.folio);
+              const params = new URLSearchParams({
+                folio: dbBoleto.folio,
+                qr_token: dbBoleto.qr_token || '',
+                estado: dbBoleto.estado || 'activo',
+                valido_hasta: dbBoleto.valido_hasta || '',
+                nombre: dbBoleto.nombre_usuario || '',
+                correo: dbBoleto.correo_usuario || '',
+                acceso: dbBoleto.tipo_entrada || '',
+                premio: dbBoleto.tipo_entrada || '',
+                destino: dbBoleto.destino_boleto || '',
+                ubicacion: dbBoleto.seccion_boleto || '',
+                lugar: dbBoleto.seccion_boleto || ''
+              });
+              window.location.href = 'boleto.html?' + params.toString();
+              return;
+            } else {
+              console.warn('[REGISTRO] Boleto en Local Storage no verificado o inválido. Limpiando cache.');
+              localStorage.removeItem('much_user_ticket');
+            }
+          }
+        }
+
+        const localUser = JSON.parse(localStorage.getItem('much_google_user') || 'null');
+        if (localUser && localUser.id_usuario) {
+          console.log('[REGISTRO] Usuario detectado. Verificando si tiene boleto en BD...');
+          const profileRes = await fetch(`${API_BASE_URL}/api/usuarios/${localUser.id_usuario}/perfil`);
+          if (profileRes.ok) {
+            const profile = await profileRes.json();
+            if (profile.boletos && profile.boletos.length > 0) {
+              const latestBoleto = profile.boletos[0];
+              console.log('[REGISTRO] Boleto encontrado en perfil de usuario:', latestBoleto.folio);
+              
+              localStorage.setItem('much_user_ticket', JSON.stringify({
+                folio: latestBoleto.folio,
+                qr_token: latestBoleto.qr_token || latestBoleto.token || '',
+                valido_hasta: latestBoleto.valido_hasta || '',
+                estado: latestBoleto.estado || 'activo'
+              }));
+
+              const params = new URLSearchParams({
+                folio: latestBoleto.folio,
+                qr_token: latestBoleto.qr_token || latestBoleto.token || '',
+                estado: latestBoleto.estado || 'activo',
+                valido_hasta: latestBoleto.valido_hasta || '',
+                nombre: profile.nombre || '',
+                correo: profile.correo || '',
+                acceso: latestBoleto.tipo || '',
+                premio: latestBoleto.tipo || '',
+                destino: latestBoleto.destino_boleto || '',
+                ubicacion: latestBoleto.seccion_boleto || '',
+                lugar: latestBoleto.seccion_boleto || ''
+              });
+              window.location.href = 'boleto.html?' + params.toString();
+            }
+          }
+        }
+      } catch (err) {
+        console.error('[REGISTRO] Error al verificar boletos existentes:', err);
+      }
+    })();
+
     document.getElementById('btnBackRegistro')?.addEventListener('click', () => {
       if (window.history.length > 1) {
         window.history.back();
@@ -812,6 +886,15 @@
           return;
         }
 
+        // Si es un error de bloqueo o límites de reclamación, NO debemos proceder localmente (seguridad)
+        if (err.message.includes('Ya reclamaste') || err.message.includes('bloqueado') || err.message.includes('utilizado')) {
+          alert(err.message);
+          submitting = false;
+          $('submitBtn').removeAttribute('disabled');
+          $('submitBtn').textContent = 'Obtener mi Boleto';
+          return;
+        }
+
         console.warn('[REGISTRO] Error guardando en base de datos. Se procederá localmente:', err);
         // Fallback local: Generamos folio local
         if (!prizeData.folio) {
@@ -845,6 +928,18 @@
 
       if (isStationCompletionTestActive()) {
         sessionStorage.removeItem(STATION_COMPLETION_TEST_STATE_KEY);
+      }
+
+      // Guardar datos mínimos (no sensibles) del boleto en Local Storage
+      try {
+        localStorage.setItem('much_user_ticket', JSON.stringify({
+          folio: prizeData.folio || '',
+          qr_token: prizeData.qr_token || '',
+          valido_hasta: prizeData.valido_hasta || '',
+          estado: prizeData.estado || 'activo'
+        }));
+      } catch (e) {
+        console.error('Error al guardar el boleto en Local Storage:', e);
       }
 
       // Evitar doble canje desde el mismo dispositivo

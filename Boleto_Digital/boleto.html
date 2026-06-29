@@ -2035,29 +2035,124 @@
   </section>
 
   <script>
-    (function () {
+    document.addEventListener("DOMContentLoaded", async () => {
       const qs = new URLSearchParams(location.search);
       const el = (id) => document.getElementById(id);
       const fmtFull = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' });
+      const fmtDeadline = new Intl.DateTimeFormat('es-MX', { dateStyle: 'long' });
       const parseDate = (value, fallback = new Date()) => {
         const date = value ? new Date(value) : fallback;
         return Number.isNaN(date.getTime()) ? fallback : date;
       };
 
-      const rawAccess = qs.get('acceso') || qs.get('premio') || qs.get('titulo') || 'MUCH';
-      const isPlanetario = /planetario/i.test(rawAccess) || /planetario/i.test(qs.get('destino') || '');
-      const acceso = isPlanetario ? 'Planetario' : rawAccess;
-      const titulo = qs.get('titulo') || acceso || 'MUCH · Premio';
-      const ubicacion = isPlanetario
-        ? 'Planetario Tuxtla'
-        : 'Museo Chiapas de Ciencia y Tecnología';
-      const fechaEmision = parseDate(qs.get('valido_desde'));
-      const fechaVencimiento = parseDate(qs.get('valido_hasta'), new Date(fechaEmision.getTime() + 7 * 24 * 60 * 60 * 1000));
-      const fmtDeadline = new Intl.DateTimeFormat('es-MX', { dateStyle: 'long' });
-      const estadoRaw = (qs.get('estado') || 'activo').toLowerCase();
-      const estadoVisible = estadoRaw === 'canjeado' || estadoRaw === 'usado'
+      const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
+      let ticketData = null;
+
+      const hasUrlParams = qs.get('folio') || qs.get('ticket');
+
+      if (hasUrlParams) {
+        // Caso A: Redirección con parámetros URL
+        const rawAccess = qs.get('acceso') || qs.get('premio') || qs.get('titulo') || 'MUCH';
+        const isPlanetario = /planetario/i.test(rawAccess) || /planetario/i.test(qs.get('destino') || '');
+        const acceso = isPlanetario ? 'Planetario' : rawAccess;
+        const folio = qs.get('folio') || qs.get('ticket') || '';
+        const qr_token = qs.get('qr_token') || qs.get('token') || '';
+        const estadoRaw = (qs.get('estado') || 'activo').toLowerCase();
+        const valido_desde = qs.get('valido_desde') || '';
+        const valido_hasta = qs.get('valido_hasta') || '';
+
+        ticketData = {
+          nombre_usuario: qs.get('nombre') || '—',
+          correo_usuario: qs.get('correo') || '—',
+          telefono: qs.get('telefono') || '—',
+          tipo_entrada: acceso,
+          destino_boleto: qs.get('destino') || '',
+          seccion_boleto: qs.get('seccion') || '',
+          lugar_boleto: qs.get('ubicacion') || qs.get('lugar') || '',
+          folio: folio,
+          qr_token: qr_token,
+          qr_data: qs.get('qr_data') || '',
+          estado: estadoRaw,
+          valido_desde: valido_desde,
+          valido_hasta: valido_hasta
+        };
+
+        // Guardar en Local Storage
+        try {
+          localStorage.setItem('much_user_ticket', JSON.stringify({
+            folio: folio,
+            qr_token: qr_token,
+            valido_hasta: valido_hasta,
+            estado: estadoRaw
+          }));
+        } catch (e) {
+          console.error('[BOLETO] Error al guardar en Local Storage:', e);
+        }
+      } else {
+        // Caso B: Cargar desde Local Storage + Backend
+        try {
+          const cachedTicketRaw = localStorage.getItem('much_user_ticket');
+          if (cachedTicketRaw) {
+            const cachedTicket = JSON.parse(cachedTicketRaw);
+            if (cachedTicket && cachedTicket.folio) {
+              const res = await fetch(`${API_BASE_URL}/api/boletos/${encodeURIComponent(cachedTicket.folio)}`);
+              if (res.ok) {
+                const dbBoleto = await res.json();
+                ticketData = {
+                  nombre_usuario: dbBoleto.nombre_usuario || '—',
+                  correo_usuario: dbBoleto.correo_usuario || '—',
+                  telefono: '—', // no almacenamos teléfono en usuarios mysql
+                  tipo_entrada: dbBoleto.tipo_entrada || 'MUCH',
+                  destino_boleto: dbBoleto.destino_boleto || '',
+                  seccion_boleto: dbBoleto.seccion_boleto || '',
+                  lugar_boleto: dbBoleto.lugar_boleto || '',
+                  folio: dbBoleto.folio,
+                  qr_token: dbBoleto.qr_token || '',
+                  qr_data: dbBoleto.qr_data || '',
+                  estado: dbBoleto.estado || 'activo',
+                  valido_desde: dbBoleto.valido_desde || '',
+                  valido_hasta: dbBoleto.valido_hasta || ''
+                };
+                
+                localStorage.setItem('much_user_ticket', JSON.stringify({
+                  folio: dbBoleto.folio,
+                  qr_token: dbBoleto.qr_token || '',
+                  valido_hasta: dbBoleto.valido_hasta || '',
+                  estado: dbBoleto.estado || 'activo'
+                }));
+              } else {
+                console.warn('[BOLETO] El boleto en Local Storage no se validó en BD.');
+              }
+            }
+          }
+        } catch (e) {
+          console.error('[BOLETO] Error al recuperar boleto de Local Storage/BD:', e);
+        }
+      }
+
+      // Si no tenemos boleto, redirigir
+      if (!ticketData || !ticketData.folio) {
+        alert('No se encontró información del boleto. Serás redirigido al inicio.');
+        localStorage.removeItem('much_user_ticket');
+        window.location.href = '../index.html';
+        return;
+      }
+
+      // ─── RENDERIZAR VISTA ───
+      const acceso = ticketData.tipo_entrada;
+      const isPlanetario = /planetario/i.test(acceso) || /planetario/i.test(ticketData.destino_boleto || '');
+      const ubicacion = isPlanetario ? 'Planetario Tuxtla' : 'Museo Chiapas de Ciencia y Tecnología';
+      const titulo = ticketData.tipo_entrada || acceso || 'MUCH · Premio';
+      const fechaEmision = parseDate(ticketData.valido_desde);
+      const fechaVencimiento = parseDate(ticketData.valido_hasta, new Date(fechaEmision.getTime() + 7 * 24 * 60 * 60 * 1000));
+      
+      const ahora = Date.now();
+      const vencidoLocal = fechaVencimiento.getTime() < ahora;
+      const estadoFinal = vencidoLocal && ticketData.estado === 'activo' ? 'vencido' : ticketData.estado;
+
+      const estadoVisible = estadoFinal === 'canjeado' || estadoFinal === 'usado'
         ? 'Utilizado'
-        : (estadoRaw === 'vencido' ? 'Vencido' : 'Disponible');
+        : (estadoFinal === 'vencido' ? 'Vencido' : 'Disponible');
 
       // Theme toggle and dynamic configuration
       const congratsText = el('tCongrats');
@@ -2067,9 +2162,7 @@
         document.body.classList.add('planetarium-ticket');
         document.body.dataset.ticketDestination = 'planetario';
         document.title = 'Boleto al Planetario · Planetario Tuxtla';
-        if (congratsText) {
-          congratsText.textContent = '¡Felicidades, ganaste un boleto al Planetario!';
-        }
+        if (congratsText) congratsText.textContent = '¡Felicidades, ganaste un boleto al Planetario!';
         if (dynamicLogo) {
           dynamicLogo.src = '../assets/logo-planetario-tuxtla.svg';
           dynamicLogo.alt = 'Planetario Tuxtla';
@@ -2078,9 +2171,7 @@
         document.body.classList.add('much-ticket');
         document.body.dataset.ticketDestination = 'much';
         document.title = 'Boleto MUCH · Museo Chiapas';
-        if (congratsText) {
-          congratsText.textContent = '¡Felicidades, ganaste un boleto al MUCH!';
-        }
+        if (congratsText) congratsText.textContent = '¡Felicidades, ganaste un boleto al MUCH!';
         if (dynamicLogo) {
           dynamicLogo.src = 'logo-much.png';
           dynamicLogo.alt = 'Museo MUCH';
@@ -2109,24 +2200,27 @@
       // Populate elements directly
       if (el('tTitle')) el('tTitle').textContent = titulo;
       
-      const folioBoleto = qs.get('folio') || 'Folio: ...';
-      if (el('tFolio')) el('tFolio').textContent = folioBoleto;
+      const folioBoleto = ticketData.folio || 'Folio: ...';
+      if (el('tFolio')) el('tFolio').textContent = 'Folio: ' + folioBoleto.replace('Folio:', '').trim();
       
       const elAlfa = el('tAlfanumerico');
       if (elAlfa) elAlfa.textContent = folioBoleto.replace('Folio:', '').trim();
       
-      if (el('tNombre')) el('tNombre').textContent = qs.get('nombre') || '—';
+      if (el('tNombre')) el('tNombre').textContent = ticketData.nombre_usuario || '—';
       if (el('tPremio')) el('tPremio').textContent = acceso;
       if (el('tFecha')) el('tFecha').textContent = fmtFull.format(fechaEmision);
-      if (el('tLugar')) el('tLugar').textContent = ubicacion;
+      if (el('tLugar')) el('tLugar').textContent = ticketData.lugar_boleto || ubicacion;
       if (el('tVencimiento')) {
         el('tVencimiento').textContent = fmtDeadline.format(fechaVencimiento);
       }
       
-      if (el('tEstado')) {
-        const statusClass = estadoVisible === 'Utilizado' ? 'used' : (estadoVisible === 'Vencido' ? 'expired' : 'available');
-        el('tEstado').innerHTML = `<span class="status-pill ${statusClass}">${estadoVisible}</span>`;
-      }
+      const updateStatusUI = (estadoVis) => {
+        if (el('tEstado')) {
+          const statusClass = estadoVis === 'Utilizado' ? 'used' : (estadoVis === 'Vencido' ? 'expired' : 'available');
+          el('tEstado').innerHTML = `<span class="status-pill ${statusClass}">${estadoVis}</span>`;
+        }
+      };
+      updateStatusUI(estadoVisible);
 
       const note = document.querySelector('.note');
       if (note) {
@@ -2135,27 +2229,84 @@
           : 'Felicidades por completar tu misión MUCH. Válido por una sola entrada.';
       }
       
-      if (el('tCorreo')) el('tCorreo').textContent = qs.get('correo') || '—';
-      if (el('tTel')) el('tTel').textContent = qs.get('telefono') || '—';
-    })();
-  </script>
+      if (el('tCorreo')) el('tCorreo').textContent = ticketData.correo_usuario || '—';
+      if (el('tTel')) el('tTel').textContent = ticketData.telefono || '—';
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // 1. GENERAR QR
-      const params = new URLSearchParams(window.location.search);
+      // ─── GENERAR QR ───
       const container = document.getElementById("qrcode");
-
-      const folio = params.get('folio') || params.get('ticket');
-      const qrToken = params.get('qr_token') || params.get('token') || '';
-      const qrData = params.get('qr_data') || '';
-      const isPlanetario = document.body.dataset.ticketDestination === 'planetario';
       const isStreamlinedTicket = document.body.classList.contains('streamlined-ticket');
       const compactTicket = isStreamlinedTicket
         && window.matchMedia('(max-width: 480px) and (max-height: 950px)').matches;
       const spaciousTicket = isStreamlinedTicket
         && window.matchMedia('(max-width: 480px) and (min-height: 701px) and (max-height: 950px)').matches;
 
+      if (container) {
+        const isLocal = window.location.href.includes('localhost') || window.location.href.includes('127.0.0.1');
+        const baseUrl = isLocal
+          ? window.location.origin + '/Boleto_Digital'
+          : 'https://gordillo123.github.io/MisionMuchApp/Boleto_Digital';
+
+        const validationUrl = ticketData.qr_data || (ticketData.qr_token
+          ? `${baseUrl}/validar.html?token=${encodeURIComponent(ticketData.qr_token)}`
+          : `${baseUrl}/validar.html?folio=${encodeURIComponent(ticketData.folio)}`);
+
+        console.log("QR apunta a:", validationUrl);
+
+        container.innerHTML = '';
+        new QRCode(container, {
+          text: validationUrl,
+          width: spaciousTicket ? 190 : (compactTicket ? 154 : (isStreamlinedTicket ? 172 : 136)),
+          height: spaciousTicket ? 190 : (compactTicket ? 154 : (isStreamlinedTicket ? 172 : 136)),
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } else {
+        container.innerHTML = '<span style="font-size:0.75rem;color:#94a3b8;">Código no disponible</span>';
+      }
+
+      // ─── DESCARGAR IMAGEN ───
+      const btnDownload = document.getElementById('btnDownloadImage');
+      if (btnDownload) {
+        btnDownload.addEventListener('click', async () => {
+          const originalText = btnDownload.textContent;
+          btnDownload.textContent = 'Generando descarga... 📥';
+          btnDownload.disabled = true;
+          try {
+            const element = document.getElementById('boletoCaptura');
+            const origWidth = element.style.width;
+            const origMaxW = element.style.maxWidth;
+            element.style.width = '580px';
+            element.style.maxWidth = '580px';
+
+            const canvas = await html2canvas(element, {
+              scale: 3,
+              backgroundColor: null,
+              useCORS: true,
+              windowWidth: 580
+            });
+
+            element.style.width = origWidth;
+            element.style.maxWidth = origMaxW;
+
+            canvas.toBlob((blob) => {
+              const fileName = `Boleto_${isPlanetario ? 'Planetario' : 'MUCH'}_${ticketData.folio || Date.now()}.png`;
+              downloadImage(blob, fileName);
+              btnDownload.textContent = '¡Descargado! 📥';
+              setTimeout(() => { btnDownload.textContent = originalText; btnDownload.disabled = false; }, 2000);
+            }, 'image/png');
+          } catch (err) {
+            console.error(err); alert("Error al descargar imagen.");
+            btnDownload.textContent = originalText; btnDownload.disabled = false;
+          }
+        });
+      }
+
+      function downloadImage(blob, fileName) {
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName || 'Boleto.png'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      }
+
+      // ─── SALIDA / FAREWELL OVERLAY ───
       const farewellOverlay = document.getElementById('exitFarewellOverlay');
       const exitButton = document.getElementById('btnExitTicket');
       const closeFarewellButton = document.getElementById('btnCloseFarewell');
@@ -2180,10 +2331,10 @@
       }
 
       function getReturnDateLabel() {
-        const explicitText = params.get('fecha_volver_texto');
+        const explicitText = qs.get('fecha_volver_texto') || ticketData.fecha_puede_volver_texto;
         if (explicitText) return capitalizeDateLabel(explicitText);
 
-        const explicitDate = formatReturnDate(params.get('fecha_volver'));
+        const explicitDate = formatReturnDate(qs.get('fecha_volver') || ticketData.fecha_puede_volver);
         if (explicitDate) return explicitDate;
 
         try {
@@ -2192,7 +2343,7 @@
           if (match?.[1]) return capitalizeDateLabel(match[1]);
         } catch (_) {}
 
-        const ticketDeadline = formatReturnDate(params.get('valido_hasta'));
+        const ticketDeadline = formatReturnDate(ticketData.valido_hasta);
         if (ticketDeadline) return ticketDeadline;
 
         const fallback = new Date();
@@ -2240,75 +2391,39 @@
         window.location.href = '../index.html?reason=playtime_blocked';
       });
 
-      if ((folio || qrToken || qrData) && container) {
-        const isLocal = window.location.href.includes('localhost') || window.location.href.includes('127.0.0.1');
+      // ─── POLLING DE ESTADO ───
+      const intervalId = setInterval(async () => {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/boletos/${encodeURIComponent(ticketData.folio)}`);
+          if (res.ok) {
+            const dbBoleto = await res.json();
+            const vencidoDb = dbBoleto.valido_hasta && new Date(dbBoleto.valido_hasta).getTime() < Date.now();
+            const estadoDbFinal = vencidoDb && dbBoleto.estado === 'activo' ? 'vencido' : dbBoleto.estado;
 
-        const baseUrl = isLocal
-          ? window.location.origin + '/Boleto_Digital'
-          : 'https://gordillo123.github.io/MisionMuchApp/Boleto_Digital';
+            if (estadoDbFinal !== ticketData.estado) {
+              console.log('[BOLETO] El estado del boleto cambió en el servidor:', estadoDbFinal);
+              ticketData.estado = estadoDbFinal;
 
-        const validationUrl = qrData || (qrToken
-          ? `${baseUrl}/validar.html?token=${encodeURIComponent(qrToken)}`
-          : `${baseUrl}/validar.html?folio=${encodeURIComponent(folio)}`);
+              localStorage.setItem('much_user_ticket', JSON.stringify({
+                folio: dbBoleto.folio,
+                qr_token: dbBoleto.qr_token || '',
+                valido_hasta: dbBoleto.valido_hasta || '',
+                estado: estadoDbFinal
+              }));
 
-        console.log("QR apunta a:", validationUrl);
+              const estadoVisibleActualizado = estadoDbFinal === 'canjeado' || estadoDbFinal === 'usado'
+                ? 'Utilizado'
+                : (estadoDbFinal === 'vencido' ? 'Vencido' : 'Disponible');
 
-        container.innerHTML = '';
-        new QRCode(container, {
-          text: validationUrl,
-          width: spaciousTicket ? 190 : (compactTicket ? 154 : (isStreamlinedTicket ? 172 : 136)),
-          height: spaciousTicket ? 190 : (compactTicket ? 154 : (isStreamlinedTicket ? 172 : 136)),
-          colorDark: "#000000",
-          colorLight: "#ffffff",
-          correctLevel: QRCode.CorrectLevel.M
-        });
-      } else {
-        container.innerHTML = '<span style="font-size:0.75rem;color:#94a3b8;">Código no disponible</span>';
-      }
-
-      // 3. DESCARGAR IMAGEN DIRECTAMENTE
-      const btnDownload = document.getElementById('btnDownloadImage');
-      if (btnDownload) {
-        btnDownload.addEventListener('click', async () => {
-          const originalText = btnDownload.textContent;
-          btnDownload.textContent = 'Generando descarga... 📥';
-          btnDownload.disabled = true;
-          try {
-            const element = document.getElementById('boletoCaptura');
-
-            // ── Forzar ancho fijo para que la captura salga "cuadradita" ──
-            const origWidth = element.style.width;
-            const origMaxW = element.style.maxWidth;
-            element.style.width = '580px';
-            element.style.maxWidth = '580px';
-
-            const canvas = await html2canvas(element, {
-              scale: 3,
-              backgroundColor: null, // transparent for nice corners
-              useCORS: true,
-              windowWidth: 580
-            });
-
-            // ── Restaurar estilos originales ──
-            element.style.width = origWidth;
-            element.style.maxWidth = origMaxW;
-
-            canvas.toBlob((blob) => {
-              const fileName = `Boleto_${isPlanetario ? 'Planetario' : 'MUCH'}_${folio || Date.now()}.png`;
-              downloadImage(blob, fileName);
-              btnDownload.textContent = '¡Descargado! 📥';
-              setTimeout(() => { btnDownload.textContent = originalText; btnDownload.disabled = false; }, 2000);
-            }, 'image/png');
-          } catch (err) {
-            console.error(err); alert("Error al descargar imagen.");
-            btnDownload.textContent = originalText; btnDownload.disabled = false;
+              updateStatusUI(estadoVisibleActualizado);
+            }
           }
-        });
-      }
+        } catch (e) {
+          console.error('[BOLETO] Error en polling de estado:', e);
+        }
+      }, 5000);
 
-      function downloadImage(blob, fileName) {
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName || 'Boleto.png'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      }
+      window.addEventListener('unload', () => clearInterval(intervalId));
     });
   </script>
 </body>

@@ -1030,6 +1030,34 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
   try {
     await connection.beginTransaction();
 
+    // 1. Verificar si el usuario está bloqueado por el playtime block
+    const estadoBloqueo = await playtime.getEstadoBloqueo(id_usuario);
+    if (estadoBloqueo.bloqueado) {
+      console.warn(`Usuario ${id_usuario} intentó generar boleto estando bloqueado. Vuelve el:`, estadoBloqueo.fecha_puede_volver);
+      await connection.rollback();
+      return res.status(403).json({
+        error: 'usuario_bloqueado',
+        mensaje: estadoBloqueo.mensaje,
+        fecha_puede_volver: estadoBloqueo.fecha_puede_volver,
+        fecha_puede_volver_texto: estadoBloqueo.fecha_puede_volver_texto
+      });
+    }
+
+    // 2. Verificar si ya existe un boleto y su estado
+    const [[boletoExistente]] = await connection.query(
+      'SELECT * FROM boletos WHERE id_usuario = ?',
+      [id_usuario]
+    );
+
+    if (boletoExistente && (boletoExistente.usado || boletoExistente.estado === 'canjeado')) {
+      console.warn(`Usuario ${id_usuario} intentó generar/modificar un boleto que ya fue usado o canjeado.`);
+      await connection.rollback();
+      return res.status(403).json({
+        error: 'usuario_bloqueado',
+        mensaje: 'Ya has reclamado y utilizado tu boleto. No se permite generar otro boleto.'
+      });
+    }
+
     const [progreso] = await connection.query(
       'SELECT id_estacion FROM progreso_usuario WHERE id_usuario = ? AND aprobada = TRUE',
       [id_usuario]
@@ -1071,11 +1099,6 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
     } : null;
     const hasTicketMetadata = Boolean(ticketMetadata);
     const ticketObservaciones = hasTicketMetadata ? JSON.stringify(ticketMetadata) : null;
-
-    const [[boletoExistente]] = await connection.query(
-      'SELECT * FROM boletos WHERE id_usuario = ?',
-      [id_usuario]
-    );
 
     let boletoRespuesta = boletoExistente;
     let esNuevo = false;
