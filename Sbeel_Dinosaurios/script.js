@@ -116,9 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await progreso.inicializarProgresoUsuario(6);
             
             // Forzar el estado de la estación a Incompleta en localStorage y base de datos
-            const completed = JSON.parse(localStorage.getItem(COMPLETED_STATIONS_KEY) || '{}');
-            completed[STATION_ID] = false;
-            localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
+            // No borrar el completado local al entrar; los fallos reales se guardan como intentos.
 
             await progreso.guardarProgresoUsuario(STATION_ID, {
                 puntaje: 0,
@@ -571,9 +569,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!solvedOnTime) {
             try {
                 // Guardar en local
-                const completed = JSON.parse(localStorage.getItem(COMPLETED_STATIONS_KEY) || '{}');
-                delete completed[STATION_ID];
-                localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
+                window.MuchLocalStorage?.recordStationAttempt?.(STATION_ID, {
+                    aprobada: false,
+                    puntaje: 0,
+                    aciertos: 0,
+                    errores: 1
+                }, { countAttempt: true });
                 
                 // Guardar en Supabase/BD
                 const progreso = await import('../supabase-utils.js');

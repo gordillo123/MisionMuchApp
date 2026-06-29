@@ -1032,7 +1032,13 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
 
     // 1. Verificar si el usuario está bloqueado por el playtime block
     const estadoBloqueo = await playtime.getEstadoBloqueo(id_usuario);
-    if (estadoBloqueo.bloqueado) {
+    const puedeReclamarPremioPendiente = Boolean(
+      reclamar
+      && estadoBloqueo.bloqueado
+      && estadoBloqueo.premio
+      && estadoBloqueo.premio.estado === 'pendiente'
+    );
+    if (estadoBloqueo.bloqueado && !puedeReclamarPremioPendiente) {
       console.warn(`Usuario ${id_usuario} intentó generar boleto estando bloqueado. Vuelve el:`, estadoBloqueo.fecha_puede_volver);
       await connection.rollback();
       return res.status(403).json({
@@ -1283,7 +1289,23 @@ app.get('/api/boletos/:folio', async (req, res) => {
       return res.status(404).json({ error: 'Boleto no encontrado por folio.' });
     }
 
-    res.json(await marcarBoletoVencidoSiAplica(boleto));
+    const [[premioBoleto]] = await pool.query(
+      `SELECT estado AS estado_premio, fecha_finalizacion, fecha_puede_volver_jugar
+       FROM premios
+       WHERE id_usuario = ?
+         AND (id_boleto = ? OR id_boleto IS NULL)
+       ORDER BY (id_boleto = ?) DESC, COALESCE(fecha_finalizacion, fecha_ganado, created_at) DESC
+       LIMIT 1`,
+      [boleto.id_usuario, boleto.id_boleto, boleto.id_boleto]
+    );
+
+    const boletoActualizado = await marcarBoletoVencidoSiAplica(boleto);
+    res.json({
+      ...boletoActualizado,
+      estado_premio: premioBoleto?.estado_premio || null,
+      fecha_finalizacion: premioBoleto?.fecha_finalizacion || null,
+      fecha_puede_volver: premioBoleto?.fecha_puede_volver_jugar || null
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -2325,7 +2347,20 @@ app.get('/api/usuarios/:id_usuario/perfil', permitirJugador, async (req, res) =>
 
     // 4. Obtener historial de boletos
     const [boletos] = await pool.query(
-      'SELECT id_boleto, folio, estado, usado, fecha_generacion, fecha_uso FROM boletos WHERE id_usuario = ? ORDER BY fecha_generacion DESC',
+      `SELECT b.id_boleto, b.folio, b.qr_token, b.tipo_entrada, b.destino_boleto, b.seccion_boleto,
+              b.estado, b.usado, b.fecha_generacion, b.fecha_uso, b.valido_desde, b.valido_hasta,
+              p.estado AS estado_premio, p.fecha_finalizacion, p.fecha_puede_volver_jugar AS fecha_puede_volver
+       FROM boletos b
+       LEFT JOIN premios p ON p.id_premio = (
+         SELECT p2.id_premio
+         FROM premios p2
+         WHERE p2.id_usuario = b.id_usuario
+           AND (p2.id_boleto = b.id_boleto OR p2.id_boleto IS NULL)
+         ORDER BY (p2.id_boleto = b.id_boleto) DESC, COALESCE(p2.fecha_finalizacion, p2.fecha_ganado, p2.created_at) DESC
+         LIMIT 1
+       )
+       WHERE b.id_usuario = ?
+       ORDER BY b.fecha_generacion DESC`,
       [idUsuario]
     );
 
@@ -2350,8 +2385,17 @@ app.get('/api/usuarios/:id_usuario/perfil', permitirJugador, async (req, res) =>
       return {
         id_boleto: b.id_boleto,
         folio: b.folio,
+        qr_token: b.qr_token || '',
         tipo,
+        tipo_entrada: b.tipo_entrada || tipo,
+        destino_boleto: b.destino_boleto || '',
+        seccion_boleto: b.seccion_boleto || '',
+        valido_desde: b.valido_desde || '',
+        valido_hasta: b.valido_hasta || '',
         fecha_generacion: b.fecha_generacion,
+        fecha_finalizacion: b.fecha_finalizacion || null,
+        fecha_puede_volver: b.fecha_puede_volver || null,
+        estado_premio: b.estado_premio || null,
         estado: estadoAmigable
       };
     });

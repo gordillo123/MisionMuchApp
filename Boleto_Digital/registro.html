@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="styles.css" />
 
   <!-- Supabase JS (BASE MUCH) -->
+  <script src="../scripts/much-local-storage.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -408,6 +409,18 @@
   <script>
     const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
 
+    async function obtenerEstadoJuegoUsuario(userId) {
+      if (!userId) return null;
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/juego/estado-bloqueo`, {
+          headers: { 'x-user-id': String(userId) }
+        });
+        return res.ok ? await res.json() : null;
+      } catch (_) {
+        return null;
+      }
+    }
+
     // Verificar si hay un boleto guardado o si el usuario logueado ya tiene uno
     (async function checkExistingTicketOnLoad() {
       try {
@@ -420,6 +433,11 @@
             if (res.ok) {
               const dbBoleto = await res.json();
               console.log('[REGISTRO] Boleto verificado con base de datos:', dbBoleto.folio);
+              const localUserForTicket = JSON.parse(localStorage.getItem('much_google_user') || 'null');
+              const estadoJuego = await obtenerEstadoJuegoUsuario(localUserForTicket?.id_usuario || localUserForTicket?.id);
+              window.MuchLocalStorage?.claimTicket?.(dbBoleto, {
+                fecha_puede_volver: estadoJuego?.fecha_puede_volver || dbBoleto.fecha_puede_volver || ''
+              });
               const params = new URLSearchParams({
                 folio: dbBoleto.folio,
                 qr_token: dbBoleto.qr_token || '',
@@ -451,6 +469,7 @@
             if (profile.boletos && profile.boletos.length > 0) {
               const latestBoleto = profile.boletos[0];
               console.log('[REGISTRO] Boleto encontrado en perfil de usuario:', latestBoleto.folio);
+              const estadoJuego = await obtenerEstadoJuegoUsuario(localUser.id_usuario || localUser.id);
               
               localStorage.setItem('much_user_ticket', JSON.stringify({
                 folio: latestBoleto.folio,
@@ -458,6 +477,9 @@
                 valido_hasta: latestBoleto.valido_hasta || '',
                 estado: latestBoleto.estado || 'activo'
               }));
+              window.MuchLocalStorage?.claimTicket?.(latestBoleto, {
+                fecha_puede_volver: estadoJuego?.fecha_puede_volver || latestBoleto.fecha_puede_volver || ''
+              });
 
               const params = new URLSearchParams({
                 folio: latestBoleto.folio,
@@ -801,6 +823,10 @@
           localStorage.setItem('much_playtime_block_msg', boleto.reclamo.mensaje);
         } catch (_) {}
       }
+      window.MuchLocalStorage?.claimTicket?.(boleto, {
+        fecha_puede_volver: boleto.reclamo?.fecha_puede_volver,
+        fecha_finalizacion: boleto.reclamo?.premio?.fecha_finalizacion || boleto.reclamo?.premio?.fecha_ganado
+      });
       prizeData.folio = boleto.folio;
       prizeData.qr_token = boleto.qr_token || '';
       prizeData.qr_data = boleto.qr_data || '';
@@ -932,12 +958,18 @@
 
       // Guardar datos mínimos (no sensibles) del boleto en Local Storage
       try {
-        localStorage.setItem('much_user_ticket', JSON.stringify({
-          folio: prizeData.folio || '',
-          qr_token: prizeData.qr_token || '',
-          valido_hasta: prizeData.valido_hasta || '',
-          estado: prizeData.estado || 'activo'
-        }));
+        window.MuchLocalStorage?.claimTicket?.(prizeData, {
+          fecha_puede_volver: prizeData.fecha_puede_volver || '',
+          fecha_finalizacion: localStorage.getItem('much_fecha_finalizacion') || ''
+        });
+        if (!window.MuchLocalStorage?.claimTicket) {
+          localStorage.setItem('much_user_ticket', JSON.stringify({
+            folio: prizeData.folio || '',
+            qr_token: prizeData.qr_token || '',
+            valido_hasta: prizeData.valido_hasta || '',
+            estado: prizeData.estado || 'activo'
+          }));
+        }
       } catch (e) {
         console.error('Error al guardar el boleto en Local Storage:', e);
       }

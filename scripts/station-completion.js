@@ -48,6 +48,9 @@
 
   function getCompletedStations() {
     try {
+      if (window.MuchLocalStorage?.getCompletedStationsMap) {
+        return window.MuchLocalStorage.getCompletedStationsMap();
+      }
       return JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
     } catch (error) {
       return {};
@@ -55,22 +58,42 @@
   }
 
   function markCompletedLocally(options) {
-    if (!options || options.passed === false || !options.stationId) return;
+    if (!options || !options.stationId) return;
 
     try {
       var stationId = String(options.stationId);
-      var completed = getCompletedStations();
-      completed[stationId] = true;
-      localStorage.setItem('much_completed_stations', JSON.stringify(completed));
-
       var nextStationId = options.nextStationId ? String(options.nextStationId) : '';
       var stationNumber = Number(stationId);
       if (!nextStationId && Number.isFinite(stationNumber)) {
         nextStationId = String(Math.min(6, stationNumber + 1));
       }
 
-      if (nextStationId) {
-        localStorage.setItem('much_current_station', nextStationId);
+      if (options.passed === false) {
+        if (window.MuchLocalStorage?.recordStationAttempt) {
+          window.MuchLocalStorage.recordStationAttempt(stationId, {
+            aprobada: false,
+            puntaje: Number(options.puntaje || 0),
+            aciertos: Number(options.aciertos || 0),
+            errores: Number(options.errores || 1)
+          });
+        }
+        return;
+      }
+
+      if (window.MuchLocalStorage?.completeStation) {
+        window.MuchLocalStorage.completeStation(stationId, {
+          nextStationId: nextStationId,
+          puntaje: options.puntaje,
+          aciertos: options.aciertos,
+          errores: options.errores
+        });
+      } else {
+        var completed = getCompletedStations();
+        completed[stationId] = true;
+        localStorage.setItem('much_completed_stations', JSON.stringify(completed));
+        if (nextStationId) {
+          localStorage.setItem('much_current_station', nextStationId);
+        }
       }
     } catch (error) {
       console.warn('No se pudo marcar la estación como completada localmente:', error);

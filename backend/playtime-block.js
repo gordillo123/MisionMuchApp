@@ -395,17 +395,20 @@ function createPlaytimeBlockService(pool) {
       premio = await registrarGanado(idUsuario, idBoleto, conn);
     }
 
+    const fechaBaseDesbloqueo = premio.fecha_finalizacion || premio.fecha_ganado || new Date();
+    const fechaDesbloqueoFallback = calcularFechaDesbloqueo(fechaBaseDesbloqueo, config);
+
     await conn.query(
       `UPDATE premios
        SET estado = 'reclamado',
            id_boleto = COALESCE(?, id_boleto),
            fecha_reclamado = COALESCE(fecha_reclamado, CURRENT_TIMESTAMP),
-           fecha_puede_volver_jugar = CASE 
-             WHEN estado = 'pendiente' THEN ? 
-             ELSE fecha_puede_volver_jugar 
-           END
+           fecha_puede_volver_jugar = COALESCE(
+             fecha_puede_volver_jugar,
+             CASE WHEN estado = 'pendiente' THEN ? ELSE NULL END
+           )
        WHERE id_premio = ?`,
-      [idBoleto, calcularFechaDesbloqueo(new Date(), config), premio.id_premio]
+      [idBoleto, fechaDesbloqueoFallback, premio.id_premio]
     );
     [[premio]] = await conn.query('SELECT * FROM premios WHERE id_premio = ?', [premio.id_premio]);
 

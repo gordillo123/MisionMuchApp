@@ -796,10 +796,12 @@ class UIManager {
         }
         return;
       } else {
-        // Asegurar que se marque como incompleta en localStorage
-        let completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
-        completed['1'] = false;
-        localStorage.setItem('much_completed_stations', JSON.stringify(completed));
+        window.MuchLocalStorage?.recordStationAttempt?.('1', {
+          aprobada: false,
+          puntaje: 0,
+          aciertos: s.correct || 0,
+          errores: 1
+        }, { countAttempt: true });
 
         e.finalTitle.classList.remove('visually-hidden');
         e.finalTitle.textContent = 'Buen intento 👀';

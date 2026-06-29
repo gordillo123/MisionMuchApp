@@ -11141,6 +11141,7 @@
 
   <div class="avatar-overlay" id="rulesOverlay" data-include="modules/rules.html"></div>
 
+  <script src="scripts/much-local-storage.js"></script>
   <script src="scripts/station-completion.js"></script>
   <script type="module" src="./supabase-utils.js"></script>
   <script>
@@ -11384,7 +11385,9 @@
 
       function restoreSavedAvatar() {
         try {
-          const savedAvatar = JSON.parse(localStorage.getItem('much_selected_avatar') || 'null');
+          const savedAvatar = window.MuchLocalStorage?.getAvatar
+            ? window.MuchLocalStorage.getAvatar()
+            : JSON.parse(localStorage.getItem('much_selected_avatar') || 'null');
           return applyAvatarToUI(savedAvatar);
         } catch (error) {
           console.error('Error al restaurar avatar:', error);
@@ -11828,17 +11831,12 @@
           const res = await fetch(`${API_BASE_URL}/api/progreso/${userId}`);
           if (!res.ok) throw new Error('Error al consultar progreso de usuario');
           const progreso = await res.json();
-          
-          // Mapear la BD y fusionarla con el estado local para no perder marcas recien completadas.
+
+          if (window.MuchLocalStorage?.syncFromServerProgress) {
+            window.MuchLocalStorage.syncFromServerProgress(progreso);
+          }
+
           const completedMap = getCompletedStations();
-          
-          progreso.forEach(p => {
-            if (p.aprobada || p.completada) {
-              completedMap[String(p.id_estacion)] = true;
-            } else {
-              delete completedMap[String(p.id_estacion)];
-            }
-          });
 
           let maxStationId = 1;
           Object.keys(completedMap).forEach(stationId => {
@@ -12249,6 +12247,22 @@
           } catch (error) {
             return;
           }
+        }
+
+        if (window.MuchLocalStorage?.getRouteState?.() === 'bloqueado_temporalmente') {
+          const fechaLocal = localStorage.getItem('much_fecha_proximo_juego');
+          const fechaTexto = fechaLocal
+            ? new Intl.DateTimeFormat('es-MX', { dateStyle: 'long', timeStyle: 'short' }).format(new Date(fechaLocal))
+            : '';
+          window.MuchStationCompletion?.showFloatingNotice({
+            badge: 'Mision completada',
+            title: 'Aun no puedes volver a jugar',
+            body: fechaTexto
+              ? `Podras volver a jugar el ${fechaTexto}.`
+              : 'Tu recorrido sigue bloqueado temporalmente.',
+            ctaLabel: 'Entendido'
+          });
+          return;
         }
 
         if (!selectedAvatar && !restoreSavedAvatar()) {
@@ -12975,7 +12989,11 @@
         if (!selectedAvatar) return;
         overlay.classList.remove('open');
 
-        localStorage.setItem('much_selected_avatar', JSON.stringify(selectedAvatar));
+        if (window.MuchLocalStorage?.setAvatar) {
+          window.MuchLocalStorage.setAvatar(selectedAvatar);
+        } else {
+          localStorage.setItem('much_selected_avatar', JSON.stringify(selectedAvatar));
+        }
         applyAvatarToUI(selectedAvatar);
         showView('viewPrep');
 
@@ -13081,6 +13099,9 @@
 
       function getCompletedStations() {
         try {
+          if (window.MuchLocalStorage?.getCompletedStationsMap) {
+            return window.MuchLocalStorage.getCompletedStationsMap();
+          }
           return JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
         } catch (e) {
           return {};
@@ -13105,6 +13126,7 @@
       function saveMissionTicketChoice(option) {
         if (!option || !option.key) return;
         selectedMissionTicketOption = option;
+        window.MuchLocalStorage?.setPrizeSelected?.(option);
         localStorage.setItem(MISSION_REWARD_CHOICE_KEY, JSON.stringify({
           key: option.key,
           label: option.label,
@@ -13115,7 +13137,11 @@
       }
 
       function hasMissionRewardClaimStarted() {
-        return localStorage.getItem(MISSION_REWARD_CLAIMED_KEY) === 'true';
+        return Boolean(
+          window.MuchLocalStorage?.isTicketClaimed?.()
+          || window.MuchLocalStorage?.hasClaimFlowStarted?.()
+          || localStorage.getItem(MISSION_REWARD_CLAIMED_KEY) === 'true'
+        );
       }
 
       function buildMissionPrize(ticketOption = selectedMissionTicketOption || getMissionTicketChoiceFromStorage() || MISSION_TICKET_OPTIONS.much) {
@@ -13330,6 +13356,8 @@
         }
 
         const prize = buildMissionPrize(option);
+        window.MuchLocalStorage?.setPrizeSelected?.(option);
+        window.MuchLocalStorage?.setClaimFlowStarted?.(true);
         localStorage.setItem('much_quiz_prize', JSON.stringify(prize));
         localStorage.setItem(MISSION_REWARD_CLAIMED_KEY, 'true');
         const params = new URLSearchParams({
@@ -13353,6 +13381,10 @@
         if (btnClaimReward) {
           btnClaimReward.disabled = !isUnlocked || claimStarted;
         }
+
+        window.MuchLocalStorage?.setClaimButtonState?.(
+          isUnlocked && !claimStarted ? 'activo' : 'bloqueado'
+        );
 
         if (isUnlocked && !claimStarted) {
           scheduleMissionRewardCelebration(completed);
@@ -13455,7 +13487,11 @@
 
         if (pos && avatar) {
           currentStation = String(stationId);
-          localStorage.setItem('much_current_station', currentStation);
+          if (window.MuchLocalStorage?.setCurrentStation) {
+            window.MuchLocalStorage.setCurrentStation(currentStation);
+          } else {
+            localStorage.setItem('much_current_station', currentStation);
+          }
           avatar.style.left = `${pos.x}%`;
           avatar.style.top = `${pos.y}%`;
 
@@ -13504,28 +13540,52 @@
         if (now - lastResetPromptAt < 800) return;
         lastResetPromptAt = now;
 
+        const resetAllowed = window.MuchLocalStorage?.canResetProgress
+          ? window.MuchLocalStorage.canResetProgress()
+          : { ok: true };
+        if (!resetAllowed.ok) {
+          window.MuchStationCompletion?.showFloatingNotice({
+            badge: 'Recorrido bloqueado',
+            title: 'Aun no puedes reiniciar',
+            body: resetAllowed.message || 'Debes esperar a la fecha permitida para volver a jugar.',
+            ctaLabel: 'Entendido'
+          });
+          return;
+        }
+
         if (confirm('¿Estás seguro de que deseas reiniciar el progreso de todas las estaciones? Las palomitas verdes se desmarcarán.')) {
-          // Limpiar localmente de inmediato para dar feedback instantáneo
-          localStorage.setItem('much_completed_stations', '{}');
-          localStorage.removeItem('much_quiz_prize');
-          localStorage.removeItem('much_mission_reward_claimed');
-          localStorage.removeItem(MISSION_REWARD_CHOICE_KEY);
+          // Limpiar localmente despues de confirmar con la base de datos.
+          try {
+            if (typeof window.reiniciarProgresoUsuario === 'function') {
+              await window.reiniciarProgresoUsuario();
+              console.log('[Sync] Progreso de base de datos reiniciado con exito.');
+            }
+          } catch (err) {
+            console.error('Error al reiniciar progreso en la base de datos:', err);
+            window.MuchStationCompletion?.showFloatingNotice({
+              badge: 'No se pudo reiniciar',
+              title: 'Intenta mas tarde',
+              body: 'El servidor no confirmo el reinicio del recorrido. Tu progreso local se conserva.',
+              ctaLabel: 'Entendido'
+            });
+            return;
+          }
+
+          if (window.MuchLocalStorage?.resetProgress) {
+            window.MuchLocalStorage.resetProgress({ force: true, reason: 'manual_reset' });
+          } else {
+            localStorage.setItem('much_completed_stations', '{}');
+            localStorage.removeItem('much_quiz_prize');
+            localStorage.removeItem('much_mission_reward_claimed');
+            localStorage.removeItem(MISSION_REWARD_CHOICE_KEY);
+          }
           window.MuchStationCompletion?.clearPendingNotice();
           currentStation = '1';
           localStorage.setItem('much_current_station', '1');
           updateCompletedStationsOnMap();
           updateRewardClaimUI({});
           moveToStation('1');
-
-          // Limpiar en base de datos si hay sesión activa
-          try {
-            if (typeof window.reiniciarProgresoUsuario === 'function') {
-              await window.reiniciarProgresoUsuario();
-              console.log('[Sync] Progreso de base de datos reiniciado con éxito.');
-            }
-          } catch (err) {
-            console.error('Error al reiniciar progreso en la base de datos:', err);
-          }
+          return;
         }
       }
 

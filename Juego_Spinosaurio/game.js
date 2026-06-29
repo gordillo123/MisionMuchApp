@@ -974,9 +974,12 @@ async function validarQuiz() {
 
     // Forzar la estación a Incompleta (en local y BD), borrando progreso previo
     try {
-      const completed = JSON.parse(localStorage.getItem(COMPLETED_STATIONS_KEY) || '{}');
-      delete completed[STATION_ID];
-      localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
+      window.MuchLocalStorage?.recordStationAttempt?.(STATION_ID, {
+        aprobada: false,
+        puntaje: 0,
+        aciertos: 0,
+        errores: 1
+      }, { countAttempt: true });
     } catch (e) {}
 
     await guardarSpinosaurioEnSupabase(0, false);
@@ -1032,9 +1035,12 @@ async function marcarIncorrectoPorTrampa() {
     if (radio) radio.disabled = true;
   });
   try {
-    const completed = JSON.parse(localStorage.getItem(COMPLETED_STATIONS_KEY) || '{}');
-    delete completed[STATION_ID];
-    localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
+    window.MuchLocalStorage?.recordStationAttempt?.(STATION_ID, {
+      aprobada: false,
+      puntaje: 0,
+      aciertos: 0,
+      errores: 1
+    }, { countAttempt: true });
   } catch (e) {}
   await guardarSpinosaurioEnSupabase(0, false);
   await registrarQuizEnSupabase(0);

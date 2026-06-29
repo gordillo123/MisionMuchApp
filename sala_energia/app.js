@@ -579,11 +579,14 @@ class UIManager {
       <div style="font-size: clamp(30px, 8vw, 48px); font-weight: 900;" id="cheatCountdown">15 s</div>
     `;
 
-    // Force station incomplete!
+    // Registrar intento fallido sin borrar una palomita ya ganada.
     try {
-      const completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
-      delete completed['4'];
-      localStorage.setItem('much_completed_stations', JSON.stringify(completed));
+      window.MuchLocalStorage?.recordStationAttempt?.('4', {
+        aprobada: false,
+        puntaje: 0,
+        aciertos: 0,
+        errores: QUESTIONS.length
+      }, { countAttempt: true });
       
       const progreso = await import('../supabase-utils.js');
       await progreso.guardarProgresoUsuario('4', {
@@ -893,10 +896,12 @@ class UIManager {
         completed['4'] = true;
         localStorage.setItem('much_completed_stations', JSON.stringify(completed));
       } else {
-        // Asegurar que se marque como incompleta en localStorage
-        let completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
-        completed['4'] = false;
-        localStorage.setItem('much_completed_stations', JSON.stringify(completed));
+        window.MuchLocalStorage?.recordStationAttempt?.('4', {
+          aprobada: false,
+          puntaje: 0,
+          aciertos: s.correct || 0,
+          errores: Math.max(0, QUESTIONS.length - (s.correct || 0))
+        }, { countAttempt: true });
 
         e.finalTitle.classList.remove('visually-hidden');
         e.finalTitle.textContent = 'Sigue explorando ✨';

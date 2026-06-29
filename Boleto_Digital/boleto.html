@@ -11,6 +11,7 @@
   <script>
     window.MuchRoleAccess?.redirectIfInternalUserOnPlayerPage({ basePath: '../' });
   </script>
+  <script src="../scripts/much-local-storage.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
@@ -2079,12 +2080,22 @@
 
         // Guardar en Local Storage
         try {
-          localStorage.setItem('much_user_ticket', JSON.stringify({
-            folio: folio,
-            qr_token: qr_token,
-            valido_hasta: valido_hasta,
-            estado: estadoRaw
-          }));
+          window.MuchLocalStorage?.claimTicket?.({
+            ...ticketData,
+            fecha_puede_volver: qs.get('fecha_volver') || '',
+            fecha_puede_volver_texto: qs.get('fecha_volver_texto') || ''
+          }, {
+            fecha_puede_volver: qs.get('fecha_volver') || '',
+            fecha_finalizacion: localStorage.getItem('much_fecha_finalizacion') || ''
+          });
+          if (!window.MuchLocalStorage?.claimTicket) {
+            localStorage.setItem('much_user_ticket', JSON.stringify({
+              folio: folio,
+              qr_token: qr_token,
+              valido_hasta: valido_hasta,
+              estado: estadoRaw
+            }));
+          }
         } catch (e) {
           console.error('[BOLETO] Error al guardar en Local Storage:', e);
         }
@@ -2114,12 +2125,18 @@
                   valido_hasta: dbBoleto.valido_hasta || ''
                 };
                 
-                localStorage.setItem('much_user_ticket', JSON.stringify({
-                  folio: dbBoleto.folio,
-                  qr_token: dbBoleto.qr_token || '',
-                  valido_hasta: dbBoleto.valido_hasta || '',
-                  estado: dbBoleto.estado || 'activo'
-                }));
+                window.MuchLocalStorage?.claimTicket?.(dbBoleto, {
+                  fecha_puede_volver: dbBoleto.fecha_puede_volver || '',
+                  fecha_finalizacion: localStorage.getItem('much_fecha_finalizacion') || ''
+                });
+                if (!window.MuchLocalStorage?.claimTicket) {
+                  localStorage.setItem('much_user_ticket', JSON.stringify({
+                    folio: dbBoleto.folio,
+                    qr_token: dbBoleto.qr_token || '',
+                    valido_hasta: dbBoleto.valido_hasta || '',
+                    estado: dbBoleto.estado || 'activo'
+                  }));
+                }
               } else {
                 console.warn('[BOLETO] El boleto en Local Storage no se validó en BD.');
               }
@@ -2404,12 +2421,18 @@
               console.log('[BOLETO] El estado del boleto cambió en el servidor:', estadoDbFinal);
               ticketData.estado = estadoDbFinal;
 
-              localStorage.setItem('much_user_ticket', JSON.stringify({
-                folio: dbBoleto.folio,
-                qr_token: dbBoleto.qr_token || '',
-                valido_hasta: dbBoleto.valido_hasta || '',
+              window.MuchLocalStorage?.storeTicketData?.({
+                ...dbBoleto,
                 estado: estadoDbFinal
-              }));
+              });
+              if (!window.MuchLocalStorage?.storeTicketData) {
+                localStorage.setItem('much_user_ticket', JSON.stringify({
+                  folio: dbBoleto.folio,
+                  qr_token: dbBoleto.qr_token || '',
+                  valido_hasta: dbBoleto.valido_hasta || '',
+                  estado: estadoDbFinal
+                }));
+              }
 
               const estadoVisibleActualizado = estadoDbFinal === 'canjeado' || estadoDbFinal === 'usado'
                 ? 'Utilizado'

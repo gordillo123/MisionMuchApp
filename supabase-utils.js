@@ -45,7 +45,8 @@ async function guardarVerificacionUbicacion(datos) {
       body: JSON.stringify(datos)
     });
     if (!res.ok) throw new Error('Error en el servidor al guardar verificación');
-    return await res.json();
+    const data = await res.json();
+    return data;
   } catch (e) {
     console.error('Error guardando verificación de ubicación en base de datos:', e.message);
     throw e;
@@ -107,11 +108,15 @@ function sincronizarCicloJuegoLocal(estado) {
   if (cicloGuardado === cicloId) return false;
 
   localStorage.setItem('much_playtime_cycle_id', cicloId);
-  localStorage.setItem('much_completed_stations', '{}');
-  localStorage.setItem('much_current_station', '1');
-  localStorage.removeItem('much_quiz_prize');
-  localStorage.removeItem('much_mission_reward_claimed');
-  localStorage.removeItem('much_mission_reward_ticket_choice');
+  if (window.MuchLocalStorage?.resetProgress) {
+    window.MuchLocalStorage.resetProgress({ force: true, reason: 'new_cycle' });
+  } else {
+    localStorage.setItem('much_completed_stations', '{}');
+    localStorage.setItem('much_current_station', '1');
+    localStorage.removeItem('much_quiz_prize');
+    localStorage.removeItem('much_mission_reward_claimed');
+    localStorage.removeItem('much_mission_reward_ticket_choice');
+  }
   sessionStorage.removeItem('much_current_attempt_id');
   sessionStorage.removeItem('much_quiz_final_data');
   window.dispatchEvent(new CustomEvent('much:newPlayCycle', { detail: estado }));
@@ -140,6 +145,7 @@ async function consultarEstadoBloqueoJuego(force = false) {
 
     const estado = await res.json();
     sincronizarCicloJuegoLocal(estado);
+    window.MuchLocalStorage?.syncPlaytimeState?.(estado);
     cachedPlaytimeEstado = estado;
     cachedPlaytimeAt = Date.now();
     return estado;
@@ -177,6 +183,7 @@ function mostrarAvisoFinalizacionJuego(finalizacion) {
   const fecha = finalizacion.fecha_puede_volver_texto;
   const mensaje = `¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrás volver a jugar el ${fecha}.`;
   localStorage.setItem('much_playtime_block_msg', finalizacion.mensaje || mensaje);
+  window.MuchLocalStorage?.completeRoute?.(finalizacion);
   invalidarCacheBloqueoJuego();
 
   if (window.MuchStationCompletion?.showFloatingNotice) {
@@ -193,7 +200,14 @@ function mostrarAvisoFinalizacionJuego(finalizacion) {
 
 async function asegurarJuegoPermitido() {
   const estado = await consultarEstadoBloqueoJuego(true);
-  if (estado.bloqueado) {
+  const bloqueoLocal = window.MuchLocalStorage?.getRouteState?.() === 'bloqueado_temporalmente';
+  if (estado.bloqueado || bloqueoLocal) {
+    if (!estado.bloqueado && bloqueoLocal) {
+      estado.bloqueado = true;
+      estado.habilitado = false;
+      estado.fecha_puede_volver = localStorage.getItem('much_fecha_proximo_juego') || '';
+      estado.mensaje = localStorage.getItem('much_playtime_block_msg') || 'Tu recorrido sigue bloqueado temporalmente.';
+    }
     mostrarAvisoBloqueoJuego(estado);
     const error = new Error(estado.mensaje || 'usuario_bloqueado');
     error.code = 'usuario_bloqueado';
@@ -208,6 +222,7 @@ async function manejarRespuestaBloqueoJuego(res) {
     const data = await res.json();
     if (data.error === 'usuario_bloqueado') {
       invalidarCacheBloqueoJuego();
+      window.MuchLocalStorage?.syncPlaytimeState?.({ ...data, bloqueado: true, habilitado: false });
       mostrarAvisoBloqueoJuego(data);
       const error = new Error(data.mensaje || 'usuario_bloqueado');
       error.code = 'usuario_bloqueado';
@@ -572,6 +587,17 @@ async function guardarProgresoUsuario(estacionId, extra = {}) {
       throw new Error('Error en el backend al guardar progreso.');
     }
     const data = await res.json();
+    const progresoGuardado = data.progreso || {};
+    window.MuchLocalStorage?.recordStationResult?.(estacionId, {
+      puntaje: progresoGuardado.puntaje ?? puntaje,
+      aciertos: progresoGuardado.aciertos ?? aciertos,
+      errores: progresoGuardado.errores ?? errores,
+      aprobada: progresoGuardado.aprobada ?? aprobada,
+      fecha_completado: progresoGuardado.fecha_completado
+    });
+    if (data.boletoGenerado) {
+      window.MuchLocalStorage?.storeTicketData?.(data.boletoGenerado);
+    }
     if (data.finalizacion) {
       mostrarAvisoFinalizacionJuego(data.finalizacion);
     }
@@ -591,9 +617,7 @@ async function inicializarProgresoUsuario(estacionId) {
 
   // Limpiar el estado de completado en el almacenamiento local al iniciar la estación
   try {
-    const completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
-    delete completed[String(estacionId)];
-    localStorage.setItem('much_completed_stations', JSON.stringify(completed));
+    // No borrar estaciones ya completadas al entrar. Los intentos fallidos se guardan aparte.
   } catch (e) {
     console.warn('No se pudo limpiar estado local al inicializar:', e);
   }
@@ -646,7 +670,9 @@ async function reiniciarProgresoUsuario() {
       await manejarRespuestaBloqueoJuego(res);
       throw new Error('Error al reiniciar progreso.');
     }
-    return await res.json();
+    const data = await res.json();
+    window.MuchLocalStorage?.resetProgress?.({ force: true, reason: 'manual_reset' });
+    return data;
   } catch (error) {
     console.error('Error en reiniciarProgresoUsuario:', error.message);
     throw error;
@@ -681,7 +707,13 @@ async function guardarIntentoEstacion(estacionId, intento = {}) {
       await manejarRespuestaBloqueoJuego(res);
       throw new Error('Error al registrar intento.');
     }
-    return await res.json();
+    const data = await res.json();
+    window.MuchLocalStorage?.recordStationAttempt?.(estacionId, {
+      ...intento,
+      id_intento: data.id_intento,
+      aprobado: Boolean(intento.aprobado)
+    }, { countAttempt: true });
+    return data;
   } catch (error) {
     console.error('Error en guardarIntentoEstacion:', error.message);
     throw error;
@@ -808,7 +840,12 @@ async function generarBoletoFinal(reclamar = false) {
       throw new Error('Error al generar el boleto.');
     }
     const data = await res.json();
+    window.MuchLocalStorage?.storeTicketData?.(data);
     if (reclamar) {
+      window.MuchLocalStorage?.claimTicket?.(data, {
+        fecha_puede_volver: data.reclamo?.fecha_puede_volver,
+        fecha_finalizacion: data.reclamo?.premio?.fecha_finalizacion || data.reclamo?.premio?.fecha_ganado
+      });
       invalidarCacheBloqueoJuego();
     }
     return data;
