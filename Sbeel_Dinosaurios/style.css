@@ -457,6 +457,89 @@ header h1 {
     height: 28px;
 }
 
+@media (min-width: 900px) and (max-height: 820px) {
+    body {
+        padding: 12px;
+    }
+
+    .container {
+        max-width: min(960px, calc(100vw - 24px));
+        padding: 1rem 1.25rem 1.1rem;
+    }
+
+    .btn-back-map {
+        top: 14px;
+        left: 14px;
+        height: 36px;
+        padding: 0 14px 0 10px;
+        font-size: 0.85rem;
+    }
+
+    .logo-institucional-container {
+        max-width: 260px;
+        margin: 0 auto 0.65rem;
+    }
+
+    header h1 {
+        font-size: clamp(1.9rem, 5vh, 2.65rem);
+        line-height: 1;
+        margin-bottom: 0.15rem;
+    }
+
+    .intro {
+        margin-bottom: 0.75rem;
+        font-size: 0.95rem;
+        line-height: 1.2;
+    }
+
+    .puzzle-board {
+        width: min(360px, calc(100vh - 330px));
+        max-width: 360px;
+        gap: 8px;
+        padding: 8px;
+        margin-bottom: 0.75rem;
+        border-radius: 16px;
+    }
+
+    .puzzle-board::before {
+        inset: 8px;
+        border-radius: 10px;
+    }
+
+    .controls {
+        gap: 0.65rem;
+    }
+
+    .timer-box {
+        min-width: 180px;
+        padding: 0.62rem 0.9rem;
+        font-size: 1rem;
+    }
+
+    .btn {
+        padding: 0.72rem 1.4rem;
+        font-size: 1rem;
+        letter-spacing: 0;
+    }
+
+    .partner-logos {
+        gap: 0.8rem 1.1rem;
+        margin-top: 0.75rem;
+        padding: 0.75rem 1.25rem;
+        border-radius: 12px;
+    }
+
+    .partner-logo-much,
+    .partner-logo-sbeel {
+        height: 28px;
+    }
+
+    .partner-logo-sata,
+    .partner-logo-planetario {
+        height: 22px;
+    }
+}
+
 /* Modal de éxito */
 .modal {
     display: none;

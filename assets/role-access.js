@@ -122,6 +122,11 @@
         return res.json();
       })
       .then((data) => {
+        if (data.exists === false) {
+          localStorage.removeItem('much_google_user');
+          return;
+        }
+
         const refreshedUser = {
           ...user,
           roles: Array.isArray(data.roles) ? data.roles : []

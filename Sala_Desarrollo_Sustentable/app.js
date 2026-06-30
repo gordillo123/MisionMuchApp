@@ -337,7 +337,19 @@ async function startQuizInDB() {
       aprobado: false
     });
 
+    if (!result?.id_intento) {
+      console.info('[Sync] Intento remoto no disponible; el quiz continúa en modo local.');
+      quizIniciando = false;
+      return null;
+    }
+
     console.log("✅ Intento iniciado en MySQL. ID Intento:", result.id_intento);
+
+    if (!result?.id_intento) {
+      console.info('[Sync] Intento remoto no disponible; el quiz continúa en modo local.');
+      quizIniciando = false;
+      return null;
+    }
 
     sessionStorage.setItem('much_current_attempt_id', result.id_intento);
     return result.id_intento;

@@ -135,6 +135,10 @@ app.get('/api/testing/station-completion', (req, res) => {
   res.json({ enabled: STATION_COMPLETION_TEST_MODE_ENABLED });
 });
 
+app.get('/favicon.ico', (req, res) => {
+  res.status(204).end();
+});
+
 // Middleware de roles y simulación de usuario actual
 // Para fines de desarrollo local y simplicidad, el frontend enviará las cabeceras:
 // 'x-user-id' con el ID del usuario actual.
@@ -182,6 +186,15 @@ async function esAdmin(idUsuario) {
 async function esTaquilla(idUsuario) {
   const roles = await obtenerRolUsuario(idUsuario);
   return roles.includes('taquilla') || roles.includes('admin');
+}
+
+async function usuarioExiste(idUsuario, connection = pool) {
+  if (!idUsuario) return false;
+  const [[usuario]] = await connection.query(
+    'SELECT id_usuario FROM usuarios WHERE id_usuario = ? LIMIT 1',
+    [idUsuario]
+  );
+  return Boolean(usuario);
 }
 
 // Generar Folio único de 6 caracteres alfanuméricos mezclados (ej: X7K9R2)
@@ -322,6 +335,10 @@ async function permitirJugador(req, res, next) {
   const idUsuario = obtenerIdUsuarioDePeticion(req);
   if (!idUsuario) {
     return res.status(401).json({ error: 'No autorizado. Falta identificador de usuario.' });
+  }
+
+  if (!(await usuarioExiste(idUsuario))) {
+    return res.status(401).json({ error: 'Usuario no encontrado. Inicia sesión nuevamente.' });
   }
 
   const roles = await obtenerRolUsuario(idUsuario);
@@ -642,14 +659,14 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
       [id_usuario, String(id_estacion), `Usuario completó estación ${id_estacion} con puntaje ${puntaje} (Guardado mejor puntaje: ${nuevoPuntaje})`]
     );
 
-    // 3. Verificar si el usuario ha completado todas las estaciones obligatorias [2, 3, 4, 5, 6]
+    // 3. Verificar si el usuario ha completado todas las estaciones obligatorias [1, 2, 3, 4, 5, 6]
     const [progreso] = await connection.query(
       'SELECT id_estacion FROM progreso_usuario WHERE id_usuario = ? AND aprobada = TRUE',
       [id_usuario]
     );
 
     const estacionesAprobadas = progreso.map(p => p.id_estacion);
-    const estacionesObligatorias = [2, 3, 4, 5, 6];
+    const estacionesObligatorias = [1, 2, 3, 4, 5, 6];
     const tieneTodoAprobado = estacionesObligatorias.every(id => estacionesAprobadas.includes(id));
 
     let boletoGenerado = null;
@@ -661,7 +678,7 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
       // Registrar auditoria de completar recorrido
       await connection.query(
         `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
-         VALUES (?, 'usuario', 'COMPLETAR_RECORRIDO', 'progreso_usuario', ?, 'Usuario completó la totalidad del recorrido del museo (estaciones 2, 3, 4, 5, 6)')`,
+         VALUES (?, 'usuario', 'COMPLETAR_RECORRIDO', 'progreso_usuario', ?, 'Usuario completó la totalidad del recorrido del museo (estaciones 1, 2, 3, 4, 5, 6)')`,
         [id_usuario, String(id_usuario)]
       );
 
@@ -1070,7 +1087,7 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
     );
 
     const estacionesAprobadas = progreso.map(p => p.id_estacion);
-    const estacionesObligatorias = [2, 3, 4, 5, 6];
+    const estacionesObligatorias = [1, 2, 3, 4, 5, 6];
     const tieneTodoAprobado = estacionesObligatorias.every(id => estacionesAprobadas.includes(id));
     // HERRAMIENTA TEMPORAL: omite solo esta validacion; no escribe progreso ni puntajes falsos.
     const usaSimulacionDePruebas = STATION_COMPLETION_TEST_MODE_ENABLED && modo_prueba === true;
@@ -1764,8 +1781,13 @@ app.get('/api/admin/auditoria', permitirAdmin, async (req, res) => {
 app.get('/api/usuarios/:id_usuario/roles', async (req, res) => {
   const idUsuario = req.params.id_usuario;
   try {
+    const exists = await usuarioExiste(idUsuario);
+    if (!exists) {
+      return res.json({ id_usuario: idUsuario, exists: false, roles: [] });
+    }
+
     const roles = await obtenerRolUsuario(idUsuario);
-    res.json({ id_usuario: idUsuario, roles });
+    res.json({ id_usuario: idUsuario, exists: true, roles });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -1810,9 +1832,9 @@ app.get('/api/admin/dashboard-stats', permitirAdmin, async (req, res) => {
         sql: `SELECT COUNT(*) AS count FROM (
           SELECT id_usuario, MAX(COALESCE(fecha_completado, updated_at, created_at)) AS fecha_final
           FROM progreso_usuario
-          WHERE aprobada = TRUE AND id_estacion IN (2, 3, 4, 5, 6)
+          WHERE aprobada = TRUE AND id_estacion IN (1, 2, 3, 4, 5, 6)
           GROUP BY id_usuario
-          HAVING COUNT(DISTINCT id_estacion) = 5 ${range ? `AND ${condicionRangoFechas('fecha_final', range)}` : ''}
+          HAVING COUNT(DISTINCT id_estacion) = 6 ${range ? `AND ${condicionRangoFechas('fecha_final', range)}` : ''}
         ) AS sub`,
         params: rangeParams()
       },

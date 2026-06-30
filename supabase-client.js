@@ -6,6 +6,7 @@ console.log('ℹ️ Supabase ha sido desactivado. Las peticiones ahora se rediri
 
 // Mock inofensivo para evitar errores de importación en el frontend legacy
 const supabase = {
+  createClient: () => supabase,
   auth: {
     getSession: async () => ({ data: { session: null }, error: null }),
     getUser: async () => ({ data: { user: null }, error: null }),

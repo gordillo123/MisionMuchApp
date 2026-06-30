@@ -276,6 +276,21 @@ function obtenerUsuarioLocal() {
   }
 }
 
+function obtenerIdUsuarioLocal(user = obtenerUsuarioLocal()) {
+  return user ? (user.id_usuario || user.id || null) : null;
+}
+
+async function manejarFalloSync(res, fallbackMessage) {
+  await manejarRespuestaBloqueoJuego(res);
+  let detail = '';
+  try {
+    const data = await res.clone().json();
+    detail = data.error || data.mensaje || '';
+  } catch (_) {}
+  console.info('[Sync]', fallbackMessage, detail || `HTTP ${res.status}`);
+  return null;
+}
+
 async function obtenerSesionActual() {
   const user = obtenerUsuarioLocal();
   if (user) {
@@ -526,7 +541,34 @@ function normalizarUsuarioSupabase(user) {
 
 async function verificarUsuarioEnTabla() {
   const user = obtenerUsuarioLocal();
-  return user;
+  const userId = obtenerIdUsuarioLocal(user);
+  if (!user || !userId) return user;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/usuarios/${userId}/roles`);
+    if (!res.ok) {
+      console.info('[Auth] No se pudo verificar el usuario local en backend.');
+      return user;
+    }
+
+    const data = await res.json();
+    if (data.exists === false) {
+      console.info('[Auth] Sesión local descartada porque el usuario no existe en backend.');
+      localStorage.removeItem('much_google_user');
+      sessionStorage.removeItem('much_current_attempt_id');
+      return null;
+    }
+
+    const verifiedUser = {
+      ...user,
+      roles: Array.isArray(data.roles) && data.roles.length ? data.roles : (user.roles || ['usuario'])
+    };
+    localStorage.setItem('much_google_user', JSON.stringify(verifiedUser));
+    return verifiedUser;
+  } catch (error) {
+    console.info('[Auth] No se pudo verificar el usuario local en backend.', error.message);
+    return user;
+  }
 }
 
 // Consultar estaciones activas
@@ -558,7 +600,8 @@ async function guardarProgresoUsuario(estacionId, extra = {}) {
   asegurarUbicacionVigente();
   await asegurarJuegoPermitido();
   const user = obtenerUsuarioLocal();
-  if (!user) throw new Error('No hay usuario autenticado en local.');
+  const userId = obtenerIdUsuarioLocal(user);
+  if (!userId) return null;
 
   const puntaje = Number(extra.puntaje || 0);
   const aciertos = Number(extra.aciertos || 0);
@@ -570,10 +613,10 @@ async function guardarProgresoUsuario(estacionId, extra = {}) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-user-id': String(user.id)
+        'x-user-id': String(userId)
       },
       body: JSON.stringify({
-        id_usuario: user.id,
+        id_usuario: userId,
         id_estacion: Number(estacionId),
         puntaje,
         aciertos,
@@ -583,8 +626,7 @@ async function guardarProgresoUsuario(estacionId, extra = {}) {
     });
 
     if (!res.ok) {
-      await manejarRespuestaBloqueoJuego(res);
-      throw new Error('Error en el backend al guardar progreso.');
+      return await manejarFalloSync(res, 'No se pudo sincronizar progreso remoto.');
     }
     const data = await res.json();
     const progresoGuardado = data.progreso || {};
@@ -603,8 +645,9 @@ async function guardarProgresoUsuario(estacionId, extra = {}) {
     }
     return data.progreso;
   } catch (error) {
-    console.error('Error en guardarProgresoUsuario:', error.message);
-    throw error;
+    if (error.code === 'usuario_bloqueado') throw error;
+    console.info('[Sync] No se pudo sincronizar progreso remoto.', error.message);
+    return null;
   }
 }
 
@@ -613,7 +656,8 @@ async function inicializarProgresoUsuario(estacionId) {
   asegurarUbicacionVigente();
   await asegurarJuegoPermitido();
   const user = obtenerUsuarioLocal();
-  if (!user) return null;
+  const userId = obtenerIdUsuarioLocal(user);
+  if (!userId) return null;
 
   // Limpiar el estado de completado en el almacenamiento local al iniciar la estación
   try {
@@ -627,22 +671,22 @@ async function inicializarProgresoUsuario(estacionId) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-user-id': String(user.id)
+        'x-user-id': String(userId)
       },
       body: JSON.stringify({
-        id_usuario: user.id,
+        id_usuario: userId,
         id_estacion: Number(estacionId)
       })
     });
 
     if (!res.ok) {
-      await manejarRespuestaBloqueoJuego(res);
-      throw new Error('Error al inicializar progreso.');
+      return await manejarFalloSync(res, 'No se pudo inicializar progreso remoto.');
     }
     return await res.json();
   } catch (error) {
-    console.error('Error en inicializarProgresoUsuario:', error.message);
-    throw error;
+    if (error.code === 'usuario_bloqueado') throw error;
+    console.info('[Sync] No se pudo inicializar progreso remoto.', error.message);
+    return null;
   }
 }
 
@@ -684,17 +728,18 @@ async function guardarIntentoEstacion(estacionId, intento = {}) {
   asegurarUbicacionVigente();
   await asegurarJuegoPermitido();
   const user = obtenerUsuarioLocal();
-  if (!user) throw new Error('No hay usuario autenticado en local.');
+  const userId = obtenerIdUsuarioLocal(user);
+  if (!userId) return null;
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/intentos`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-user-id': String(user.id)
+        'x-user-id': String(userId)
       },
       body: JSON.stringify({
-        id_usuario: user.id,
+        id_usuario: userId,
         id_estacion: Number(estacionId),
         puntaje: Number(intento.puntaje || 0),
         aciertos: Number(intento.aciertos || 0),
@@ -704,8 +749,7 @@ async function guardarIntentoEstacion(estacionId, intento = {}) {
     });
 
     if (!res.ok) {
-      await manejarRespuestaBloqueoJuego(res);
-      throw new Error('Error al registrar intento.');
+      return await manejarFalloSync(res, 'No se pudo registrar intento remoto.');
     }
     const data = await res.json();
     window.MuchLocalStorage?.recordStationAttempt?.(estacionId, {
@@ -715,8 +759,9 @@ async function guardarIntentoEstacion(estacionId, intento = {}) {
     }, { countAttempt: true });
     return data;
   } catch (error) {
-    console.error('Error en guardarIntentoEstacion:', error.message);
-    throw error;
+    if (error.code === 'usuario_bloqueado') throw error;
+    console.info('[Sync] No se pudo registrar intento remoto.', error.message);
+    return null;
   }
 }
 
@@ -725,14 +770,15 @@ async function actualizarIntentoEstacion(idIntento, intento = {}) {
   asegurarUbicacionVigente();
   await asegurarJuegoPermitido();
   const user = obtenerUsuarioLocal();
-  if (!user) throw new Error('No hay usuario autenticado en local.');
+  const userId = obtenerIdUsuarioLocal(user);
+  if (!userId) return null;
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/intentos/${idIntento}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'x-user-id': String(user.id)
+        'x-user-id': String(userId)
       },
       body: JSON.stringify({
         puntaje: Number(intento.puntaje || 0),
@@ -743,13 +789,13 @@ async function actualizarIntentoEstacion(idIntento, intento = {}) {
     });
 
     if (!res.ok) {
-      await manejarRespuestaBloqueoJuego(res);
-      throw new Error('Error al actualizar intento.');
+      return await manejarFalloSync(res, 'No se pudo actualizar intento remoto.');
     }
     return await res.json();
   } catch (error) {
-    console.error('Error en actualizarIntentoEstacion:', error.message);
-    throw error;
+    if (error.code === 'usuario_bloqueado') throw error;
+    console.info('[Sync] No se pudo actualizar intento remoto.', error.message);
+    return null;
   }
 }
 
@@ -758,28 +804,32 @@ async function guardarPartidaMinijuego(partida = {}) {
   asegurarUbicacionVigente();
   await asegurarJuegoPermitido();
   const user = obtenerUsuarioLocal();
-  if (!user) throw new Error('No hay usuario autenticado en local.');
+  const userId = obtenerIdUsuarioLocal(user);
+  if (!userId) return null;
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/partidas-minijuego`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-user-id': String(user.id)
+        'x-user-id': String(userId)
       },
       body: JSON.stringify({
-        id_usuario: user.id,
+        id_usuario: userId,
         id_estacion: 2, // Spinosaurio es la estación 2
         puntaje: Number(partida.puntaje || 0),
         aprobado: Boolean(partida.aprobado)
       })
     });
 
-    if (!res.ok) throw new Error('Error al registrar partida de minijuego.');
+    if (!res.ok) {
+      return await manejarFalloSync(res, 'No se pudo registrar partida remota.');
+    }
     return await res.json();
   } catch (error) {
-    console.error('Error en guardarPartidaMinijuego:', error.message);
-    throw error;
+    if (error.code === 'usuario_bloqueado') throw error;
+    console.info('[Sync] No se pudo registrar partida remota.', error.message);
+    return null;
   }
 }
 
@@ -788,18 +838,19 @@ async function guardarRespuestaUsuario(idIntento, estacionId, preguntaTexto, res
   asegurarUbicacionVigente();
   await asegurarJuegoPermitido();
   const user = obtenerUsuarioLocal();
-  if (!user) return null;
+  const userId = obtenerIdUsuarioLocal(user);
+  if (!userId) return null;
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/respuestas-usuario`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-user-id': String(user.id)
+        'x-user-id': String(userId)
       },
       body: JSON.stringify({
         id_intento: Number(idIntento),
-        id_usuario: user.id,
+        id_usuario: userId,
         id_estacion: Number(estacionId),
         pregunta_texto: preguntaTexto,
         respuesta_texto: respuestaTexto,
@@ -807,11 +858,14 @@ async function guardarRespuestaUsuario(idIntento, estacionId, preguntaTexto, res
       })
     });
 
-    if (!res.ok) throw new Error('Error al guardar respuesta del usuario.');
+    if (!res.ok) {
+      return await manejarFalloSync(res, 'No se pudo guardar respuesta remota.');
+    }
     return await res.json();
   } catch (error) {
-    console.error('Error en guardarRespuestaUsuario:', error.message);
-    throw error;
+    if (error.code === 'usuario_bloqueado') throw error;
+    console.info('[Sync] No se pudo guardar respuesta remota.', error.message);
+    return null;
   }
 }
 
@@ -820,17 +874,18 @@ async function generarBoletoFinal(reclamar = false) {
   asegurarUbicacionVigente();
   await asegurarJuegoPermitido();
   const user = obtenerUsuarioLocal();
-  if (!user) throw new Error('No hay usuario autenticado.');
+  const userId = obtenerIdUsuarioLocal(user);
+  if (!userId) throw new Error('No hay usuario autenticado.');
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/boletos`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-user-id': String(user.id)
+        'x-user-id': String(userId)
       },
       body: JSON.stringify({
-        id_usuario: user.id,
+        id_usuario: userId,
         reclamar: Boolean(reclamar)
       })
     });

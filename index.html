@@ -10800,6 +10800,7 @@
     }
   </style>
   <script src="modules/modules_html.js"></script>
+  <script type="module" src="./supabase-client.js"></script>
 </head>
 
 <body class="splash-active">
@@ -11466,6 +11467,7 @@
           // Lógica local para Invitados
           const localCompleted = getCompletedStations();
           const estaciones = [
+            { id: 1, nombre: 'Entrada MUCH', puntos_base: 10, key: '1', detalle: '10 preguntas' },
             { id: 2, nombre: 'Espinosaurio', puntos_base: 15, key: '2', detalle: '15 saltos' },
             { id: 3, nombre: 'Biodiversidad y Conocimiento', puntos_base: 10, key: '3', detalle: '10 preguntas' },
             { id: 4, nombre: 'Sala de Energía', puntos_base: 10, key: '4', detalle: '10 preguntas' },
@@ -11885,7 +11887,14 @@
         }
 
         try {
-          await window.verificarUsuarioEnTabla();
+          const usuarioVerificado = await window.verificarUsuarioEnTabla();
+          if (!usuarioVerificado) {
+            googleUser = null;
+            loginNote.innerText = 'Usa Google para comenzar tu aventura.';
+            return null;
+          }
+          googleUser = window.normalizarUsuarioSupabase(usuarioVerificado);
+          localStorage.setItem('much_google_user', JSON.stringify(googleUser));
           // Sincronizar el progreso de la BD después de verificar el usuario
           await actualizarVisibilidadMenuRoles();
           if (redirectInternalUserIfNeeded(googleUser)) return googleUser;
@@ -12118,6 +12127,13 @@
           const res = await fetch(`${API_BASE_URL}/api/usuarios/${userId}/roles`);
           if (!res.ok) throw new Error('Error al consultar roles');
           const data = await res.json();
+          if (data.exists === false) {
+            localStorage.removeItem('much_google_user');
+            googleUser = null;
+            if (adminBtn) adminBtn.style.setProperty('display', 'none', 'important');
+            if (taquillaBtn) taquillaBtn.style.setProperty('display', 'none', 'important');
+            return;
+          }
           const roles = data.roles || [];
           const userWithRoles = { ...user, roles };
           if (isLocalAdmin && !roles.includes('admin')) userWithRoles.roles = [...roles, 'admin'];
@@ -13067,7 +13083,7 @@
         '6': { x: 42, y: 66 }
       };
 
-      const REQUIRED_REWARD_STATIONS = ['2', '3', '4', '5', '6'];
+      const REQUIRED_REWARD_STATIONS = ['1', '2', '3', '4', '5', '6'];
       const MISSION_REWARD_CHOICE_KEY = 'much_mission_reward_ticket_choice';
       const MISSION_REWARD_CLAIMED_KEY = 'much_mission_reward_claimed';
       const MISSION_TICKET_OPTIONS = {
@@ -13960,7 +13976,25 @@
     const SUPABASE_ANON_KEY =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3Z2Flb3JzeW1maXNwbXRzYnV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzODcyODUsImV4cCI6MjA3Nzk2MzI4NX0.FThZIIpz3daC9u8QaKyRTpxUeW0v4QHs5sHX2s1U1eo';
 
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    const supabaseCompat = window.supabase || {
+      createClient: () => supabaseCompat,
+      auth: {
+        getSession: async () => ({ data: { session: null }, error: null }),
+        signOut: async () => ({ error: null })
+      },
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            single: async () => ({ data: null, error: null }),
+            maybeSingle: async () => ({ data: null, error: null })
+          }),
+          order: () => ({ limit: async () => ({ data: [], error: null }) })
+        })
+      })
+    };
+    window.supabase = supabaseCompat;
+
+    const sb = supabaseCompat.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
         persistSession: false,
         autoRefreshToken: false,
@@ -13968,7 +14002,7 @@
       }
     });
 
-    const sbAuth = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    const sbAuth = supabaseCompat.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,

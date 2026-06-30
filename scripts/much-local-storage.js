@@ -36,7 +36,7 @@
     '6': { id: '6', nombre: 'Sbeel', puntos: 10 }
   };
 
-  const REQUIRED_REWARD_STATIONS = ['2', '3', '4', '5', '6'];
+  const REQUIRED_REWARD_STATIONS = ['1', '2', '3', '4', '5', '6'];
 
   function storageAvailable() {
     try {

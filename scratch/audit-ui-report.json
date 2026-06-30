@@ -1,0 +1,1136 @@
+{
+  "baseUrl": "http://localhost:3000",
+  "chromeExecutable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+  "auditUserId": 84,
+  "auditAdminId": 85,
+  "auditTicketFolio": "HU49L2",
+  "questionFiles": [
+    {
+      "file": "entrada-much/preguntas.json",
+      "count": 12,
+      "invalid": [],
+      "correctIndexHistogram": {
+        "0": 4,
+        "1": 4,
+        "2": 3,
+        "3": 1
+      }
+    },
+    {
+      "file": "sala_energia/preguntas.json",
+      "count": 386,
+      "invalid": [],
+      "correctIndexHistogram": {
+        "0": 195,
+        "1": 173,
+        "2": 16,
+        "3": 2
+      }
+    },
+    {
+      "file": "Sala_Desarrollo_Sustentable/preguntas.json",
+      "count": 148,
+      "invalid": [],
+      "correctIndexHistogram": {
+        "0": 48,
+        "1": 86,
+        "2": 11,
+        "3": 3
+      }
+    },
+    {
+      "file": "SALA-Biodiversidad-y-Conocimiento/preguntas.json",
+      "count": 623,
+      "invalid": [],
+      "correctIndexHistogram": {
+        "0": 564,
+        "1": 30,
+        "2": 29
+      }
+    },
+    {
+      "file": "Juego_Spinosaurio/quiz.json",
+      "count": 1,
+      "invalid": [],
+      "correctIndexHistogram": {
+        "0": 1
+      }
+    }
+  ],
+  "mainFlow": {
+    "name": "main-flow",
+    "console": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      }
+    ],
+    "pageErrors": [],
+    "requestFailed": [
+      {
+        "url": "https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap",
+        "failure": "net::ERR_ABORTED"
+      }
+    ],
+    "badResponses": [],
+    "prepState": {
+      "activePrep": true,
+      "markerCount": 6,
+      "hasStartButton": true,
+      "completedChecksInitiallyVisible": false,
+      "rewardVisibleWithoutCompletion": false
+    },
+    "stationResults": [
+      {
+        "stationId": "1",
+        "rulesTitle": "Estación 1: Taquilla",
+        "url": "http://localhost:3000/entrada-much/index.html?from=portada&sala=entrada",
+        "expectedPath": "/entrada-much/index.html",
+        "ok": true
+      },
+      {
+        "stationId": "2",
+        "rulesTitle": "Mision Espinosaurio",
+        "url": "http://localhost:3000/Juego_Spinosaurio/index.html",
+        "expectedPath": "/Juego_Spinosaurio/index.html",
+        "ok": true
+      },
+      {
+        "stationId": "3",
+        "rulesTitle": "Sala A - Biodiversidad",
+        "url": "http://localhost:3000/SALA-Biodiversidad-y-Conocimiento/index.html?from=portada&sala=biodiversidad",
+        "expectedPath": "/SALA-Biodiversidad-y-Conocimiento/index.html",
+        "ok": true
+      },
+      {
+        "stationId": "4",
+        "rulesTitle": "Sala B de Energia",
+        "url": "http://localhost:3000/sala_energia/index.html?from=portada&sala=energia",
+        "expectedPath": "/sala_energia/index.html",
+        "ok": true
+      },
+      {
+        "stationId": "5",
+        "rulesTitle": "Sala C - Desarrollo Sustentable",
+        "url": "http://localhost:3000/Sala_Desarrollo_Sustentable/index.html?from=portada&sala=desarrollo-sustentable",
+        "expectedPath": "/Sala_Desarrollo_Sustentable/index.html",
+        "ok": true
+      },
+      {
+        "stationId": "6",
+        "rulesTitle": "Mision Sbeel",
+        "url": "http://localhost:3000/Sbeel_Dinosaurios/index.html",
+        "expectedPath": "/Sbeel_Dinosaurios/index.html",
+        "ok": true
+      }
+    ]
+  },
+  "sbeel": {
+    "name": "sbeel-puzzle",
+    "console": [],
+    "pageErrors": [],
+    "requestFailed": [],
+    "badResponses": [],
+    "before": {
+      "pieces": 9,
+      "solved": false,
+      "fixed": 3
+    },
+    "afterReset": {
+      "pieces": 9,
+      "solved": false,
+      "fixed": 0
+    },
+    "firstChanged": true
+  },
+  "spino": {
+    "name": "spino-game",
+    "console": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      }
+    ],
+    "pageErrors": [],
+    "requestFailed": [],
+    "badResponses": [],
+    "portadaVisible": true,
+    "started": {
+      "portadaVisible": false,
+      "score": "0",
+      "retryVisible": false
+    },
+    "gameOverVisible": "grid",
+    "retrySameUrl": true,
+    "afterRetry": {
+      "gameOver": "none",
+      "score": "0"
+    }
+  },
+  "smoke": [
+    {
+      "page": "home",
+      "viewport": "mobile",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Misión MUCH",
+        "url": "http://localhost:3000/index.html",
+        "bodyClass": "splash-active",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": []
+      }
+    },
+    {
+      "page": "entrada",
+      "viewport": "mobile",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "MUCH • Quiz Interactivo",
+        "url": "http://localhost:3000/entrada-much/index.html?from=portada&sala=entrada",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "VOLVER\nRegresar",
+          "🔹\nGuaya",
+          "🔹\nAguacate",
+          "🔹\nRoble",
+          "🔹\nMango"
+        ]
+      }
+    },
+    {
+      "page": "spinosaurio",
+      "viewport": "mobile",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Juego Spinosaurio",
+        "url": "http://localhost:3000/Juego_Spinosaurio/index.html",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "Jugar ahora 🦕",
+          "Regresar al mapa"
+        ]
+      }
+    },
+    {
+      "page": "biodiversidad",
+      "viewport": "mobile",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "MUCH • Quiz Interactivo",
+        "url": "http://localhost:3000/SALA-Biodiversidad-y-Conocimiento/index.html?from=portada&sala=biodiversidad",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "VOLVER\nRegresar",
+          "🔹\nTuxtla",
+          "🔹\nOcozocoautla",
+          "🔹\nTapachula",
+          "🔹\nSan Cristóbal"
+        ]
+      }
+    },
+    {
+      "page": "energia",
+      "viewport": "mobile",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "MUCH • Quiz Interactivo",
+        "url": "http://localhost:3000/sala_energia/index.html?from=portada&sala=energia",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "VOLVER\nRegresar",
+          "🔹\n30–40 %",
+          "🔹\n10 %",
+          "🔹\n5 %",
+          "🔹\n90 %"
+        ]
+      }
+    },
+    {
+      "page": "desarrollo",
+      "viewport": "mobile",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "MUCH • Quiz Interactivo",
+        "url": "http://localhost:3000/Sala_Desarrollo_Sustentable/index.html?from=portada&sala=desarrollo-sustentable",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "VOLVER\nRegresar",
+          "🔹\nONG",
+          "🔹\nGobernantes",
+          "🔹\nCiudadanos",
+          "🔹\nEmpresas"
+        ]
+      }
+    },
+    {
+      "page": "sbeel",
+      "viewport": "mobile",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Sbeel Dinosaurios - Rompecabezas",
+        "url": "http://localhost:3000/Sbeel_Dinosaurios/index.html",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "Volver",
+          "Sauropodo de Sbeel, pieza 2",
+          "Sauropodo de Sbeel, pieza 6",
+          "Sauropodo de Sbeel, pieza 3",
+          "Sauropodo de Sbeel, pieza 1",
+          "Sauropodo de Sbeel, pieza 4",
+          "Sauropodo de Sbeel, pieza 8",
+          "Sauropodo de Sbeel, pieza 7",
+          "Sauropodo de Sbeel, pieza 9",
+          "Sauropodo de Sbeel, pieza 5",
+          "MEZCLAR PIEZAS"
+        ]
+      }
+    },
+    {
+      "page": "registro-boleto",
+      "viewport": "mobile",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Boleto MUCH · Museo Chiapas",
+        "url": "http://localhost:3000/Boleto_Digital/boleto.html?folio=HU49L2&qr_token=ea80f32945dff0500feeae568313e009&estado=activo&valido_hasta=2026-07-07T14%3A55%3A45.000Z&nombre=Beneficiario+Auditoria&correo=boleto.auditoria.1782831345537%40example.com&acceso=MUCH&premio=MUCH&destino=MUCH&ubicacion=MUCH&lugar=MUCH",
+        "bodyClass": "much-ticket streamlined-ticket",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "📥 Descargar boleto",
+          "🏠 Volver al mapa",
+          "🚪 Salir"
+        ]
+      }
+    },
+    {
+      "page": "boleto",
+      "viewport": "mobile",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Boleto MUCH · Museo Chiapas",
+        "url": "http://localhost:3000/Boleto_Digital/boleto.html",
+        "bodyClass": "much-ticket streamlined-ticket",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "📥 Descargar boleto",
+          "🏠 Volver al mapa",
+          "🚪 Salir"
+        ]
+      }
+    },
+    {
+      "page": "admin",
+      "viewport": "mobile",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Misión MUCH - Panel Administrativo",
+        "url": "http://localhost:3000/ADMINISTRADOR.html",
+        "bodyClass": "",
+        "offscreen": [
+          {
+            "label": "×",
+            "tag": "button",
+            "left": -52,
+            "top": 30,
+            "right": -25,
+            "bottom": 62
+          },
+          {
+            "label": "Cerrar sesión 🚪",
+            "tag": "button",
+            "left": -264,
+            "top": 779,
+            "right": -17,
+            "bottom": 820
+          }
+        ],
+        "textOverflow": [],
+        "buttons": [
+          "×",
+          "Cerrar sesión 🚪",
+          "☰",
+          "🔄 Actualizar",
+          "Desde dia",
+          "Desde mes",
+          "Desde año",
+          "📅",
+          "Calendario Desde",
+          "Hasta dia",
+          "Hasta mes",
+          "Hasta año",
+          "📅",
+          "Calendario Hasta",
+          "Aplicar",
+          "Hoy"
+        ]
+      }
+    },
+    {
+      "page": "taquilla",
+      "viewport": "mobile",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Misión MUCH - Panel Administrativo",
+        "url": "http://localhost:3000/ADMINISTRADOR.html",
+        "bodyClass": "",
+        "offscreen": [
+          {
+            "label": "×",
+            "tag": "button",
+            "left": -52,
+            "top": 30,
+            "right": -25,
+            "bottom": 62
+          },
+          {
+            "label": "Cerrar sesión 🚪",
+            "tag": "button",
+            "left": -264,
+            "top": 779,
+            "right": -17,
+            "bottom": 820
+          }
+        ],
+        "textOverflow": [],
+        "buttons": [
+          "×",
+          "Cerrar sesión 🚪",
+          "☰",
+          "🔄 Actualizar",
+          "Desde dia",
+          "Desde mes",
+          "Desde año",
+          "📅",
+          "Calendario Desde",
+          "Hasta dia",
+          "Hasta mes",
+          "Hasta año",
+          "📅",
+          "Calendario Hasta",
+          "Aplicar",
+          "Hoy"
+        ]
+      }
+    },
+    {
+      "page": "home",
+      "viewport": "tablet",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Misión MUCH",
+        "url": "http://localhost:3000/index.html",
+        "bodyClass": "splash-active",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": []
+      }
+    },
+    {
+      "page": "entrada",
+      "viewport": "tablet",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "MUCH • Quiz Interactivo",
+        "url": "http://localhost:3000/entrada-much/index.html?from=portada&sala=entrada",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "VOLVER\nRegresar",
+          "🔹\n16",
+          "🔹\n5",
+          "🔹\n12",
+          "🔹\n10"
+        ]
+      }
+    },
+    {
+      "page": "spinosaurio",
+      "viewport": "tablet",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Juego Spinosaurio",
+        "url": "http://localhost:3000/Juego_Spinosaurio/index.html",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "Jugar ahora 🦕",
+          "Regresar al mapa"
+        ]
+      }
+    },
+    {
+      "page": "biodiversidad",
+      "viewport": "tablet",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "MUCH • Quiz Interactivo",
+        "url": "http://localhost:3000/SALA-Biodiversidad-y-Conocimiento/index.html?from=portada&sala=biodiversidad",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "VOLVER\nRegresar",
+          "🔹\nEducación",
+          "🔹\nTurismo responsable",
+          "🔹\nExplotación excesiva",
+          "🔹\nArte"
+        ]
+      }
+    },
+    {
+      "page": "energia",
+      "viewport": "tablet",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "MUCH • Quiz Interactivo",
+        "url": "http://localhost:3000/sala_energia/index.html?from=portada&sala=energia",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "VOLVER\nRegresar",
+          "🔹\nAhorrar agua y energía",
+          "🔹\nQuemar basura",
+          "🔹\nUsar más plásticos",
+          "🔹\nDesperdiciar comida"
+        ]
+      }
+    },
+    {
+      "page": "desarrollo",
+      "viewport": "tablet",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "MUCH • Quiz Interactivo",
+        "url": "http://localhost:3000/Sala_Desarrollo_Sustentable/index.html?from=portada&sala=desarrollo-sustentable",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "VOLVER\nRegresar",
+          "🔹\nDesierto",
+          "🔹\nSelva Lacandona",
+          "🔹\nTundra",
+          "🔹\nSabana"
+        ]
+      }
+    },
+    {
+      "page": "sbeel",
+      "viewport": "tablet",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Sbeel Dinosaurios - Rompecabezas",
+        "url": "http://localhost:3000/Sbeel_Dinosaurios/index.html",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "Volver",
+          "Triceratops de Sbeel, pieza 5",
+          "Triceratops de Sbeel, pieza 2",
+          "Triceratops de Sbeel, pieza 1",
+          "Triceratops de Sbeel, pieza 3",
+          "Triceratops de Sbeel, pieza 7",
+          "Triceratops de Sbeel, pieza 9",
+          "Triceratops de Sbeel, pieza 6",
+          "Triceratops de Sbeel, pieza 8",
+          "Triceratops de Sbeel, pieza 4",
+          "MEZCLAR PIEZAS"
+        ]
+      }
+    },
+    {
+      "page": "registro-boleto",
+      "viewport": "tablet",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Boleto MUCH · Museo Chiapas",
+        "url": "http://localhost:3000/Boleto_Digital/boleto.html?folio=HU49L2&qr_token=ea80f32945dff0500feeae568313e009&estado=activo&valido_hasta=2026-07-07T14%3A55%3A45.000Z&nombre=Beneficiario+Auditoria&correo=boleto.auditoria.1782831345537%40example.com&acceso=MUCH&premio=MUCH&destino=MUCH&ubicacion=MUCH&lugar=MUCH",
+        "bodyClass": "much-ticket streamlined-ticket",
+        "offscreen": [
+          {
+            "label": "📥 Descargar boleto",
+            "tag": "button",
+            "left": 94,
+            "top": 1049,
+            "right": 674,
+            "bottom": 1097
+          },
+          {
+            "label": "🏠 Volver al mapa",
+            "tag": "a",
+            "left": 94,
+            "top": 1109,
+            "right": 674,
+            "bottom": 1159
+          },
+          {
+            "label": "🚪 Salir",
+            "tag": "button",
+            "left": 94,
+            "top": 1171,
+            "right": 674,
+            "bottom": 1221
+          }
+        ],
+        "textOverflow": [],
+        "buttons": [
+          "📥 Descargar boleto",
+          "🏠 Volver al mapa",
+          "🚪 Salir"
+        ]
+      }
+    },
+    {
+      "page": "boleto",
+      "viewport": "tablet",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Boleto MUCH · Museo Chiapas",
+        "url": "http://localhost:3000/Boleto_Digital/boleto.html",
+        "bodyClass": "much-ticket streamlined-ticket",
+        "offscreen": [
+          {
+            "label": "📥 Descargar boleto",
+            "tag": "button",
+            "left": 94,
+            "top": 1049,
+            "right": 674,
+            "bottom": 1097
+          },
+          {
+            "label": "🏠 Volver al mapa",
+            "tag": "a",
+            "left": 94,
+            "top": 1109,
+            "right": 674,
+            "bottom": 1159
+          },
+          {
+            "label": "🚪 Salir",
+            "tag": "button",
+            "left": 94,
+            "top": 1171,
+            "right": 674,
+            "bottom": 1221
+          }
+        ],
+        "textOverflow": [],
+        "buttons": [
+          "📥 Descargar boleto",
+          "🏠 Volver al mapa",
+          "🚪 Salir"
+        ]
+      }
+    },
+    {
+      "page": "admin",
+      "viewport": "tablet",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Misión MUCH - Panel Administrativo",
+        "url": "http://localhost:3000/ADMINISTRADOR.html",
+        "bodyClass": "",
+        "offscreen": [
+          {
+            "label": "×",
+            "tag": "button",
+            "left": -52,
+            "top": 30,
+            "right": -25,
+            "bottom": 62
+          },
+          {
+            "label": "Cerrar sesión 🚪",
+            "tag": "button",
+            "left": -264,
+            "top": 959,
+            "right": -17,
+            "bottom": 1000
+          }
+        ],
+        "textOverflow": [],
+        "buttons": [
+          "×",
+          "Cerrar sesión 🚪",
+          "☰",
+          "🔄 Actualizar",
+          "Desde dia",
+          "Desde mes",
+          "Desde año",
+          "📅",
+          "Calendario Desde",
+          "Hasta dia",
+          "Hasta mes",
+          "Hasta año",
+          "📅",
+          "Calendario Hasta",
+          "Aplicar",
+          "Hoy"
+        ]
+      }
+    },
+    {
+      "page": "taquilla",
+      "viewport": "tablet",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Misión MUCH - Panel Administrativo",
+        "url": "http://localhost:3000/ADMINISTRADOR.html",
+        "bodyClass": "",
+        "offscreen": [
+          {
+            "label": "×",
+            "tag": "button",
+            "left": -52,
+            "top": 30,
+            "right": -25,
+            "bottom": 62
+          },
+          {
+            "label": "Cerrar sesión 🚪",
+            "tag": "button",
+            "left": -264,
+            "top": 959,
+            "right": -17,
+            "bottom": 1000
+          }
+        ],
+        "textOverflow": [],
+        "buttons": [
+          "×",
+          "Cerrar sesión 🚪",
+          "☰",
+          "🔄 Actualizar",
+          "Desde dia",
+          "Desde mes",
+          "Desde año",
+          "📅",
+          "Calendario Desde",
+          "Hasta dia",
+          "Hasta mes",
+          "Hasta año",
+          "📅",
+          "Calendario Hasta",
+          "Aplicar",
+          "Hoy"
+        ]
+      }
+    },
+    {
+      "page": "home",
+      "viewport": "desktop",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Misión MUCH",
+        "url": "http://localhost:3000/index.html",
+        "bodyClass": "splash-active",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": []
+      }
+    },
+    {
+      "page": "entrada",
+      "viewport": "desktop",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "MUCH • Quiz Interactivo",
+        "url": "http://localhost:3000/entrada-much/index.html?from=portada&sala=entrada",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "VOLVER\nRegresar",
+          "🔹\nZooMAT (Zoológico Miguel Álvarez del Toro)",
+          "🔹\nZoológico de Chapultepec",
+          "🔹\nZoo de Tuxtla",
+          "🔹\nZoológico de Guadalajara"
+        ]
+      }
+    },
+    {
+      "page": "spinosaurio",
+      "viewport": "desktop",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Juego Spinosaurio",
+        "url": "http://localhost:3000/Juego_Spinosaurio/index.html",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "Jugar ahora 🦕",
+          "Regresar al mapa",
+          "Salir"
+        ]
+      }
+    },
+    {
+      "page": "biodiversidad",
+      "viewport": "desktop",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "MUCH • Quiz Interactivo",
+        "url": "http://localhost:3000/SALA-Biodiversidad-y-Conocimiento/index.html?from=portada&sala=biodiversidad",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "VOLVER\nRegresar",
+          "🔹\n5",
+          "🔹\n3",
+          "🔹\n10",
+          "🔹\n1"
+        ]
+      }
+    },
+    {
+      "page": "energia",
+      "viewport": "desktop",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "MUCH • Quiz Interactivo",
+        "url": "http://localhost:3000/sala_energia/index.html?from=portada&sala=energia",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "VOLVER\nRegresar",
+          "🔹\nPolea",
+          "🔹\nPalanca",
+          "🔹\nRueda",
+          "🔹\nTornillo"
+        ]
+      }
+    },
+    {
+      "page": "desarrollo",
+      "viewport": "desktop",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "MUCH • Quiz Interactivo",
+        "url": "http://localhost:3000/Sala_Desarrollo_Sustentable/index.html?from=portada&sala=desarrollo-sustentable",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "VOLVER\nRegresar",
+          "🔹\nHidrógeno y helio",
+          "🔹\nNitrógeno y oxígeno",
+          "🔹\nOzono y argón",
+          "🔹\nDióxido de carbono y metano"
+        ]
+      }
+    },
+    {
+      "page": "sbeel",
+      "viewport": "desktop",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Sbeel Dinosaurios - Rompecabezas",
+        "url": "http://localhost:3000/Sbeel_Dinosaurios/index.html",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "Volver",
+          "Sauropodo de Sbeel, pieza 2",
+          "Sauropodo de Sbeel, pieza 8",
+          "Sauropodo de Sbeel, pieza 1",
+          "Sauropodo de Sbeel, pieza 3",
+          "Sauropodo de Sbeel, pieza 6",
+          "Sauropodo de Sbeel, pieza 5",
+          "Sauropodo de Sbeel, pieza 9",
+          "Sauropodo de Sbeel, pieza 7",
+          "Sauropodo de Sbeel, pieza 4",
+          "MEZCLAR PIEZAS"
+        ]
+      }
+    },
+    {
+      "page": "registro-boleto",
+      "viewport": "desktop",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Boleto MUCH · Museo Chiapas",
+        "url": "http://localhost:3000/Boleto_Digital/boleto.html?folio=HU49L2&qr_token=ea80f32945dff0500feeae568313e009&estado=activo&valido_hasta=2026-07-07T14%3A55%3A45.000Z&nombre=Beneficiario+Auditoria&correo=boleto.auditoria.1782831345537%40example.com&acceso=MUCH&premio=MUCH&destino=MUCH&ubicacion=MUCH&lugar=MUCH",
+        "bodyClass": "much-ticket streamlined-ticket",
+        "offscreen": [
+          {
+            "label": "📥 Descargar boleto",
+            "tag": "button",
+            "left": 393,
+            "top": 1052,
+            "right": 973,
+            "bottom": 1100
+          },
+          {
+            "label": "🏠 Volver al mapa",
+            "tag": "a",
+            "left": 393,
+            "top": 1112,
+            "right": 973,
+            "bottom": 1162
+          },
+          {
+            "label": "🚪 Salir",
+            "tag": "button",
+            "left": 393,
+            "top": 1174,
+            "right": 973,
+            "bottom": 1224
+          }
+        ],
+        "textOverflow": [],
+        "buttons": [
+          "📥 Descargar boleto",
+          "🏠 Volver al mapa",
+          "🚪 Salir"
+        ]
+      }
+    },
+    {
+      "page": "boleto",
+      "viewport": "desktop",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Boleto MUCH · Museo Chiapas",
+        "url": "http://localhost:3000/Boleto_Digital/boleto.html",
+        "bodyClass": "much-ticket streamlined-ticket",
+        "offscreen": [
+          {
+            "label": "📥 Descargar boleto",
+            "tag": "button",
+            "left": 393,
+            "top": 1052,
+            "right": 973,
+            "bottom": 1100
+          },
+          {
+            "label": "🏠 Volver al mapa",
+            "tag": "a",
+            "left": 393,
+            "top": 1112,
+            "right": 973,
+            "bottom": 1162
+          },
+          {
+            "label": "🚪 Salir",
+            "tag": "button",
+            "left": 393,
+            "top": 1174,
+            "right": 973,
+            "bottom": 1224
+          }
+        ],
+        "textOverflow": [],
+        "buttons": [
+          "📥 Descargar boleto",
+          "🏠 Volver al mapa",
+          "🚪 Salir"
+        ]
+      }
+    },
+    {
+      "page": "admin",
+      "viewport": "desktop",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Misión MUCH - Panel Administrativo",
+        "url": "http://localhost:3000/ADMINISTRADOR.html",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "Cerrar sesión 🚪",
+          "🔄 Actualizar",
+          "Desde dia",
+          "Desde mes",
+          "Desde año",
+          "📅",
+          "Calendario Desde",
+          "Hasta dia",
+          "Hasta mes",
+          "Hasta año",
+          "📅",
+          "Calendario Hasta",
+          "Aplicar",
+          "Hoy"
+        ]
+      }
+    },
+    {
+      "page": "taquilla",
+      "viewport": "desktop",
+      "console": [],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "layout": {
+        "title": "Misión MUCH - Panel Administrativo",
+        "url": "http://localhost:3000/ADMINISTRADOR.html",
+        "bodyClass": "",
+        "offscreen": [],
+        "textOverflow": [],
+        "buttons": [
+          "Cerrar sesión 🚪",
+          "🔄 Actualizar",
+          "Desde dia",
+          "Desde mes",
+          "Desde año",
+          "📅",
+          "Calendario Desde",
+          "Hasta dia",
+          "Hasta mes",
+          "Hasta año",
+          "📅",
+          "Calendario Hasta",
+          "Aplicar",
+          "Hoy"
+        ]
+      }
+    }
+  ]
+}
