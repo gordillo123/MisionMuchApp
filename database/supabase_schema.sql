@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS public.intentos_estacion (
   errores INT DEFAULT 0,
   puntaje INT DEFAULT 0,
   aprobado BOOLEAN DEFAULT FALSE,
+  finalizado BOOLEAN DEFAULT FALSE,
   fecha_intento TIMESTAMPTZ DEFAULT NOW()
 );
 

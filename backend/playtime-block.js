@@ -50,6 +50,10 @@ function buildMensajeBloqueo(fechaPuedeVolver) {
   return `¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrás volver a jugar el ${formatFechaMX(fechaPuedeVolver)}.`;
 }
 
+function buildMensajeBloqueoIntentos(fechaPuedeVolver, estacionNombre = 'esta estacion') {
+  return `Has superado el limite de intentos en ${estacionNombre}.\nPodras volver a jugar el ${formatFechaMX(fechaPuedeVolver)}.\nRegresa en esa fecha para continuar tu mision cientifica.`;
+}
+
 function calcularFechaDesbloqueo(fechaBase, config) {
   const base = fechaBase instanceof Date ? new Date(fechaBase.getTime()) : new Date(fechaBase);
   if (Number.isNaN(base.getTime())) throw new Error('Fecha base inválida.');
@@ -77,6 +81,11 @@ function formatTiempoRestante(ms) {
 }
 
 function createPlaytimeBlockService(pool) {
+  async function ensureColumn(tableName, columnName, ddl) {
+    const [columns] = await pool.query(`SHOW COLUMNS FROM ${tableName} LIKE ?`, [columnName]);
+    if (columns.length === 0) await pool.query(ddl);
+  }
+
   async function ensureTables() {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS configuracion_juego (
@@ -129,6 +138,17 @@ function createPlaytimeBlockService(pool) {
         INDEX idx_premios_fecha_volver (fecha_puede_volver_jugar)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
+
+    await ensureColumn(
+      'premios',
+      'motivo_bloqueo',
+      'ALTER TABLE premios ADD COLUMN motivo_bloqueo VARCHAR(50) NULL AFTER unidad_bloqueo'
+    );
+    await ensureColumn(
+      'premios',
+      'detalle_bloqueo',
+      'ALTER TABLE premios ADD COLUMN detalle_bloqueo VARCHAR(255) NULL AFTER motivo_bloqueo'
+    );
 
     const [fechaFinalizacionColumn] = await pool.query(
       "SHOW COLUMNS FROM premios LIKE 'fecha_finalizacion'"
@@ -198,8 +218,8 @@ function createPlaytimeBlockService(pool) {
       `SELECT * FROM premios
        WHERE id_usuario = ?
          AND fecha_puede_volver_jugar IS NOT NULL
-         AND COALESCE(fecha_finalizacion, fecha_ganado) IS NOT NULL
-       ORDER BY COALESCE(fecha_finalizacion, fecha_ganado, created_at) DESC
+         AND COALESCE(fecha_reclamado, fecha_finalizacion, fecha_ganado) IS NOT NULL
+       ORDER BY COALESCE(fecha_reclamado, fecha_finalizacion, fecha_ganado, created_at) DESC
        LIMIT 1`,
       [idUsuario]
     );
@@ -223,6 +243,7 @@ function createPlaytimeBlockService(pool) {
       }
 
       await connection.query('DELETE FROM progreso_usuario WHERE id_usuario = ?', [idUsuario]);
+      await connection.query('DELETE FROM intentos_estacion WHERE id_usuario = ?', [idUsuario]);
       await connection.query(
         'UPDATE premios SET ciclo_reiniciado_at = CURRENT_TIMESTAMP WHERE id_premio = ?',
         [actual.id_premio]
@@ -246,8 +267,9 @@ function createPlaytimeBlockService(pool) {
     const config = await getConfig();
     const habilitado = { bloqueado: false, habilitado: true, config };
     let premio = await getUltimoPremioFinalizado(idUsuario);
+    const esBloqueoPorIntentos = premio?.motivo_bloqueo === 'intentos';
 
-    if (!config.bloqueo_activo) {
+    if (!config.bloqueo_activo && !esBloqueoPorIntentos) {
       if (!premio) return { ...habilitado, motivo: 'bloqueo_desactivado' };
       await pool.query(
         `UPDATE premios SET fecha_puede_volver_jugar = CURRENT_TIMESTAMP
@@ -282,16 +304,21 @@ function createPlaytimeBlockService(pool) {
     }
 
     const restanteMs = msRestantes(fechaPuedeVolver);
+    const motivoBloqueo = premio?.motivo_bloqueo || 'reclamo_boleto';
+    const mensaje = motivoBloqueo === 'intentos'
+      ? buildMensajeBloqueoIntentos(fechaPuedeVolver, premio.detalle_bloqueo || 'esta estacion')
+      : buildMensajeBloqueo(fechaPuedeVolver);
     return {
       bloqueado: true,
       habilitado: false,
       config,
       premio,
+      motivo_bloqueo: motivoBloqueo,
       fecha_puede_volver: fechaPuedeVolver.toISOString(),
       fecha_puede_volver_texto: formatFechaMX(fechaPuedeVolver),
       tiempo_restante: formatTiempoRestante(restanteMs),
       tiempo_restante_ms: restanteMs,
-      mensaje: buildMensajeBloqueo(fechaPuedeVolver)
+      mensaje
     };
   }
 
@@ -343,14 +370,10 @@ function createPlaytimeBlockService(pool) {
          SET id_boleto = COALESCE(id_boleto, ?),
              fecha_ganado = COALESCE(fecha_ganado, CURRENT_TIMESTAMP),
              fecha_finalizacion = COALESCE(fecha_finalizacion, CURRENT_TIMESTAMP),
-             fecha_puede_volver_jugar = COALESCE(
-               fecha_puede_volver_jugar,
-               CASE WHEN ? THEN DATE_ADD(CURRENT_TIMESTAMP, INTERVAL ? DAY) ELSE NULL END
-             ),
              cantidad_bloqueo = COALESCE(cantidad_bloqueo, ?),
              unidad_bloqueo = COALESCE(unidad_bloqueo, 'dias')
          WHERE id_premio = ?`,
-        [idBoleto, config.bloqueo_activo, config.cantidad, config.cantidad, premioPendiente.id_premio]
+        [idBoleto, config.cantidad, premioPendiente.id_premio]
       );
       const [[actualizado]] = await conn.query('SELECT * FROM premios WHERE id_premio = ?', [premioPendiente.id_premio]);
       return actualizado;
@@ -362,15 +385,13 @@ function createPlaytimeBlockService(pool) {
          fecha_puede_volver_jugar, cantidad_bloqueo, unidad_bloqueo)
        VALUES (
          ?, ?, ?, 'pendiente', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-         CASE WHEN ? THEN DATE_ADD(CURRENT_TIMESTAMP, INTERVAL ? DAY) ELSE NULL END,
+         NULL,
          ?, 'dias'
        )`,
       [
         idUsuario,
         participacion.id_participacion,
         idBoleto,
-        config.bloqueo_activo,
-        config.cantidad,
         config.cantidad
       ]
     );
@@ -395,20 +416,28 @@ function createPlaytimeBlockService(pool) {
       premio = await registrarGanado(idUsuario, idBoleto, conn);
     }
 
-    const fechaBaseDesbloqueo = premio.fecha_finalizacion || premio.fecha_ganado || new Date();
-    const fechaDesbloqueoFallback = calcularFechaDesbloqueo(fechaBaseDesbloqueo, config);
+    const fechaDesbloqueoFallback = calcularFechaDesbloqueo(new Date(), config);
 
     await conn.query(
       `UPDATE premios
-       SET estado = 'reclamado',
-           id_boleto = COALESCE(?, id_boleto),
+       SET id_boleto = COALESCE(?, id_boleto),
            fecha_reclamado = COALESCE(fecha_reclamado, CURRENT_TIMESTAMP),
-           fecha_puede_volver_jugar = COALESCE(
-             fecha_puede_volver_jugar,
-             CASE WHEN estado = 'pendiente' THEN ? ELSE NULL END
-           )
+           fecha_puede_volver_jugar = CASE
+             WHEN estado = 'pendiente' THEN ?
+             ELSE COALESCE(fecha_puede_volver_jugar, ?)
+           END,
+           cantidad_bloqueo = COALESCE(cantidad_bloqueo, ?),
+           unidad_bloqueo = COALESCE(unidad_bloqueo, 'dias'),
+           motivo_bloqueo = COALESCE(motivo_bloqueo, 'reclamo_boleto'),
+           estado = 'reclamado'
        WHERE id_premio = ?`,
-      [idBoleto, fechaDesbloqueoFallback, premio.id_premio]
+      [
+        idBoleto,
+        fechaDesbloqueoFallback,
+        fechaDesbloqueoFallback,
+        Math.max(1, Number(config.cantidad) || DIAS_BLOQUEO_POR_DEFECTO),
+        premio.id_premio
+      ]
     );
     [[premio]] = await conn.query('SELECT * FROM premios WHERE id_premio = ?', [premio.id_premio]);
 
@@ -424,9 +453,81 @@ function createPlaytimeBlockService(pool) {
     return {
       premio,
       bloqueado: Boolean(config.bloqueo_activo && fechaPuedeVolver),
+      motivo_bloqueo: 'reclamo_boleto',
       fecha_puede_volver: fechaPuedeVolver ? fechaPuedeVolver.toISOString() : null,
       fecha_puede_volver_texto: fechaPuedeVolver ? formatFechaMX(fechaPuedeVolver) : null,
       mensaje: fechaPuedeVolver ? buildMensajeBloqueo(fechaPuedeVolver) : null
+    };
+  }
+
+  async function registrarBloqueoPorIntentos(idUsuario, idEstacion, connection = null) {
+    const conn = connection || pool;
+    const config = await getConfig();
+    const participacion = await asegurarParticipacionActiva(conn, idUsuario);
+    const [[estacion]] = await conn.query(
+      'SELECT nombre FROM estaciones WHERE id_estacion = ? LIMIT 1',
+      [idEstacion]
+    );
+    const nombreEstacion = estacion?.nombre
+      ? `la estacion ${estacion.nombre}`
+      : `la estacion ${idEstacion}`;
+    const [[bloqueoActivo]] = await conn.query(
+      `SELECT *
+       FROM premios
+       WHERE id_usuario = ?
+         AND motivo_bloqueo = 'intentos'
+         AND fecha_puede_volver_jugar IS NOT NULL
+         AND fecha_puede_volver_jugar > CURRENT_TIMESTAMP
+         AND ciclo_reiniciado_at IS NULL
+       ORDER BY created_at DESC
+       LIMIT 1`,
+      [idUsuario]
+    );
+    if (bloqueoActivo) {
+      const fechaActiva = new Date(bloqueoActivo.fecha_puede_volver_jugar);
+      return {
+        premio: bloqueoActivo,
+        bloqueado: true,
+        motivo_bloqueo: 'intentos',
+        fecha_puede_volver: fechaActiva.toISOString(),
+        fecha_puede_volver_texto: formatFechaMX(fechaActiva),
+        mensaje: buildMensajeBloqueoIntentos(fechaActiva, bloqueoActivo.detalle_bloqueo || nombreEstacion)
+      };
+    }
+    const fechaFinalizacion = new Date();
+    const fechaPuedeVolver = calcularFechaDesbloqueo(fechaFinalizacion, config);
+
+    await conn.query(
+      `UPDATE participaciones SET estado = 'reclamado', fecha_fin = CURRENT_TIMESTAMP
+       WHERE id_participacion = ?`,
+      [participacion.id_participacion]
+    );
+
+    const [result] = await conn.query(
+      `INSERT INTO premios
+        (id_usuario, id_participacion, id_boleto, estado, fecha_ganado, fecha_reclamado,
+         fecha_finalizacion, fecha_puede_volver_jugar, cantidad_bloqueo, unidad_bloqueo,
+         motivo_bloqueo, detalle_bloqueo)
+       VALUES (?, ?, NULL, 'reclamado', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
+         ?, ?, ?, 'dias', 'intentos', ?)`,
+      [
+        idUsuario,
+        participacion.id_participacion,
+        fechaFinalizacion,
+        fechaPuedeVolver,
+        Math.max(1, Number(config.cantidad) || DIAS_BLOQUEO_POR_DEFECTO),
+        nombreEstacion
+      ]
+    );
+
+    const [[premio]] = await conn.query('SELECT * FROM premios WHERE id_premio = ?', [result.insertId]);
+    return {
+      premio,
+      bloqueado: true,
+      motivo_bloqueo: 'intentos',
+      fecha_puede_volver: fechaPuedeVolver.toISOString(),
+      fecha_puede_volver_texto: formatFechaMX(fechaPuedeVolver),
+      mensaje: buildMensajeBloqueoIntentos(fechaPuedeVolver, nombreEstacion)
     };
   }
 
@@ -473,9 +574,9 @@ function createPlaytimeBlockService(pool) {
   async function aplicarConfiguracionABloqueosActivos(updatedBy = null) {
     const config = await getConfig();
     const [premios] = await pool.query(
-      `SELECT id_premio, COALESCE(fecha_finalizacion, fecha_ganado) AS fecha_finalizacion
+      `SELECT id_premio, COALESCE(fecha_reclamado, fecha_finalizacion, fecha_ganado) AS fecha_finalizacion
        FROM premios
-       WHERE COALESCE(fecha_finalizacion, fecha_ganado) IS NOT NULL
+       WHERE COALESCE(fecha_reclamado, fecha_finalizacion, fecha_ganado) IS NOT NULL
          AND fecha_puede_volver_jugar IS NOT NULL
          AND fecha_puede_volver_jugar > CURRENT_TIMESTAMP`
     );
@@ -506,6 +607,8 @@ function createPlaytimeBlockService(pool) {
          p.fecha_entregado,
          p.fecha_finalizacion,
          p.fecha_puede_volver_jugar,
+         p.motivo_bloqueo,
+         p.detalle_bloqueo,
          part.fecha_inicio AS fecha_jugo,
          part.id_participacion
        FROM usuarios u
@@ -513,14 +616,14 @@ function createPlaytimeBlockService(pool) {
          AND p.id_premio = (
            SELECT p2.id_premio FROM premios p2
            WHERE p2.id_usuario = u.id_usuario
-           ORDER BY COALESCE(p2.fecha_finalizacion, p2.fecha_ganado, p2.created_at) DESC
+           ORDER BY COALESCE(p2.fecha_reclamado, p2.fecha_finalizacion, p2.fecha_ganado, p2.created_at) DESC
            LIMIT 1
          )
        LEFT JOIN participaciones part ON part.id_participacion = p.id_participacion
        WHERE EXISTS (
          SELECT 1 FROM premios px WHERE px.id_usuario = u.id_usuario
        )
-       ORDER BY COALESCE(p.fecha_finalizacion, p.fecha_ganado, u.fecha_registro) DESC`
+       ORDER BY COALESCE(p.fecha_reclamado, p.fecha_finalizacion, p.fecha_ganado, u.fecha_registro) DESC`
     );
 
     const config = await getConfig();
@@ -530,7 +633,7 @@ function createPlaytimeBlockService(pool) {
       let tiempoRestante = '—';
       let estadoActual = 'habilitado';
 
-      if (row.fecha_finalizacion && row.fecha_puede_volver_jugar && config.bloqueo_activo) {
+      if (row.fecha_finalizacion && row.fecha_puede_volver_jugar && (config.bloqueo_activo || row.motivo_bloqueo === 'intentos')) {
         const fechaVolver = new Date(row.fecha_puede_volver_jugar);
         const restante = msRestantes(fechaVolver);
         bloqueado = restante > 0;
@@ -580,6 +683,7 @@ function createPlaytimeBlockService(pool) {
           return res.status(403).json({
             error: 'usuario_bloqueado',
             mensaje: estado.mensaje,
+            motivo_bloqueo: estado.motivo_bloqueo,
             fecha_puede_volver: estado.fecha_puede_volver,
             fecha_puede_volver_texto: estado.fecha_puede_volver_texto,
             tiempo_restante: estado.tiempo_restante
@@ -604,6 +708,7 @@ function createPlaytimeBlockService(pool) {
     asegurarParticipacionActiva,
     registrarGanado,
     registrarReclamo,
+    registrarBloqueoPorIntentos,
     marcarEntregado,
     desbloquearUsuario,
     actualizarFechaPermitida,
@@ -612,6 +717,7 @@ function createPlaytimeBlockService(pool) {
     historialPremiosUsuario,
     middlewareVerificarBloqueo,
     buildMensajeBloqueo,
+    buildMensajeBloqueoIntentos,
     formatFechaMX,
     formatFechaHoraMX,
     calcularFechaDesbloqueo
@@ -622,6 +728,7 @@ module.exports = {
   DIAS_BLOQUEO_POR_DEFECTO,
   createPlaytimeBlockService,
   buildMensajeBloqueo,
+  buildMensajeBloqueoIntentos,
   calcularFechaDesbloqueo,
   formatFechaMX
 };

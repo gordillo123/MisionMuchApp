@@ -940,7 +940,6 @@ async function validarQuiz() {
     if (!alreadyCompleted) {
       markStationCompleted();
       await guardarSpinosaurioEnSupabase(Number(score), true);
-      await registrarQuizEnSupabase(Number(score));
     }
     localStorage.setItem('much_current_station', '3');
     navigatingToRegistro = true;
@@ -973,17 +972,7 @@ async function validarQuiz() {
     playIncorrectSound();
 
     // Forzar la estación a Incompleta (en local y BD), borrando progreso previo
-    try {
-      window.MuchLocalStorage?.recordStationAttempt?.(STATION_ID, {
-        aprobada: false,
-        puntaje: 0,
-        aciertos: 0,
-        errores: 1
-      }, { countAttempt: true });
-    } catch (e) {}
-
     await guardarSpinosaurioEnSupabase(0, false);
-    await registrarQuizEnSupabase(0);
 
     // Retrasar 1.8 segundos para los efectos visuales/sonoros antes de mostrar el aviso flotante
     setTimeout(() => {
@@ -1034,16 +1023,7 @@ async function marcarIncorrectoPorTrampa() {
     var radio = label.querySelector('input');
     if (radio) radio.disabled = true;
   });
-  try {
-    window.MuchLocalStorage?.recordStationAttempt?.(STATION_ID, {
-      aprobada: false,
-      puntaje: 0,
-      aciertos: 0,
-      errores: 1
-    }, { countAttempt: true });
-  } catch (e) {}
   await guardarSpinosaurioEnSupabase(0, false);
-  await registrarQuizEnSupabase(0);
   setTimeout(() => {
     try { document.getElementById('quizOverlay').classList.remove('show'); } catch (e) {}
     document.body.classList.remove('quiz-mode');
@@ -1115,28 +1095,15 @@ const API_BASE_URL = window.location.hostname ? `http://${window.location.hostna
 
 async function registrarIntentoInicial() {
   try {
-    const user = JSON.parse(localStorage.getItem('much_google_user') || '{}');
-    if (!user || (!user.id_usuario && !user.id)) {
-      console.warn("⚠️ No hay usuario autenticado para registrar intento.");
-      return null;
-    }
-    const res = await fetch(`${API_BASE_URL}/api/intentos`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-user-id': String(user.id_usuario || user.id)
-      },
-      body: JSON.stringify({
-        id_usuario: user.id_usuario || user.id,
-        id_estacion: Number(STATION_ID),
-        puntaje: 0,
-        aciertos: 0,
-        errores: 0,
-        aprobado: false
-      })
+    const progreso = await import('../supabase-utils.js');
+    const data = await progreso.guardarIntentoEstacion(STATION_ID, {
+      puntaje: 0,
+      aciertos: 0,
+      errores: 0,
+      aprobado: false,
+      finalizado: false
     });
-    if (res.ok) {
-      const data = await res.json();
+    if (data?.id_intento) {
       sessionStorage.setItem("ultimo_intento_id", String(data.id_intento));
       return data.id_intento;
     }
@@ -1148,53 +1115,27 @@ async function registrarIntentoInicial() {
 
 async function registrarQuizEnSupabase(puntajeFinal) {
   try {
-    const user = JSON.parse(localStorage.getItem('much_google_user') || '{}');
-    if (!user || (!user.id_usuario && !user.id)) return;
-    const userId = user.id_usuario || user.id;
+    const progreso = await import('../supabase-utils.js');
     const puntaje = Number(puntajeFinal);
     const aprobado = puntaje >= WIN_SCORE;
     const payload = {
+      id_estacion: Number(STATION_ID),
       puntaje,
       aciertos: puntaje,
       errores: aprobado ? 0 : 1,
-      aprobado
+      aprobado,
+      finalizado: true
     };
     const intentoId = sessionStorage.getItem("ultimo_intento_id");
-    let intentoGuardado = false;
 
     if (intentoId) {
-      const updateRes = await fetch(`${API_BASE_URL}/api/intentos/${encodeURIComponent(intentoId)}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-id': String(userId)
-        },
-        body: JSON.stringify(payload)
-      });
-      intentoGuardado = updateRes.ok;
-      if (!intentoGuardado) {
-        try { sessionStorage.removeItem("ultimo_intento_id"); } catch (e) {}
-      }
+      const actualizado = await progreso.actualizarIntentoEstacion(intentoId, payload);
+      if (actualizado) return;
+      try { sessionStorage.removeItem("ultimo_intento_id"); } catch (e) {}
     }
 
-    if (intentoGuardado) return;
-
-    const res = await fetch(`${API_BASE_URL}/api/intentos`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-user-id': String(userId)
-      },
-      body: JSON.stringify({
-        id_usuario: userId,
-        id_estacion: Number(STATION_ID),
-        ...payload
-      })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.id_intento) sessionStorage.setItem("ultimo_intento_id", String(data.id_intento));
-    }
+    const data = await progreso.guardarIntentoEstacion(STATION_ID, payload);
+    if (data?.id_intento) sessionStorage.setItem("ultimo_intento_id", String(data.id_intento));
   } catch (error) {
     console.error('Error al registrar quiz en MySQL:', error);
   }

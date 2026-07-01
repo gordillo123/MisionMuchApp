@@ -298,6 +298,25 @@
       object-fit: contain;
     }
 
+    .ticket-destination-mark {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      margin: -6px auto 16px;
+    }
+
+    .ticket-destination-mark .logo-destino {
+      height: clamp(48px, 9vw, 66px);
+      max-width: min(72%, 220px);
+      padding: 4px 12px;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 8px 22px rgba(2, 6, 23, .24);
+    }
+
     .planetarium-access-kicker {
       display: none;
     }
@@ -913,6 +932,22 @@
       color: #0f172a;
       border: 1.5px solid #e2e8f0;
       box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    .ticket-download-slot {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      margin: 0 0 12px;
+      padding: 0 clamp(4px, 2vw, 10px);
+    }
+
+    .ticket-download-slot .btn {
+      width: 100%;
+    }
+
+    #boletoCaptura.is-capturing .ticket-download-slot {
+      display: none;
     }
 
     body.planetarium-ticket .btn-link {
@@ -1666,6 +1701,17 @@
         line-height: 1.12;
       }
 
+      body.streamlined-ticket .ticket-destination-mark {
+        margin: 0 auto 5px;
+      }
+
+      body.streamlined-ticket .ticket-destination-mark .logo-destino {
+        height: 38px;
+        max-width: 136px;
+        padding: 2px 6px;
+        border-radius: 8px;
+      }
+
       body.streamlined-ticket .main-group {
         gap: 2px;
         margin-bottom: 5px;
@@ -1712,6 +1758,19 @@
 
       body.streamlined-ticket .note {
         display: none;
+      }
+
+      body.streamlined-ticket .ticket-download-slot {
+        margin: 2px 0 4px;
+        padding: 0;
+      }
+
+      body.streamlined-ticket .ticket-download-slot .btn {
+        min-height: 32px;
+        padding: 6px 8px;
+        border-radius: 9px;
+        font-size: .64rem;
+        line-height: 1.05;
       }
 
       body.streamlined-ticket .brand-strip {
@@ -1793,6 +1852,15 @@
         font-size: 1rem;
       }
 
+      body.streamlined-ticket .ticket-destination-mark {
+        margin-bottom: 7px;
+      }
+
+      body.streamlined-ticket .ticket-destination-mark .logo-destino {
+        height: 46px;
+        max-width: 154px;
+      }
+
       body.streamlined-ticket .info-label {
         font-size: .68rem;
       }
@@ -1834,6 +1902,15 @@
       body.streamlined-ticket .ticket-restriction {
         padding: 7px 11px;
         font-size: .76rem;
+      }
+
+      body.streamlined-ticket .ticket-download-slot {
+        margin-bottom: 5px;
+      }
+
+      body.streamlined-ticket .ticket-download-slot .btn {
+        min-height: 38px;
+        font-size: .72rem;
       }
 
       body.streamlined-ticket .brand-strip {
@@ -1908,12 +1985,6 @@
           <img class="logo-agencia" src="Logo-Ag-14.png" alt="Agencia Digital" crossorigin="anonymous"
             onerror="this.style.display='none'">
         </div>
-        <div class="header-right">
-          <img class="logo-sata" src="logo-sata.png" alt="SATA" crossorigin="anonymous"
-            onerror="this.style.display='none'">
-          <img id="tDynamicLogo" class="logo-destino" src="logo-much.png" alt="Destino" crossorigin="anonymous"
-            onerror="this.style.display='none'">
-        </div>
       </div>
 
       <div class="planetarium-access-kicker" aria-label="Acceso exclusivo al Planetario">
@@ -1926,6 +1997,11 @@
         <span class="congrats-sparkle" aria-hidden="true">✨</span>
         <h2 id="tCongrats" class="congrats-text">¡Felicidades, ganaste un boleto!</h2>
         <span class="congrats-sparkle" aria-hidden="true">✨</span>
+      </div>
+
+      <div class="ticket-destination-mark" aria-label="Destino seleccionado">
+        <img id="tDynamicLogo" class="logo-destino" src="logo-much.png" alt="Destino" crossorigin="anonymous"
+          onerror="this.style.display='none'">
       </div>
 
       <!-- Ticket Info Section -->
@@ -1999,6 +2075,10 @@
         <!-- Description Note -->
         <div class="note">Felicidades por completar tu recorrido.</div>
 
+        <div class="ticket-download-slot">
+          <button id="btnDownloadImage" class="btn btn-download" type="button">Descargar boleto</button>
+        </div>
+
         <!-- Bottom Brand strip (Point 8) -->
         <div class="brand-strip" aria-label="Logos institucionales">
           <img src="../entrada-much/logo-much.png" alt="MUCH · Museo Chiapas" class="brand-much">
@@ -2011,7 +2091,6 @@
 
     <!-- Actions block -->
     <div class="actions">
-      <button id="btnDownloadImage" class="btn btn-download">📥 Descargar Boleto (Imagen)</button>
       <a class="btn btn-link" href="../index.html">🏠 Volver al mapa</a>
       <button id="btnExitTicket" class="btn btn-exit" type="button">🚪 Salir</button>
     </div>
@@ -2212,7 +2291,7 @@
           ? 'Acceso exclusivo al Planetario Tuxtla'
           : 'Acceso exclusivo al Museo MUCH');
       }
-      if (el('btnDownloadImage')) el('btnDownloadImage').textContent = '📥 Descargar boleto';
+      if (el('btnDownloadImage')) el('btnDownloadImage').textContent = 'Descargar boleto';
 
       // Populate elements directly
       if (el('tTitle')) el('tTitle').textContent = titulo;
@@ -2289,12 +2368,18 @@
           const originalText = btnDownload.textContent;
           btnDownload.textContent = 'Generando descarga... 📥';
           btnDownload.disabled = true;
+          let element = null;
+          let origWidth = '';
+          let origMaxW = '';
           try {
-            const element = document.getElementById('boletoCaptura');
-            const origWidth = element.style.width;
-            const origMaxW = element.style.maxWidth;
+            element = document.getElementById('boletoCaptura');
+            if (!element) throw new Error('No se encontro el boleto para descargar.');
+            origWidth = element.style.width;
+            origMaxW = element.style.maxWidth;
+            element.classList.add('is-capturing');
             element.style.width = '580px';
             element.style.maxWidth = '580px';
+            await new Promise((resolve) => requestAnimationFrame(resolve));
 
             const canvas = await html2canvas(element, {
               scale: 3,
@@ -2302,9 +2387,6 @@
               useCORS: true,
               windowWidth: 580
             });
-
-            element.style.width = origWidth;
-            element.style.maxWidth = origMaxW;
 
             canvas.toBlob((blob) => {
               const fileName = `Boleto_${isPlanetario ? 'Planetario' : 'MUCH'}_${ticketData.folio || Date.now()}.png`;
@@ -2315,6 +2397,12 @@
           } catch (err) {
             console.error(err); alert("Error al descargar imagen.");
             btnDownload.textContent = originalText; btnDownload.disabled = false;
+          } finally {
+            if (element) {
+              element.style.width = origWidth;
+              element.style.maxWidth = origMaxW;
+              element.classList.remove('is-capturing');
+            }
           }
         });
       }

@@ -1,5 +1,6 @@
 (function () {
   const DEFAULT_BLOCK_DAYS = 7;
+  const FAILED_ATTEMPT_LIMIT = 3;
   const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
   const KEYS = {
@@ -12,6 +13,8 @@
     boletoReclamado: 'much_boleto_reclamado',
     fechaFinalizacion: 'much_fecha_finalizacion',
     fechaProximoJuego: 'much_fecha_proximo_juego',
+    motivoBloqueo: 'much_motivo_bloqueo',
+    detalleBloqueo: 'much_detalle_bloqueo',
     datosBoleto: 'much_datos_boleto',
     estadoBotonReclamar: 'much_estado_boton_reclamar',
     avatarSeleccionado: 'much_avatar_seleccionado',
@@ -120,6 +123,22 @@
     return new Date(base.getTime() + Math.max(1, Number(days) || DEFAULT_BLOCK_DAYS) * MS_PER_DAY);
   }
 
+  function formatFechaMX(date) {
+    const value = parseDate(date);
+    if (!value) return '';
+    return new Intl.DateTimeFormat('es-MX', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }).format(value);
+  }
+
+  function buildAttemptBlockMessage(stationName, date) {
+    const fecha = formatFechaMX(date);
+    return `Has superado el limite de intentos en ${stationName || 'esta estacion'}.\nPodras volver a jugar el ${fecha}.\nRegresa en esa fecha para continuar tu mision cientifica.`;
+  }
+
   function getConfiguredBlockDays() {
     const config = parseJson(KEYS.configJuego, null);
     return Math.max(1, Number(config?.cantidad) || DEFAULT_BLOCK_DAYS);
@@ -212,6 +231,43 @@
       || '';
   }
 
+  function blockByFailedAttempts(stationId, attemptRecord = {}, options = {}) {
+    const station = getStation(stationId);
+    const stationName = station?.nombre ? `la estacion ${station.nombre}` : 'esta estacion';
+    const finishedAt = nowIso();
+    const blockDays = options.dias_bloqueo || options.cantidad_bloqueo || getConfiguredBlockDays();
+    const nextDate = options.fecha_puede_volver || addDays(finishedAt, blockDays).toISOString();
+    const message = options.mensaje || buildAttemptBlockMessage(stationName, nextDate);
+    const detail = {
+      bloqueado: true,
+      habilitado: false,
+      motivo_bloqueo: 'intentos',
+      id_estacion: stationId,
+      estacion: station.nombre,
+      intentos_fallidos: attemptRecord.intentos_fallidos || FAILED_ATTEMPT_LIMIT,
+      limite_intentos: FAILED_ATTEMPT_LIMIT,
+      fecha_finalizacion: finishedAt,
+      fecha_puede_volver: nextDate,
+      fecha_puede_volver_texto: formatFechaMX(nextDate),
+      mensaje: message
+    };
+
+    setItem(KEYS.fechaFinalizacion, finishedAt);
+    setItem(KEYS.fechaProximoJuego, nextDate);
+    setItem(KEYS.motivoBloqueo, 'intentos');
+    setItem(KEYS.detalleBloqueo, stationName);
+    setItem(KEYS.legacyPlaytimeBlockMsg, message);
+    setRouteState('bloqueado_temporalmente');
+    setClaimButtonState('bloqueado');
+    dispatchProgressChanged();
+
+    try {
+      window.dispatchEvent(new CustomEvent('much:playtimeBlocked', { detail }));
+    } catch (_) {}
+
+    return detail;
+  }
+
   function recordStationAttempt(stationId, attempt = {}, options = {}) {
     const id = toStationId(stationId);
     if (!id) return null;
@@ -222,6 +278,7 @@
     const completedMap = getCompletedStationsMap();
     const attemptId = getCurrentAttemptId({ ...attempt, ...options });
     const knownIds = Array.isArray(previous.ids_intentos) ? previous.ids_intentos.slice(-12) : [];
+    const failedIds = Array.isArray(previous.ids_intentos_fallidos) ? previous.ids_intentos_fallidos.slice(-12) : [];
     const countAttempt = options.countAttempt === true;
     const shouldCount = countAttempt && (!attemptId || !knownIds.includes(String(attemptId)));
     const puntaje = Math.max(0, toNumber(attempt.puntaje ?? attempt.puntaje_total, previous.ultimo_puntaje || 0));
@@ -229,9 +286,20 @@
       : (attempt.aprobado !== undefined ? Boolean(attempt.aprobado) : Boolean(previous.aprobada));
     const completedAlready = Boolean(completedMap[id] || previous.completada);
     const completada = aprobada || completedAlready;
+    const finalizada = attempt.finalizado !== undefined ? Boolean(attempt.finalizado)
+      : (options.finalizado !== undefined ? Boolean(options.finalizado)
+        : Boolean(aprobada || puntaje > 0 || toNumber(attempt.aciertos, 0) > 0 || toNumber(attempt.errores, 0) > 0));
+    const countFailure = options.countFailure === true && finalizada && !aprobada && !completedAlready;
+    const shouldCountFailure = countFailure && (!attemptId || !failedIds.includes(String(attemptId)));
+    const intentosFallidos = completada
+      ? 0
+      : Math.min(FAILED_ATTEMPT_LIMIT, toNumber(previous.intentos_fallidos, 0) + (shouldCountFailure ? 1 : 0));
 
     if (attemptId && !knownIds.includes(String(attemptId))) {
       knownIds.push(String(attemptId));
+    }
+    if (attemptId && shouldCountFailure && !failedIds.includes(String(attemptId))) {
+      failedIds.push(String(attemptId));
     }
 
     attempts[id] = {
@@ -240,6 +308,9 @@
       intentado: true,
       intentos: Math.max(1, toNumber(previous.intentos, 0) + (shouldCount ? 1 : 0)),
       ids_intentos: knownIds.slice(-12),
+      intentos_fallidos: intentosFallidos,
+      ids_intentos_fallidos: completada ? [] : failedIds.slice(-12),
+      limite_intentos: FAILED_ATTEMPT_LIMIT,
       ultimo_id_intento: attemptId || previous.ultimo_id_intento || '',
       ultimo_puntaje: puntaje,
       mejor_puntaje: Math.max(toNumber(previous.mejor_puntaje, 0), puntaje),
@@ -247,12 +318,19 @@
       errores: toNumber(attempt.errores, previous.errores || 0),
       aprobada: Boolean(aprobada || previous.aprobada),
       completada,
+      finalizado: Boolean(finalizada || previous.finalizado),
       debe_reintentar: !completada,
       ultimo_intento_at: attempt.fecha || nowIso(),
       completado_at: completada ? (previous.completado_at || nowIso()) : previous.completado_at || null
     };
 
     writeAttempts(attempts);
+    let bloqueoIntentos = null;
+    if (!completada && intentosFallidos >= FAILED_ATTEMPT_LIMIT && getItem(KEYS.estadoRecorrido) !== 'bloqueado_temporalmente') {
+      bloqueoIntentos = blockByFailedAttempts(id, attempts[id], options);
+      attempts[id].bloqueo = bloqueoIntentos;
+      writeAttempts(attempts);
+    }
 
     if (aprobada) {
       completeStation(id, {
@@ -267,7 +345,7 @@
       dispatchProgressChanged();
     }
 
-    if (getItem(KEYS.estadoRecorrido) !== 'bloqueado_temporalmente' && !aprobada) {
+    if (!bloqueoIntentos && getItem(KEYS.estadoRecorrido) !== 'bloqueado_temporalmente' && !aprobada) {
       setRouteState('en_progreso');
     }
 
@@ -301,6 +379,19 @@
     };
 
     writeCompletedRecords(records);
+    const attempts = getAttempts();
+    if (attempts[id]) {
+      attempts[id] = {
+        ...attempts[id],
+        aprobada: true,
+        completada: true,
+        debe_reintentar: false,
+        intentos_fallidos: 0,
+        ids_intentos_fallidos: [],
+        completado_at: records[id].fecha_completado
+      };
+      writeAttempts(attempts);
+    }
 
     const nextStationId = data.nextStationId || String(Math.min(6, Number(id) + 1));
     if (nextStationId) setCurrentStation(nextStationId);
@@ -484,6 +575,8 @@
     setItem(KEYS.boletoReclamado, 'true');
     setItem(KEYS.fechaFinalizacion, finishedAt);
     setItem(KEYS.fechaProximoJuego, nextDate);
+    setItem(KEYS.motivoBloqueo, 'reclamo_boleto');
+    removeItem(KEYS.detalleBloqueo);
     setItem(KEYS.legacyRewardClaimed, 'true');
     setClaimButtonState('bloqueado');
     updateRouteStateFromDates();
@@ -498,6 +591,8 @@
 
     setItem(KEYS.fechaFinalizacion, finishedAt);
     setItem(KEYS.fechaProximoJuego, nextDate);
+    setItem(KEYS.motivoBloqueo, finalization.motivo_bloqueo || 'reclamo_boleto');
+    if (finalization.detalle_bloqueo) setItem(KEYS.detalleBloqueo, finalization.detalle_bloqueo);
     if (finalization.config || finalization.dias_bloqueo || finalization.cantidad_bloqueo) {
       writeJson(KEYS.configJuego, {
         cantidad: blockDays,
@@ -528,6 +623,8 @@
     if (state.bloqueado) {
       if (state.fecha_puede_volver) setItem(KEYS.fechaProximoJuego, state.fecha_puede_volver);
       if (state.mensaje) setItem(KEYS.legacyPlaytimeBlockMsg, state.mensaje);
+      if (state.motivo_bloqueo) setItem(KEYS.motivoBloqueo, state.motivo_bloqueo);
+      if (state.detalle_bloqueo || state.estacion) setItem(KEYS.detalleBloqueo, state.detalle_bloqueo || state.estacion);
       setRouteState('bloqueado_temporalmente');
       setClaimButtonState('bloqueado');
       return;
@@ -637,11 +734,14 @@
       KEYS.boletoReclamado,
       KEYS.fechaFinalizacion,
       KEYS.fechaProximoJuego,
+      KEYS.motivoBloqueo,
+      KEYS.detalleBloqueo,
       KEYS.datosBoleto,
       KEYS.legacyPrize,
       KEYS.legacyRewardClaimed,
       KEYS.legacyRewardChoice,
-      KEYS.legacyUserTicket
+      KEYS.legacyUserTicket,
+      KEYS.legacyPlaytimeBlockMsg
     ].forEach(removeItem);
 
     writeJson(KEYS.legacyCompletedStations, {});
@@ -708,6 +808,7 @@
     completeStation,
     recordStationAttempt,
     recordStationResult,
+    blockByFailedAttempts,
     syncFromServerProgress,
     setCurrentStation,
     getCurrentStation,

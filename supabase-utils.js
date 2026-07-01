@@ -161,15 +161,42 @@ function invalidarCacheBloqueoJuego() {
   cachedPlaytimeAt = 0;
 }
 
+function inferirIntentoFinalizado(intento = {}) {
+  if (intento.finalizado !== undefined) return Boolean(intento.finalizado);
+  return Boolean(intento.aprobado || intento.aprobada)
+    || Number(intento.puntaje || intento.puntaje_total || 0) > 0
+    || Number(intento.aciertos || 0) > 0
+    || Number(intento.errores || 0) > 0;
+}
+
+function sincronizarBloqueoPorIntentos(data = {}) {
+  if (!data.bloqueo?.bloqueado) return false;
+  const estado = {
+    ...data.bloqueo,
+    bloqueado: true,
+    habilitado: false,
+    motivo_bloqueo: data.bloqueo.motivo_bloqueo || 'intentos'
+  };
+  invalidarCacheBloqueoJuego();
+  cachedPlaytimeEstado = estado;
+  cachedPlaytimeAt = Date.now();
+  window.MuchLocalStorage?.syncPlaytimeState?.(estado);
+  mostrarAvisoBloqueoJuego(estado);
+  return true;
+}
+
 function mostrarAvisoBloqueoJuego(estado) {
   const fecha = estado?.fecha_puede_volver_texto || '';
-  const mensaje = estado?.mensaje || (fecha
+  const esBloqueoPorIntentos = estado?.motivo_bloqueo === 'intentos';
+  const mensaje = estado?.mensaje || (esBloqueoPorIntentos && fecha
+    ? `Has superado el limite de intentos en esta estacion.\nPodras volver a jugar el ${fecha}.\nRegresa en esa fecha para continuar tu mision cientifica.`
+    : fecha
     ? `¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrás volver a jugar el ${fecha}.`
     : 'Tu misión ya fue completada. Debes esperar para comenzar una nueva aventura.');
   if (window.MuchStationCompletion?.showFloatingNotice) {
     window.MuchStationCompletion.showFloatingNotice({
-      badge: '⏳ Misión completada',
-      title: '¡Aventura completada!',
+      badge: esBloqueoPorIntentos ? 'Limite de intentos' : '⏳ Misión completada',
+      title: esBloqueoPorIntentos ? 'Juego bloqueado temporalmente' : '¡Aventura completada!',
       body: mensaje.replace(/\n/g, '<br>'),
       ctaLabel: 'Entendido'
     });
@@ -207,6 +234,7 @@ async function asegurarJuegoPermitido() {
       estado.habilitado = false;
       estado.fecha_puede_volver = localStorage.getItem('much_fecha_proximo_juego') || '';
       estado.mensaje = localStorage.getItem('much_playtime_block_msg') || 'Tu recorrido sigue bloqueado temporalmente.';
+      estado.motivo_bloqueo = localStorage.getItem('much_motivo_bloqueo') || estado.motivo_bloqueo;
     }
     mostrarAvisoBloqueoJuego(estado);
     const error = new Error(estado.mensaje || 'usuario_bloqueado');
@@ -730,6 +758,7 @@ async function guardarIntentoEstacion(estacionId, intento = {}) {
   const user = obtenerUsuarioLocal();
   const userId = obtenerIdUsuarioLocal(user);
   if (!userId) return null;
+  const finalizado = inferirIntentoFinalizado(intento);
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/intentos`, {
@@ -744,7 +773,8 @@ async function guardarIntentoEstacion(estacionId, intento = {}) {
         puntaje: Number(intento.puntaje || 0),
         aciertos: Number(intento.aciertos || 0),
         errores: Number(intento.errores || 0),
-        aprobado: Boolean(intento.aprobado)
+        aprobado: Boolean(intento.aprobado),
+        finalizado
       })
     });
 
@@ -752,11 +782,16 @@ async function guardarIntentoEstacion(estacionId, intento = {}) {
       return await manejarFalloSync(res, 'No se pudo registrar intento remoto.');
     }
     const data = await res.json();
+    if (data.id_intento) {
+      sessionStorage.setItem('much_current_attempt_station_id', String(estacionId));
+    }
     window.MuchLocalStorage?.recordStationAttempt?.(estacionId, {
       ...intento,
       id_intento: data.id_intento,
-      aprobado: Boolean(intento.aprobado)
-    }, { countAttempt: true });
+      aprobado: Boolean(intento.aprobado),
+      finalizado
+    }, { countAttempt: true, countFailure: finalizado });
+    sincronizarBloqueoPorIntentos(data);
     return data;
   } catch (error) {
     if (error.code === 'usuario_bloqueado') throw error;
@@ -772,6 +807,11 @@ async function actualizarIntentoEstacion(idIntento, intento = {}) {
   const user = obtenerUsuarioLocal();
   const userId = obtenerIdUsuarioLocal(user);
   if (!userId) return null;
+  const finalizado = intento.finalizado === undefined ? true : inferirIntentoFinalizado(intento);
+  const estacionId = intento.id_estacion
+    || intento.estacionId
+    || sessionStorage.getItem('much_current_attempt_station_id')
+    || localStorage.getItem('much_current_station');
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/intentos/${idIntento}`, {
@@ -784,14 +824,28 @@ async function actualizarIntentoEstacion(idIntento, intento = {}) {
         puntaje: Number(intento.puntaje || 0),
         aciertos: Number(intento.aciertos || 0),
         errores: Number(intento.errores || 0),
-        aprobado: Boolean(intento.aprobado)
+        aprobado: Boolean(intento.aprobado),
+        finalizado
       })
     });
 
     if (!res.ok) {
       return await manejarFalloSync(res, 'No se pudo actualizar intento remoto.');
     }
-    return await res.json();
+    const data = await res.json();
+    if (estacionId) {
+      window.MuchLocalStorage?.recordStationAttempt?.(estacionId, {
+        ...intento,
+        id_intento: idIntento,
+        aprobado: Boolean(intento.aprobado),
+        finalizado: data.finalizado !== undefined ? Boolean(data.finalizado) : finalizado
+      }, {
+        countAttempt: false,
+        countFailure: data.finalizado !== false
+      });
+    }
+    sincronizarBloqueoPorIntentos(data);
+    return data;
   } catch (error) {
     if (error.code === 'usuario_bloqueado') throw error;
     console.info('[Sync] No se pudo actualizar intento remoto.', error.message);

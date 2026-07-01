@@ -50,6 +50,8 @@ CREATE TABLE IF NOT EXISTS premios (
   fecha_puede_volver_jugar TIMESTAMP NULL,
   cantidad_bloqueo INT NULL,
   unidad_bloqueo ENUM('dias', 'semanas', 'meses') NULL,
+  motivo_bloqueo VARCHAR(50) NULL,
+  detalle_bloqueo VARCHAR(255) NULL,
   ciclo_reiniciado_at TIMESTAMP NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -81,6 +83,26 @@ SET @sql_ciclo_reiniciado = IF(
 PREPARE stmt_ciclo_reiniciado FROM @sql_ciclo_reiniciado;
 EXECUTE stmt_ciclo_reiniciado;
 DEALLOCATE PREPARE stmt_ciclo_reiniciado;
+
+SET @sql_motivo_bloqueo = IF(
+  (SELECT COUNT(*) FROM information_schema.COLUMNS
+   WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'premios' AND COLUMN_NAME = 'motivo_bloqueo') = 0,
+  'ALTER TABLE premios ADD COLUMN motivo_bloqueo VARCHAR(50) NULL AFTER unidad_bloqueo',
+  'SELECT 1'
+);
+PREPARE stmt_motivo_bloqueo FROM @sql_motivo_bloqueo;
+EXECUTE stmt_motivo_bloqueo;
+DEALLOCATE PREPARE stmt_motivo_bloqueo;
+
+SET @sql_detalle_bloqueo = IF(
+  (SELECT COUNT(*) FROM information_schema.COLUMNS
+   WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'premios' AND COLUMN_NAME = 'detalle_bloqueo') = 0,
+  'ALTER TABLE premios ADD COLUMN detalle_bloqueo VARCHAR(255) NULL AFTER motivo_bloqueo',
+  'SELECT 1'
+);
+PREPARE stmt_detalle_bloqueo FROM @sql_detalle_bloqueo;
+EXECUTE stmt_detalle_bloqueo;
+DEALLOCATE PREPARE stmt_detalle_bloqueo;
 
 UPDATE premios
 SET fecha_finalizacion = fecha_ganado

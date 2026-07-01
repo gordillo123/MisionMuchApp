@@ -12,9 +12,7 @@ require('dotenv').config();
 
 const playtime = createPlaytimeBlockService(pool);
 const TICKET_VALIDITY_DAYS = Math.max(1, Number(process.env.TICKET_VALIDITY_DAYS || process.env.BOLETO_VALIDEZ_DIAS || 7));
-// HERRAMIENTA TEMPORAL: retirar esta bandera y sus usos al concluir las pruebas del boleto.
-const STATION_COMPLETION_TEST_MODE_ENABLED = process.env.NODE_ENV !== 'production'
-  && /^(1|true|yes|on)$/i.test(process.env.ENABLE_STATION_COMPLETION_TEST_MODE || '');
+const FAILED_ATTEMPT_LIMIT = 3;
 
 function tieneTexto(value) {
   return typeof value === 'string' && value.trim().length > 0;
@@ -73,6 +71,52 @@ async function ensureTicketSchema() {
   await agregarColumnaSiFalta('boletos', 'valido_hasta', "ALTER TABLE boletos ADD COLUMN valido_hasta TIMESTAMP NULL AFTER valido_desde");
 }
 
+async function ensureAttemptSchema() {
+  const [[table]] = await pool.query(
+    `SELECT COUNT(*) AS total
+     FROM information_schema.TABLES
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'intentos_estacion'`
+  );
+  if (!Number(table?.total || 0)) return;
+
+  await agregarColumnaSiFalta('intentos_estacion', 'finalizado', "ALTER TABLE intentos_estacion ADD COLUMN finalizado BOOLEAN NOT NULL DEFAULT FALSE AFTER aprobado");
+}
+
+function inferirIntentoFinalizado({ finalizado, aprobado, puntaje, aciertos, errores }) {
+  if (finalizado !== undefined) return Boolean(finalizado);
+  return Boolean(aprobado)
+    || Number(puntaje || 0) > 0
+    || Number(aciertos || 0) > 0
+    || Number(errores || 0) > 0;
+}
+
+async function evaluarBloqueoPorIntentos(connection, idUsuario, idEstacion) {
+  const [[progress]] = await connection.query(
+    'SELECT aprobada, completada FROM progreso_usuario WHERE id_usuario = ? AND id_estacion = ?',
+    [idUsuario, idEstacion]
+  );
+  if (progress?.aprobada || progress?.completada) {
+    return { fallos: 0, bloqueo: null };
+  }
+
+  const [[row]] = await connection.query(
+    `SELECT COUNT(*) AS fallos
+     FROM intentos_estacion
+     WHERE id_usuario = ?
+       AND id_estacion = ?
+       AND aprobado = FALSE
+       AND finalizado = TRUE`,
+    [idUsuario, idEstacion]
+  );
+  const fallos = Number(row?.fallos || 0);
+  if (fallos < FAILED_ATTEMPT_LIMIT) {
+    return { fallos, bloqueo: null };
+  }
+
+  const bloqueo = await playtime.registrarBloqueoPorIntentos(idUsuario, idEstacion, connection);
+  return { fallos, bloqueo };
+}
+
 // Asegurar existencia de la tabla de verificación de ubicación
 (async () => {
   try {
@@ -105,6 +149,7 @@ async function ensureTicketSchema() {
   try {
     await playtime.ensureTables();
     await ensureTicketSchema();
+    await ensureAttemptSchema();
     console.log('✅ Tablas de bloqueo de juego verificadas/creadas con éxito.');
   } catch (error) {
     console.error('❌ Error al verificar/crear tablas de bloqueo de juego:', error.message);
@@ -127,12 +172,6 @@ app.use(express.json());
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
-});
-
-// HERRAMIENTA TEMPORAL: permite al frontend saber si debe mostrar el boton de pruebas.
-app.get('/api/testing/station-completion', (req, res) => {
-  res.set('Cache-Control', 'no-store');
-  res.json({ enabled: STATION_COMPLETION_TEST_MODE_ENABLED });
 });
 
 app.get('/favicon.ico', (req, res) => {
@@ -684,7 +723,14 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
 
       // Verificar si ya tiene un boleto existente
       const [[boletoExistente]] = await connection.query(
-        'SELECT * FROM boletos WHERE id_usuario = ?',
+        `SELECT *
+         FROM boletos
+         WHERE id_usuario = ?
+           AND usado = FALSE
+           AND LOWER(estado) = 'activo'
+           AND (valido_hasta IS NULL OR valido_hasta > CURRENT_TIMESTAMP)
+         ORDER BY id_boleto DESC
+         LIMIT 1`,
         [id_usuario]
       );
 
@@ -790,13 +836,13 @@ app.post('/api/progreso/inicializar', permitirJugador, verificarBloqueoJugador, 
         (id_usuario, id_estacion, completada, aprobada, puntaje, aciertos, errores, fecha_inicio, fecha_completado)
        VALUES (?, ?, FALSE, FALSE, 0, 0, 0, CURRENT_TIMESTAMP, NULL)
        ON DUPLICATE KEY UPDATE 
-         completada = FALSE,
-         aprobada = FALSE,
-         fecha_completado = NULL,
-         puntaje = 0,
-         aciertos = 0,
-         errores = 0,
-         fecha_inicio = COALESCE(fecha_inicio, CURRENT_TIMESTAMP)`,
+          completada = completada,
+          aprobada = aprobada,
+          fecha_completado = fecha_completado,
+          puntaje = puntaje,
+          aciertos = aciertos,
+          errores = errores,
+          fecha_inicio = COALESCE(fecha_inicio, CURRENT_TIMESTAMP)`,
       [id_usuario, id_estacion]
     );
 
@@ -881,7 +927,53 @@ app.post('/api/partidas-minijuego', permitirJugador, verificarBloqueoJugador, as
 // 6. POST /api/intentos
 // ==========================================
 app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, res) => {
-  const { id_usuario, id_estacion, puntaje, aciertos, errores, aprobado } = req.body;
+  const { id_usuario, id_estacion, puntaje, aciertos, errores, aprobado, finalizado } = req.body;
+
+  if (!id_usuario || !id_estacion) {
+    return res.status(400).json({ error: 'Faltan parametros: id_usuario o id_estacion' });
+  }
+
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    const [[estacion]] = await connection.query('SELECT activa FROM estaciones WHERE id_estacion = ?', [id_estacion]);
+    if (!estacion || !estacion.activa) {
+      await connection.rollback();
+      return res.status(403).json({ error: 'La estacion se encuentra inactiva.' });
+    }
+
+    const intentoFinalizado = inferirIntentoFinalizado({ finalizado, aprobado, puntaje, aciertos, errores });
+    const [result] = await connection.query(
+      `INSERT INTO intentos_estacion (id_usuario, id_estacion, puntaje, aciertos, errores, aprobado, finalizado)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [id_usuario, id_estacion, puntaje || 0, aciertos || 0, errores || 0, Boolean(aprobado), intentoFinalizado]
+    );
+
+    const intentos = (!Boolean(aprobado) && intentoFinalizado)
+      ? await evaluarBloqueoPorIntentos(connection, id_usuario, id_estacion)
+      : { fallos: 0, bloqueo: null };
+
+    await connection.commit();
+
+    res.status(201).json({
+      message: 'Intento de estacion registrado correctamente.',
+      id_intento: result.insertId,
+      finalizado: intentoFinalizado,
+      intentos_fallidos: intentos.fallos,
+      limite_intentos: FAILED_ATTEMPT_LIMIT,
+      bloqueo: intentos.bloqueo
+    });
+  } catch (error) {
+    await connection.rollback();
+    res.status(500).json({ error: error.message });
+  } finally {
+    connection.release();
+  }
+});
+
+async function intentosLegacyDisabledNotMounted(req, res) {
+  const { id_usuario, id_estacion, puntaje, aciertos, errores, aprobado, finalizado } = req.body;
 
   if (!id_usuario || !id_estacion) {
     return res.status(400).json({ error: 'Faltan parámetros: id_usuario o id_estacion' });
@@ -907,12 +999,57 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-});
+}
 
 // ==========================================
 // 6a. PUT /api/intentos/:id_intento
 // ==========================================
 app.put('/api/intentos/:id_intento', permitirJugador, verificarBloqueoJugador, async (req, res) => {
+  const idIntento = req.params.id_intento;
+  const { puntaje, aciertos, errores, aprobado, finalizado } = req.body;
+
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    const intentoFinalizado = finalizado === undefined
+      ? true
+      : inferirIntentoFinalizado({ finalizado, aprobado, puntaje, aciertos, errores });
+
+    await connection.query(
+      `UPDATE intentos_estacion
+       SET puntaje = ?, aciertos = ?, errores = ?, aprobado = ?, finalizado = ?
+       WHERE id_intento = ?`,
+      [puntaje || 0, aciertos || 0, errores || 0, Boolean(aprobado), intentoFinalizado, idIntento]
+    );
+
+    const [[intento]] = await connection.query(
+      'SELECT id_usuario, id_estacion FROM intentos_estacion WHERE id_intento = ?',
+      [idIntento]
+    );
+    const intentos = (intento && !Boolean(aprobado) && intentoFinalizado)
+      ? await evaluarBloqueoPorIntentos(connection, intento.id_usuario, intento.id_estacion)
+      : { fallos: 0, bloqueo: null };
+
+    await connection.commit();
+
+    res.json({
+      message: 'Intento de estacion actualizado correctamente.',
+      finalizado: intentoFinalizado,
+      intentos_fallidos: intentos.fallos,
+      limite_intentos: FAILED_ATTEMPT_LIMIT,
+      bloqueo: intentos.bloqueo
+    });
+  } catch (error) {
+    await connection.rollback();
+    console.error('Error al actualizar intento:', error.message);
+    res.status(500).json({ error: error.message });
+  } finally {
+    connection.release();
+  }
+});
+
+async function actualizarIntentoLegacyDisabledNotMounted(req, res) {
   const idIntento = req.params.id_intento;
   const { puntaje, aciertos, errores, aprobado } = req.body;
 
@@ -929,7 +1066,7 @@ app.put('/api/intentos/:id_intento', permitirJugador, verificarBloqueoJugador, a
     console.error('Error al actualizar intento:', error.message);
     res.status(500).json({ error: error.message });
   }
-});
+}
 
 // ==========================================
 // 7. POST /api/respuestas-usuario
@@ -1037,7 +1174,7 @@ app.get('/api/progreso/:id_usuario', permitirJugador, async (req, res) => {
 // 9. POST /api/boletos
 // ==========================================
 app.post('/api/boletos', permitirJugador, async (req, res) => {
-  const { id_usuario, reclamar, tipo_entrada, destino_boleto, lugar, modo_prueba } = req.body;
+  const { id_usuario, reclamar, tipo_entrada, destino_boleto, lugar } = req.body;
 
   if (!id_usuario) {
     return res.status(400).json({ error: 'Falta el id_usuario.' });
@@ -1061,6 +1198,7 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
       return res.status(403).json({
         error: 'usuario_bloqueado',
         mensaje: estadoBloqueo.mensaje,
+        motivo_bloqueo: estadoBloqueo.motivo_bloqueo,
         fecha_puede_volver: estadoBloqueo.fecha_puede_volver,
         fecha_puede_volver_texto: estadoBloqueo.fecha_puede_volver_texto
       });
@@ -1068,7 +1206,14 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
 
     // 2. Verificar si ya existe un boleto y su estado
     const [[boletoExistente]] = await connection.query(
-      'SELECT * FROM boletos WHERE id_usuario = ?',
+      `SELECT *
+       FROM boletos
+       WHERE id_usuario = ?
+         AND usado = FALSE
+         AND LOWER(estado) = 'activo'
+         AND (valido_hasta IS NULL OR valido_hasta > CURRENT_TIMESTAMP)
+       ORDER BY id_boleto DESC
+       LIMIT 1`,
       [id_usuario]
     );
 
@@ -1089,17 +1234,11 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
     const estacionesAprobadas = progreso.map(p => p.id_estacion);
     const estacionesObligatorias = [1, 2, 3, 4, 5, 6];
     const tieneTodoAprobado = estacionesObligatorias.every(id => estacionesAprobadas.includes(id));
-    // HERRAMIENTA TEMPORAL: omite solo esta validacion; no escribe progreso ni puntajes falsos.
-    const usaSimulacionDePruebas = STATION_COMPLETION_TEST_MODE_ENABLED && modo_prueba === true;
 
-    if (!tieneTodoAprobado && !usaSimulacionDePruebas) {
+    if (!tieneTodoAprobado) {
       console.warn(`Usuario ${id_usuario} intenta generar boleto sin completar todo el recorrido. Estaciones aprobadas:`, estacionesAprobadas);
       await connection.rollback();
       return res.status(403).json({ error: 'Debes completar todas las estaciones antes de reclamar tu boleto.' });
-    }
-
-    if (usaSimulacionDePruebas) {
-      console.warn(`[Pruebas] Generando boleto para el usuario ${id_usuario} sin alterar su progreso real.`);
     }
 
     const recibioSeleccionBoleto = [tipo_entrada, destino_boleto, lugar].some(tieneTexto);
@@ -1117,8 +1256,7 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
       seccion_boleto: seccionBoleto,
       lugar: lugarBoleto,
       valido_desde: fechaEmisionBoleto.toISOString(),
-      valido_hasta: fechaVencimientoBoleto.toISOString(),
-      ...(usaSimulacionDePruebas ? { modo_prueba: true, puntaje_simulado: 55 } : {})
+      valido_hasta: fechaVencimientoBoleto.toISOString()
     } : null;
     const hasTicketMetadata = Boolean(ticketMetadata);
     const ticketObservaciones = hasTicketMetadata ? JSON.stringify(ticketMetadata) : null;
@@ -1157,9 +1295,7 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
         [
           newBoletoId,
           id_usuario,
-          usaSimulacionDePruebas
-            ? 'Boleto generado con la herramienta temporal de pruebas'
-            : 'Boleto generado al completar recorrido'
+          'Boleto generado al completar recorrido'
         ]
       );
 
@@ -1173,9 +1309,7 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
         [
           id_usuario,
           String(newBoletoId),
-          usaSimulacionDePruebas
-            ? 'Boleto generado con simulacion temporal de estaciones completadas'
-            : 'Boleto generado al completar recorrido'
+          'Boleto generado al completar recorrido'
         ]
       );
 

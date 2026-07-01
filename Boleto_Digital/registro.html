@@ -592,47 +592,6 @@
     const qs = new URLSearchParams(location.search);
     const salaSlug = qs.get('sala') || 'energia';
 
-    // HERRAMIENTA TEMPORAL: estado creado por "Completar estaciones para prueba".
-    const STATION_COMPLETION_TEST_STATE_KEY = 'much_station_completion_test_state';
-
-    function getStationCompletionTestState() {
-      try {
-        return JSON.parse(sessionStorage.getItem(STATION_COMPLETION_TEST_STATE_KEY) || 'null');
-      } catch (_) {
-        return null;
-      }
-    }
-
-    function restoreTestProgressSnapshot() {
-      const state = getStationCompletionTestState();
-      if (!state?.active || !state.original || state.restored) return state;
-
-      const restoreValue = (key, value) => {
-        if (value === null || value === undefined) localStorage.removeItem(key);
-        else localStorage.setItem(key, value);
-      };
-
-      restoreValue('much_completed_stations', state.original.completedStations);
-      restoreValue('much_current_station', state.original.currentStation);
-      restoreValue('much_mission_reward_claimed', state.original.rewardClaimed);
-      restoreValue('much_mission_reward_ticket_choice', state.original.rewardChoice);
-
-      const restoredState = {
-        ...state,
-        restored: true,
-        restoredAt: new Date().toISOString()
-      };
-      sessionStorage.setItem(STATION_COMPLETION_TEST_STATE_KEY, JSON.stringify(restoredState));
-      return restoredState;
-    }
-
-    function isStationCompletionTestActive() {
-      const state = getStationCompletionTestState();
-      return Boolean(state?.active && state?.continuing);
-    }
-
-    restoreTestProgressSnapshot();
-
     // ---------- Validadores ----------
     const reNombre = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:[ \t]+[A-Za-zÁÉÍÓÚÜÑáéíóúüñ'.-]+){1,}$/;
     const reEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
@@ -860,9 +819,7 @@
           reclamar: true,
           tipo_entrada: getTipoEntrada(prizeData),
           destino_boleto: prizeData?.destino_boleto || prizeData?.ticketChoice?.key || '',
-          lugar: prizeData?.lugar || '',
-          // HERRAMIENTA TEMPORAL: el backend solo acepta este modo con la bandera de desarrollo activa.
-          modo_prueba: isStationCompletionTestActive()
+          lugar: prizeData?.lugar || ''
         })
       });
 
@@ -960,15 +917,6 @@
           prizeData
         );
       } catch (err) {
-        if (isStationCompletionTestActive()) {
-          console.error('[REGISTRO][PRUEBAS] No se genero un boleto verificable:', err);
-          alert(`No se pudo generar el boleto de prueba en el servidor: ${err.message}`);
-          submitting = false;
-          $('submitBtn').removeAttribute('disabled');
-          $('submitBtn').textContent = 'Obtener mi Boleto';
-          return;
-        }
-
         // Si es un error de bloqueo o límites de reclamación, NO debemos proceder localmente (seguridad)
         if (err.message.includes('Ya reclamaste') || err.message.includes('bloqueado') || err.message.includes('utilizado')) {
           alert(err.message);
@@ -1008,10 +956,6 @@
         fecha_volver_texto: prizeData.fecha_puede_volver_texto || '',
         sala: salaSlug
       });
-
-      if (isStationCompletionTestActive()) {
-        sessionStorage.removeItem(STATION_COMPLETION_TEST_STATE_KEY);
-      }
 
       // Guardar datos mínimos (no sensibles) del boleto en Local Storage
       try {

@@ -97,6 +97,7 @@ CREATE TABLE IF NOT EXISTS intentos_estacion (
   aciertos INT DEFAULT 0,
   errores INT DEFAULT 0,
   aprobado BOOLEAN DEFAULT FALSE,
+  finalizado BOOLEAN NOT NULL DEFAULT FALSE,
   fecha_intento TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_intentos_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
   CONSTRAINT fk_intentos_estacion FOREIGN KEY (id_estacion) REFERENCES estaciones (id_estacion) ON DELETE CASCADE

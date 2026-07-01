@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS intentos_estacion (
     errores INT DEFAULT 0,
     puntaje INT DEFAULT 0,
     aprobado BOOLEAN DEFAULT false,
+    finalizado BOOLEAN DEFAULT false,
     fecha_intento TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (estacion_id) REFERENCES estaciones(id) ON DELETE CASCADE
