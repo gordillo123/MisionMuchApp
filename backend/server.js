@@ -82,6 +82,18 @@ async function ensureAttemptSchema() {
   await agregarColumnaSiFalta('intentos_estacion', 'finalizado', "ALTER TABLE intentos_estacion ADD COLUMN finalizado BOOLEAN NOT NULL DEFAULT FALSE AFTER aprobado");
 }
 
+async function ensurePrivacyConsentSchema() {
+  const [[table]] = await pool.query(
+    `SELECT COUNT(*) AS total
+     FROM information_schema.TABLES
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'usuarios'`
+  );
+  if (!Number(table?.total || 0)) return;
+
+  await agregarColumnaSiFalta('usuarios', 'acepto_privacidad', "ALTER TABLE usuarios ADD COLUMN acepto_privacidad BOOLEAN NOT NULL DEFAULT FALSE AFTER activo");
+  await agregarColumnaSiFalta('usuarios', 'privacidad_aceptada_en', "ALTER TABLE usuarios ADD COLUMN privacidad_aceptada_en TIMESTAMP NULL AFTER acepto_privacidad");
+}
+
 function inferirIntentoFinalizado({ finalizado, aprobado, puntaje, aciertos, errores }) {
   if (finalizado !== undefined) return Boolean(finalizado);
   return Boolean(aprobado)
@@ -150,6 +162,7 @@ async function evaluarBloqueoPorIntentos(connection, idUsuario, idEstacion) {
     await playtime.ensureTables();
     await ensureTicketSchema();
     await ensureAttemptSchema();
+    await ensurePrivacyConsentSchema();
     console.log('✅ Tablas de bloqueo de juego verificadas/creadas con éxito.');
   } catch (error) {
     console.error('❌ Error al verificar/crear tablas de bloqueo de juego:', error.message);
@@ -225,6 +238,18 @@ async function esAdmin(idUsuario) {
 async function esTaquilla(idUsuario) {
   const roles = await obtenerRolUsuario(idUsuario);
   return roles.includes('taquilla') || roles.includes('admin');
+}
+
+async function usuarioTieneConsentimientoPrivacidad(idUsuario) {
+  if (!idUsuario) return false;
+  const [[usuario]] = await pool.query(
+    `SELECT acepto_privacidad
+     FROM usuarios
+     WHERE id_usuario = ?
+     LIMIT 1`,
+    [idUsuario]
+  );
+  return Boolean(usuario?.acepto_privacidad);
 }
 
 async function usuarioExiste(idUsuario, connection = pool) {
@@ -387,6 +412,14 @@ async function permitirJugador(req, res, next) {
     });
   }
 
+  if (!(await usuarioTieneConsentimientoPrivacidad(idUsuario))) {
+    return res.status(403).json({
+      error: 'privacy_consent_required',
+      mensaje: 'Debes aceptar el aviso de privacidad para continuar.'
+    });
+  }
+
+  req.idUsuario = idUsuario;
   next();
 }
 
@@ -550,7 +583,9 @@ app.post('/api/auth/google', async (req, res) => {
       correo: usuario.correo,
       avatar_url: usuario.avatar_url,
       roles: userRoles,
-      activo: usuario.activo
+      activo: usuario.activo,
+      acepto_privacidad: Boolean(usuario.acepto_privacidad),
+      privacidad_aceptada_en: usuario.privacidad_aceptada_en
     });
 
   } catch (error) {
@@ -1922,6 +1957,76 @@ app.get('/api/usuarios/:id_usuario/roles', async (req, res) => {
 
     const roles = await obtenerRolUsuario(idUsuario);
     res.json({ id_usuario: idUsuario, exists: true, roles });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 19b-2. GET /api/usuarios/:id_usuario/privacy-consent
+// ==========================================
+app.get('/api/usuarios/:id_usuario/privacy-consent', async (req, res) => {
+  const idUsuario = req.params.id_usuario;
+  try {
+    const [[usuario]] = await pool.query(
+      `SELECT id_usuario, acepto_privacidad, privacidad_aceptada_en
+       FROM usuarios
+       WHERE id_usuario = ?`,
+      [idUsuario]
+    );
+
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado.' });
+    }
+
+    res.json({
+      id_usuario: usuario.id_usuario,
+      acepto_privacidad: Boolean(usuario.acepto_privacidad),
+      privacidad_aceptada_en: usuario.privacidad_aceptada_en,
+      completo: Boolean(usuario.acepto_privacidad)
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 19b-3. POST /api/usuarios/:id_usuario/privacy-consent
+// ==========================================
+app.post('/api/usuarios/:id_usuario/privacy-consent', async (req, res) => {
+  const idUsuario = req.params.id_usuario;
+  const { acepto_privacidad } = req.body || {};
+
+  try {
+    if (!(await usuarioExiste(idUsuario))) {
+      return res.status(404).json({ error: 'Usuario no encontrado.' });
+    }
+
+    if (acepto_privacidad !== true) {
+      return res.status(400).json({ error: 'Debes aceptar el aviso de privacidad.' });
+    }
+
+    await pool.query(
+      `UPDATE usuarios
+       SET acepto_privacidad = TRUE,
+           privacidad_aceptada_en = CURRENT_TIMESTAMP
+       WHERE id_usuario = ?`,
+      [idUsuario]
+    );
+
+    const [[usuario]] = await pool.query(
+      `SELECT id_usuario, acepto_privacidad, privacidad_aceptada_en
+       FROM usuarios
+       WHERE id_usuario = ?`,
+      [idUsuario]
+    );
+
+    res.json({
+      id_usuario: usuario.id_usuario,
+      acepto_privacidad: Boolean(usuario.acepto_privacidad),
+      privacidad_aceptada_en: usuario.privacidad_aceptada_en,
+      completo: true
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

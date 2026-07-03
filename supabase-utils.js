@@ -464,7 +464,9 @@ async function iniciarSesionConGoogle() {
           email: data.correo,
           picture: data.avatar_url,
           avatar_url: data.avatar_url,
-          roles: data.roles || ['usuario']
+          roles: data.roles || ['usuario'],
+          acepto_privacidad: Boolean(data.acepto_privacidad),
+          privacidad_aceptada_en: data.privacidad_aceptada_en || null
         };
         localStorage.setItem('much_google_user', JSON.stringify(sessionUser));
 
@@ -597,6 +599,216 @@ async function verificarUsuarioEnTabla() {
     console.info('[Auth] No se pudo verificar el usuario local en backend.', error.message);
     return user;
   }
+}
+
+function usuarioTieneConsentimientoLocal(user = obtenerUsuarioLocal()) {
+  return Boolean(user?.acepto_privacidad);
+}
+
+function actualizarUsuarioLocalConsentimiento(consentimiento) {
+  const user = obtenerUsuarioLocal();
+  if (!user) return null;
+  const actualizado = {
+    ...user,
+    acepto_privacidad: Boolean(consentimiento.acepto_privacidad),
+    privacidad_aceptada_en: consentimiento.privacidad_aceptada_en || user.privacidad_aceptada_en || null
+  };
+  localStorage.setItem('much_google_user', JSON.stringify(actualizado));
+  return actualizado;
+}
+
+function aceptarConsentimientoPrivacidadLocalPendiente() {
+  const aceptadoEn = new Date().toISOString();
+  const actualizado = actualizarUsuarioLocalConsentimiento({
+    acepto_privacidad: true,
+    privacidad_aceptada_en: aceptadoEn
+  });
+  localStorage.setItem('much_privacy_consent_pending_sync', 'true');
+  return actualizado;
+}
+
+async function consultarConsentimientoPrivacidad(user = obtenerUsuarioLocal()) {
+  const userId = obtenerIdUsuarioLocal(user);
+  if (!userId) return null;
+
+  const res = await fetch(`${API_BASE_URL}/api/usuarios/${userId}/privacy-consent`);
+  if (!res.ok) {
+    const error = new Error('No se pudo consultar el consentimiento de privacidad.');
+    error.status = res.status;
+    throw error;
+  }
+  const data = await res.json();
+  actualizarUsuarioLocalConsentimiento(data);
+  return data;
+}
+
+function crearModalConsentimientoPrivacidad() {
+  let modal = document.getElementById('much-privacy-consent-modal');
+  if (modal) return modal;
+
+  modal = document.createElement('div');
+  modal.id = 'much-privacy-consent-modal';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-labelledby', 'muchPrivacyTitle');
+  modal.style.cssText = `
+    position: fixed;
+    inset: 0;
+    z-index: 1000000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(3, 8, 24, 0.88);
+    backdrop-filter: blur(12px);
+    font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  `;
+  modal.innerHTML = `
+    <div style="
+      width: min(94vw, 520px);
+      max-height: min(92vh, 720px);
+      overflow: auto;
+      background: #101936;
+      color: #f7fafc;
+      border: 1px solid rgba(124, 179, 255, 0.35);
+      border-radius: 16px;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.55);
+      padding: 26px;
+    ">
+      <div style="display: grid; gap: 10px; margin-bottom: 20px;">
+        <p style="margin: 0; color: #f6c453; font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;">Acceso requerido</p>
+        <h2 id="muchPrivacyTitle" style="margin: 0; font-size: clamp(24px, 5vw, 34px); line-height: 1.08;">Aviso de privacidad</h2>
+        <p style="margin: 0; color: #c7d2fe; font-size: 15px; line-height: 1.5;">
+          Para continuar con Mision MUCH necesitamos tu aceptacion del uso de datos de la cuenta para guardar progreso, premios y actividad de juego.
+        </p>
+      </div>
+
+      <form id="muchPrivacyForm" style="display: grid; gap: 16px;">
+        <label style="
+          display: grid;
+          grid-template-columns: 22px 1fr;
+          gap: 11px;
+          align-items: start;
+          color: #e2e8f0;
+          font-size: 14px;
+          line-height: 1.45;
+        ">
+          <input id="muchPrivacyCheck" type="checkbox" style="width: 18px; height: 18px; margin-top: 2px;">
+          <span>Acepto los terminos y condiciones de privacidad, y autorizo el tratamiento de mis datos para operar mi cuenta y progreso dentro de la aplicacion.</span>
+        </label>
+
+        <p id="muchPrivacyError" style="display: none; margin: 0; color: #fecaca; background: rgba(220, 38, 38, 0.16); border: 1px solid rgba(248, 113, 113, 0.35); border-radius: 10px; padding: 10px 12px; font-size: 13px;"></p>
+
+        <button id="muchPrivacyAccept" type="submit" disabled style="
+          width: 100%;
+          min-height: 46px;
+          border: 0;
+          border-radius: 10px;
+          background: linear-gradient(90deg, #f6c453, #f97316);
+          color: #111827;
+          font-weight: 900;
+          font-size: 15px;
+          cursor: pointer;
+          opacity: 0.45;
+        ">Aceptar y continuar</button>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  return modal;
+}
+
+function mostrarModalConsentimientoPrivacidad() {
+  return new Promise((resolve, reject) => {
+    const user = obtenerUsuarioLocal();
+    const userId = obtenerIdUsuarioLocal(user);
+    if (!userId) {
+      reject(new Error('No hay usuario autenticado para guardar consentimiento.'));
+      return;
+    }
+
+    const modal = crearModalConsentimientoPrivacidad();
+    const form = modal.querySelector('#muchPrivacyForm');
+    const privacyCheck = modal.querySelector('#muchPrivacyCheck');
+    const acceptButton = modal.querySelector('#muchPrivacyAccept');
+    const errorEl = modal.querySelector('#muchPrivacyError');
+
+    const setError = (message) => {
+      errorEl.textContent = message || '';
+      errorEl.style.display = message ? 'block' : 'none';
+    };
+
+    const updateState = () => {
+      const valid = privacyCheck.checked;
+      acceptButton.disabled = !valid;
+      acceptButton.style.opacity = valid ? '1' : '0.45';
+      acceptButton.style.cursor = valid ? 'pointer' : 'not-allowed';
+    };
+
+    privacyCheck.addEventListener('change', updateState);
+
+    form.onsubmit = async (event) => {
+      event.preventDefault();
+      updateState();
+      if (acceptButton.disabled) return;
+
+      acceptButton.disabled = true;
+      acceptButton.textContent = 'Guardando...';
+      setError('');
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/usuarios/${userId}/privacy-consent`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            acepto_privacidad: true
+          })
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.error || 'No se pudo guardar el consentimiento.');
+        }
+
+        actualizarUsuarioLocalConsentimiento(data);
+        modal.style.display = 'none';
+        resolve(data);
+      } catch (error) {
+        if (error instanceof TypeError && String(error.message || '').toLowerCase().includes('fetch')) {
+          aceptarConsentimientoPrivacidadLocalPendiente();
+          console.warn('[Privacidad] Backend no disponible; consentimiento guardado localmente para sincronizar despues.');
+          modal.style.display = 'none';
+          resolve({ acepto_privacidad: true, privacidad_aceptada_en: new Date().toISOString(), pendiente_sync: true });
+          return;
+        }
+
+        setError(error.message || 'No se pudo guardar el consentimiento.');
+        acceptButton.disabled = false;
+        acceptButton.textContent = 'Aceptar y continuar';
+        updateState();
+      }
+    };
+
+    modal.style.display = 'flex';
+    privacyCheck.focus();
+    updateState();
+  });
+}
+
+async function asegurarConsentimientoPrivacidad() {
+  const user = obtenerUsuarioLocal();
+  if (!user) return false;
+  if (usuarioTieneConsentimientoLocal(user)) return true;
+
+  try {
+    const consentimiento = await consultarConsentimientoPrivacidad(user);
+    if (consentimiento?.completo) return true;
+  } catch (error) {
+    console.info('[Privacidad] Se solicitara consentimiento localmente.', error.message);
+  }
+
+  await mostrarModalConsentimientoPrivacidad();
+  return true;
 }
 
 // Consultar estaciones activas
@@ -983,6 +1195,8 @@ window.iniciarSesionConGoogle = iniciarSesionConGoogle;
 window.cerrarSesion = cerrarSesion;
 window.normalizarUsuarioSupabase = normalizarUsuarioSupabase;
 window.verificarUsuarioEnTabla = verificarUsuarioEnTabla;
+window.asegurarConsentimientoPrivacidad = asegurarConsentimientoPrivacidad;
+window.consultarConsentimientoPrivacidad = consultarConsentimientoPrivacidad;
 window.consultarEstaciones = consultarEstaciones;
 window.guardarProgresoUsuario = guardarProgresoUsuario;
 window.inicializarProgresoUsuario = inicializarProgresoUsuario;
@@ -1021,6 +1235,9 @@ function esPaginaDeEstacion() {
 if (typeof window !== 'undefined' && esPaginaDeEstacion()) {
   window.addEventListener('DOMContentLoaded', async () => {
     try {
+      if (obtenerUsuarioLocal()) {
+        await asegurarConsentimientoPrivacidad();
+      }
       const estado = await consultarEstadoBloqueoJuego(true);
       if (estado.bloqueado) {
         mostrarAvisoBloqueoJuego(estado);
@@ -1055,6 +1272,8 @@ export {
   cerrarSesion,
   normalizarUsuarioSupabase,
   verificarUsuarioEnTabla,
+  asegurarConsentimientoPrivacidad,
+  consultarConsentimientoPrivacidad,
   consultarEstaciones,
   guardarProgresoUsuario,
   inicializarProgresoUsuario,

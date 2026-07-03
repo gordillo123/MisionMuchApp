@@ -12,7 +12,9 @@ CREATE TABLE IF NOT EXISTS usuarios (
   avatar_url TEXT NULL,
   fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   ultimo_login TIMESTAMP NULL,
-  activo BOOLEAN DEFAULT TRUE
+  activo BOOLEAN DEFAULT TRUE,
+  acepto_privacidad BOOLEAN NOT NULL DEFAULT FALSE,
+  privacidad_aceptada_en TIMESTAMP NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 2. Tabla: roles

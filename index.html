@@ -11898,6 +11898,10 @@
           // Sincronizar el progreso de la BD después de verificar el usuario
           await actualizarVisibilidadMenuRoles();
           if (redirectInternalUserIfNeeded(googleUser)) return googleUser;
+          if (typeof window.asegurarConsentimientoPrivacidad === 'function') {
+            await window.asegurarConsentimientoPrivacidad();
+            googleUser = JSON.parse(localStorage.getItem('much_google_user') || 'null');
+          }
           if (typeof window.consultarEstadoBloqueoJuego === 'function') {
             const estadoJuego = await window.consultarEstadoBloqueoJuego(true);
             if (estadoJuego?.bloqueado && typeof window.mostrarAvisoBloqueoJuego === 'function') {
