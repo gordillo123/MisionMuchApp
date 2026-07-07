@@ -3,152 +3,161 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MUCH &bull; Quiz Interactivo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#2a1454" />
+  <title>MUCH · Memorama del MUCH</title>
 
   <script src="../assets/navigation-guard.js"></script>
   <script src="../assets/role-access.js"></script>
   <script>
     window.MuchRoleAccess?.redirectIfInternalUserOnPlayerPage({ basePath: '../' });
   </script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+
   <link rel="stylesheet" href="../assets/station-completion.css">
-  <link rel="stylesheet" href="../assets/quiz-options.css">
-  <link rel="stylesheet" href="station-layout.css">
+  <link rel="stylesheet" href="memorama.css">
 </head>
 
-<body>
-  <canvas id="confetti" class="confetti-canvas"></canvas>
+<body class="memorama-body">
+  <div class="memorama-stars" aria-hidden="true"></div>
 
-  <button id="startBtn" class="visually-hidden" hidden></button>
+  <div class="memorama-app">
+    <!-- Pantalla de inicio -->
+    <section id="screenStart" class="memorama-screen is-active">
+      <div class="mm-topbar">
+        <button type="button" id="btnBackStart" class="mm-btn-back" title="Regresar al mapa">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Volver
+        </button>
+        <p class="mm-station-label">Estación 1 / Memorama</p>
+        <span style="width:72px" aria-hidden="true"></span>
+      </div>
+
+      <div class="mm-hero-card">
+        <h1 class="mm-title">MEMORAMA</h1>
+        <p class="mm-subtitle">DESCUBRE EL MUCH</p>
+        <p class="mm-desc">
+          Pon a prueba tu memoria encontrando los pares de cartas relacionadas con el Museo Chiapas de Ciencia y Tecnología.
+        </p>
+      </div>
+
+      <div class="mm-section">
+        <h3>¿Cómo jugar?</h3>
+        <ul>
+          <li>Toca una carta para descubrirla.</li>
+          <li>Toca otra carta para encontrar su pareja.</li>
+          <li>Si son iguales, se quedarán descubiertas y sumarás puntos.</li>
+          <li>Encuentra todos los pares antes de que se acabe el tiempo.</li>
+        </ul>
+      </div>
+
+      <div class="mm-section">
+        <h3>Recompensa</h3>
+        <p>Completa el memorama y gana los <strong>10 puntos</strong> de la Estación 1 para tu recorrido.</p>
+      </div>
+
+      <button type="button" id="btnMemoramaStart" class="mm-btn-primary">¡COMENZAR!</button>
+
+      <div class="mm-logo-strip" aria-label="Logos institucionales">
+        <img src="logo-much.png" alt="MUCH · Museo Chiapas" class="mm-logo-much">
+        <img src="logo-sata.png" alt="SATA" class="mm-logo-sata">
+        <img src="../Sbeel_Dinosaurios/logo-sbeel-dinosaurios.png" alt="SBEEL Dinosaurios" class="mm-logo-sbeel">
+        <img src="../assets/logo-planetario-tuxtla.svg" alt="Planetario Tuxtla" class="mm-logo-planetario">
+      </div>
+    </section>
+
+    <!-- Pantalla de juego -->
+    <section id="screenGame" class="memorama-screen">
+      <div class="mm-topbar">
+        <button type="button" id="btnBackGame" class="mm-btn-back" title="Regresar al mapa">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Volver
+        </button>
+        <p class="mm-station-label">Estación 1 / Memorama</p>
+        <span style="width:72px" aria-hidden="true"></span>
+      </div>
+
+      <div class="mm-game-header">
+        <h2>MEMORAMA DEL MUCH</h2>
+      </div>
+
+      <div class="mm-stats">
+        <div class="mm-stat">
+          <span>Tiempo</span>
+          <strong id="mmTimer">01:20</strong>
+        </div>
+        <div class="mm-stat">
+          <span>Puntos</span>
+          <strong id="mmScore">0</strong>
+        </div>
+        <div class="mm-stat">
+          <span>Intentos</span>
+          <strong id="mmAttempts">0</strong>
+        </div>
+      </div>
+
+      <div id="mmBoard" class="mm-board" role="grid" aria-label="Tablero de memorama"></div>
+    </section>
+
+    <!-- Pantalla de victoria -->
+    <section id="screenVictory" class="memorama-screen">
+      <div class="mm-victory">
+        <div class="mm-trophy" aria-hidden="true">🏆</div>
+        <h2>¡MUY BIEN!</h2>
+        <p>Encontraste todos los pares y completaste la Estación 1.</p>
+        <div class="mm-points-badge" id="mmVictoryPoints">+10 puntos</div>
+        <p>Tu memoria es increíble. ¡Sigue así y continúa el recorrido!</p>
+        <div id="mmVictoryHost" class="mm-victory-host"></div>
+        <button type="button" id="btnMemoramaContinue" class="mm-btn-primary">CONTINUAR</button>
+      </div>
+    </section>
+
+    <!-- Pantalla de fallo -->
+    <section id="screenFail" class="memorama-screen mm-fail">
+      <div class="mm-victory">
+        <div class="mm-trophy" aria-hidden="true">⏳</div>
+        <h2>¡Se acabó el tiempo!</h2>
+        <p>No alcanzaste a encontrar todos los pares. ¡Inténtalo de nuevo!</p>
+        <button type="button" id="btnMemoramaRetry" class="mm-btn-primary">Reintentar</button>
+        <button type="button" class="mm-btn-secondary" onclick="window.location.href='../index.html?view=prep'">Volver al mapa</button>
+      </div>
+    </section>
+
+    <!-- Ya completada -->
+    <section id="screenAlreadyDone" class="memorama-screen">
+      <div class="mm-already-done">
+        <h1 class="mm-title">Estación completada</h1>
+        <p class="mm-desc" style="margin-bottom:20px;">
+          Ya terminaste el Memorama del MUCH. No se sumarán puntos adicionales.
+        </p>
+        <button type="button" id="btnBackDone" class="mm-btn-primary">Volver al mapa</button>
+      </div>
+    </section>
+  </div>
 
   <script>
     (function () {
       var params = new URLSearchParams(location.search);
       var from = params.get('from');
       var lugar = params.get('lugar');
-
-      // 🛡️ ATRAPAMOS EL LUGAR EN EL MILISEGUNDO 1 ANTES DE QUE SE PIERDA
-      if (lugar) {
-        localStorage.setItem('much_lugar_seguro', lugar);
-      }
-
-      // Permite entrar si vienes desde la portada; si no, manda a portada.html
+      if (lugar) localStorage.setItem('much_lugar_seguro', lugar);
       if (from !== 'portada') {
-        // Al redirigir, nos llevamos el enlace completo por si acaso
         location.replace('portada.html' + location.search);
       }
     })();
   </script>
 
-  <main id="quizShell">
-    <div class="quiz-card">
-
-      <div class="header-section text-center mb-3">
-        <div class="station-logo-strip" aria-label="Logos institucionales">
-          <img src="logo-much.png" alt="MUCH · Museo Chiapas" class="station-logo-much">
-          <img src="logo-sata.png" alt="SATA" class="station-logo-sata">
-          <img src="../Sbeel_Dinosaurios/logo-sbeel-dinosaurios.png" alt="SBEEL Dinosaurios" class="station-logo-sbeel">
-          <img src="../assets/logo-planetario-tuxtla.svg" alt="Planetario Tuxtla" class="station-logo-planetario">
-        </div>
-
-        <h1 class="app-title mb-0">MUCH &bull; Quiz Interactivo</h1>
-        <p class="app-subtitle mb-0">Responde, aprende y demuestra tu conocimiento 🧠</p>
-      </div>
-
-      <div class="controls-row d-flex justify-content-between align-items-center gap-3 mb-4">
-        <button id="returnBtn" type="button" class="btn-back-premium" title="Regresar al mapa">
-          <div class="back-icon-wrapper">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 12H5M12 19l-7-7 7-7"/>
-            </svg>
-            <span class="back-icon-label">Volver</span>
-          </div>
-          Regresar
-        </button>
-        <div id="pillSala" class="sala-pill">Sala: Entrada</div>
-
-        <input type="checkbox" id="soundToggle" checked hidden>
-      </div>
-
-      <div class="progress mb-4" style="height:4px;" role="progressbar">
-        <div id="bar" class="progress-bar" style="width:0%"></div>
-      </div>
-
-      <section id="quizView">
-        <div class="question-container text-center">
-
-          <div class="d-inline-block mb-3">
-            <span class="badge-question">
-              PREGUNTA <span id="qIndex">1</span> DE <span id="qTotal">6</span>
-            </span>
-          </div>
-
-          <h2 id="qText" class="question-text mb-4">¿...?</h2>
-          <div id="questionTimer" class="question-timer mb-3 fw-bold text-warning">⏳ 10 s</div>
-          <p id="qDesc" class="d-none">...</p>
-          <div id="options" class="options-list d-flex flex-column gap-3 mb-4">
-          </div>
-
-          <div id="status" class="status-msg fw-bold mb-3" aria-live="polite"></div>
-
-          <button id="nextBtn" type="button" class="btn btn-action w-100 py-3 rounded-4 fw-bold shadow-sm">
-            Siguiente ➡️
-          </button>
-
-        </div>
-
-        <div class="footer-info score-panel text-center mt-4">
-          <div class="points-pill">
-            ⭐ Puntos: <strong id="points">0</strong>
-          </div>
-          <div class="score-stat correct-pill">
-            <span>Aciertos</span>
-            <strong><span id="correctCount">0</span>/<span id="correctTotal">6</span></strong>
-          </div>
-          <p id="hint" class="tiny text-muted mt-2 mb-0">Consejo: solo puedes elegir una respuesta.</p>
-        </div>
-      </section>
-
-      <section id="finalView" class="d-none text-center py-4">
-        <h2 id="finalTitle" class="h4 fw-bold mb-2">Resultados</h2>
-        <div id="finalMsg" class="result-message text-secondary mb-4"></div>
-
-        <div class="result-score mb-4">
-          <div class="display-4 fw-bold text-primary mb-0"><span id="finalPoints">0</span></div>
-          <small class="text-uppercase tracking-wider">Puntos totales</small>
-        </div>
-
-        <p class="mb-4">
-          Aciertos: <strong id="finalCorrect">0</strong> de <strong id="finalTotal">0</strong>
-        </p>
-
-        <div id="finalAutoNote" class="station-auto-note d-none" aria-live="polite"></div>
-
-        <div id="giftRow" class="d-flex flex-column gap-2 d-none">
-          <button id="nextStationBtn" class="btn btn-success w-100 py-3 rounded-4">Volver al mapa</button>
-          <button id="playAgainBtn1" class="btn btn-outline-secondary w-100 py-2 rounded-4">🔁 Jugar otra vez</button>
-        </div>
-
-        <div id="retryRow" class="d-flex flex-column gap-2 d-none">
-          <button id="playAgainBtn2" class="btn btn-primary w-100 py-3 rounded-4">🔁 Intentar de nuevo</button>
-        </div>
-      </section>
-
-    </div>
-  </main>
-
   <script src="../scripts/orientation-manager.js"></script>
   <script src="../scripts/much-local-storage.js"></script>
   <script src="../scripts/station-completion.js"></script>
-  <script src="preguntas-local.js"></script>
-  <script src="app.js"></script>
+  <script src="memorama.js"></script>
   <script src="../scripts/bg-music.js"></script>
   <script>
-    try { ensureBgMusic('../Sonidos/musica fondo.mp3'); initBgAutoPlay(); } catch(e){}
+    try { ensureBgMusic('../Sonidos/musica fondo.mp3'); initBgAutoPlay(); } catch (e) {}
   </script>
-
 </body>
 
 </html>

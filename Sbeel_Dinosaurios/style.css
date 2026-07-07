@@ -425,6 +425,19 @@ header h1 {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.partner-logos::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 8%;
+    right: 8%;
+    height: 3px;
+    background: #ffffff;
+    border-radius: 999px;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.55);
 }
 
 .partner-logo {

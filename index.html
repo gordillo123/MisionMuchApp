@@ -11467,7 +11467,7 @@
           // Lógica local para Invitados
           const localCompleted = getCompletedStations();
           const estaciones = [
-            { id: 1, nombre: 'Entrada MUCH', puntos_base: 10, key: '1', detalle: '10 preguntas' },
+            { id: 1, nombre: 'Entrada MUCH', puntos_base: 10, key: '1', detalle: 'Memorama' },
             { id: 2, nombre: 'Espinosaurio', puntos_base: 15, key: '2', detalle: '15 saltos' },
             { id: 3, nombre: 'Biodiversidad y Conocimiento', puntos_base: 10, key: '3', detalle: '10 preguntas' },
             { id: 4, nombre: 'Sala de Energía', puntos_base: 10, key: '4', detalle: '10 preguntas' },
@@ -12319,37 +12319,37 @@
           icon: '&#127915;',
           step: '01',
           title: '&iexcl;Bienvenido al MUCH!',
-          copy: 'Antes de comenzar tu aventura, observa con atenci&oacute;n todo lo que te rodea en el museo.'
+          copy: 'Antes de comenzar tu aventura, prep&aacute;rate para poner a prueba tu memoria en la Estaci&oacute;n 1.'
+        },
+        {
+          icon: '&#127183;',
+          step: '02',
+          title: 'Memorama del MUCH',
+          copy: 'Encuentra los pares de cartas relacionadas con el Museo Chiapas de Ciencia y Tecnolog&iacute;a.'
         },
         {
           icon: '&#128064;',
-          step: '02',
-          title: '&iexcl;Abre bien los ojos, explorador!',
-          copy: 'Mira los detalles de la entrada, los espacios, los colores, las figuras y todo lo que hace especial al MUCH.'
-        },
-        {
-          icon: '&#128269;',
           step: '03',
-          title: '&iexcl;Descubre lo que hay a tu alrededor!',
-          copy: 'En esta parte pondr&aacute;s a prueba qu&eacute; tanto observas y recuerdas del Museo Chiapas de Ciencia y Tecnolog&iacute;a.'
+          title: 'Toca para descubrir',
+          copy: 'Voltea las cartas una a una y recuerda d&oacute;nde est&aacute; cada imagen del museo.'
         },
         {
-          icon: '&#129504;',
+          icon: '&#128260;',
           step: '04',
-          title: '&iexcl;Responde el reto de observaci&oacute;n!',
-          copy: 'Tendr&aacute;s preguntas relacionadas con lo que viste en la entrada y en el museo.'
+          title: 'Busca las parejas',
+          copy: 'Si dos cartas coinciden, se quedan descubiertas y sumas puntos en tu recorrido.'
         },
         {
-          icon: '&#9989;',
+          icon: '&#9201;',
           step: '05',
-          title: '&iexcl;Demuestra tu atenci&oacute;n!',
-          copy: 'Contesta con cuidado y piensa bien tus respuestas antes de continuar.'
+          title: 'Cuida el tiempo',
+          copy: 'Tienes <strong>1 minuto y 20 segundos</strong> para encontrar todos los pares.'
         },
         {
           icon: '&#128640;',
           step: '06',
-          title: '&iexcl;Prep&aacute;rate para la misi&oacute;n cient&iacute;fica!',
-          copy: 'Al terminar este reto, estar&aacute;s listo para avanzar a las dem&aacute;s estaciones del recorrido.'
+          title: '&iexcl;Completa la Estaci&oacute;n 1!',
+          copy: 'Al terminar el memorama ganar&aacute;s los puntos de la estaci&oacute;n y podr&aacute;s continuar tu misi&oacute;n.'
         }
       ];
 
@@ -12669,12 +12669,12 @@
         [TICKET_STATION_ID]: {
           stationKey: TICKET_STATION_ID,
           prepListClass: 'ticket-station-rules-list',
-          prepTitle: 'Estaci\u00f3n 1: Taquilla',
-          prepTitleMarkup: '<span>Estaci&oacute;n 1: Taquilla</span><small>Reto: &iquest;Qu&eacute; tanto miras del MUCH?</small>',
+          prepTitle: 'Estaci\u00f3n 1: Memorama',
+          prepTitleMarkup: '<span>Estaci&oacute;n 1: Memorama</span><small>Memorama del MUCH</small>',
           overlayModeClass: 'ticket-station-rules-mode',
           boardClass: 'ticket-rules-board',
-          overlayTitle: 'Estaci\u00f3n 1: Taquilla',
-          overlaySubtitle: 'Reto: \u00bfQu\u00e9 tanto miras del MUCH?',
+          overlayTitle: 'Estaci\u00f3n 1: Memorama',
+          overlaySubtitle: 'Memorama del MUCH',
           buildPrepMarkup: buildStation1PrepRulesMarkup,
           buildOverlayMarkup: buildStation1RulesBoardMarkup
         },
