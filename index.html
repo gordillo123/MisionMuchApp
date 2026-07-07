@@ -13128,7 +13128,62 @@
         }
       }
 
+      function getFailedStations() {
+        try {
+          if (window.MuchLocalStorage?.isStationFailed) {
+            const failed = {};
+            REQUIRED_REWARD_STATIONS.forEach(id => {
+              if (window.MuchLocalStorage.isStationFailed(id)) {
+                failed[id] = true;
+              }
+            });
+            return failed;
+          }
+          const attempts = JSON.parse(localStorage.getItem('much_intentos_estaciones') || '{}');
+          const failed = {};
+          Object.keys(attempts).forEach(id => {
+            if (attempts[id]?.fallida) {
+              failed[id] = true;
+            }
+          });
+          return failed;
+        } catch (e) {
+          return {};
+        }
+      }
+
+      function getBlockedStations() {
+        try {
+          if (window.MuchLocalStorage?.isStationBlocked) {
+            const blocked = {};
+            REQUIRED_REWARD_STATIONS.forEach(id => {
+              if (window.MuchLocalStorage.isStationBlocked(id)) {
+                blocked[id] = true;
+              }
+            });
+            return blocked;
+          }
+          const attempts = JSON.parse(localStorage.getItem('much_intentos_estaciones') || '{}');
+          const blocked = {};
+          Object.keys(attempts).forEach(id => {
+            if (attempts[id]?.bloqueada) {
+              const date = attempts[id].fecha_puede_volver_jugar ? new Date(attempts[id].fecha_puede_volver_jugar) : null;
+              if (date && date.getTime() > Date.now()) {
+                blocked[id] = true;
+              }
+            }
+          });
+          return blocked;
+        } catch (e) {
+          return {};
+        }
+      }
+
       function areAllRewardStationsCompleted(completed = getCompletedStations()) {
+        const failed = getFailedStations();
+        const blocked = getBlockedStations();
+        const hasFailedOrBlocked = REQUIRED_REWARD_STATIONS.some(stationId => failed[stationId] || blocked[stationId]);
+        if (hasFailedOrBlocked) return false;
         return REQUIRED_REWARD_STATIONS.every(stationId => completed[stationId]);
       }
 
@@ -13428,36 +13483,54 @@
         openMissionRewardOverlay();
       }
 
-      function ensureMapMarkerCheckSlot(marker) {
+      function ensureMapMarkerCheckSlot(marker, isFailed = false, isBlocked = false) {
         if (!marker) return null;
 
         let checkEl = marker.querySelector('.map-marker-check');
-        if (checkEl) return checkEl;
-
-        checkEl = document.createElement('span');
-        checkEl.className = 'map-marker-check';
-        checkEl.setAttribute('aria-hidden', 'true');
-        checkEl.innerHTML = '&#10003;';
-        marker.appendChild(checkEl);
+        if (!checkEl) {
+          checkEl = document.createElement('span');
+          checkEl.className = 'map-marker-check';
+          checkEl.setAttribute('aria-hidden', 'true');
+          marker.appendChild(checkEl);
+        }
+        // Cruz si falló o está bloqueada, palomita si completó
+        if (isFailed || isBlocked) {
+          checkEl.innerHTML = '&#10006;';
+        } else {
+          checkEl.innerHTML = '&#10003;';
+        }
         return checkEl;
       }
 
       function updateCompletedStationsOnMapLegacy() {
         try {
           const completed = getCompletedStations();
+          const failed = getFailedStations();
+          const blocked = getBlockedStations();
           document.querySelectorAll('.map-marker').forEach(marker => {
             const stationId = marker.dataset.station;
             const numberEl = marker.querySelector('.map-marker-number');
+            const isCompleted = Boolean(completed[stationId]);
+            const isFailed = Boolean(failed[stationId]);
+            const isBlocked = Boolean(blocked[stationId]);
+
             if (numberEl) {
-              marker.classList.toggle('completed', Boolean(completed[stationId]));
-              numberEl.textContent = completed[stationId] ? '\u2713' : stationId;
+              marker.classList.toggle('completed', isCompleted);
+              marker.classList.toggle('failed', isFailed || isBlocked);
+              numberEl.textContent = isCompleted ? '\u2713' : (isFailed || isBlocked ? '\u2717' : stationId);
               return;
             }
-            if (completed[stationId]) {
+            if (isCompleted) {
               marker.classList.add('completed');
+              marker.classList.remove('failed');
               marker.innerHTML = '✓';
+            } else if (isFailed || isBlocked) {
+              marker.classList.remove('completed');
+              marker.classList.add('failed');
+              marker.innerHTML = '✗';
             } else {
               marker.classList.remove('completed');
+              marker.classList.remove('failed');
               marker.innerHTML = stationId;
             }
           });
@@ -13470,13 +13543,18 @@
       function updateCompletedStationsOnMap() {
         try {
           const completed = getCompletedStations();
+          const failed = getFailedStations();
+          const blocked = getBlockedStations();
           document.querySelectorAll('.map-marker').forEach(marker => {
             const stationId = marker.dataset.station;
             const numberEl = marker.querySelector('.map-marker-number');
             const isCompleted = Boolean(completed[stationId]);
+            const isFailed = Boolean(failed[stationId]);
+            const isBlocked = Boolean(blocked[stationId]);
 
-            ensureMapMarkerCheckSlot(marker);
+            ensureMapMarkerCheckSlot(marker, isFailed, isBlocked);
             marker.classList.toggle('completed', isCompleted);
+            marker.classList.toggle('failed', isFailed || isBlocked);
 
             // Verificar si está activa
             if (activeStationIds) {
@@ -13485,13 +13563,21 @@
             }
 
             if (numberEl) {
-              numberEl.textContent = stationId;
+              if (isFailed || isBlocked) {
+                numberEl.textContent = '✖';
+              } else if (isCompleted) {
+                numberEl.textContent = '✓';
+              } else {
+                numberEl.textContent = stationId;
+              }
             }
 
             marker.setAttribute(
               'title',
               isCompleted
                 ? `Estacion ${stationId} completada`
+                : (isFailed || isBlocked)
+                ? `Estacion ${stationId} bloqueada`
                 : `Estacion ${stationId} pendiente`
             );
           });
@@ -13523,8 +13609,10 @@
           updateCompletedStationsOnMap();
           syncPrepRulesForStation(currentStation);
 
-          // Bloquear el botón de comenzar si la estación ya está completada o inactiva
+          // Bloquear el botón de comenzar si la estación ya está completada, fallida, bloqueada o inactiva
           const completed = getCompletedStations();
+          const failed = getFailedStations();
+          const blocked = getBlockedStations();
           updateRewardClaimUI(completed);
           const btnComenzar = document.getElementById('btnComenzar');
           if (btnComenzar) {
@@ -13537,6 +13625,11 @@
             } else if (completed[String(stationId)]) {
               btnComenzar.innerHTML = '🔒 ESTACIÓN COMPLETADA';
               btnComenzar.style.background = '#00B487';
+              btnComenzar.style.opacity = '0.7';
+              btnComenzar.style.pointerEvents = 'none';
+            } else if (failed[String(stationId)] || blocked[String(stationId)]) {
+              btnComenzar.innerHTML = '🔒 ESTACIÓN BLOQUEADA';
+              btnComenzar.style.background = '#e11d48';
               btnComenzar.style.opacity = '0.7';
               btnComenzar.style.pointerEvents = 'none';
             } else {

@@ -77,9 +77,22 @@ async function ensureAttemptSchema() {
      FROM information_schema.TABLES
      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'intentos_estacion'`
   );
-  if (!Number(table?.total || 0)) return;
+  if (Number(table?.total || 0)) {
+    await agregarColumnaSiFalta('intentos_estacion', 'finalizado', "ALTER TABLE intentos_estacion ADD COLUMN finalizado BOOLEAN NOT NULL DEFAULT FALSE AFTER aprobado");
+  }
 
-  await agregarColumnaSiFalta('intentos_estacion', 'finalizado', "ALTER TABLE intentos_estacion ADD COLUMN finalizado BOOLEAN NOT NULL DEFAULT FALSE AFTER aprobado");
+  // Verificar y agregar columnas de progreso y bloqueo a 'progreso_usuario'
+  const [[progressTable]] = await pool.query(
+    `SELECT COUNT(*) AS total
+     FROM information_schema.TABLES
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'progreso_usuario'`
+  );
+  if (Number(progressTable?.total || 0)) {
+    await agregarColumnaSiFalta('progreso_usuario', 'fallida', "ALTER TABLE progreso_usuario ADD COLUMN fallida BOOLEAN NOT NULL DEFAULT FALSE AFTER aprobada");
+    await agregarColumnaSiFalta('progreso_usuario', 'bloqueada', "ALTER TABLE progreso_usuario ADD COLUMN bloqueada BOOLEAN NOT NULL DEFAULT FALSE AFTER fallida");
+    await agregarColumnaSiFalta('progreso_usuario', 'fecha_bloqueo', "ALTER TABLE progreso_usuario ADD COLUMN fecha_bloqueo TIMESTAMP NULL AFTER bloqueada");
+    await agregarColumnaSiFalta('progreso_usuario', 'fecha_puede_volver_jugar', "ALTER TABLE progreso_usuario ADD COLUMN fecha_puede_volver_jugar TIMESTAMP NULL AFTER fecha_bloqueo");
+  }
 }
 
 async function ensurePrivacyConsentSchema() {
@@ -102,9 +115,49 @@ function inferirIntentoFinalizado({ finalizado, aprobado, puntaje, aciertos, err
     || Number(errores || 0) > 0;
 }
 
+async function autoUnlockEstaciones(connection, idUsuario) {
+  // Buscar estaciones bloqueadas del usuario cuyo tiempo de bloqueo ya expiró
+  const [blockedStations] = await connection.query(
+    `SELECT id_estacion 
+     FROM progreso_usuario 
+     WHERE id_usuario = ? 
+       AND bloqueada = TRUE 
+       AND fecha_puede_volver_jugar <= CURRENT_TIMESTAMP`,
+    [idUsuario]
+  );
+
+  for (const row of blockedStations) {
+    const idEstacion = row.id_estacion;
+    console.log(`🔓 Auto-desbloqueando estación ${idEstacion} para el usuario ${idUsuario}`);
+    
+    // 1. Restablecer progreso de la estación
+    await connection.query(
+      `UPDATE progreso_usuario 
+       SET completada = FALSE,
+           aprobada = FALSE,
+           fallida = FALSE,
+           bloqueada = FALSE,
+           fecha_bloqueo = NULL,
+           fecha_puede_volver_jugar = NULL,
+           puntaje = 0,
+           aciertos = 0,
+           errores = 0,
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id_usuario = ? AND id_estacion = ?`,
+      [idUsuario, idEstacion]
+    );
+
+    // 2. Eliminar intentos históricos de la estación para que tenga 3 intentos nuevos
+    await connection.query(
+      `DELETE FROM intentos_estacion WHERE id_usuario = ? AND id_estacion = ?`,
+      [idUsuario, idEstacion]
+    );
+  }
+}
+
 async function evaluarBloqueoPorIntentos(connection, idUsuario, idEstacion) {
   const [[progress]] = await connection.query(
-    'SELECT aprobada, completada FROM progreso_usuario WHERE id_usuario = ? AND id_estacion = ?',
+    'SELECT aprobada, completada, fallida, bloqueada FROM progreso_usuario WHERE id_usuario = ? AND id_estacion = ?',
     [idUsuario, idEstacion]
   );
   if (progress?.aprobada || progress?.completada) {
@@ -125,7 +178,36 @@ async function evaluarBloqueoPorIntentos(connection, idUsuario, idEstacion) {
     return { fallos, bloqueo: null };
   }
 
-  const bloqueo = await playtime.registrarBloqueoPorIntentos(idUsuario, idEstacion, connection);
+  // Marcar la estación como fallida y bloqueada por una semana (7 días)
+  console.log(`⚠️ Usuario ${idUsuario} agotó sus intentos en la estación ${idEstacion}. Bloqueando por 1 semana.`);
+  await connection.query(
+    `INSERT INTO progreso_usuario 
+      (id_usuario, id_estacion, completada, aprobada, fallida, bloqueada, fecha_bloqueo, fecha_puede_volver_jugar, puntaje, aciertos, errores, fecha_inicio, fecha_completado)
+     VALUES (?, ?, FALSE, FALSE, TRUE, TRUE, CURRENT_TIMESTAMP, DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 7 DAY), 0, 0, 0, CURRENT_TIMESTAMP, NULL)
+     ON DUPLICATE KEY UPDATE 
+       completada = FALSE,
+       aprobada = FALSE,
+       fallida = TRUE,
+       bloqueada = TRUE,
+       fecha_bloqueo = CURRENT_TIMESTAMP,
+       fecha_puede_volver_jugar = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 7 DAY),
+       updated_at = CURRENT_TIMESTAMP`,
+    [idUsuario, idEstacion]
+  );
+
+  const fechaPuedeVolver = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const bloqueo = {
+    bloqueado: true,
+    habilitado: false,
+    motivo_bloqueo: 'intentos',
+    tipo: 'estacion',
+    id_estacion: idEstacion,
+    fecha_finalizacion: new Date().toISOString(),
+    fecha_puede_volver: fechaPuedeVolver.toISOString(),
+    fecha_puede_volver_texto: playtime.formatFechaMX(fechaPuedeVolver),
+    mensaje: `Has superado el limite de intentos en la estacion.`
+  };
+
   return { fallos, bloqueo };
 }
 
@@ -972,10 +1054,32 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
   try {
     await connection.beginTransaction();
 
+    // Auto-desbloquear estaciones expiradas primero
+    await autoUnlockEstaciones(connection, id_usuario);
+
     const [[estacion]] = await connection.query('SELECT activa FROM estaciones WHERE id_estacion = ?', [id_estacion]);
     if (!estacion || !estacion.activa) {
       await connection.rollback();
       return res.status(403).json({ error: 'La estacion se encuentra inactiva.' });
+    }
+
+    const [[progress]] = await connection.query(
+      'SELECT completada, aprobada, bloqueada, fecha_puede_volver_jugar FROM progreso_usuario WHERE id_usuario = ? AND id_estacion = ?',
+      [id_usuario, id_estacion]
+    );
+
+    if (progress?.aprobada || progress?.completada) {
+      await connection.rollback();
+      return res.status(403).json({ error: 'Ya has aprobado esta estación.' });
+    }
+
+    if (progress?.bloqueada) {
+      await connection.rollback();
+      return res.status(403).json({
+        error: 'estacion_bloqueada',
+        mensaje: 'Esta estación está bloqueada temporalmente por límite de intentos.',
+        fecha_puede_volver_jugar: progress.fecha_puede_volver_jugar
+      });
     }
 
     const intentoFinalizado = inferirIntentoFinalizado({ finalizado, aprobado, puntaje, aciertos, errores });
@@ -1062,9 +1166,11 @@ app.put('/api/intentos/:id_intento', permitirJugador, verificarBloqueoJugador, a
       'SELECT id_usuario, id_estacion FROM intentos_estacion WHERE id_intento = ?',
       [idIntento]
     );
-    const intentos = (intento && !Boolean(aprobado) && intentoFinalizado)
-      ? await evaluarBloqueoPorIntentos(connection, intento.id_usuario, intento.id_estacion)
-      : { fallos: 0, bloqueo: null };
+    let intentos = { fallos: 0, bloqueo: null };
+    if (intento && !Boolean(aprobado) && intentoFinalizado) {
+      await autoUnlockEstaciones(connection, intento.id_usuario);
+      intentos = await evaluarBloqueoPorIntentos(connection, intento.id_usuario, intento.id_estacion);
+    }
 
     await connection.commit();
 
@@ -1191,8 +1297,10 @@ app.post('/api/respuestas-usuario', permitirJugador, verificarBloqueoJugador, as
 // ==========================================
 app.get('/api/progreso/:id_usuario', permitirJugador, async (req, res) => {
   const idUsuario = req.params.id_usuario;
+  const connection = await pool.getConnection();
   try {
-    const [progreso] = await pool.query(
+    await autoUnlockEstaciones(connection, idUsuario);
+    const [progreso] = await connection.query(
       `SELECT p.*, e.nombre AS nombre_estacion, e.tipo AS tipo_estacion
        FROM progreso_usuario p
        JOIN estaciones e ON p.id_estacion = e.id_estacion
@@ -1202,6 +1310,8 @@ app.get('/api/progreso/:id_usuario', permitirJugador, async (req, res) => {
     res.json(progreso);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  } finally {
+    connection.release();
   }
 });
 
@@ -1261,19 +1371,28 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
       });
     }
 
+    // Auto-desbloquear primero
+    await autoUnlockEstaciones(connection, id_usuario);
+
     const [progreso] = await connection.query(
-      'SELECT id_estacion FROM progreso_usuario WHERE id_usuario = ? AND aprobada = TRUE',
+      'SELECT id_estacion, aprobada, fallida, bloqueada FROM progreso_usuario WHERE id_usuario = ?',
       [id_usuario]
     );
 
-    const estacionesAprobadas = progreso.map(p => p.id_estacion);
+    const estacionesAprobadas = progreso.filter(p => p.aprobada).map(p => p.id_estacion);
+    const tieneAlgunaFallidaOBloqueada = progreso.some(p => p.fallida || p.bloqueada);
     const estacionesObligatorias = [1, 2, 3, 4, 5, 6];
     const tieneTodoAprobado = estacionesObligatorias.every(id => estacionesAprobadas.includes(id));
 
-    if (!tieneTodoAprobado) {
-      console.warn(`Usuario ${id_usuario} intenta generar boleto sin completar todo el recorrido. Estaciones aprobadas:`, estacionesAprobadas);
+    if (!tieneTodoAprobado || tieneAlgunaFallidaOBloqueada) {
+      console.warn(`Usuario ${id_usuario} intenta generar boleto sin cumplir requisitos. Aprobadas:`, estacionesAprobadas, `Tiene fallida/bloqueada:`, tieneAlgunaFallidaOBloqueada);
       await connection.rollback();
-      return res.status(403).json({ error: 'Debes completar todas las estaciones antes de reclamar tu boleto.' });
+      return res.status(403).json({
+        error: 'requisitos_insuficientes',
+        mensaje: tieneAlgunaFallidaOBloqueada
+          ? 'No puedes reclamar tu boleto porque tienes una estación fallida o bloqueada.'
+          : 'Debes completar y aprobar todas las estaciones antes de reclamar tu boleto.'
+      });
     }
 
     const recibioSeleccionBoleto = [tipo_entrada, destino_boleto, lugar].some(tieneTexto);

@@ -220,6 +220,28 @@
     writeJson(KEYS.intentosEstaciones, attempts || {});
   }
 
+  function hasFailedStation() {
+    const attempts = getAttempts();
+    return REQUIRED_REWARD_STATIONS.some((stationId) => {
+      const att = attempts[stationId];
+      return att && (att.intentos_fallidos >= FAILED_ATTEMPT_LIMIT || att.fallida === true || att.bloqueada === true);
+    });
+  }
+
+  function hasBlockedStation() {
+    const attempts = getAttempts();
+    return REQUIRED_REWARD_STATIONS.some((stationId) => {
+      const att = attempts[stationId];
+      if (!att) return false;
+      const isBlocked = att.bloqueada === true;
+      const date = att.fecha_puede_volver_jugar ? new Date(att.fecha_puede_volver_jugar) : null;
+      if (isBlocked && date && date.getTime() > Date.now()) {
+        return true;
+      }
+      return false;
+    });
+  }
+
   function getCurrentAttemptId(extra = {}) {
     return extra.id_intento
       || extra.idIntento
@@ -302,6 +324,11 @@
       failedIds.push(String(attemptId));
     }
 
+    const fallida = intentosFallidos >= FAILED_ATTEMPT_LIMIT || Boolean(previous.fallida) || Boolean(attempt.fallida);
+    const bloqueada = intentosFallidos >= FAILED_ATTEMPT_LIMIT || Boolean(previous.bloqueada) || Boolean(attempt.bloqueada);
+    const fechaBloqueo = bloqueada ? (previous.fecha_bloqueo || attempt.fecha_bloqueo || nowIso()) : null;
+    const fechaPuedeVolverJugar = bloqueada ? (previous.fecha_puede_volver_jugar || attempt.fecha_puede_volver_jugar || attempt.fecha_puede_volver || addDays(fechaBloqueo || nowIso(), 7).toISOString()) : null;
+
     attempts[id] = {
       id_estacion: id,
       nombre: station.nombre,
@@ -318,19 +345,17 @@
       errores: toNumber(attempt.errores, previous.errores || 0),
       aprobada: Boolean(aprobada || previous.aprobada),
       completada,
+      fallida,
+      bloqueada,
+      fecha_bloqueo: fechaBloqueo,
+      fecha_puede_volver_jugar: fechaPuedeVolverJugar,
       finalizado: Boolean(finalizada || previous.finalizado),
-      debe_reintentar: !completada,
+      debe_reintentar: !completada && !bloqueada,
       ultimo_intento_at: attempt.fecha || nowIso(),
       completado_at: completada ? (previous.completado_at || nowIso()) : previous.completado_at || null
     };
 
     writeAttempts(attempts);
-    let bloqueoIntentos = null;
-    if (!completada && intentosFallidos >= FAILED_ATTEMPT_LIMIT && getItem(KEYS.estadoRecorrido) !== 'bloqueado_temporalmente') {
-      bloqueoIntentos = blockByFailedAttempts(id, attempts[id], options);
-      attempts[id].bloqueo = bloqueoIntentos;
-      writeAttempts(attempts);
-    }
 
     if (aprobada) {
       completeStation(id, {
@@ -345,7 +370,7 @@
       dispatchProgressChanged();
     }
 
-    if (!bloqueoIntentos && getItem(KEYS.estadoRecorrido) !== 'bloqueado_temporalmente' && !aprobada) {
+    if (!bloqueada && getItem(KEYS.estadoRecorrido) !== 'bloqueado_temporalmente' && !aprobada) {
       setRouteState('en_progreso');
     }
 
@@ -460,7 +485,9 @@
     }
 
     const completed = getCompletedStationsMap();
-    if (REQUIRED_REWARD_STATIONS.every((stationId) => completed[stationId])) {
+    const hasFailed = hasFailedStation();
+    const hasBlocked = hasBlockedStation();
+    if (REQUIRED_REWARD_STATIONS.every((stationId) => completed[stationId]) && !hasFailed && !hasBlocked) {
       setRouteState('completado');
       setClaimButtonState(isTicketClaimed() ? 'bloqueado' : 'activo');
       return 'completado';
@@ -650,6 +677,10 @@
       const station = getStation(id);
       const puntaje = Math.max(0, toNumber(row.puntaje, station.puntos));
       const completada = Boolean(row.aprobada || row.completada);
+      const fallida = Boolean(row.fallida);
+      const bloqueada = Boolean(row.bloqueada);
+      const fechaBloqueo = row.fecha_bloqueo || null;
+      const fechaPuedeVolverJugar = row.fecha_puede_volver_jugar || null;
 
       attempts[id] = {
         ...(attempts[id] || {}),
@@ -663,7 +694,11 @@
         errores: toNumber(row.errores, attempts[id]?.errores || 0),
         aprobada: completada,
         completada,
-        debe_reintentar: !completada,
+        fallida,
+        bloqueada,
+        fecha_bloqueo: fechaBloqueo,
+        fecha_puede_volver_jugar: fechaPuedeVolverJugar,
+        debe_reintentar: !completada && !bloqueada,
         ultimo_intento_at: row.updated_at || row.fecha_inicio || nowIso(),
         completado_at: row.fecha_completado || attempts[id]?.completado_at || null
       };
@@ -705,20 +740,27 @@
   function canResetProgress(options = {}) {
     if (options.force || options.adminOverride) return { ok: true };
     const nextDate = parseDate(getItem(KEYS.fechaProximoJuego));
+    if (nextDate && nextDate.getTime() > Date.now()) {
+      const dateText = new Intl.DateTimeFormat('es-MX', {
+        dateStyle: 'long',
+        timeStyle: 'short'
+      }).format(nextDate);
+      return {
+        ok: false,
+        reason: 'reset_not_allowed',
+        fecha_proximo_juego: nextDate.toISOString(),
+        message: `Podrás reiniciar el recorrido el ${dateText}.`
+      };
+    }
     if (nextDate && nextDate.getTime() <= Date.now()) return { ok: true };
     if (getRouteState() === 'disponible_para_volver_a_jugar') return { ok: true };
+    if (hasFailedStation() || hasBlockedStation()) return { ok: true };
 
-    const dateText = nextDate ? new Intl.DateTimeFormat('es-MX', {
-      dateStyle: 'long',
-      timeStyle: 'short'
-    }).format(nextDate) : '';
     return {
       ok: false,
       reason: 'reset_not_allowed',
-      fecha_proximo_juego: nextDate ? nextDate.toISOString() : '',
-      message: dateText
-        ? `Podras reiniciar el recorrido el ${dateText}.`
-        : 'Solo puedes reiniciar cuando el recorrido este disponible nuevamente.'
+      fecha_proximo_juego: '',
+      message: 'Solo puedes reiniciar cuando el recorrido este disponible nuevamente.'
     };
   }
 
@@ -805,6 +847,20 @@
     getCompletedStationsMap,
     getCompletedRecords,
     isStationCompleted: (stationId) => Boolean(getCompletedStationsMap()[toStationId(stationId)]),
+    isStationFailed: (stationId) => {
+      const atts = getAttempts();
+      const id = toStationId(stationId);
+      return Boolean(atts[id]?.fallida === true);
+    },
+    isStationBlocked: (stationId) => {
+      const atts = getAttempts();
+      const id = toStationId(stationId);
+      if (!atts[id]?.bloqueada) return false;
+      const date = atts[id].fecha_puede_volver_jugar ? new Date(atts[id].fecha_puede_volver_jugar) : null;
+      if (date && date.getTime() > Date.now()) return true;
+      return false;
+    },
+    getAttempts,
     completeStation,
     recordStationAttempt,
     recordStationResult,

@@ -171,11 +171,45 @@ function inferirIntentoFinalizado(intento = {}) {
 
 function sincronizarBloqueoPorIntentos(data = {}) {
   if (!data.bloqueo?.bloqueado) return false;
+
+  const b = data.bloqueo;
+  if (b.tipo === 'estacion') {
+    const idEst = b.id_estacion;
+    if (window.MuchLocalStorage?.recordStationAttempt) {
+      window.MuchLocalStorage.recordStationAttempt(idEst, {
+        fallida: true,
+        bloqueada: true,
+        fecha_bloqueo: b.fecha_finalizacion,
+        fecha_puede_volver: b.fecha_puede_volver
+      });
+    }
+
+    if (window.MuchStationCompletion?.showFloatingNotice) {
+      window.MuchStationCompletion.showFloatingNotice({
+        badge: 'Estación bloqueada',
+        title: 'Límite de intentos superado',
+        body: `Has agotado tus 3 intentos en esta estación. Estará bloqueada hasta el <b>${b.fecha_puede_volver_texto}</b>.<br><br>Puedes seguir jugando en las demás estaciones.`,
+        ctaLabel: 'Regresar al mapa',
+        onCta: () => {
+          if (typeof showView === 'function') {
+            showView('viewPrep');
+          }
+        }
+      });
+    } else {
+      alert(`Has superado el límite de intentos en esta estación. Estará bloqueada hasta el ${b.fecha_puede_volver_texto}.`);
+      if (typeof showView === 'function') {
+        showView('viewPrep');
+      }
+    }
+    return true;
+  }
+
   const estado = {
-    ...data.bloqueo,
+    ...b,
     bloqueado: true,
     habilitado: false,
-    motivo_bloqueo: data.bloqueo.motivo_bloqueo || 'intentos'
+    motivo_bloqueo: b.motivo_bloqueo || 'intentos'
   };
   invalidarCacheBloqueoJuego();
   cachedPlaytimeEstado = estado;
