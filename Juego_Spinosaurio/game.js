@@ -68,7 +68,7 @@ var quizVisible = false;
 var quizWarningShown = false;
 var navigatingToRegistro = false;
 // Temporizador de pregunta especial
-var QUESTION_SECONDS = 10;
+var QUESTION_SECONDS = 15;
 var questionSecondsLeft = 0;
 var questionTimerInterval = null;
 
@@ -881,7 +881,7 @@ function mostrarQuiz() {
 
   o.classList.add("show"); quizVisible = true;
   try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { }
-  // Iniciar temporizador de 10 segundos para la pregunta especial
+  // Iniciar temporizador de 15 segundos para la pregunta especial
   startQuestionTimer(QUESTION_SECONDS);
 }
 

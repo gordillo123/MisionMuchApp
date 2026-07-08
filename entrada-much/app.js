@@ -44,7 +44,7 @@ if (LUGAR_EN_URL && LUGAR_EN_URL.trim() !== "") {
 const LUGAR_QR = localStorage.getItem('much_lugar_seguro') || 'Sin Especificar';
 
 const NUM_QUESTIONS = 10;
-const QUESTION_SECONDS = 10;
+const QUESTION_SECONDS = 15;
 function getPrizeDescriptor(prizeData) {
   return [
     prizeData?.key,
@@ -582,7 +582,7 @@ class UIManager {
   }
 
   createQuestionDeadline() {
-    // Siempre crear un nuevo deadline desde cero (10 segundos)
+    // Siempre crear un nuevo deadline desde cero (15 segundos)
     this.currentQuestionDeadline = Date.now() + (QUESTION_SECONDS * 1000);
     this.persistCurrentQuestionProgress();
   }

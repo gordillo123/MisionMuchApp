@@ -40,7 +40,7 @@ if (LUGAR_EN_URL && LUGAR_EN_URL.trim() !== "") {
 const LUGAR_QR = localStorage.getItem('much_lugar_seguro') || 'Sin Especificar';
 
 const NUM_QUESTIONS = 10;
-const QUESTION_SECONDS = 10;
+const QUESTION_SECONDS = 15;
 // Función para mezclar arrays
 const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
 
@@ -641,7 +641,7 @@ class UIManager {
   }
 
   createQuestionDeadline() {
-    // Siempre crear un nuevo deadline desde cero (10 segundos)
+    // Siempre crear un nuevo deadline desde cero (15 segundos)
     this.currentQuestionDeadline = Date.now() + (QUESTION_SECONDS * 1000);
     this.persistCurrentQuestionProgress();
   }
