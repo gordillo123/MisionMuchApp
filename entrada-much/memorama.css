@@ -63,15 +63,27 @@ body.memorama-body {
   width: min(100%, 520px);
   height: 100dvh;
   max-height: 100dvh;
+  background: inherit;
   margin: 0 auto;
   padding:
     max(8px, env(safe-area-inset-top))
     max(10px, env(safe-area-inset-right))
-    max(10px, env(safe-area-inset-bottom))
+    max(8px, env(safe-area-inset-bottom))
     max(10px, env(safe-area-inset-left));
   overflow: hidden;
 }
 
+.memorama-app::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 10px;
+  background: var(--mm-bg-purple);
+  pointer-events: none;
+  z-index: 0;
+}
 .memorama-screen {
   display: none;
   animation: mm-fade-in 0.35s ease;
@@ -345,7 +357,7 @@ body.memorama-body {
 
 .mm-card-back {
   background: linear-gradient(145deg, #6d28d9, #4c1d95);
-  font-size: clamp(1.05rem, 4.8vw, 1.8rem);
+  font-size: clamp(1.7rem, 7vw, 2.7rem);
 }
 
 .mm-card-front {
@@ -354,48 +366,59 @@ body.memorama-body {
 }
 
 .mm-card-emoji {
-  font-size: clamp(1.15rem, 5.8vw, 2.1rem);
+  font-size: clamp(1.9rem, 8vw, 3.1rem);
   line-height: 1;
 }
 
 .mm-card-label {
-  font-size: clamp(0.48rem, 1.9vw, 0.58rem);
+  font-size: clamp(0.68rem, 2.7vw, 0.9rem);
   font-weight: 700;
   text-align: center;
-  margin-top: 4px;
+  margin-top: 6px;
   line-height: 1.15;
   color: rgba(255, 255, 255, 0.92);
 }
 
 .mm-card.is-matched .mm-card-face {
-  border-color: rgba(251, 191, 36, 0.65);
-  box-shadow: 0 0 18px rgba(251, 191, 36, 0.35);
+  border-color: rgba(251, 191, 36, 0.75);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.45);
 }
 
 .mm-logo-strip {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: clamp(0.35rem, 1.2vw, 0.7rem);
+  gap: clamp(0.65rem, 2.8vw, 1.4rem);
   margin-top: 18px;
-  padding-top: 14px;
-  border-top: 2px solid rgba(255, 255, 255, 0.85);
+  padding: clamp(0.75rem, 2.5vw, 1.25rem) clamp(0.85rem, 4vw, 2rem);
+  background: #ffffff;
+  border-radius: 16px;
+  border: 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  position: relative;
 }
+
 
 .mm-logo-strip img {
-  height: clamp(26px, 4vw, 36px);
-  max-width: clamp(68px, 18vw, 110px);
+  width: auto;
   object-fit: contain;
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 8px;
-  padding: 3px 7px;
+  display: block;
+  filter:
+    drop-shadow(0 0 6px rgba(255, 255, 255, 0.5))
+    drop-shadow(0 0 14px rgba(56, 189, 248, 0.38))
+    drop-shadow(0 0 18px rgba(251, 191, 36, 0.22))
+    drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
 }
 
+.mm-logo-strip .mm-logo-much,
 .mm-logo-strip .mm-logo-sbeel {
-  background: transparent;
-  padding: 0;
-  height: clamp(30px, 4.5vw, 40px);
+  height: clamp(28px, 5vw, 40px);
+}
+
+.mm-logo-strip .mm-logo-sata,
+.mm-logo-strip .mm-logo-planetario {
+  height: clamp(23px, 4.2vw, 34px);
 }
 
 .mm-victory {
@@ -485,7 +508,7 @@ body.memorama-body {
   }
 
   .mm-card-label {
-    display: none;
+    font-size: 0.62rem;
   }
 }
 
@@ -497,4 +520,74 @@ body.memorama-body {
   .mm-station-label {
     letter-spacing: 0.08em;
   }
+}
+
+.mm-agency-mark {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 auto;
+  width: 100%;
+  margin: clamp(8px, 1.8dvh, 14px) auto clamp(4px, 1dvh, 8px);
+}
+
+.mm-agency-mark img {
+  width: min(96vw, 500px);
+  max-height: clamp(50px, 9.5dvh, 88px);
+  height: auto;
+  object-fit: contain;
+  display: block;
+  filter:
+    drop-shadow(0 0 6px rgba(255, 255, 255, 0.22))
+    drop-shadow(0 0 12px rgba(56, 189, 248, 0.26))
+    drop-shadow(0 3px 8px rgba(0, 0, 0, 0.35));
+}
+
+.mm-logo-strip-game {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  gap: clamp(0.35rem, 1.6vw, 0.8rem);
+  width: 100%;
+  margin-top: clamp(6px, 1.2dvh, 12px);
+  padding: clamp(0.42rem, 1.2dvh, 0.7rem) clamp(0.5rem, 2.4vw, 1rem);
+}
+
+#screenGame .mm-logo-strip img {
+  max-width: 24%;
+  flex: 0 1 auto;
+}
+
+#screenGame .mm-logo-strip .mm-logo-much,
+#screenGame .mm-logo-strip .mm-logo-sbeel {
+  height: clamp(23px, 4.2dvh, 34px);
+}
+
+#screenGame .mm-logo-strip .mm-logo-sata,
+#screenGame .mm-logo-strip .mm-logo-planetario {
+  height: clamp(19px, 3.5dvh, 28px);
+}
+
+.mm-fail.memorama-screen.is-active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: clamp(18px, 5dvh, 48px) 0;
+}
+
+.mm-fail-host {
+  width: 100%;
+  padding: 0;
+}
+
+.mm-fail .station-completion-card {
+  margin: 0 auto;
+  max-width: min(100%, 440px);
+}
+
+.mm-fail .station-completion-cta--secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  box-shadow: none;
 }

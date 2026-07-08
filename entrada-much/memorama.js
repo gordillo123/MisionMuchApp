@@ -30,7 +30,8 @@
     lockBoard: false,
     gameStarted: false,
     attemptId: null,
-    completionSaved: false
+    completionSaved: false,
+    audioCtx: null
   };
 
   const screens = {
@@ -95,22 +96,96 @@
     }
   }
 
-  function playSound(type) {
-    const map = {
-      flip: null,
-      match: null,
-      win: '../Sonidos/Estacion completada.mp3',
-      lose: '../Sonidos/respuesta incorrecta.mp3'
-    };
-    const src = map[type];
-    if (!src) return;
+  function unlockAudio() {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return null;
     try {
-      const audio = new Audio(src);
-      audio.volume = 0.6;
-      audio.play().catch(() => {});
-    } catch (_) {}
+      const ctx = state.audioCtx || new AudioCtx();
+      state.audioCtx = ctx;
+      if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
+      return ctx;
+    } catch (_) {
+      return null;
+    }
   }
 
+  function playSound(type) {
+    try {
+      const ctx = unlockAudio();
+      if (!ctx) return;
+
+      const now = ctx.currentTime + 0.01;
+      const master = ctx.createGain();
+      master.gain.value = 0.85;
+      master.connect(ctx.destination);
+
+      const playTone = (freq, start, duration, volume, wave = 'sine') => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = wave;
+        osc.frequency.setValueAtTime(freq, start);
+        gain.gain.setValueAtTime(0.0001, start);
+        gain.gain.exponentialRampToValueAtTime(volume, start + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+        osc.connect(gain);
+        gain.connect(master);
+        osc.start(start);
+        osc.stop(start + duration + 0.03);
+      };
+
+      const playCardBrush = (start, duration, volume) => {
+        const bufferSize = Math.max(1, Math.floor(ctx.sampleRate * duration));
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i += 1) {
+          data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+        }
+        const noise = ctx.createBufferSource();
+        const filter = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(1700, start);
+        filter.Q.setValueAtTime(0.95, start);
+        gain.gain.setValueAtTime(volume, start);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+        noise.buffer = buffer;
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(master);
+        noise.start(start);
+        noise.stop(start + duration);
+      };
+
+      if (type === 'flip') {
+        playCardBrush(now, 0.07, 0.28);
+        playTone(760, now + 0.014, 0.055, 0.08, 'triangle');
+        return;
+      }
+
+      if (type === 'match') {
+        playTone(988, now, 0.06, 0.16, 'square');
+        playTone(1318, now + 0.05, 0.075, 0.15, 'square');
+        playTone(1976, now + 0.11, 0.08, 0.08, 'triangle');
+        return;
+      }
+
+      if (type === 'win') {
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, index) => {
+          playTone(freq, now + index * 0.07, 0.16, 0.1, 'sine');
+        });
+        return;
+      }
+
+      if (type === 'lose') {
+        playCardBrush(now, 0.055, 0.18);
+        playTone(220, now, 0.08, 0.16, 'square');
+        playTone(165, now + 0.08, 0.12, 0.14, 'square');
+        playTone(110, now + 0.18, 0.16, 0.09, 'triangle');
+      }
+    } catch (_) {}
+  }
   // --- Base de datos ---
   function verifyStationActive() {
     import('../supabase-utils.js')
@@ -271,6 +346,7 @@
       }, 400);
     } else {
       setTimeout(() => {
+        playSound('lose');
         first.btn.classList.remove('is-flipped');
         second.btn.classList.remove('is-flipped');
         state.flipped = [];
@@ -300,11 +376,11 @@
         stationId: STATION_ID,
         nextStationId: '2',
         badge: 'Estación completada',
-        title: '¡Muy bien!',
-        body: 'Encontraste todos los pares y completaste la <strong>Estación 1</strong>. Tu memoria es increíble. ¡Sigue así y continúa el recorrido!',
-        detailLabel: 'Puntos obtenidos',
+        title: '¡Estación completada!',
+        body: 'Encontraste todos los pares y completaste la <strong>Estación 1</strong>. Sumaste 10 puntos para tu misión científica. Regresa al mapa para continuar el recorrido MUCH.',
+        detailLabel: 'Marcador',
         detailValue: `${finalScore} pts`,
-        ctaLabel: 'CONTINUAR',
+        ctaLabel: 'Volver al mapa',
         onReturnToMap: goBackToMap
       });
 
@@ -345,6 +421,7 @@
   }
 
   async function startGame() {
+    unlockAudio();
     if (isStationCompleted()) {
       showScreen('alreadyDone');
       return;
@@ -358,6 +435,9 @@
   }
 
   function bindEvents() {
+    document.addEventListener('pointerdown', unlockAudio, { once: true, passive: true });
+    document.addEventListener('touchstart', unlockAudio, { once: true, passive: true });
+    document.addEventListener('keydown', unlockAudio, { once: true });
     els.btnStart?.addEventListener('click', () => startGame());
     els.btnRetry?.addEventListener('click', () => startGame());
     els.btnContinue?.addEventListener('click', goBackToMap);

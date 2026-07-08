@@ -36,9 +36,9 @@
 
       <div class="mm-hero-card">
         <h1 class="mm-title">MEMORAMA</h1>
-        <p class="mm-subtitle">DESCUBRE EL MUCH</p>
+        <p class="mm-subtitle">MISIÓN CIENTÍFICA MUCH</p>
         <p class="mm-desc">
-          Pon a prueba tu memoria encontrando los pares de cartas relacionadas con el Museo Chiapas de Ciencia y Tecnología.
+          Encuentra los pares del museo y completa la primera estación de tu misión científica.
         </p>
       </div>
 
@@ -54,6 +54,10 @@
 
     <!-- Pantalla de juego -->
     <section id="screenGame" class="memorama-screen">
+      <div class="mm-agency-mark" aria-label="Agencia">
+        <img src="../assets/logo-institucional-aditech.png" alt="Gobierno de Chiapas - ADTE">
+      </div>
+
       <div class="mm-topbar">
         <button type="button" id="btnBackGame" class="mm-btn-back" title="Regresar al mapa">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -66,7 +70,7 @@
       </div>
 
       <div class="mm-game-header">
-        <h2>MEMORAMA DEL MUCH</h2>
+        <h2>MISIÓN MEMORAMA MUCH</h2>
       </div>
 
       <div class="mm-stats">
@@ -85,38 +89,55 @@
       </div>
 
       <div id="mmBoard" class="mm-board" role="grid" aria-label="Tablero de memorama"></div>
+
+      <div class="mm-logo-strip mm-logo-strip-game" aria-label="Logos institucionales">
+        <img src="logo-much.png" alt="MUCH · Museo Chiapas" class="mm-logo-much">
+        <img src="logo-sata.png" alt="SATA" class="mm-logo-sata">
+        <img src="../Sbeel_Dinosaurios/logo-sbeel-dinosaurios.png" alt="SBEEL Dinosaurios" class="mm-logo-sbeel">
+        <img src="../assets/logo-planetario-tuxtla.svg" alt="Planetario Tuxtla" class="mm-logo-planetario">
+      </div>
     </section>
 
     <!-- Pantalla de victoria -->
     <section id="screenVictory" class="memorama-screen">
       <div class="mm-victory">
         <div class="mm-trophy" aria-hidden="true">🏆</div>
-        <h2>¡MUY BIEN!</h2>
-        <p>Encontraste todos los pares antes de que terminara el minuto y completaste la Estación 1.</p>
+        <h2>¡Estación completada!</h2>
+        <p>Encontraste todos los pares y completaste la Estación 1 de tu recorrido científico.</p>
         <div class="mm-points-badge" id="mmVictoryPoints">+10 puntos</div>
-        <p>Ganaste los 10 puntos de esta estación. ¡Sigue así y continúa el recorrido!</p>
+        <p>Sumaste 10 puntos. Regresa al mapa para continuar tu misión MUCH.</p>
         <div id="mmVictoryHost" class="mm-victory-host"></div>
-        <button type="button" id="btnMemoramaContinue" class="mm-btn-primary">CONTINUAR</button>
+        <button type="button" id="btnMemoramaContinue" class="mm-btn-primary">Volver al mapa</button>
       </div>
     </section>
 
     <!-- Pantalla de fallo -->
     <section id="screenFail" class="memorama-screen mm-fail">
-      <div class="mm-victory">
-        <div class="mm-trophy" aria-hidden="true">⏳</div>
-        <h2>¡Se acabó el tiempo!</h2>
-        <p>No alcanzaste a encontrar todos los pares en 1 minuto. Inténtalo de nuevo para ganar los 10 puntos.</p>
-        <button type="button" id="btnMemoramaRetry" class="mm-btn-primary">Reintentar</button>
-        <button type="button" class="mm-btn-secondary" onclick="window.location.href='../index.html?view=prep'">Volver al mapa</button>
+      <div class="station-completion-host mm-fail-host">
+        <div class="station-completion-card">
+          <div class="station-completion-card__head">
+            <div class="station-completion-card__seal station-completion-card__seal--fail" aria-hidden="true">&times;</div>
+            <div class="station-completion-card__intro">
+              <div class="station-completion-card__kicker">Misión MUCH</div>
+              <h3 class="station-completion-card__title">Sigue intentando</h3>
+            </div>
+          </div>
+          <p class="station-completion-card__body">
+            Tu misión MUCH continúa. Observa las cartas con calma y vuelve a intentarlo para completar esta estación.
+          </p>
+          <div class="station-completion-card__actions">
+            <button type="button" id="btnMemoramaRetry" class="station-completion-cta">Reintentar</button>
+            <button type="button" class="station-completion-cta station-completion-cta--secondary" onclick="window.location.href='../index.html?view=prep'">Volver al mapa</button>
+          </div>
+        </div>
       </div>
     </section>
-
     <!-- Ya completada -->
     <section id="screenAlreadyDone" class="memorama-screen">
       <div class="mm-already-done">
         <h1 class="mm-title">Estación completada</h1>
         <p class="mm-desc" style="margin-bottom:20px;">
-          Ya terminaste el Memorama del MUCH. No se sumarán puntos adicionales.
+          Esta estación ya está completada. Regresa al mapa para continuar tu misión científica.
         </p>
         <button type="button" id="btnBackDone" class="mm-btn-primary">Volver al mapa</button>
       </div>
