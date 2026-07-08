@@ -114,6 +114,22 @@ function inferirIntentoFinalizado({ finalizado, aprobado, puntaje, aciertos, err
     || Number(aciertos || 0) > 0
     || Number(errores || 0) > 0;
 }
+function calcularPuntajeMinimoEstacion(estacion = {}) {
+  const puntos = Number(estacion.puntos || 0);
+  const minimoConfigurado = Number(estacion.puntaje_minimo || 0);
+  const minimoBase = puntos > 0 ? Math.min(puntos, 10) : 10;
+  return Math.max(1, minimoBase, minimoConfigurado);
+}
+
+function evaluarAprobacionEstacion(estacion = {}, puntaje = 0, aprobadaSolicitada = false) {
+  const puntajeNumerico = Math.max(0, Number(puntaje || 0));
+  const puntajeMinimo = calcularPuntajeMinimoEstacion(estacion);
+  return {
+    puntaje: puntajeNumerico,
+    puntaje_minimo: puntajeMinimo,
+    aprobada: Boolean(aprobadaSolicitada) && puntajeNumerico >= puntajeMinimo
+  };
+}
 
 async function autoUnlockEstaciones(connection, idUsuario) {
   // Buscar estaciones bloqueadas del usuario cuyo tiempo de bloqueo ya expiró
@@ -178,34 +194,37 @@ async function evaluarBloqueoPorIntentos(connection, idUsuario, idEstacion) {
     return { fallos, bloqueo: null };
   }
 
-  // Marcar la estación como fallida y bloqueada por una semana (7 días)
-  console.log(`⚠️ Usuario ${idUsuario} agotó sus intentos en la estación ${idEstacion}. Bloqueando por 1 semana.`);
+  const bloqueoGlobal = await playtime.registrarBloqueoPorIntentos(idUsuario, idEstacion, connection);
+  const fechaPuedeVolver = bloqueoGlobal?.fecha_puede_volver
+    ? new Date(bloqueoGlobal.fecha_puede_volver)
+    : playtime.calcularFechaDesbloqueo(new Date(), await playtime.getConfig());
+
+  console.log(`⚠️ Usuario ${idUsuario} agotó sus intentos en la estación ${idEstacion}. Bloqueando hasta ${fechaPuedeVolver.toISOString()}.`);
   await connection.query(
     `INSERT INTO progreso_usuario 
       (id_usuario, id_estacion, completada, aprobada, fallida, bloqueada, fecha_bloqueo, fecha_puede_volver_jugar, puntaje, aciertos, errores, fecha_inicio, fecha_completado)
-     VALUES (?, ?, FALSE, FALSE, TRUE, TRUE, CURRENT_TIMESTAMP, DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 7 DAY), 0, 0, 0, CURRENT_TIMESTAMP, NULL)
+     VALUES (?, ?, FALSE, FALSE, TRUE, TRUE, CURRENT_TIMESTAMP, ?, 0, 0, 0, CURRENT_TIMESTAMP, NULL)
      ON DUPLICATE KEY UPDATE 
        completada = FALSE,
        aprobada = FALSE,
        fallida = TRUE,
        bloqueada = TRUE,
        fecha_bloqueo = CURRENT_TIMESTAMP,
-       fecha_puede_volver_jugar = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 7 DAY),
+       fecha_puede_volver_jugar = VALUES(fecha_puede_volver_jugar),
        updated_at = CURRENT_TIMESTAMP`,
-    [idUsuario, idEstacion]
+    [idUsuario, idEstacion, fechaPuedeVolver]
   );
 
-  const fechaPuedeVolver = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const bloqueo = {
     bloqueado: true,
     habilitado: false,
     motivo_bloqueo: 'intentos',
-    tipo: 'estacion',
+    tipo: 'juego',
     id_estacion: idEstacion,
     fecha_finalizacion: new Date().toISOString(),
     fecha_puede_volver: fechaPuedeVolver.toISOString(),
     fecha_puede_volver_texto: playtime.formatFechaMX(fechaPuedeVolver),
-    mensaje: `Has superado el limite de intentos en la estacion.`
+    mensaje: bloqueoGlobal?.mensaje || playtime.buildMensajeBloqueoIntentos(fechaPuedeVolver, bloqueoGlobal?.premio?.detalle_bloqueo || 'esta estacion')
   };
 
   return { fallos, bloqueo };
@@ -750,8 +769,9 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
     return res.status(400).json({ error: 'Faltan parámetros obligatorios: id_usuario o id_estacion.' });
   }
 
+  let estacion = null;
   try {
-    const [[estacion]] = await pool.query('SELECT activa FROM estaciones WHERE id_estacion = ?', [id_estacion]);
+    [[estacion]] = await pool.query('SELECT activa, nombre, puntos, puntaje_minimo FROM estaciones WHERE id_estacion = ?', [id_estacion]);
     if (!estacion || !estacion.activa) {
       return res.status(403).json({ error: 'La estación se encuentra inactiva y no se puede guardar progreso.' });
     }
@@ -763,7 +783,8 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
   try {
     await connection.beginTransaction();
 
-    const isPassed = Boolean(aprobada);
+    const validacionEstacion = evaluarAprobacionEstacion(estacion, puntaje, aprobada);
+    const isPassed = validacionEstacion.aprobada;
 
     // 1. Consultar el progreso actual del usuario para esta estación
     const [[progresoExistente]] = await connection.query(
@@ -771,7 +792,7 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
       [id_usuario, id_estacion]
     );
 
-    let nuevoPuntaje = puntaje || 0;
+    let nuevoPuntaje = validacionEstacion.puntaje;
     let nuevosAciertos = aciertos || 0;
     let nuevosErrores = errores || 0;
     let nuevoCompletada = isPassed;
@@ -779,12 +800,12 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
     let nuevoFechaCompletado = isPassed ? new Date() : null;
 
     if (progresoExistente) {
-      // Mantener completada / aprobada si ya era true
-      nuevoCompletada = progresoExistente.completada || isPassed;
-      nuevoAprobada = progresoExistente.aprobada || isPassed;
+      const progresoPrevioValido = Boolean((progresoExistente.completada || progresoExistente.aprobada) && Number(progresoExistente.puntaje || 0) >= validacionEstacion.puntaje_minimo);
+      nuevoCompletada = progresoPrevioValido || isPassed;
+      nuevoAprobada = progresoPrevioValido || isPassed;
 
-      // Mantener la mejor puntuación histórica solo si aprobamos el intento actual
-      if (isPassed && progresoExistente.puntaje >= nuevoPuntaje) {
+      // Mantener la mejor puntuación válida ya ganada si el intento actual no mejora el progreso.
+      if (progresoPrevioValido && (!isPassed || progresoExistente.puntaje >= nuevoPuntaje)) {
         nuevoPuntaje = progresoExistente.puntaje;
         nuevosAciertos = progresoExistente.aciertos;
         nuevosErrores = progresoExistente.errores;
@@ -812,7 +833,7 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
     await connection.query(
       `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
        VALUES (?, 'usuario', 'COMPLETAR_ESTACION', 'progreso_usuario', ?, ?)`,
-      [id_usuario, String(id_estacion), `Usuario completó estación ${id_estacion} con puntaje ${puntaje} (Guardado mejor puntaje: ${nuevoPuntaje})`]
+      [id_usuario, String(id_estacion), `Usuario registró estación ${id_estacion} con puntaje ${puntaje} de ${validacionEstacion.puntaje_minimo} requeridos (aprobada: ${isPassed})`]
     );
 
     // 3. Verificar si el usuario ha completado todas las estaciones obligatorias [1, 2, 3, 4, 5, 6]
@@ -941,7 +962,7 @@ app.post('/api/progreso/inicializar', permitirJugador, verificarBloqueoJugador, 
 
   try {
     // Verificar si la estación está activa
-    const [[estacion]] = await pool.query('SELECT activa FROM estaciones WHERE id_estacion = ?', [id_estacion]);
+    const [[estacion]] = await pool.query('SELECT activa, nombre, puntos, puntaje_minimo FROM estaciones WHERE id_estacion = ?', [id_estacion]);
     if (!estacion || !estacion.activa) {
       return res.status(403).json({ error: 'La estación se encuentra inactiva.' });
     }
@@ -1057,7 +1078,7 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
     // Auto-desbloquear estaciones expiradas primero
     await autoUnlockEstaciones(connection, id_usuario);
 
-    const [[estacion]] = await connection.query('SELECT activa FROM estaciones WHERE id_estacion = ?', [id_estacion]);
+    const [[estacion]] = await connection.query('SELECT activa, nombre, puntos, puntaje_minimo FROM estaciones WHERE id_estacion = ?', [id_estacion]);
     if (!estacion || !estacion.activa) {
       await connection.rollback();
       return res.status(403).json({ error: 'La estacion se encuentra inactiva.' });
@@ -1082,14 +1103,16 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
       });
     }
 
-    const intentoFinalizado = inferirIntentoFinalizado({ finalizado, aprobado, puntaje, aciertos, errores });
+    const validacionEstacion = evaluarAprobacionEstacion(estacion, puntaje, aprobado);
+    const aprobadoValidado = validacionEstacion.aprobada;
+    const intentoFinalizado = inferirIntentoFinalizado({ finalizado, aprobado: aprobadoValidado, puntaje, aciertos, errores });
     const [result] = await connection.query(
       `INSERT INTO intentos_estacion (id_usuario, id_estacion, puntaje, aciertos, errores, aprobado, finalizado)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [id_usuario, id_estacion, puntaje || 0, aciertos || 0, errores || 0, Boolean(aprobado), intentoFinalizado]
+      [id_usuario, id_estacion, validacionEstacion.puntaje, aciertos || 0, errores || 0, aprobadoValidado, intentoFinalizado]
     );
 
-    const intentos = (!Boolean(aprobado) && intentoFinalizado)
+    const intentos = (!aprobadoValidado && intentoFinalizado)
       ? await evaluarBloqueoPorIntentos(connection, id_usuario, id_estacion)
       : { fallos: 0, bloqueo: null };
 
@@ -1099,6 +1122,7 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
       message: 'Intento de estacion registrado correctamente.',
       id_intento: result.insertId,
       finalizado: intentoFinalizado,
+      aprobado: aprobadoValidado,
       intentos_fallidos: intentos.fallos,
       limite_intentos: FAILED_ATTEMPT_LIMIT,
       bloqueo: intentos.bloqueo
@@ -1120,7 +1144,7 @@ async function intentosLegacyDisabledNotMounted(req, res) {
 
   try {
     // Verificar si la estación está activa
-    const [[estacion]] = await pool.query('SELECT activa FROM estaciones WHERE id_estacion = ?', [id_estacion]);
+    const [[estacion]] = await pool.query('SELECT activa, nombre, puntos, puntaje_minimo FROM estaciones WHERE id_estacion = ?', [id_estacion]);
     if (!estacion || !estacion.activa) {
       return res.status(403).json({ error: 'La estación se encuentra inactiva.' });
     }
@@ -1151,25 +1175,41 @@ app.put('/api/intentos/:id_intento', permitirJugador, verificarBloqueoJugador, a
   try {
     await connection.beginTransaction();
 
+    const [[intentoActual]] = await connection.query(
+      `SELECT i.id_usuario, i.id_estacion, e.activa, e.nombre, e.puntos, e.puntaje_minimo
+       FROM intentos_estacion i
+       JOIN estaciones e ON e.id_estacion = i.id_estacion
+       WHERE i.id_intento = ?`,
+      [idIntento]
+    );
+
+    if (!intentoActual) {
+      await connection.rollback();
+      return res.status(404).json({ error: 'Intento no encontrado.' });
+    }
+
+    if (!intentoActual.activa) {
+      await connection.rollback();
+      return res.status(403).json({ error: 'La estacion se encuentra inactiva.' });
+    }
+
+    const validacionEstacion = evaluarAprobacionEstacion(intentoActual, puntaje, aprobado);
+    const aprobadoValidado = validacionEstacion.aprobada;
     const intentoFinalizado = finalizado === undefined
       ? true
-      : inferirIntentoFinalizado({ finalizado, aprobado, puntaje, aciertos, errores });
+      : inferirIntentoFinalizado({ finalizado, aprobado: aprobadoValidado, puntaje, aciertos, errores });
 
     await connection.query(
       `UPDATE intentos_estacion
        SET puntaje = ?, aciertos = ?, errores = ?, aprobado = ?, finalizado = ?
        WHERE id_intento = ?`,
-      [puntaje || 0, aciertos || 0, errores || 0, Boolean(aprobado), intentoFinalizado, idIntento]
+      [validacionEstacion.puntaje, aciertos || 0, errores || 0, aprobadoValidado, intentoFinalizado, idIntento]
     );
 
-    const [[intento]] = await connection.query(
-      'SELECT id_usuario, id_estacion FROM intentos_estacion WHERE id_intento = ?',
-      [idIntento]
-    );
     let intentos = { fallos: 0, bloqueo: null };
-    if (intento && !Boolean(aprobado) && intentoFinalizado) {
-      await autoUnlockEstaciones(connection, intento.id_usuario);
-      intentos = await evaluarBloqueoPorIntentos(connection, intento.id_usuario, intento.id_estacion);
+    if (!aprobadoValidado && intentoFinalizado) {
+      await autoUnlockEstaciones(connection, intentoActual.id_usuario);
+      intentos = await evaluarBloqueoPorIntentos(connection, intentoActual.id_usuario, intentoActual.id_estacion);
     }
 
     await connection.commit();
@@ -1177,6 +1217,7 @@ app.put('/api/intentos/:id_intento', permitirJugador, verificarBloqueoJugador, a
     res.json({
       message: 'Intento de estacion actualizado correctamente.',
       finalizado: intentoFinalizado,
+      aprobado: aprobadoValidado,
       intentos_fallidos: intentos.fallos,
       limite_intentos: FAILED_ATTEMPT_LIMIT,
       bloqueo: intentos.bloqueo

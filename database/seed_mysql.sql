@@ -10,11 +10,11 @@ ON DUPLICATE KEY UPDATE nombre=nombre;
 
 -- 2. Insertar Estaciones de la Misión
 INSERT INTO estaciones (id_estacion, nombre, descripcion, orden, puntos, puntaje_minimo, tipo, activa) VALUES
-(1, 'Entrada MUCH', 'Preguntas de bienvenida al museo', 1, 10, 6, 'preguntas', 1),
+(1, 'Entrada MUCH', 'Preguntas de bienvenida al museo', 1, 10, 10, 'preguntas', 1),
 (2, 'Espinosaurio', 'Reto de saltos del Espinosaurio', 2, 15, 15, 'minijuego', 1),
-(3, 'Biodiversidad y Conocimiento', 'Preguntas sobre flora y fauna de Chiapas', 3, 10, 7, 'preguntas', 1),
-(4, 'Sala de energía', 'Preguntas sobre fuentes y tipos de energía', 4, 10, 7, 'preguntas', 1),
-(5, 'Sala de desarrollo sustentable', 'Preguntas sobre desarrollo sustentable y ecotecnias', 5, 10, 7, 'preguntas', 1),
+(3, 'Biodiversidad y Conocimiento', 'Preguntas sobre flora y fauna de Chiapas', 3, 10, 10, 'preguntas', 1),
+(4, 'Sala de energía', 'Preguntas sobre fuentes y tipos de energía', 4, 10, 10, 'preguntas', 1),
+(5, 'Sala de desarrollo sustentable', 'Preguntas sobre desarrollo sustentable y ecotecnias', 5, 10, 10, 'preguntas', 1),
 (6, 'SBEEL Dinosaurios', 'Armado del rompecabezas SBEEL de dinosaurios', 6, 10, 10, 'rompecabezas', 1)
 ON DUPLICATE KEY UPDATE nombre=VALUES(nombre), descripcion=VALUES(descripcion), tipo=VALUES(tipo), puntos=VALUES(puntos), puntaje_minimo=VALUES(puntaje_minimo);
 

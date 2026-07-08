@@ -11467,7 +11467,7 @@
           // Lógica local para Invitados
           const localCompleted = getCompletedStations();
           const estaciones = [
-            { id: 1, nombre: 'Entrada MUCH', puntos_base: 10, key: '1', detalle: 'Memorama' },
+            { id: 1, nombre: 'Entrada MUCH', puntos_base: 10, key: '1', detalle: 'Memorama en 1 min' },
             { id: 2, nombre: 'Espinosaurio', puntos_base: 15, key: '2', detalle: '15 saltos' },
             { id: 3, nombre: 'Biodiversidad y Conocimiento', puntos_base: 10, key: '3', detalle: '10 preguntas' },
             { id: 4, nombre: 'Sala de Energía', puntos_base: 10, key: '4', detalle: '10 preguntas' },
@@ -11987,6 +11987,17 @@
       function showView(viewId) {
         if (viewId !== 'viewLanding' && redirectInternalUserIfNeeded()) return;
 
+        if (viewId === 'viewPrep' && window.MuchLocalStorage?.getRouteState?.() === 'bloqueado_temporalmente') {
+          const msg = localStorage.getItem('much_playtime_block_msg') || 'Tu recorrido sigue bloqueado temporalmente.';
+          window.MuchStationCompletion?.showFloatingNotice?.({
+            badge: 'Limite de intentos',
+            title: 'Juego bloqueado temporalmente',
+            body: msg.replace(/\\n/g, '<br>'),
+            ctaLabel: 'Entendido'
+          });
+          viewId = 'viewLanding';
+        }
+
         document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
         const target = document.getElementById(viewId);
         if (target) {
@@ -12337,19 +12348,19 @@
           icon: '&#128260;',
           step: '04',
           title: 'Busca las parejas',
-          copy: 'Si dos cartas coinciden, se quedan descubiertas y sumas puntos en tu recorrido.'
+          copy: 'Si dos cartas coinciden, se quedan descubiertas. Completa todos los pares para ganar la estaci&oacute;n.'
         },
         {
           icon: '&#9201;',
           step: '05',
           title: 'Cuida el tiempo',
-          copy: 'Tienes <strong>1 minuto y 20 segundos</strong> para encontrar todos los pares.'
+          copy: 'Tienes <strong>1 minuto</strong> para encontrar todos los pares.'
         },
         {
           icon: '&#128640;',
           step: '06',
           title: '&iexcl;Completa la Estaci&oacute;n 1!',
-          copy: 'Al terminar el memorama ganar&aacute;s los puntos de la estaci&oacute;n y podr&aacute;s continuar tu misi&oacute;n.'
+          copy: 'Si completas el memorama antes de que termine el minuto, ganas <strong>10 puntos</strong> y podr&aacute;s continuar tu misi&oacute;n.'
         }
       ];
 
@@ -12674,7 +12685,7 @@
           overlayModeClass: 'ticket-station-rules-mode',
           boardClass: 'ticket-rules-board',
           overlayTitle: 'Estaci\u00f3n 1: Memorama',
-          overlaySubtitle: 'Memorama del MUCH',
+          overlaySubtitle: 'Encuentra todos los pares en 1 minuto para ganar 10 puntos.',
           buildPrepMarkup: buildStation1PrepRulesMarkup,
           buildOverlayMarkup: buildStation1RulesBoardMarkup
         },

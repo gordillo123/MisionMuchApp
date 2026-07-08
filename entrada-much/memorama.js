@@ -7,8 +7,7 @@
 
   const STATION_ID = '1';
   const STATION_POINTS = 10;
-  const PAIR_POINTS = 1;
-  const TIME_LIMIT_SEC = 80; // 1 min 20 s
+  const TIME_LIMIT_SEC = 60; // 1 minuto
   const NUM_PAIRS = 6;
 
   const CARD_PAIRS = [
@@ -213,7 +212,7 @@
         statBox.classList.toggle('time-warning', state.timeLeft <= 15);
       }
     }
-    if (els.score) els.score.textContent = String(state.score);
+    if (els.score) els.score.textContent = `${state.matched}/${NUM_PAIRS}`;
     if (els.attempts) els.attempts.textContent = String(state.attempts);
   }
 
@@ -261,7 +260,6 @@
         first.btn.classList.add('is-matched');
         second.btn.classList.add('is-matched');
         state.matched += 1;
-        state.score = Math.min(STATION_POINTS, state.score + PAIR_POINTS);
         updateStats();
         state.flipped = [];
         state.lockBoard = false;
@@ -323,7 +321,7 @@
 
     window.MuchLocalStorage?.recordStationAttempt?.(STATION_ID, {
       aprobada: false,
-      puntaje: state.score,
+      puntaje: 0,
       aciertos: state.matched,
       errores: 1
     }, { countAttempt: true });
@@ -380,7 +378,7 @@
     if (isStationCompleted()) {
       showScreen('alreadyDone');
     } else {
-      showScreen('start');
+      startGame();
     }
   }
 

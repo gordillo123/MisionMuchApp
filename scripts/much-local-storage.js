@@ -107,6 +107,15 @@
     return STATIONS[id] || { id, nombre: `Estacion ${id}`, puntos: 0 };
   }
 
+  function getRequiredScore(stationId) {
+    const station = getStation(stationId);
+    return Math.max(1, toNumber(station.puntos, 10));
+  }
+
+  function hasRequiredScore(stationId, score) {
+    return toNumber(score, 0) >= getRequiredScore(stationId);
+  }
+
   function toNumber(value, fallback = 0) {
     const number = Number(value);
     return Number.isFinite(number) ? number : fallback;
@@ -304,9 +313,10 @@
     const countAttempt = options.countAttempt === true;
     const shouldCount = countAttempt && (!attemptId || !knownIds.includes(String(attemptId)));
     const puntaje = Math.max(0, toNumber(attempt.puntaje ?? attempt.puntaje_total, previous.ultimo_puntaje || 0));
-    const aprobada = attempt.aprobada !== undefined ? Boolean(attempt.aprobada)
+    const aprobadaSolicitada = attempt.aprobada !== undefined ? Boolean(attempt.aprobada)
       : (attempt.aprobado !== undefined ? Boolean(attempt.aprobado) : Boolean(previous.aprobada));
-    const completedAlready = Boolean(completedMap[id] || previous.completada);
+    const aprobada = aprobadaSolicitada && hasRequiredScore(id, puntaje);
+    const completedAlready = Boolean((completedMap[id] || previous.completada) && hasRequiredScore(id, previous.mejor_puntaje || previous.ultimo_puntaje || 0));
     const completada = aprobada || completedAlready;
     const finalizada = attempt.finalizado !== undefined ? Boolean(attempt.finalizado)
       : (options.finalizado !== undefined ? Boolean(options.finalizado)
@@ -327,7 +337,7 @@
     const fallida = intentosFallidos >= FAILED_ATTEMPT_LIMIT || Boolean(previous.fallida) || Boolean(attempt.fallida);
     const bloqueada = intentosFallidos >= FAILED_ATTEMPT_LIMIT || Boolean(previous.bloqueada) || Boolean(attempt.bloqueada);
     const fechaBloqueo = bloqueada ? (previous.fecha_bloqueo || attempt.fecha_bloqueo || nowIso()) : null;
-    const fechaPuedeVolverJugar = bloqueada ? (previous.fecha_puede_volver_jugar || attempt.fecha_puede_volver_jugar || attempt.fecha_puede_volver || addDays(fechaBloqueo || nowIso(), 7).toISOString()) : null;
+    const fechaPuedeVolverJugar = bloqueada ? (previous.fecha_puede_volver_jugar || attempt.fecha_puede_volver_jugar || attempt.fecha_puede_volver || addDays(fechaBloqueo || nowIso(), getConfiguredBlockDays()).toISOString()) : null;
 
     attempts[id] = {
       id_estacion: id,
@@ -343,7 +353,7 @@
       mejor_puntaje: Math.max(toNumber(previous.mejor_puntaje, 0), puntaje),
       aciertos: toNumber(attempt.aciertos, previous.aciertos || 0),
       errores: toNumber(attempt.errores, previous.errores || 0),
-      aprobada: Boolean(aprobada || previous.aprobada),
+      aprobada: Boolean(aprobada || (previous.aprobada && hasRequiredScore(id, previous.mejor_puntaje || previous.ultimo_puntaje || 0))),
       completada,
       fallida,
       bloqueada,
@@ -392,6 +402,16 @@
       toNumber(previous.puntaje, 0),
       toNumber(data.puntaje ?? data.puntaje_total, station.puntos)
     );
+
+    const requiredScore = getRequiredScore(id);
+    if (puntaje < requiredScore) {
+      recordStationAttempt(id, {
+        ...data,
+        aprobada: false,
+        puntaje
+      }, { countAttempt: false, countFailure: false });
+      return null;
+    }
 
     records[id] = {
       id,

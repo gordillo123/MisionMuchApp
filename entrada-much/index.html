@@ -42,21 +42,6 @@
         </p>
       </div>
 
-      <div class="mm-section">
-        <h3>¿Cómo jugar?</h3>
-        <ul>
-          <li>Toca una carta para descubrirla.</li>
-          <li>Toca otra carta para encontrar su pareja.</li>
-          <li>Si son iguales, se quedarán descubiertas y sumarás puntos.</li>
-          <li>Encuentra todos los pares antes de que se acabe el tiempo.</li>
-        </ul>
-      </div>
-
-      <div class="mm-section">
-        <h3>Recompensa</h3>
-        <p>Completa el memorama y gana los <strong>10 puntos</strong> de la Estación 1 para tu recorrido.</p>
-      </div>
-
       <button type="button" id="btnMemoramaStart" class="mm-btn-primary">¡COMENZAR!</button>
 
       <div class="mm-logo-strip" aria-label="Logos institucionales">
@@ -87,11 +72,11 @@
       <div class="mm-stats">
         <div class="mm-stat">
           <span>Tiempo</span>
-          <strong id="mmTimer">01:20</strong>
+          <strong id="mmTimer">01:00</strong>
         </div>
         <div class="mm-stat">
-          <span>Puntos</span>
-          <strong id="mmScore">0</strong>
+          <span>Pares</span>
+          <strong id="mmScore">0/6</strong>
         </div>
         <div class="mm-stat">
           <span>Intentos</span>
@@ -107,9 +92,9 @@
       <div class="mm-victory">
         <div class="mm-trophy" aria-hidden="true">🏆</div>
         <h2>¡MUY BIEN!</h2>
-        <p>Encontraste todos los pares y completaste la Estación 1.</p>
+        <p>Encontraste todos los pares antes de que terminara el minuto y completaste la Estación 1.</p>
         <div class="mm-points-badge" id="mmVictoryPoints">+10 puntos</div>
-        <p>Tu memoria es increíble. ¡Sigue así y continúa el recorrido!</p>
+        <p>Ganaste los 10 puntos de esta estación. ¡Sigue así y continúa el recorrido!</p>
         <div id="mmVictoryHost" class="mm-victory-host"></div>
         <button type="button" id="btnMemoramaContinue" class="mm-btn-primary">CONTINUAR</button>
       </div>
@@ -120,7 +105,7 @@
       <div class="mm-victory">
         <div class="mm-trophy" aria-hidden="true">⏳</div>
         <h2>¡Se acabó el tiempo!</h2>
-        <p>No alcanzaste a encontrar todos los pares. ¡Inténtalo de nuevo!</p>
+        <p>No alcanzaste a encontrar todos los pares en 1 minuto. Inténtalo de nuevo para ganar los 10 puntos.</p>
         <button type="button" id="btnMemoramaRetry" class="mm-btn-primary">Reintentar</button>
         <button type="button" class="mm-btn-secondary" onclick="window.location.href='../index.html?view=prep'">Volver al mapa</button>
       </div>
