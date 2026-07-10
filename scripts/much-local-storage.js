@@ -144,8 +144,7 @@
   }
 
   function buildAttemptBlockMessage(stationName, date) {
-    const fecha = formatFechaMX(date);
-    return `Has superado el limite de intentos en ${stationName || 'esta estacion'}.\nPodras volver a jugar el ${fecha}.\nRegresa en esa fecha para continuar tu mision cientifica.`;
+    return `Has agotado tus 3 intentos en esta estación. Tu acceso al juego ha sido bloqueado temporalmente. Podrás volver a jugar después de una semana.`;
   }
 
   function getConfiguredBlockDays() {

@@ -1103,6 +1103,39 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
       });
     }
 
+    // Buscar si ya hay un intento activo no finalizado para este usuario y estación
+    const [[activeAttempt]] = await connection.query(
+      `SELECT id_intento 
+       FROM intentos_estacion 
+       WHERE id_usuario = ? AND id_estacion = ? AND finalizado = FALSE 
+       LIMIT 1`,
+      [id_usuario, id_estacion]
+    );
+
+    if (activeAttempt) {
+      const [[failuresRow]] = await connection.query(
+        `SELECT COUNT(*) AS fallos
+         FROM intentos_estacion
+         WHERE id_usuario = ?
+           AND id_estacion = ?
+           AND aprobado = FALSE
+           AND finalizado = TRUE`,
+        [id_usuario, id_estacion]
+      );
+      const fallos = Number(failuresRow?.fallos || 0);
+
+      await connection.commit();
+      return res.status(200).json({
+        message: 'Intento de estacion activo reutilizado.',
+        id_intento: activeAttempt.id_intento,
+        finalizado: false,
+        aprobado: false,
+        intentos_fallidos: fallos,
+        limite_intentos: FAILED_ATTEMPT_LIMIT,
+        bloqueo: null
+      });
+    }
+
     const validacionEstacion = evaluarAprobacionEstacion(estacion, puntaje, aprobado);
     const aprobadoValidado = validacionEstacion.aprobada;
     const intentoFinalizado = inferirIntentoFinalizado({ finalizado, aprobado: aprobadoValidado, puntaje, aciertos, errores });

@@ -222,8 +222,8 @@ function sincronizarBloqueoPorIntentos(data = {}) {
 function mostrarAvisoBloqueoJuego(estado) {
   const fecha = estado?.fecha_puede_volver_texto || '';
   const esBloqueoPorIntentos = estado?.motivo_bloqueo === 'intentos';
-  const mensaje = estado?.mensaje || (esBloqueoPorIntentos && fecha
-    ? `Has superado el limite de intentos en esta estacion.\nPodras volver a jugar el ${fecha}.\nRegresa en esa fecha para continuar tu mision cientifica.`
+  const mensaje = estado?.mensaje || (esBloqueoPorIntentos
+    ? `Has agotado tus 3 intentos en esta estación. Tu acceso al juego ha sido bloqueado temporalmente. Podrás volver a jugar después de una semana.`
     : fecha
     ? `¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrás volver a jugar el ${fecha}.`
     : 'Tu misión ya fue completada. Debes esperar para comenzar una nueva aventura.');
