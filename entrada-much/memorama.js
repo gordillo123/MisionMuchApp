@@ -54,6 +54,8 @@
     btnRetry: document.getElementById('btnMemoramaRetry'),
     btnBackStart: document.getElementById('btnBackStart'),
     btnBackGame: document.getElementById('btnBackGame'),
+    btnBackBottom: document.getElementById('btnBackBottom'),
+    btnBackVictory: document.getElementById('btnBackVictory'),
     btnBackDone: document.getElementById('btnBackDone')
   };
 
@@ -447,6 +449,12 @@
       stopTimer();
       goBackToMap();
     });
+    els.btnBackBottom?.addEventListener('click', () => {
+      if (state.gameStarted && !confirm('¿Salir del memorama? Tu partida actual se perderá.')) return;
+      stopTimer();
+      goBackToMap();
+    });
+    els.btnBackVictory?.addEventListener('click', goBackToMap);
     els.btnBackDone?.addEventListener('click', goBackToMap);
   }
 

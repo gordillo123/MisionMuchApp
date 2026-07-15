@@ -557,6 +557,31 @@ body.memorama-body {
   flex: 0 1 auto;
 }
 
+.mm-bottom-actions {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 0;
+  flex: 0 0 auto;
+}
+
+.mm-btn-back-bottom {
+  width: min(100%, 340px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--mm-white);
+  border-radius: 999px;
+  padding: 14px 18px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.mm-btn-back-bottom:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
+}
+
 #screenGame .mm-logo-strip .mm-logo-much,
 #screenGame .mm-logo-strip .mm-logo-sbeel {
   height: clamp(23px, 4.2dvh, 34px);
@@ -565,6 +590,21 @@ body.memorama-body {
 #screenGame .mm-logo-strip .mm-logo-sata,
 #screenGame .mm-logo-strip .mm-logo-planetario {
   height: clamp(19px, 3.5dvh, 28px);
+}
+
+#screenVictory,
+#screenFail,
+#screenAlreadyDone {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100%;
+}
+
+.mm-victory,
+.mm-already-done,
+.station-completion-card {
+  max-width: 100%;
 }
 
 .mm-fail.memorama-screen.is-active {

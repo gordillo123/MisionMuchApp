@@ -67,10 +67,44 @@ var quizAnswerIndex = null;
 var quizVisible = false;
 var quizWarningShown = false;
 var navigatingToRegistro = false;
+var spinosaurioPlayerId = null;
 // Temporizador de pregunta especial
 var QUESTION_SECONDS = 15;
 var questionSecondsLeft = 0;
 var questionTimerInterval = null;
+
+function getSpinosaurioPlayerId() {
+  if (spinosaurioPlayerId) return spinosaurioPlayerId;
+  const existing = sessionStorage.getItem('much_spinosaurio_player_id') || localStorage.getItem('much_spinosaurio_player_id');
+  if (existing) {
+    spinosaurioPlayerId = existing;
+    return spinosaurioPlayerId;
+  }
+  spinosaurioPlayerId = `spinosaurio-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  sessionStorage.setItem('much_spinosaurio_player_id', spinosaurioPlayerId);
+  localStorage.setItem('much_spinosaurio_player_id', spinosaurioPlayerId);
+  return spinosaurioPlayerId;
+}
+
+function resolveSpinosaurioQuizData() {
+  try {
+    const pool = window.MuchSpinosaurioQuestionPool;
+    if (pool && typeof pool.pickSpinosaurioQuestion === 'function') {
+      const question = pool.pickSpinosaurioQuestion(sessionStorage, getSpinosaurioPlayerId());
+      if (question) return question;
+    }
+  } catch (error) {
+    console.warn('No se pudo cargar la pregunta del Espinosaurio:', error);
+  }
+
+  return {
+    title: '¡Pregunta final del Espinosaurio!',
+    subtitle: 'Responde con cuidado',
+    question: '¿Qué tipo de dinosaurio era el Espinosaurio?',
+    options: ['Herbívoro', 'Carnívoro', 'Dinosaurio volador', 'Dinosaurio marino pequeño'],
+    answerIndex: 1
+  };
+}
 
 function playCompletionSound() {
   try {
@@ -592,10 +626,7 @@ async function restartGameInPlace(e) {
 /* ===== QUIZ JSON ===== */
 async function cargarQuizJSON() {
   try {
-    const res = await fetch("quiz.json", { cache: "force-cache" });
-    const data = await res.json();
-    const list = Array.isArray(data.questions) ? data.questions : [];
-    quizData = list.length ? list[Math.floor(Math.random() * list.length)] : null;
+    quizData = resolveSpinosaurioQuizData();
   } catch (e) {
     quizData = null;
   }
@@ -853,9 +884,9 @@ function mostrarQuiz() {
 
   if (!quizData) {
     quizData = {
-      title: "¡Muy bien!", subtitle: "Responde para continuar:",
-      question: "¿Pregunta por defecto?", options: ["A", "B", "C", "D"], answerIndex: 3
-    };
+        title: "¡Pregunta final del Espinosaurio!", subtitle: "Responde con cuidado",
+        question: "¿Qué tipo de dinosaurio era el Espinosaurio?", options: ["Herbívoro", "Carnívoro", "Dinosaurio volador", "Dinosaurio marino pequeño"], answerIndex: 1
+      };
   }
 
   var preparedQuiz = prepareQuizOptions(quizData);
@@ -929,8 +960,15 @@ async function validarQuiz() {
 
   if (Number(sel.value) === quizAnswerIndex) {
     window.MuchStationCompletion?.clearInline(msg);
-    msg.textContent = '¡Respuesta Correcta! Estación completada con éxito. 🎉';
+    msg.textContent = '¡Respuesta correcta! Estación completada con éxito. 🎉';
     msg.className = "quiz-msg ok";
+
+    const btnNext = document.getElementById('btnQuizNext');
+    if (btnNext) {
+      btnNext.style.display = 'inline-block';
+      btnNext.textContent = 'Regresar al mapa';
+    }
+    if (btnOk) btnOk.disabled = true;
 
     playVictoryMusic();
     playCompletionSound();
@@ -967,8 +1005,14 @@ async function validarQuiz() {
 
   } else {
     window.MuchStationCompletion?.clearInline(msg);
-    msg.textContent = 'Respuesta incorrecta. El Spinosaurio es incompleto.';
+    msg.textContent = 'Respuesta incorrecta. El Spinosaurio quedó incompleto.';
     msg.className = "quiz-msg err";
+    const btnNext = document.getElementById('btnQuizNext');
+    if (btnNext) {
+      btnNext.style.display = 'inline-block';
+      btnNext.textContent = 'Regresar al mapa';
+    }
+    if (btnOk) btnOk.disabled = true;
     playIncorrectSound();
 
     // Forzar la estación a Incompleta (en local y BD), borrando progreso previo

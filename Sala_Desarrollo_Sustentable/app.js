@@ -30,6 +30,7 @@
 /* =================== Datos de Configuración =================== */
 const params = new URLSearchParams(location.search);
 const SALA = params.get('sala') || 'desarrollo-sustentable';
+const STATION_KEY = (SALA || 'desarrollo-sustentable').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
 // 🛡️ BLINDAJE NIVEL DIOS: Guardar en memoria PERMANENTE
 const LUGAR_EN_URL = (params.get('lugar') || '').trim();
@@ -87,6 +88,14 @@ function distributeQuestionOptions(questions) {
 let QUESTIONS = [];
 // 🔒 BANDERA DE SEGURIDAD (Evita dobles registros al dar clic rápido)
 let quizIniciando = false;
+
+function clearStationQuestionDeck() {
+  try {
+    window.MuchQuestionPool?.clearQuestionDeck?.(STATION_KEY, window.localStorage);
+  } catch (error) {
+    console.warn('[question-pool] No se pudo limpiar el banco:', error);
+  }
+}
 
 class ProgressManager {
   constructor(storageKey) {
@@ -277,8 +286,14 @@ async function loadPreguntas() {
 
     const pool = bySala.length ? bySala : bank;
     const normalized = pool.map(normalize);
+    const selectedDeck = window.MuchQuestionPool?.createQuestionDeck ? window.MuchQuestionPool.createQuestionDeck({
+      questions: normalized,
+      stationKey: STATION_KEY,
+      count: NUM_QUESTIONS,
+      storage: window.localStorage
+    }) : normalized;
 
-    QUESTIONS = distributeQuestionOptions(shuffle(normalized).slice(0, NUM_QUESTIONS));
+    QUESTIONS = distributeQuestionOptions((selectedDeck || []).map((question) => ({ ...question })));
     console.log('[loadPreguntas] JSON Cargado. Total preguntas:', QUESTIONS.length);
     return QUESTIONS;
   } catch (err) {
@@ -305,7 +320,14 @@ async function loadPreguntas() {
       return { text, options, correctIndex, points, desc };
     };
 
-    QUESTIONS = distributeQuestionOptions(shuffle(bankLocal.map(normalize)).slice(0, NUM_QUESTIONS));
+    const selectedDeck = window.MuchQuestionPool?.createQuestionDeck ? window.MuchQuestionPool.createQuestionDeck({
+      questions: bankLocal.map(normalize),
+      stationKey: STATION_KEY,
+      count: NUM_QUESTIONS,
+      storage: window.localStorage
+    }) : bankLocal.map(normalize);
+
+    QUESTIONS = distributeQuestionOptions((selectedDeck || []).map((question) => ({ ...question })));
     console.log('[loadPreguntas] Fallback local cargado. Total:', QUESTIONS.length);
     return QUESTIONS;
   }
@@ -763,10 +785,12 @@ class UIManager {
     this.e.returnBtn.addEventListener('click', () => this.goBackToMap());
     this.e.nextStationBtn.addEventListener('click', () => this.goBackToMap());
     this.e.playAgainBtn1.addEventListener('click', () => {
+      clearStationQuestionDeck();
       this.progressManager.resetProgress();
       location.reload();
     });
     this.e.playAgainBtn2.addEventListener('click', () => {
+      clearStationQuestionDeck();
       this.progressManager.resetProgress();
       location.reload();
     });
@@ -875,6 +899,7 @@ class UIManager {
     }
 
     if (s.idx >= QUESTIONS.length) {
+      clearStationQuestionDeck();
       this.progressManager.resetProgress();
       this.stopQuestionTimer();
       e.quizView.classList.add('d-none');
