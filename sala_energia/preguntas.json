@@ -1,4 +1,49 @@
 [
+  {
+    "id": "energia-panel-solar-luz-sol",
+    "sala": "energia",
+    "text": "¿Cuál de las siguientes fuentes produce energía utilizando la luz del Sol?",
+    "options": ["Carbón", "Panel solar", "Gasolina", "Petróleo"],
+    "correctIndex": 1,
+    "points": 10,
+    "_energyRequired": true
+  },
+  {
+    "id": "energia-no-renovable-petroleo",
+    "sala": "energia",
+    "text": "¿Cuál de las siguientes fuentes de energía no es renovable?",
+    "options": ["Viento", "Luz solar", "Petróleo", "Agua"],
+    "correctIndex": 2,
+    "points": 10,
+    "_energyRequired": true
+  },
+  {
+    "id": "energia-ahorro-apagar-luces",
+    "sala": "energia",
+    "text": "¿Cuál de las siguientes acciones ayuda a ahorrar energía eléctrica?",
+    "options": ["Dejar las luces encendidas", "Abrir el refrigerador constantemente", "Mantener conectados todos los aparatos", "Apagar las luces que no se utilizan"],
+    "correctIndex": 3,
+    "points": 10,
+    "_energyRequired": true
+  },
+  {
+    "id": "energia-electrica-en-luz-foco",
+    "sala": "energia",
+    "text": "¿Cuál de los siguientes aparatos transforma la energía eléctrica en luz?",
+    "options": ["Foco", "Ventilador", "Licuadora", "Refrigerador"],
+    "correctIndex": 0,
+    "points": 10,
+    "_energyRequired": true
+  },
+  {
+    "id": "energia-viento-aerogenerador",
+    "sala": "energia",
+    "text": "¿Cuál de estas opciones utiliza la fuerza del viento para producir electricidad?",
+    "options": ["Panel solar", "Aerogenerador", "Batería", "Estufa de gas"],
+    "correctIndex": 1,
+    "points": 10,
+    "_energyRequired": true
+  },
 {"text":"¿Qué elemento es básico para el desarrollo de un país según el panel de bienvenida?","options":["La energía","El deporte","La educación","La agricultura"],"correctIndex":0,"points":10},
 {"text":"¿Qué recursos son hoy esenciales para cualquier persona, según el texto?","options":["Gasolina y carbón","Electricidad y agua","Petróleo y leña","Oro y plata"],"correctIndex":1,"points":10},
 {"text":"¿Qué medio utilizamos para comunicarnos con el exterior, según el panel?","options":["Correo postal","Internet","Radio antigua","Señales de humo"],"correctIndex":1,"points":10},

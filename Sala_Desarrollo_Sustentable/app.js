@@ -43,6 +43,118 @@ const LUGAR_QR = LUGAR_EN_URL || 'Sin Especificar';
 
 const NUM_QUESTIONS = 10;
 const QUESTION_SECONDS = 15;
+const DESARROLLO_REQUIRED_QUESTIONS = [
+  {
+    id: 'desarrollo-cuidar-medio-ambiente-separar-residuos',
+    sala: 'desarrollo-sustentable',
+    text: '¿Cuál de las siguientes acciones ayuda a cuidar el medio ambiente?',
+    options: ['Tirar basura en la calle', 'Separar los residuos', 'Desperdiciar agua', 'Quemar plástico'],
+    correctIndex: 1,
+    points: 10,
+    _sustainableRequired: true
+  },
+  {
+    id: 'desarrollo-ahorrar-agua-cerrar-llave',
+    sala: 'desarrollo-sustentable',
+    text: '¿Qué acción ayuda a ahorrar agua?',
+    options: ['Dejar la llave abierta', 'Jugar con el agua', 'Cerrar la llave mientras nos cepillamos los dientes', 'Lavar la calle con una manguera'],
+    correctIndex: 2,
+    points: 10,
+    _sustainableRequired: true
+  },
+  {
+    id: 'desarrollo-transporte-contamina-menos-bicicleta',
+    sala: 'desarrollo-sustentable',
+    text: '¿Cuál de los siguientes medios de transporte contamina menos?',
+    options: ['Automóvil', 'Motocicleta', 'Camión de carga', 'Bicicleta'],
+    correctIndex: 3,
+    points: 10,
+    _sustainableRequired: true
+  },
+  {
+    id: 'desarrollo-reutilizar-volver-a-usar',
+    sala: 'desarrollo-sustentable',
+    text: '¿Qué significa reutilizar?',
+    options: ['Volver a utilizar un objeto', 'Tirar todos los objetos', 'Comprar más productos', 'Quemar los residuos'],
+    correctIndex: 0,
+    points: 10,
+    _sustainableRequired: true
+  },
+  {
+    id: 'desarrollo-origen-universo-big-bang',
+    sala: 'desarrollo-sustentable',
+    text: '¿Cómo se llama la teoría que explica el origen del universo?',
+    options: ['Teoría de la evolución', 'Teoría del Big Bang', 'Teoría de la gravedad', 'Teoría del océano'],
+    correctIndex: 1,
+    points: 10,
+    _sustainableRequired: true
+  },
+  {
+    id: 'desarrollo-galaxia-tierra-via-lactea',
+    sala: 'desarrollo-sustentable',
+    text: '¿En qué galaxia se encuentra el planeta Tierra?',
+    options: ['Andrómeda', 'Vía Láctea', 'Galaxia Azul', 'Galaxia Solar'],
+    correctIndex: 1,
+    points: 10,
+    _sustainableRequired: true
+  },
+  {
+    id: 'desarrollo-capa-exterior-tierra-corteza',
+    sala: 'desarrollo-sustentable',
+    text: '¿Cuál es la capa exterior de la Tierra donde vivimos?',
+    options: ['Núcleo', 'Manto', 'Corteza', 'Estratosfera'],
+    correctIndex: 2,
+    points: 10,
+    _sustainableRequired: true
+  },
+  {
+    id: 'desarrollo-parte-profunda-caliente-nucleo',
+    sala: 'desarrollo-sustentable',
+    text: '¿Cuál es la parte más profunda y caliente de la Tierra?',
+    options: ['Corteza', 'Núcleo', 'Atmósfera', 'Océano'],
+    correctIndex: 1,
+    points: 10,
+    _sustainableRequired: true
+  },
+  {
+    id: 'desarrollo-capa-gases-atmosfera',
+    sala: 'desarrollo-sustentable',
+    text: '¿Cómo se llama la capa de gases que rodea la Tierra?',
+    options: ['Corteza', 'Atmósfera', 'Manto', 'Núcleo'],
+    correctIndex: 1,
+    points: 10,
+    _sustainableRequired: true
+  },
+  {
+    id: 'desarrollo-atmosfera-vivimos-troposfera',
+    sala: 'desarrollo-sustentable',
+    text: '¿En qué capa de la atmósfera vivimos y se forman las nubes?',
+    options: ['Exosfera', 'Mesosfera', 'Troposfera', 'Estratosfera'],
+    correctIndex: 2,
+    points: 10,
+    _sustainableRequired: true
+  },
+  {
+    id: 'desarrollo-capa-ozono-estratosfera',
+    sala: 'desarrollo-sustentable',
+    text: '¿En qué capa de la atmósfera se encuentra la capa de ozono?',
+    options: ['Estratosfera', 'Troposfera', 'Exosfera', 'Núcleo'],
+    correctIndex: 0,
+    points: 10,
+    _sustainableRequired: true
+  },
+  {
+    id: 'desarrollo-importancia-capa-ozono',
+    sala: 'desarrollo-sustentable',
+    text: '¿Por qué es importante la capa de ozono?',
+    options: ['Porque produce basura', 'Porque protege a la Tierra de parte de los rayos solares', 'Porque forma las montañas', 'Porque aumenta la contaminación'],
+    correctIndex: 1,
+    points: 10,
+    _sustainableRequired: true
+  }
+];
+const DESARROLLO_REQUIRED_STATION_KEY = `${STATION_KEY}-nuevas-v1`;
+const DESARROLLO_OPTIONAL_STATION_KEY = `${STATION_KEY}-complemento-v1`;
 // Función para mezclar arrays
 const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
 
@@ -84,6 +196,103 @@ function distributeQuestionOptions(questions) {
   return questions.map((question, index) => shuffleQuestionOptions(question, positionPlan[index]));
 }
 
+function cloneQuestion(question) {
+  const copy = { ...question };
+  if (Array.isArray(question?.options)) copy.options = question.options.slice();
+  return copy;
+}
+
+function getQuestionText(question) {
+  return question?.text ?? question?.pregunta ?? question?.enunciado ?? '';
+}
+
+function normalizeQuestionIdentity(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function sameQuestion(a, b) {
+  const idA = String(a?.id || '').trim();
+  const idB = String(b?.id || '').trim();
+  if (idA && idB && idA === idB) return true;
+  return normalizeQuestionIdentity(getQuestionText(a)) === normalizeQuestionIdentity(getQuestionText(b));
+}
+
+function mergeRequiredSustainableQuestions(bank) {
+  const merged = Array.isArray(bank) ? bank.map(cloneQuestion) : [];
+
+  DESARROLLO_REQUIRED_QUESTIONS.forEach((requiredQuestion) => {
+    const existingIndex = merged.findIndex((question) => sameQuestion(question, requiredQuestion));
+    if (existingIndex >= 0) {
+      merged[existingIndex] = {
+        ...merged[existingIndex],
+        id: merged[existingIndex].id || requiredQuestion.id,
+        sala: merged[existingIndex].sala || requiredQuestion.sala,
+        _sustainableRequired: true
+      };
+      return;
+    }
+
+    merged.push(cloneQuestion(requiredQuestion));
+  });
+
+  return merged;
+}
+
+function buildSustainableQuestionDeck(questions) {
+  const requiredSource = DESARROLLO_REQUIRED_QUESTIONS.map((requiredQuestion) => {
+    const match = questions.find((question) => sameQuestion(question, requiredQuestion));
+    return {
+      ...cloneQuestion(match || requiredQuestion),
+      id: requiredQuestion.id,
+      sala: 'desarrollo-sustentable',
+      _sustainableRequired: true
+    };
+  });
+
+  const requiredCount = Math.min(NUM_QUESTIONS, requiredSource.length);
+  let requiredDeck = requiredCount > 0
+    ? (window.MuchQuestionPool?.createQuestionDeck ? window.MuchQuestionPool.createQuestionDeck({
+      questions: requiredSource,
+      stationKey: DESARROLLO_REQUIRED_STATION_KEY,
+      count: requiredCount,
+      storage: window.localStorage
+    }) : shuffle(requiredSource).slice(0, requiredCount))
+    : [];
+
+  if (requiredDeck.length < requiredCount && window.MuchQuestionPool?.clearQuestionDeck) {
+    window.MuchQuestionPool.clearQuestionDeck(DESARROLLO_REQUIRED_STATION_KEY, window.localStorage);
+    requiredDeck = window.MuchQuestionPool.createQuestionDeck({
+      questions: requiredSource,
+      stationKey: DESARROLLO_REQUIRED_STATION_KEY,
+      count: requiredCount,
+      storage: window.localStorage
+    });
+  }
+
+  const requiredIds = new Set(requiredDeck.map((question) => question.id));
+  const requiredTexts = new Set(requiredDeck.map((question) => normalizeQuestionIdentity(question.text)));
+  const optionalQuestions = questions.filter((question) => (
+    !requiredIds.has(question.id)
+    && !requiredTexts.has(normalizeQuestionIdentity(question.text))
+    && !DESARROLLO_REQUIRED_QUESTIONS.some((requiredQuestion) => sameQuestion(question, requiredQuestion))
+  ));
+  const optionalCount = Math.max(0, NUM_QUESTIONS - requiredDeck.length);
+  const optionalDeck = optionalCount > 0
+    ? (window.MuchQuestionPool?.createQuestionDeck ? window.MuchQuestionPool.createQuestionDeck({
+      questions: optionalQuestions,
+      stationKey: DESARROLLO_OPTIONAL_STATION_KEY,
+      count: optionalCount,
+      storage: window.localStorage
+    }) : shuffle(optionalQuestions).slice(0, optionalCount))
+    : [];
+
+  return shuffle(requiredDeck.concat(optionalDeck)).slice(0, NUM_QUESTIONS);
+}
+
 // Placeholder: Se llenará desde el JSON
 let QUESTIONS = [];
 // 🔒 BANDERA DE SEGURIDAD (Evita dobles registros al dar clic rápido)
@@ -92,6 +301,8 @@ let quizIniciando = false;
 function clearStationQuestionDeck() {
   try {
     window.MuchQuestionPool?.clearQuestionDeck?.(STATION_KEY, window.localStorage);
+    window.MuchQuestionPool?.clearQuestionDeck?.(DESARROLLO_REQUIRED_STATION_KEY, window.localStorage);
+    window.MuchQuestionPool?.clearQuestionDeck?.(DESARROLLO_OPTIONAL_STATION_KEY, window.localStorage);
   } catch (error) {
     console.warn('[question-pool] No se pudo limpiar el banco:', error);
   }
@@ -245,7 +456,11 @@ async function loadPreguntas() {
     if (!Array.isArray(bank) || bank.length === 0)
       throw new Error('preguntas.json no contiene un array de preguntas');
 
+    bank = mergeRequiredSustainableQuestions(bank);
+
     const normalize = (it) => {
+      const id = it.id ?? it.id_pregunta ?? it.codigo ?? '';
+      const sala = it.sala ?? it.sala_codigo ?? it.estacion ?? it.station ?? '';
       const text = it.text ?? it.pregunta ?? it.enunciado ?? 'Pregunta sin texto';
       const desc = it.desc ?? it.descripcion ?? '';
       let options = it.options ?? it.opciones ?? it.respuestas ?? [];
@@ -276,22 +491,29 @@ async function loadPreguntas() {
       if (correctIndex == null || correctIndex < 0 || correctIndex >= options.length) {
         correctIndex = 0;
       }
-      return { text, options, correctIndex, points, desc };
+      return {
+        id: id ? String(id) : undefined,
+        sala,
+        text,
+        options,
+        correctIndex,
+        points,
+        desc,
+        _sustainableRequired: Boolean(it._sustainableRequired)
+      };
     };
 
     const bySala = bank.filter(q =>
-      !q?.sala && !q?.sala_codigo ? true :
-        (q.sala === SALA || q.sala_codigo === SALA)
+      !q?.sala && !q?.sala_codigo && !q?.estacion && !q?.station
+        ? true
+        : (window.MuchQuestionPool?.questionMatchesStation
+          ? window.MuchQuestionPool.questionMatchesStation(q, STATION_KEY)
+          : (q.sala === SALA || q.sala_codigo === SALA))
     );
 
     const pool = bySala.length ? bySala : bank;
     const normalized = pool.map(normalize);
-    const selectedDeck = window.MuchQuestionPool?.createQuestionDeck ? window.MuchQuestionPool.createQuestionDeck({
-      questions: normalized,
-      stationKey: STATION_KEY,
-      count: NUM_QUESTIONS,
-      storage: window.localStorage
-    }) : normalized;
+    const selectedDeck = buildSustainableQuestionDeck(normalized);
 
     QUESTIONS = distributeQuestionOptions((selectedDeck || []).map((question) => ({ ...question })));
     console.log('[loadPreguntas] JSON Cargado. Total preguntas:', QUESTIONS.length);
@@ -303,8 +525,11 @@ async function loadPreguntas() {
       console.error('No hay preguntas locales disponibles.');
       throw err;
     }
+    const mergedBankLocal = mergeRequiredSustainableQuestions(bankLocal);
 
     const normalize = (it) => {
+      const id = it.id ?? it.id_pregunta ?? it.codigo ?? '';
+      const sala = it.sala ?? it.sala_codigo ?? it.estacion ?? it.station ?? '';
       const text = it.text ?? it.pregunta ?? it.enunciado ?? 'Pregunta sin texto';
       const desc = it.desc ?? it.descripcion ?? '';
       let options = it.options ?? it.opciones ?? it.respuestas ?? [];
@@ -317,15 +542,19 @@ async function loadPreguntas() {
       const points = it.points ?? it.puntos ?? 10;
       if (!Array.isArray(options) || options.length === 0) { options = ['(sin opciones)']; correctIndex = 0; }
       if (correctIndex == null || correctIndex < 0 || correctIndex >= options.length) { correctIndex = 0; }
-      return { text, options, correctIndex, points, desc };
+      return {
+        id: id ? String(id) : undefined,
+        sala,
+        text,
+        options,
+        correctIndex,
+        points,
+        desc,
+        _sustainableRequired: Boolean(it._sustainableRequired)
+      };
     };
 
-    const selectedDeck = window.MuchQuestionPool?.createQuestionDeck ? window.MuchQuestionPool.createQuestionDeck({
-      questions: bankLocal.map(normalize),
-      stationKey: STATION_KEY,
-      count: NUM_QUESTIONS,
-      storage: window.localStorage
-    }) : bankLocal.map(normalize);
+    const selectedDeck = buildSustainableQuestionDeck(mergedBankLocal.map(normalize));
 
     QUESTIONS = distributeQuestionOptions((selectedDeck || []).map((question) => ({ ...question })));
     console.log('[loadPreguntas] Fallback local cargado. Total:', QUESTIONS.length);

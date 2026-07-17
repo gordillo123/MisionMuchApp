@@ -1,5 +1,113 @@
 
 [
+  {
+    "id": "desarrollo-cuidar-medio-ambiente-separar-residuos",
+    "sala": "desarrollo-sustentable",
+    "text": "¿Cuál de las siguientes acciones ayuda a cuidar el medio ambiente?",
+    "options": ["Tirar basura en la calle", "Separar los residuos", "Desperdiciar agua", "Quemar plástico"],
+    "correctIndex": 1,
+    "points": 10,
+    "_sustainableRequired": true
+  },
+  {
+    "id": "desarrollo-ahorrar-agua-cerrar-llave",
+    "sala": "desarrollo-sustentable",
+    "text": "¿Qué acción ayuda a ahorrar agua?",
+    "options": ["Dejar la llave abierta", "Jugar con el agua", "Cerrar la llave mientras nos cepillamos los dientes", "Lavar la calle con una manguera"],
+    "correctIndex": 2,
+    "points": 10,
+    "_sustainableRequired": true
+  },
+  {
+    "id": "desarrollo-transporte-contamina-menos-bicicleta",
+    "sala": "desarrollo-sustentable",
+    "text": "¿Cuál de los siguientes medios de transporte contamina menos?",
+    "options": ["Automóvil", "Motocicleta", "Camión de carga", "Bicicleta"],
+    "correctIndex": 3,
+    "points": 10,
+    "_sustainableRequired": true
+  },
+  {
+    "id": "desarrollo-reutilizar-volver-a-usar",
+    "sala": "desarrollo-sustentable",
+    "text": "¿Qué significa reutilizar?",
+    "options": ["Volver a utilizar un objeto", "Tirar todos los objetos", "Comprar más productos", "Quemar los residuos"],
+    "correctIndex": 0,
+    "points": 10,
+    "_sustainableRequired": true
+  },
+  {
+    "id": "desarrollo-origen-universo-big-bang",
+    "sala": "desarrollo-sustentable",
+    "text": "¿Cómo se llama la teoría que explica el origen del universo?",
+    "options": ["Teoría de la evolución", "Teoría del Big Bang", "Teoría de la gravedad", "Teoría del océano"],
+    "correctIndex": 1,
+    "points": 10,
+    "_sustainableRequired": true
+  },
+  {
+    "id": "desarrollo-galaxia-tierra-via-lactea",
+    "sala": "desarrollo-sustentable",
+    "text": "¿En qué galaxia se encuentra el planeta Tierra?",
+    "options": ["Andrómeda", "Vía Láctea", "Galaxia Azul", "Galaxia Solar"],
+    "correctIndex": 1,
+    "points": 10,
+    "_sustainableRequired": true
+  },
+  {
+    "id": "desarrollo-capa-exterior-tierra-corteza",
+    "sala": "desarrollo-sustentable",
+    "text": "¿Cuál es la capa exterior de la Tierra donde vivimos?",
+    "options": ["Núcleo", "Manto", "Corteza", "Estratosfera"],
+    "correctIndex": 2,
+    "points": 10,
+    "_sustainableRequired": true
+  },
+  {
+    "id": "desarrollo-parte-profunda-caliente-nucleo",
+    "sala": "desarrollo-sustentable",
+    "text": "¿Cuál es la parte más profunda y caliente de la Tierra?",
+    "options": ["Corteza", "Núcleo", "Atmósfera", "Océano"],
+    "correctIndex": 1,
+    "points": 10,
+    "_sustainableRequired": true
+  },
+  {
+    "id": "desarrollo-capa-gases-atmosfera",
+    "sala": "desarrollo-sustentable",
+    "text": "¿Cómo se llama la capa de gases que rodea la Tierra?",
+    "options": ["Corteza", "Atmósfera", "Manto", "Núcleo"],
+    "correctIndex": 1,
+    "points": 10,
+    "_sustainableRequired": true
+  },
+  {
+    "id": "desarrollo-atmosfera-vivimos-troposfera",
+    "sala": "desarrollo-sustentable",
+    "text": "¿En qué capa de la atmósfera vivimos y se forman las nubes?",
+    "options": ["Exosfera", "Mesosfera", "Troposfera", "Estratosfera"],
+    "correctIndex": 2,
+    "points": 10,
+    "_sustainableRequired": true
+  },
+  {
+    "id": "desarrollo-capa-ozono-estratosfera",
+    "sala": "desarrollo-sustentable",
+    "text": "¿En qué capa de la atmósfera se encuentra la capa de ozono?",
+    "options": ["Estratosfera", "Troposfera", "Exosfera", "Núcleo"],
+    "correctIndex": 0,
+    "points": 10,
+    "_sustainableRequired": true
+  },
+  {
+    "id": "desarrollo-importancia-capa-ozono",
+    "sala": "desarrollo-sustentable",
+    "text": "¿Por qué es importante la capa de ozono?",
+    "options": ["Porque produce basura", "Porque protege a la Tierra de parte de los rayos solares", "Porque forma las montañas", "Porque aumenta la contaminación"],
+    "correctIndex": 1,
+    "points": 10,
+    "_sustainableRequired": true
+  },
 	{"text": "¿Qué sala del MUCH aborda los temas de medio ambiente y futuro sustentable?", "options": ["Matemáticas", "Desarrollo Sustentable", "Astronomía", "Energía"], "correctIndex": 1, "points": 10},
 	{"text": "¿Qué busca el desarrollo sustentable?", "options": ["Solo crecimiento económico", "Equilibrio entre sociedad, economía y ambiente", "Reducir la tecnología", "Evitar el progreso humano"], "correctIndex": 1, "points": 10},
 	{"text": "¿Qué fenómeno provoca un aumento de la temperatura global?", "options": ["Efecto invernadero", "Lluvia ácida", "Rotación de la Tierra", "Tormentas solares"], "correctIndex": 0, "points": 10},

@@ -42,6 +42,54 @@ const LUGAR_QR = localStorage.getItem('much_lugar_seguro') || 'Sin Especificar';
 
 const NUM_QUESTIONS = 10;
 const QUESTION_SECONDS = 15;
+const ENERGIA_REQUIRED_QUESTIONS = [
+  {
+    id: 'energia-panel-solar-luz-sol',
+    sala: 'energia',
+    text: '¿Cuál de las siguientes fuentes produce energía utilizando la luz del Sol?',
+    options: ['Carbón', 'Panel solar', 'Gasolina', 'Petróleo'],
+    correctIndex: 1,
+    points: 10,
+    _energyRequired: true
+  },
+  {
+    id: 'energia-no-renovable-petroleo',
+    sala: 'energia',
+    text: '¿Cuál de las siguientes fuentes de energía no es renovable?',
+    options: ['Viento', 'Luz solar', 'Petróleo', 'Agua'],
+    correctIndex: 2,
+    points: 10,
+    _energyRequired: true
+  },
+  {
+    id: 'energia-ahorro-apagar-luces',
+    sala: 'energia',
+    text: '¿Cuál de las siguientes acciones ayuda a ahorrar energía eléctrica?',
+    options: ['Dejar las luces encendidas', 'Abrir el refrigerador constantemente', 'Mantener conectados todos los aparatos', 'Apagar las luces que no se utilizan'],
+    correctIndex: 3,
+    points: 10,
+    _energyRequired: true
+  },
+  {
+    id: 'energia-electrica-en-luz-foco',
+    sala: 'energia',
+    text: '¿Cuál de los siguientes aparatos transforma la energía eléctrica en luz?',
+    options: ['Foco', 'Ventilador', 'Licuadora', 'Refrigerador'],
+    correctIndex: 0,
+    points: 10,
+    _energyRequired: true
+  },
+  {
+    id: 'energia-viento-aerogenerador',
+    sala: 'energia',
+    text: '¿Cuál de estas opciones utiliza la fuerza del viento para producir electricidad?',
+    options: ['Panel solar', 'Aerogenerador', 'Batería', 'Estufa de gas'],
+    correctIndex: 1,
+    points: 10,
+    _energyRequired: true
+  }
+];
+const ENERGIA_OPTIONAL_STATION_KEY = `${STATION_KEY}-complemento-v1`;
 // Función para mezclar arrays
 const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
 
@@ -83,6 +131,84 @@ function distributeQuestionOptions(questions) {
   return questions.map((question, index) => shuffleQuestionOptions(question, positionPlan[index]));
 }
 
+function cloneQuestion(question) {
+  const copy = { ...question };
+  if (Array.isArray(question?.options)) copy.options = question.options.slice();
+  return copy;
+}
+
+function getQuestionText(question) {
+  return question?.text ?? question?.pregunta ?? question?.enunciado ?? '';
+}
+
+function normalizeQuestionIdentity(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function sameQuestion(a, b) {
+  const idA = String(a?.id || '').trim();
+  const idB = String(b?.id || '').trim();
+  if (idA && idB && idA === idB) return true;
+  return normalizeQuestionIdentity(getQuestionText(a)) === normalizeQuestionIdentity(getQuestionText(b));
+}
+
+function mergeRequiredEnergyQuestions(bank) {
+  const merged = Array.isArray(bank) ? bank.map(cloneQuestion) : [];
+
+  ENERGIA_REQUIRED_QUESTIONS.forEach((requiredQuestion) => {
+    const existingIndex = merged.findIndex((question) => sameQuestion(question, requiredQuestion));
+    if (existingIndex >= 0) {
+      merged[existingIndex] = {
+        ...merged[existingIndex],
+        id: merged[existingIndex].id || requiredQuestion.id,
+        sala: merged[existingIndex].sala || requiredQuestion.sala,
+        _energyRequired: true
+      };
+      return;
+    }
+
+    merged.push(cloneQuestion(requiredQuestion));
+  });
+
+  return merged;
+}
+
+function buildEnergyQuestionDeck(questions) {
+  const requiredQuestions = ENERGIA_REQUIRED_QUESTIONS
+    .map((requiredQuestion) => {
+      const match = questions.find((question) => sameQuestion(question, requiredQuestion));
+      return {
+        ...cloneQuestion(match || requiredQuestion),
+        id: requiredQuestion.id,
+        sala: 'energia',
+        _energyRequired: true
+      };
+    })
+    .slice(0, NUM_QUESTIONS);
+
+  const requiredIds = new Set(requiredQuestions.map((question) => question.id));
+  const requiredTexts = new Set(requiredQuestions.map((question) => normalizeQuestionIdentity(question.text)));
+  const optionalQuestions = questions.filter((question) => (
+    !requiredIds.has(question.id)
+    && !requiredTexts.has(normalizeQuestionIdentity(question.text))
+  ));
+  const optionalCount = Math.max(0, NUM_QUESTIONS - requiredQuestions.length);
+  const optionalDeck = optionalCount > 0
+    ? (window.MuchQuestionPool?.createQuestionDeck ? window.MuchQuestionPool.createQuestionDeck({
+      questions: optionalQuestions,
+      stationKey: ENERGIA_OPTIONAL_STATION_KEY,
+      count: optionalCount,
+      storage: window.localStorage
+    }) : shuffle(optionalQuestions).slice(0, optionalCount))
+    : [];
+
+  return shuffle(requiredQuestions.concat(optionalDeck)).slice(0, NUM_QUESTIONS);
+}
+
 // Placeholder: Se llenará desde el JSON
 let QUESTIONS = [];
 // 🔒 BANDERA DE SEGURIDAD (Evita dobles registros al dar clic rápido)
@@ -91,6 +217,7 @@ let quizIniciando = false;
 function clearStationQuestionDeck() {
   try {
     window.MuchQuestionPool?.clearQuestionDeck?.(STATION_KEY, window.localStorage);
+    window.MuchQuestionPool?.clearQuestionDeck?.(ENERGIA_OPTIONAL_STATION_KEY, window.localStorage);
   } catch (error) {
     console.warn('[question-pool] No se pudo limpiar el banco:', error);
   }
@@ -222,7 +349,11 @@ async function loadPreguntas() {
     if (!Array.isArray(bank) || bank.length === 0)
       throw new Error('preguntas.json no contiene un array de preguntas');
 
+    bank = mergeRequiredEnergyQuestions(bank);
+
     const normalize = (it) => {
+      const id = it.id ?? it.id_pregunta ?? it.codigo ?? '';
+      const sala = it.sala ?? it.sala_codigo ?? it.estacion ?? it.station ?? '';
       const text = it.text ?? it.pregunta ?? it.enunciado ?? 'Pregunta sin texto';
       const desc = it.desc ?? it.descripcion ?? '';
       let options = it.options ?? it.opciones ?? it.respuestas ?? [];
@@ -253,22 +384,29 @@ async function loadPreguntas() {
       if (correctIndex == null || correctIndex < 0 || correctIndex >= options.length) {
         correctIndex = 0;
       }
-      return { text, options, correctIndex, points, desc };
+      return {
+        id: id ? String(id) : undefined,
+        sala,
+        text,
+        options,
+        correctIndex,
+        points,
+        desc,
+        _energyRequired: Boolean(it._energyRequired)
+      };
     };
 
     const bySala = bank.filter(q =>
-      !q?.sala && !q?.sala_codigo ? true :
-        (q.sala === SALA || q.sala_codigo === SALA)
+      !q?.sala && !q?.sala_codigo && !q?.estacion && !q?.station
+        ? true
+        : (window.MuchQuestionPool?.questionMatchesStation
+          ? window.MuchQuestionPool.questionMatchesStation(q, STATION_KEY)
+          : (q.sala === SALA || q.sala_codigo === SALA))
     );
 
     const pool = bySala.length ? bySala : bank;
     const normalized = pool.map(normalize);
-    const selectedDeck = window.MuchQuestionPool?.createQuestionDeck ? window.MuchQuestionPool.createQuestionDeck({
-      questions: normalized,
-      stationKey: STATION_KEY,
-      count: NUM_QUESTIONS,
-      storage: window.localStorage
-    }) : normalized;
+    const selectedDeck = buildEnergyQuestionDeck(normalized);
 
     QUESTIONS = distributeQuestionOptions((selectedDeck || []).map((question) => ({ ...question })));
     console.log('[loadPreguntas] JSON Cargado. Total preguntas:', QUESTIONS.length);
@@ -280,8 +418,11 @@ async function loadPreguntas() {
       console.error('No hay preguntas locales disponibles.');
       throw err;
     }
+    const mergedBankLocal = mergeRequiredEnergyQuestions(bankLocal);
 
     const normalize = (it) => {
+      const id = it.id ?? it.id_pregunta ?? it.codigo ?? '';
+      const sala = it.sala ?? it.sala_codigo ?? it.estacion ?? it.station ?? '';
       const text = it.text ?? it.pregunta ?? it.enunciado ?? 'Pregunta sin texto';
       const desc = it.desc ?? it.descripcion ?? '';
       let options = it.options ?? it.opciones ?? it.respuestas ?? [];
@@ -294,15 +435,19 @@ async function loadPreguntas() {
       const points = it.points ?? it.puntos ?? 10;
       if (!Array.isArray(options) || options.length === 0) { options = ['(sin opciones)']; correctIndex = 0; }
       if (correctIndex == null || correctIndex < 0 || correctIndex >= options.length) { correctIndex = 0; }
-      return { text, options, correctIndex, points, desc };
+      return {
+        id: id ? String(id) : undefined,
+        sala,
+        text,
+        options,
+        correctIndex,
+        points,
+        desc,
+        _energyRequired: Boolean(it._energyRequired)
+      };
     };
 
-    const selectedDeck = window.MuchQuestionPool?.createQuestionDeck ? window.MuchQuestionPool.createQuestionDeck({
-      questions: bankLocal.map(normalize),
-      stationKey: STATION_KEY,
-      count: NUM_QUESTIONS,
-      storage: window.localStorage
-    }) : bankLocal.map(normalize);
+    const selectedDeck = buildEnergyQuestionDeck(mergedBankLocal.map(normalize));
 
     QUESTIONS = distributeQuestionOptions((selectedDeck || []).map((question) => ({ ...question })));
     console.log('[loadPreguntas] Fallback local cargado. Total:', QUESTIONS.length);

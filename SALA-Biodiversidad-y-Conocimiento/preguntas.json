@@ -1,4 +1,31 @@
 [
+  {
+    "id": "biodiversidad-dispersion-semillas-mono-arana",
+    "sala": "biodiversidad",
+    "text": "¿Cuál de los siguientes animales ayuda a dispersar semillas?",
+    "options": ["Mono araña", "Cocodrilo", "Tortuga marina", "Tiburón"],
+    "correctIndex": 0,
+    "points": 10,
+    "_biodiversityRequired": true
+  },
+  {
+    "id": "biodiversidad-no-dispersa-semillas-tiburon",
+    "sala": "biodiversidad",
+    "text": "¿Cuál de los siguientes animales no ayuda a dispersar semillas?",
+    "options": ["Tucán", "Murciélago frugívoro", "Mono araña", "Tiburón"],
+    "correctIndex": 3,
+    "points": 10,
+    "_biodiversityRequired": true
+  },
+  {
+    "id": "biodiversidad-serpiente-no-importancia-medica-mazacuata",
+    "sala": "biodiversidad",
+    "text": "¿Cuál de las siguientes serpientes no es considerada de importancia médica?",
+    "options": ["Nauyaca", "Coralillo", "Cascabel", "Mazacuata o boa"],
+    "correctIndex": 3,
+    "points": 10,
+    "_biodiversityRequired": true
+  },
   {"text":"📅 ¿Dónde surgió el Homo sapiens?","options":["China","África","Rusia","España"],"correctIndex":1,"points":10},
   {"text":"⌛ ¿Hace cuántos años apareció el Homo sapiens en África?","options":["500 mil","Entre 350 mil y 200 mil","100 mil","50 mil"],"correctIndex":1,"points":10},
   {"text":"🌍 ¿Qué evento climático impulsó la migración humana fuera de África?","options":["Sequía","Tormentas","Glaciación","Erupción volcánica"],"correctIndex":0,"points":10},
