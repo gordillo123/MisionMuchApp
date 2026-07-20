@@ -105,16 +105,32 @@ window.APP_MODULES = {
   `,
 
   "modules/prep.html": `
-<button class="back-button-prep" id="btnBackPrep" title="Volver">&#11013;</button>
+<button class="back-button-prep" id="btnBackPrep" title="Volver" aria-label="Volver">
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M19 12H5M12 19l-7-7 7-7"></path>
+  </svg>
+</button>
 <button class="screen-sound-toggle prep-sound-toggle" type="button" aria-label="Quitar sonido" aria-pressed="true" title="Quitar sonido">
-  <span class="sound-icon sound-icon-on" aria-hidden="true">&#128266;</span>
-  <span class="sound-icon sound-icon-off" aria-hidden="true">&#128263;</span>
+  <span class="sound-icon sound-icon-on" aria-hidden="true">
+    <svg viewBox="0 0 24 24" focusable="false">
+      <path d="M11 5 6.5 8.5H3.8v7h2.7L11 19V5Z"></path>
+      <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+      <path d="M18.4 5.6a9 9 0 0 1 0 12.8"></path>
+    </svg>
+  </span>
+  <span class="sound-icon sound-icon-off" aria-hidden="true">
+    <svg viewBox="0 0 24 24" focusable="false">
+      <path d="M11 5 6.5 8.5H3.8v7h2.7L11 19V5Z"></path>
+      <path d="m16 9 5 5"></path>
+      <path d="m21 9-5 5"></path>
+    </svg>
+  </span>
 </button>
 <div class="intro-container">
   <div class="rules-col">
     <div class="card">
       <h2 class="section-title"> Reglas</h2>
-      <ul id="prepRulesList" class="rules-list" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+      <ul id="prepRulesList" class="rules-list">
         <li><span class="rule-icon">📱</span>
           <div>Usa el celular en vertical para las preguntas. Solo el Espinosaurio se juega en horizontal.</div>
         </li>
@@ -229,8 +245,8 @@ window.APP_MODULES = {
           </div>
           <button id="btnClaimReward" class="btn-claim-reward" type="button">🎟️ Reclamar mi premio</button>
         </div>
-        <button id="btnResetProgress" type="button" style="background: transparent; border: 2px dashed rgba(255,255,255,0.25); color: #A0A4B8; padding: 6px 16px; border-radius: 20px; font-family: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 5px;">
-          <span>🔄</span> Reiniciar Estaciones
+        <button id="btnResetProgress" type="button" data-test-reset="true" style="background: transparent; border: 2px dashed rgba(255,255,255,0.25); color: #A0A4B8; padding: 6px 16px; border-radius: 20px; font-family: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 5px;">
+          <span>🔄</span> Prueba: Reiniciar estaciones
         </button>
         <div class="prep-logo-strip" aria-label="Logos institucionales">
           <img src="entrada-much/logo-much.png" alt="MUCH · Museo Chiapas" class="prep-logo-much">

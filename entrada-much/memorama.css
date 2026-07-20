@@ -93,6 +93,14 @@ body.memorama-body {
   display: block;
 }
 
+#screenStart.memorama-screen.is-active {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  justify-content: center;
+  gap: clamp(8px, 1.8dvh, 16px);
+}
+
 #screenGame.memorama-screen.is-active {
   display: flex;
   flex-direction: column;
@@ -149,9 +157,9 @@ body.memorama-body {
   border: 1px solid var(--mm-card-border);
   border-radius: var(--mm-radius);
   box-shadow: var(--mm-shadow);
-  padding: clamp(18px, 4vw, 28px);
+  padding: clamp(16px, 4vw, 28px);
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: clamp(6px, 1.6dvh, 16px);
 }
 
 .mm-title {
@@ -160,6 +168,7 @@ body.memorama-body {
   font-weight: 700;
   margin: 0 0 4px;
   line-height: 1;
+  overflow-wrap: anywhere;
   background: linear-gradient(90deg, #fde68a, #fbbf24, #fff);
   -webkit-background-clip: text;
   background-clip: text;
@@ -171,14 +180,17 @@ body.memorama-body {
   font-weight: 700;
   letter-spacing: 0.08em;
   color: var(--mm-blue);
-  margin: 0 0 12px;
+  margin: 0 0 clamp(6px, 1.5dvh, 12px);
+  overflow-wrap: anywhere;
 }
 
 .mm-desc {
-  font-size: 0.95rem;
-  line-height: 1.55;
+  font-size: clamp(0.82rem, 2.9vw, 0.95rem);
+  line-height: 1.35;
   color: rgba(255, 255, 255, 0.88);
   margin: 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .mm-section {
@@ -215,7 +227,7 @@ body.memorama-body {
   width: 100%;
   border: none;
   border-radius: 999px;
-  padding: 16px 20px;
+  padding: clamp(12px, 2.4dvh, 16px) 20px;
   font-family: 'Fredoka', sans-serif;
   font-size: 1.15rem;
   font-weight: 700;
@@ -390,13 +402,17 @@ body.memorama-body {
   align-items: center;
   justify-content: center;
   gap: clamp(0.65rem, 2.8vw, 1.4rem);
-  margin-top: 18px;
+  margin-top: clamp(8px, 1.8dvh, 18px);
   padding: clamp(0.75rem, 2.5vw, 1.25rem) clamp(0.85rem, 4vw, 2rem);
   background: #ffffff;
   border-radius: 16px;
   border: 0;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   position: relative;
+}
+
+#screenStart .mm-logo-strip {
+  flex: 0 0 auto;
 }
 
 
@@ -499,6 +515,52 @@ body.memorama-body {
 
   .mm-stat strong {
     font-size: 0.88rem;
+  }
+
+  #screenStart.memorama-screen.is-active {
+    gap: 8px;
+  }
+
+  #screenStart .mm-topbar {
+    margin-bottom: 2px;
+  }
+
+  #screenStart .mm-hero-card {
+    padding: 14px 16px;
+  }
+
+  #screenStart .mm-title {
+    font-size: clamp(1.65rem, 7.2svh, 2.35rem);
+  }
+
+  #screenStart .mm-subtitle {
+    font-size: clamp(0.76rem, 2.6svh, 0.95rem);
+  }
+
+  #screenStart .mm-desc {
+    font-size: clamp(0.72rem, 2.5svh, 0.84rem);
+    line-height: 1.22;
+  }
+
+  #screenStart .mm-btn-primary {
+    min-height: 42px;
+    padding-block: 10px;
+    font-size: clamp(0.95rem, 3.1svh, 1.05rem);
+  }
+
+  #screenStart .mm-logo-strip {
+    gap: 0.5rem 0.8rem;
+    padding: 0.55rem 0.75rem;
+  }
+
+  #screenStart .mm-logo-strip .mm-logo-much,
+  #screenStart .mm-logo-strip .mm-logo-sbeel {
+    height: clamp(22px, 4.2svh, 30px);
+  }
+
+  #screenStart .mm-logo-strip .mm-logo-sata,
+  #screenStart .mm-logo-strip .mm-logo-planetario {
+    height: clamp(18px, 3.5svh, 24px);
   }
 }
 

@@ -45,6 +45,7 @@
     }
      .card{
     width:min(920px, 94vw);
+    max-height:calc(100svh - max(28px, env(safe-area-inset-top)) - max(18px, env(safe-area-inset-bottom)));
     border-radius:var(--card-br);
     background:linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
     border:1px solid rgba(255,255,255,.45);
@@ -53,6 +54,11 @@
     text-align:center; color:var(--white);
     backdrop-filter: blur(6px);
     position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    overflow:visible;
   }
 
   /* ===== LOGOS (base) ===== */
@@ -90,12 +96,12 @@
   /* Logo MUCH */
   .logo-much{
     display:block; margin:0 auto clamp(16px, 4vw, 24px);
-    height:100px; width:auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,.25));
+    height:clamp(68px, 15svh, 100px); width:auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,.25));
   }
 
   h1{ font-size: clamp(25px, 7vw, 50px); line-height:1.05; font-weight:900; letter-spacing:.6px;
-      text-shadow:0 2px 8px rgba(0,0,0,.35); margin: 6px 0 10px; }
-  .sub{ font-size:clamp(14px, 3.8vw, 20px); opacity:.95; margin-bottom:clamp(12px, 4vw, 18px) }
+      text-shadow:0 2px 8px rgba(0,0,0,.35); margin: 6px 0 10px; overflow-wrap:anywhere; }
+  .sub{ font-size:clamp(14px, 3.8vw, 20px); opacity:.95; margin-bottom:clamp(12px, 4vw, 18px); line-height:1.22; overflow-wrap:anywhere; text-wrap:balance; }
 
   .btn{
     appearance:none; border:0; cursor:pointer; display:inline-block; text-decoration:none;
@@ -110,12 +116,53 @@
     pointer-events: none;
     cursor: not-allowed;
   }
-  .tip{margin-top:clamp(10px, 3vw, 14px); font-size:clamp(12px, 3.4vw, 14px); opacity:.9}
+  .tip{margin-top:clamp(10px, 3vw, 14px); font-size:clamp(12px, 3.4vw, 14px); opacity:.9; line-height:1.25; overflow-wrap:anywhere; text-wrap:balance; }
   #mensajeAgotado {
     display: none;
     color: #ffc107;
     font-weight: bold;
     margin-top: 1rem;
+    line-height:1.25;
+    overflow-wrap:anywhere;
+  }
+  @media (max-width: 480px) {
+    body {
+      padding:
+        max(10px, env(safe-area-inset-top))
+        max(10px, env(safe-area-inset-right))
+        max(12px, env(safe-area-inset-bottom))
+        max(10px, env(safe-area-inset-left));
+    }
+
+    .card {
+      width:min(94vw, 430px);
+      padding:clamp(14px, 4.5vw, 22px);
+      border-radius:20px;
+    }
+
+    .logo-esquina {
+      --logo-h: clamp(34px, 10vw, 42px);
+      padding:5px 8px;
+      border-radius:10px;
+    }
+
+    .logo-izq-abs { left:clamp(10px, 4vw, 16px); }
+    .logo-der-abs { right:clamp(10px, 4vw, 16px); }
+    .logo-much { margin-bottom:clamp(8px, 2.2svh, 14px); }
+    h1 { font-size:clamp(24px, 8vw, 36px); margin-bottom:clamp(6px, 1.4svh, 10px); }
+    .sub { margin-bottom:clamp(10px, 2.4svh, 14px); }
+    .btn { min-width:min(200px, 82vw); min-height:44px; }
+  }
+
+  @media (max-height: 640px) {
+    body { padding-top:max(48px, env(safe-area-inset-top)); }
+    .card { padding-block:clamp(12px, 3svh, 20px); }
+    .logo-much { height:clamp(52px, 13svh, 78px); margin-bottom:clamp(6px, 1.6svh, 10px); }
+    h1 { font-size:clamp(22px, 7svh, 34px); margin:2px 0 6px; }
+    .sub { font-size:clamp(12px, 3.1svh, 16px); margin-bottom:clamp(8px, 1.8svh, 12px); }
+    .btn { padding-block:clamp(9px, 2.2svh, 12px); min-height:42px; font-size:clamp(14px, 3.3svh, 17px); }
+    .tip { margin-top:clamp(6px, 1.5svh, 10px); font-size:clamp(11px, 2.8svh, 13px); }
+    #mensajeAgotado { margin-top:0.6rem; font-size:clamp(11px, 2.8svh, 13px); }
   }
 </style>
 </head>

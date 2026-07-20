@@ -162,35 +162,18 @@ function mergeRequiredBiodiversityQuestions(bank) {
 }
 
 function buildBiodiversityQuestionDeck(questions) {
-  const requiredQuestions = BIODIVERSIDAD_REQUIRED_QUESTIONS
-    .map((requiredQuestion) => {
-      const match = questions.find((question) => sameQuestion(question, requiredQuestion));
-      return {
-        ...cloneQuestion(match || requiredQuestion),
-        id: requiredQuestion.id,
-        sala: 'biodiversidad',
-        _biodiversityRequired: true
-      };
-    })
-    .slice(0, NUM_QUESTIONS);
+  if (window.MuchQuestionPool?.createQuestionDeck) {
+    return window.MuchQuestionPool.createQuestionDeck({
+      questions,
+      stationKey: STATION_KEY,
+      count: NUM_QUESTIONS,
+      storage: window.localStorage,
+      forceNew: !hasStationQuestionProgress(),
+      preferDifficult: true
+    });
+  }
 
-  const requiredIds = new Set(requiredQuestions.map((question) => question.id));
-  const requiredTexts = new Set(requiredQuestions.map((question) => normalizeQuestionIdentity(question.text)));
-  const optionalQuestions = questions.filter((question) => (
-    !requiredIds.has(question.id)
-    && !requiredTexts.has(normalizeQuestionIdentity(question.text))
-  ));
-  const optionalCount = Math.max(0, NUM_QUESTIONS - requiredQuestions.length);
-  const optionalDeck = optionalCount > 0
-    ? (window.MuchQuestionPool?.createQuestionDeck ? window.MuchQuestionPool.createQuestionDeck({
-      questions: optionalQuestions,
-      stationKey: BIODIVERSIDAD_OPTIONAL_STATION_KEY,
-      count: optionalCount,
-      storage: window.localStorage
-    }) : shuffle(optionalQuestions).slice(0, optionalCount))
-    : [];
-
-  return shuffle(requiredQuestions.concat(optionalDeck)).slice(0, NUM_QUESTIONS);
+  return shuffle(questions).slice(0, NUM_QUESTIONS);
 }
 
 // Placeholder: Se llenará desde el JSON
@@ -200,10 +183,18 @@ let quizIniciando = false;
 
 function clearStationQuestionDeck() {
   try {
-    window.MuchQuestionPool?.clearQuestionDeck?.(STATION_KEY, window.localStorage);
-    window.MuchQuestionPool?.clearQuestionDeck?.(BIODIVERSIDAD_OPTIONAL_STATION_KEY, window.localStorage);
+    window.MuchQuestionPool?.clearQuestionDeck?.(STATION_KEY, window.localStorage, undefined, undefined, undefined, { preserveHistory: true });
+    window.MuchQuestionPool?.clearQuestionDeck?.(BIODIVERSIDAD_OPTIONAL_STATION_KEY, window.localStorage, undefined, undefined, undefined, { preserveHistory: true });
   } catch (error) {
     console.warn('[question-pool] No se pudo limpiar el banco:', error);
+  }
+}
+
+function hasStationQuestionProgress() {
+  try {
+    return sessionStorage.getItem(`much_quiz_progress_${SALA}`) !== null;
+  } catch (error) {
+    return false;
   }
 }
 
@@ -393,6 +384,8 @@ async function loadPreguntas() {
         correctIndex,
         points,
         desc,
+        difficulty: it.difficulty ?? it.dificultad ?? it.nivel ?? it.level ?? it.reto ?? it.challenge,
+        hard: it.hard ?? it.dificil ?? it._hard ?? it._challenge,
         _biodiversityRequired: Boolean(it._biodiversityRequired)
       };
     };
@@ -406,7 +399,7 @@ async function loadPreguntas() {
           : (q.sala === SALA || q.sala_codigo === SALA))
     );
 
-    const pool = filtered.length ? filtered : bank;
+    const pool = filtered.length ? filtered : [];
     const normalized = pool.map(normalize);
     const selectedDeck = buildBiodiversityQuestionDeck(normalized);
 

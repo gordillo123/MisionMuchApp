@@ -526,6 +526,27 @@ async function permitirJugador(req, res, next) {
 
 const verificarBloqueoJugador = playtime.middlewareVerificarBloqueo(obtenerIdUsuarioDePeticion);
 
+function esReinicioDePrueba(req) {
+  const body = req.body || {};
+  const headerMode = String(req.get('x-reset-mode') || '').toLowerCase();
+  return body.force_reset === true
+    || body.force_reset === 'true'
+    || body.force_reset === 1
+    || body.force_reset === '1'
+    || body.modo_prueba === true
+    || body.modo_prueba === 'true'
+    || headerMode === 'test';
+}
+
+function verificarBloqueoExceptoReinicioPrueba(req, res, next) {
+  if (esReinicioDePrueba(req)) {
+    req.playtimeEstado = { bloqueado: false, habilitado: true, motivo: 'reinicio_prueba' };
+    return next();
+  }
+
+  return verificarBloqueoJugador(req, res, next);
+}
+
 // ==========================================
 // 1. GET /api/health (Health check)
 // ==========================================
@@ -999,11 +1020,17 @@ app.post('/api/progreso/inicializar', permitirJugador, verificarBloqueoJugador, 
 // ==========================================
 // 5a-1. POST /api/progreso/reset
 // ==========================================
-app.post('/api/progreso/reset', permitirJugador, verificarBloqueoJugador, async (req, res) => {
+app.post('/api/progreso/reset', permitirJugador, verificarBloqueoExceptoReinicioPrueba, async (req, res) => {
   const { id_usuario } = req.body;
+  const forceReset = esReinicioDePrueba(req);
+  const idUsuarioAutorizado = req.idUsuario;
 
   if (!id_usuario) {
     return res.status(400).json({ error: 'Falta el parámetro id_usuario.' });
+  }
+
+  if (String(id_usuario) !== String(idUsuarioAutorizado)) {
+    return res.status(403).json({ error: 'No puedes reiniciar el progreso de otro usuario.' });
   }
 
   const connection = await pool.getConnection();
@@ -1016,15 +1043,46 @@ app.post('/api/progreso/reset', permitirJugador, verificarBloqueoJugador, async 
     await connection.query('DELETE FROM partidas_minijuego WHERE id_usuario = ?', [id_usuario]);
     await connection.query('DELETE FROM boletos WHERE id_usuario = ?', [id_usuario]);
 
+    if (forceReset) {
+      await connection.query(
+        `UPDATE premios
+         SET ciclo_reiniciado_at = COALESCE(ciclo_reiniciado_at, CURRENT_TIMESTAMP),
+             estado_bloqueo = 'desbloqueado',
+             fecha_puede_volver_jugar = CURRENT_TIMESTAMP,
+             motivo_bloqueo = NULL,
+             detalle_bloqueo = NULL
+         WHERE id_usuario = ?`,
+        [id_usuario]
+      );
+
+      await connection.query(
+        `UPDATE participaciones
+         SET estado = 'habilitado',
+             fecha_fin = COALESCE(fecha_fin, CURRENT_TIMESTAMP)
+         WHERE id_usuario = ?
+           AND estado IN ('en_curso', 'ganado', 'reclamado')`,
+        [id_usuario]
+      );
+    }
+
     // Registrar en auditoria_acciones
     await connection.query(
       `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
-       VALUES (?, 'usuario', 'REINICIAR_PROGRESO', 'progreso_usuario', ?, 'Usuario reinició todo su progreso de estaciones y boletos')`,
-      [id_usuario, String(id_usuario)]
+       VALUES (?, 'usuario', 'REINICIAR_PROGRESO', 'progreso_usuario', ?, ?)`,
+      [
+        id_usuario,
+        String(id_usuario),
+        forceReset
+          ? 'Usuario reinicio todo su progreso desde el boton de prueba'
+          : 'Usuario reinició todo su progreso de estaciones y boletos'
+      ]
     );
 
     await connection.commit();
-    res.json({ message: 'Progreso reiniciado correctamente en la base de datos.' });
+    res.json({
+      message: 'Progreso reiniciado correctamente en la base de datos.',
+      modo_prueba: forceReset
+    });
   } catch (error) {
     await connection.rollback();
     console.error('Error al reiniciar progreso:', error.message);

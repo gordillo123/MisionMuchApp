@@ -936,3 +936,73 @@ body {
     font-size: clamp(0.86rem, min(3.8vw, 2.2vh), 1.08rem) !important;
   }
 }
+
+/* Final text-fit lock: long answers must grow and wrap inside their button. */
+.question-container {
+  grid-template-rows: auto minmax(0, auto) auto auto minmax(1rem, auto) auto !important;
+}
+
+#options,
+#options.options-list,
+.options-list {
+  display: flex !important;
+  flex-direction: column !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+#options > *,
+.options-list > * {
+  flex: 0 0 auto !important;
+  min-height: 0 !important;
+}
+
+#options .option-btn,
+#options.options-list .option-btn,
+.options-list .option-btn,
+.option-btn {
+  height: auto !important;
+  min-height: clamp(3.25rem, 7.3vh, 4.9rem) !important;
+  max-height: none !important;
+  padding-block: clamp(0.62rem, 1.35vh, 0.95rem) !important;
+  overflow: visible !important;
+}
+
+#options .option-btn span:not(.emoji),
+#options.options-list .option-btn span:not(.emoji),
+.options-list .option-btn span:not(.emoji),
+.option-btn span:not(.emoji) {
+  display: block !important;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal !important;
+  overflow: visible !important;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
+}
+
+@media (max-width: 480px), (max-height: 700px) {
+  :root {
+    --quiz-answer-font: clamp(0.82rem, min(4.05vw, 2.18vh), 1.08rem);
+    --quiz-list-gap: clamp(0.34rem, 0.78vh, 0.55rem);
+  }
+
+  #options .option-btn,
+  #options.options-list .option-btn,
+  .options-list .option-btn,
+  .option-btn {
+    min-height: clamp(3rem, 7vh, 4.25rem) !important;
+    padding: clamp(0.52rem, 1.1vh, 0.76rem) clamp(0.72rem, 2.4vw, 1rem) !important;
+  }
+
+  #options .option-btn span:not(.emoji),
+  #options.options-list .option-btn span:not(.emoji),
+  .options-list .option-btn span:not(.emoji),
+  .option-btn span:not(.emoji) {
+    padding-inline: clamp(1.25rem, 6.5vw, 1.9rem) !important;
+    line-height: 1.08 !important;
+  }
+}

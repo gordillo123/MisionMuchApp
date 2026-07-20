@@ -54,6 +54,7 @@
 
 .card{
       width:min(920px, 94vw);
+      max-height:calc(100svh - max(28px, env(safe-area-inset-top)) - max(18px, env(safe-area-inset-bottom)));
       border-radius:var(--card-br);
       background:linear-gradient(180deg, var(--card-bg1), var(--card-bg2));
       border:1px solid rgba(15,108,129,.16);
@@ -63,6 +64,10 @@
       backdrop-filter: blur(6px);
       position:relative;
       overflow:visible;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
       margin-top:78px; /* 👈 espacio extra para los logos */
     }
 
@@ -91,7 +96,7 @@
     .logo-much{
       display:block;
       margin:0 auto clamp(16px, 4vw, 24px);
-      height:100px;
+      height:clamp(68px, 15svh, 100px);
       width:auto;
       filter: drop-shadow(0 4px 10px rgba(0,0,0,.25));
     }
@@ -102,11 +107,15 @@
       color:#0e5063;
       text-shadow:0 2px 10px rgba(16,183,207,.12);
       margin: 6px 0 10px;
+      overflow-wrap:anywhere;
     }
     p.sub{
       font-size:clamp(14px, 3.8vw, 20px);
       color:#35515e;
       opacity:.98;
+      line-height:1.22;
+      overflow-wrap:anywhere;
+      text-wrap:balance;
       margin-bottom:clamp(12px, 4vw, 18px)
     }
 
@@ -122,7 +131,7 @@
     }
     .btn:active{ transform: translateY(1px); }
 
-    .tip{margin-top:clamp(10px, 3vw, 14px); font-size:clamp(12px, 3.4vw, 14px); color:#58707a; opacity:.98}
+    .tip{margin-top:clamp(10px, 3vw, 14px); font-size:clamp(12px, 3.4vw, 14px); color:#58707a; opacity:.98; line-height:1.25; overflow-wrap:anywhere; text-wrap:balance;}
 
     /* Botón Regresar al Mapa (Píldora Premium) */
     .btn-regresar-mapa {
@@ -186,6 +195,55 @@
         font-size: 0.88rem;
         border-radius: 21px;
       }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding:
+          max(10px, env(safe-area-inset-top))
+          max(10px, env(safe-area-inset-right))
+          max(12px, env(safe-area-inset-bottom))
+          max(10px, env(safe-area-inset-left));
+      }
+
+      .card {
+        width:min(94vw, 430px);
+        margin-top:clamp(60px, 13svh, 76px);
+        padding:clamp(14px, 4.5vw, 22px);
+        border-radius:20px;
+      }
+
+      .logo-esquina {
+        top:calc(-1 * clamp(48px, 11svh, 62px));
+        height:clamp(34px, 10vw, 42px);
+        padding:5px 8px;
+        border-radius:10px;
+      }
+
+      .logo-izq-abs { left:clamp(10px, 4vw, 16px); }
+      .logo-der-abs { right:clamp(10px, 4vw, 16px); }
+      .logo-much { margin-bottom:clamp(8px, 2.2svh, 14px); }
+      h1 { font-size:clamp(24px, 8vw, 36px); margin-bottom:clamp(6px, 1.4svh, 10px); }
+      p.sub { margin-bottom:clamp(10px, 2.4svh, 14px); }
+      .btn { min-width:min(200px, 82vw); min-height:44px; }
+    }
+
+    @media (max-height: 640px) {
+      .card {
+        margin-top:clamp(54px, 12svh, 70px);
+        padding-block:clamp(12px, 3svh, 20px);
+      }
+
+      .logo-esquina {
+        top:calc(-1 * clamp(44px, 11svh, 58px));
+        height:clamp(34px, 8svh, 42px);
+      }
+
+      .logo-much { height:clamp(52px, 13svh, 78px); margin-bottom:clamp(6px, 1.6svh, 10px); }
+      h1 { font-size:clamp(22px, 7svh, 34px); margin:2px 0 6px; }
+      p.sub { font-size:clamp(12px, 3.1svh, 16px); margin-bottom:clamp(8px, 1.8svh, 12px); }
+      .btn { padding-block:clamp(9px, 2.2svh, 12px); min-height:42px; font-size:clamp(14px, 3.3svh, 17px); }
+      .tip { margin-top:clamp(6px, 1.5svh, 10px); font-size:clamp(11px, 2.8svh, 13px); }
     }
 
   </style>

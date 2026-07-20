@@ -182,6 +182,8 @@ body {
   background: url("pinosaurio.png") no-repeat 0 0;
   background-size: 720px 150px;
   transition: transform 0.1s ease;
+  will-change: bottom, transform;
+  backface-visibility: hidden;
 }
 
 /* Estilo agachado eliminado */
@@ -205,6 +207,8 @@ body {
   background: url("suelo.png") repeat-x 0 0;
   background-size: 50% 42px;
   image-rendering: pixelated;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 /* ===== OBSTÁCULOS Y NUBES ===== */
@@ -220,6 +224,8 @@ body {
   image-rendering: pixelated;
   background-repeat: no-repeat;
   background-position: bottom center;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 /* Tipos de cactus (Sin cambios, se quedan igual) */
@@ -245,6 +251,8 @@ body {
   z-index: 0;
   background: url("nube.png") no-repeat;
   background-size: contain;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 /* Score */

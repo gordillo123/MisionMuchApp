@@ -131,9 +131,17 @@ let quizIniciando = false;
 
 function clearStationQuestionDeck() {
   try {
-    window.MuchQuestionPool?.clearQuestionDeck?.(STATION_KEY, window.localStorage);
+    window.MuchQuestionPool?.clearQuestionDeck?.(STATION_KEY, window.localStorage, undefined, undefined, undefined, { preserveHistory: true });
   } catch (error) {
     console.warn('[question-pool] No se pudo limpiar el banco:', error);
+  }
+}
+
+function hasStationQuestionProgress() {
+  try {
+    return localStorage.getItem(`much_quiz_progress_${SALA}`) !== null;
+  } catch (error) {
+    return false;
   }
 }
 
@@ -210,6 +218,8 @@ async function loadPreguntas() {
     }
 
     const normalize = (it) => {
+      const id = it.id ?? it.id_pregunta ?? it.codigo ?? '';
+      const sala = it.sala ?? it.sala_codigo ?? it.estacion ?? it.station ?? '';
       const text = it.text ?? it.pregunta ?? it.enunciado ?? 'Pregunta sin texto';
       const desc = it.desc ?? it.descripcion ?? '';
       let options = it.options ?? it.opciones ?? it.respuestas ?? [];
@@ -240,21 +250,36 @@ async function loadPreguntas() {
       if (correctIndex == null || correctIndex < 0 || correctIndex >= options.length) {
         correctIndex = 0;
       }
-      return { text, options, correctIndex, points, desc };
+      return {
+        id: id ? String(id) : undefined,
+        sala,
+        text,
+        options,
+        correctIndex,
+        points,
+        desc,
+        difficulty: it.difficulty ?? it.dificultad ?? it.nivel ?? it.level ?? it.reto ?? it.challenge,
+        hard: it.hard ?? it.dificil ?? it._hard ?? it._challenge
+      };
     };
 
     const bySala = bank.filter(q =>
-      !q?.sala && !q?.sala_codigo ? true :
-        (q.sala === SALA || q.sala_codigo === SALA)
+      !q?.sala && !q?.sala_codigo && !q?.estacion && !q?.station
+        ? true
+        : (window.MuchQuestionPool?.questionMatchesStation
+          ? window.MuchQuestionPool.questionMatchesStation(q, STATION_KEY)
+          : (q.sala === SALA || q.sala_codigo === SALA))
     );
 
-    const pool = bySala.length ? bySala : bank;
+    const pool = bySala.length ? bySala : [];
     const normalized = pool.map(normalize);
     const selectedDeck = window.MuchQuestionPool?.createQuestionDeck ? window.MuchQuestionPool.createQuestionDeck({
       questions: normalized,
       stationKey: STATION_KEY,
       count: NUM_QUESTIONS,
-      storage: window.localStorage
+      storage: window.localStorage,
+      forceNew: !hasStationQuestionProgress(),
+      preferDifficult: true
     }) : normalized;
 
     QUESTIONS = distributeQuestionOptions((selectedDeck || []).map((question) => ({ ...question })));

@@ -810,6 +810,16 @@
     setCurrentStation('1');
     setClaimButtonState('bloqueado');
     setRouteState(options.reason === 'new_cycle' ? 'disponible_para_volver_a_jugar' : 'en_progreso');
+    try {
+      [
+        'much_current_attempt_id',
+        'much_current_attempt_station_id',
+        'much_quiz_final_data',
+        'much_quiz_start',
+        'much_current_quiz_id',
+        'much_cheat_count'
+      ].forEach(key => sessionStorage.removeItem(key));
+    } catch (_) {}
     dispatchProgressChanged();
     return { ok: true };
   }

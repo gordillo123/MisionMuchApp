@@ -243,54 +243,18 @@ function mergeRequiredSustainableQuestions(bank) {
 }
 
 function buildSustainableQuestionDeck(questions) {
-  const requiredSource = DESARROLLO_REQUIRED_QUESTIONS.map((requiredQuestion) => {
-    const match = questions.find((question) => sameQuestion(question, requiredQuestion));
-    return {
-      ...cloneQuestion(match || requiredQuestion),
-      id: requiredQuestion.id,
-      sala: 'desarrollo-sustentable',
-      _sustainableRequired: true
-    };
-  });
-
-  const requiredCount = Math.min(NUM_QUESTIONS, requiredSource.length);
-  let requiredDeck = requiredCount > 0
-    ? (window.MuchQuestionPool?.createQuestionDeck ? window.MuchQuestionPool.createQuestionDeck({
-      questions: requiredSource,
-      stationKey: DESARROLLO_REQUIRED_STATION_KEY,
-      count: requiredCount,
-      storage: window.localStorage
-    }) : shuffle(requiredSource).slice(0, requiredCount))
-    : [];
-
-  if (requiredDeck.length < requiredCount && window.MuchQuestionPool?.clearQuestionDeck) {
-    window.MuchQuestionPool.clearQuestionDeck(DESARROLLO_REQUIRED_STATION_KEY, window.localStorage);
-    requiredDeck = window.MuchQuestionPool.createQuestionDeck({
-      questions: requiredSource,
-      stationKey: DESARROLLO_REQUIRED_STATION_KEY,
-      count: requiredCount,
-      storage: window.localStorage
+  if (window.MuchQuestionPool?.createQuestionDeck) {
+    return window.MuchQuestionPool.createQuestionDeck({
+      questions,
+      stationKey: STATION_KEY,
+      count: NUM_QUESTIONS,
+      storage: window.localStorage,
+      forceNew: !hasStationQuestionProgress(),
+      preferDifficult: true
     });
   }
 
-  const requiredIds = new Set(requiredDeck.map((question) => question.id));
-  const requiredTexts = new Set(requiredDeck.map((question) => normalizeQuestionIdentity(question.text)));
-  const optionalQuestions = questions.filter((question) => (
-    !requiredIds.has(question.id)
-    && !requiredTexts.has(normalizeQuestionIdentity(question.text))
-    && !DESARROLLO_REQUIRED_QUESTIONS.some((requiredQuestion) => sameQuestion(question, requiredQuestion))
-  ));
-  const optionalCount = Math.max(0, NUM_QUESTIONS - requiredDeck.length);
-  const optionalDeck = optionalCount > 0
-    ? (window.MuchQuestionPool?.createQuestionDeck ? window.MuchQuestionPool.createQuestionDeck({
-      questions: optionalQuestions,
-      stationKey: DESARROLLO_OPTIONAL_STATION_KEY,
-      count: optionalCount,
-      storage: window.localStorage
-    }) : shuffle(optionalQuestions).slice(0, optionalCount))
-    : [];
-
-  return shuffle(requiredDeck.concat(optionalDeck)).slice(0, NUM_QUESTIONS);
+  return shuffle(questions).slice(0, NUM_QUESTIONS);
 }
 
 // Placeholder: Se llenará desde el JSON
@@ -300,11 +264,19 @@ let quizIniciando = false;
 
 function clearStationQuestionDeck() {
   try {
-    window.MuchQuestionPool?.clearQuestionDeck?.(STATION_KEY, window.localStorage);
-    window.MuchQuestionPool?.clearQuestionDeck?.(DESARROLLO_REQUIRED_STATION_KEY, window.localStorage);
-    window.MuchQuestionPool?.clearQuestionDeck?.(DESARROLLO_OPTIONAL_STATION_KEY, window.localStorage);
+    window.MuchQuestionPool?.clearQuestionDeck?.(STATION_KEY, window.localStorage, undefined, undefined, undefined, { preserveHistory: true });
+    window.MuchQuestionPool?.clearQuestionDeck?.(DESARROLLO_REQUIRED_STATION_KEY, window.localStorage, undefined, undefined, undefined, { preserveHistory: true });
+    window.MuchQuestionPool?.clearQuestionDeck?.(DESARROLLO_OPTIONAL_STATION_KEY, window.localStorage, undefined, undefined, undefined, { preserveHistory: true });
   } catch (error) {
     console.warn('[question-pool] No se pudo limpiar el banco:', error);
+  }
+}
+
+function hasStationQuestionProgress() {
+  try {
+    return sessionStorage.getItem(`much_quiz_progress_${SALA}`) !== null;
+  } catch (error) {
+    return false;
   }
 }
 
@@ -499,6 +471,8 @@ async function loadPreguntas() {
         correctIndex,
         points,
         desc,
+        difficulty: it.difficulty ?? it.dificultad ?? it.nivel ?? it.level ?? it.reto ?? it.challenge,
+        hard: it.hard ?? it.dificil ?? it._hard ?? it._challenge,
         _sustainableRequired: Boolean(it._sustainableRequired)
       };
     };
@@ -511,7 +485,7 @@ async function loadPreguntas() {
           : (q.sala === SALA || q.sala_codigo === SALA))
     );
 
-    const pool = bySala.length ? bySala : bank;
+    const pool = bySala.length ? bySala : [];
     const normalized = pool.map(normalize);
     const selectedDeck = buildSustainableQuestionDeck(normalized);
 
@@ -550,11 +524,20 @@ async function loadPreguntas() {
         correctIndex,
         points,
         desc,
+        difficulty: it.difficulty ?? it.dificultad ?? it.nivel ?? it.level ?? it.reto ?? it.challenge,
+        hard: it.hard ?? it.dificil ?? it._hard ?? it._challenge,
         _sustainableRequired: Boolean(it._sustainableRequired)
       };
     };
 
-    const selectedDeck = buildSustainableQuestionDeck(mergedBankLocal.map(normalize));
+    const fallbackPool = mergedBankLocal.filter(q =>
+      !q?.sala && !q?.sala_codigo && !q?.estacion && !q?.station
+        ? true
+        : (window.MuchQuestionPool?.questionMatchesStation
+          ? window.MuchQuestionPool.questionMatchesStation(q, STATION_KEY)
+          : (q.sala === SALA || q.sala_codigo === SALA))
+    );
+    const selectedDeck = buildSustainableQuestionDeck((fallbackPool.length ? fallbackPool : []).map(normalize));
 
     QUESTIONS = distributeQuestionOptions((selectedDeck || []).map((question) => ({ ...question })));
     console.log('[loadPreguntas] Fallback local cargado. Total:', QUESTIONS.length);

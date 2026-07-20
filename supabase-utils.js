@@ -965,9 +965,12 @@ async function inicializarProgresoUsuario(estacionId) {
 }
 
 // Reiniciar todo el progreso del usuario en la base de datos MySQL
-async function reiniciarProgresoUsuario() {
+async function reiniciarProgresoUsuario(options = {}) {
+  const forceReset = Boolean(options.force || options.testMode);
   asegurarUbicacionVigente();
-  await asegurarJuegoPermitido();
+  if (!forceReset) {
+    await asegurarJuegoPermitido();
+  }
   const user = obtenerUsuarioLocal();
   if (!user) return null;
   const userId = user.id_usuario || user.id;
@@ -977,10 +980,13 @@ async function reiniciarProgresoUsuario() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-user-id': String(userId)
+        'x-user-id': String(userId),
+        'x-reset-mode': forceReset ? 'test' : 'manual'
       },
       body: JSON.stringify({
-        id_usuario: userId
+        id_usuario: userId,
+        force_reset: forceReset,
+        modo_prueba: Boolean(options.testMode)
       })
     });
 
@@ -989,7 +995,7 @@ async function reiniciarProgresoUsuario() {
       throw new Error('Error al reiniciar progreso.');
     }
     const data = await res.json();
-    window.MuchLocalStorage?.resetProgress?.({ force: true, reason: 'manual_reset' });
+    window.MuchLocalStorage?.resetProgress?.({ force: true, reason: forceReset ? 'test_reset' : 'manual_reset' });
     return data;
   } catch (error) {
     console.error('Error en reiniciarProgresoUsuario:', error.message);

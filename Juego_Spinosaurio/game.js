@@ -45,7 +45,8 @@ function getMexicoTime() {
 const LUGAR_QR = localStorage.getItem('much_lugar_seguro') || 'Sin Especificar';
 
 /* ====== LOOP BASE Y VARIABLES GLOBALES ====== */
-var time = new Date(), deltaTime = 0;
+var time = getFrameTimestamp(), deltaTime = 0;
+var MAX_DELTA_TIME = 1 / 30;
 var sueloY = 2;
 var velY = 0, impulso = 980, gravedad = 2400;
 var dinoPosX = 24, dinoPosY = sueloY;
@@ -73,14 +74,43 @@ var QUESTION_SECONDS = 15;
 var questionSecondsLeft = 0;
 var questionTimerInterval = null;
 
+function normalizeSpinosaurioPlayerPart(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80);
+}
+
+function getSpinosaurioAccountId() {
+  try {
+    const rawUser = localStorage.getItem('much_google_user');
+    if (!rawUser) return '';
+    const user = JSON.parse(rawUser);
+    const candidate = user?.id_usuario || user?.id || user?.uid || user?.google_id || user?.email || user?.correo || '';
+    return normalizeSpinosaurioPlayerPart(candidate);
+  } catch (error) {
+    return '';
+  }
+}
+
+function getSpinosaurioDeviceId() {
+  const existing = sessionStorage.getItem('much_spinosaurio_device_id') || localStorage.getItem('much_spinosaurio_device_id');
+  if (existing) return normalizeSpinosaurioPlayerPart(existing);
+  const generated = `spinosaurio-device-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  sessionStorage.setItem('much_spinosaurio_device_id', generated);
+  localStorage.setItem('much_spinosaurio_device_id', generated);
+  return generated;
+}
+
 function getSpinosaurioPlayerId() {
   if (spinosaurioPlayerId) return spinosaurioPlayerId;
-  const existing = sessionStorage.getItem('much_spinosaurio_player_id') || localStorage.getItem('much_spinosaurio_player_id');
-  if (existing) {
-    spinosaurioPlayerId = existing;
-    return spinosaurioPlayerId;
-  }
-  spinosaurioPlayerId = `spinosaurio-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const accountId = getSpinosaurioAccountId();
+  const deviceId = getSpinosaurioDeviceId();
+  spinosaurioPlayerId = accountId ? `spinosaurio-${accountId}-${deviceId}` : deviceId;
   sessionStorage.setItem('much_spinosaurio_player_id', spinosaurioPlayerId);
   localStorage.setItem('much_spinosaurio_player_id', spinosaurioPlayerId);
   return spinosaurioPlayerId;
@@ -272,6 +302,48 @@ function updateResponsiveScale() {
   document.documentElement.style.setProperty("--game-scale", scale.toFixed(3));
 }
 
+function getFrameTimestamp() {
+  return (window.performance && typeof window.performance.now === "function")
+    ? window.performance.now()
+    : Date.now();
+}
+
+function bindTapAction(element, handler, key) {
+  if (!element) return;
+  var bindKey = key || "default";
+  if (element.dataset.spinoTapBound === bindKey) return;
+  element.dataset.spinoTapBound = bindKey;
+
+  var lastTapAt = 0;
+  var run = function (e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    var now = getFrameTimestamp();
+    if (now - lastTapAt < 420) return;
+    lastTapAt = now;
+    handler(e);
+  };
+
+  element.addEventListener("pointerdown", function () {
+    element.classList.add("is-pressed");
+  }, { passive: true });
+  ["pointerup", "pointercancel", "pointerleave", "blur"].forEach(function (eventName) {
+    element.addEventListener(eventName, function () {
+      element.classList.remove("is-pressed");
+    }, { passive: true });
+  });
+
+  if (window.PointerEvent) {
+    element.addEventListener("pointerup", run, { passive: false });
+  } else {
+    element.addEventListener("touchend", run, { passive: false });
+  }
+  element.addEventListener("click", run, { passive: false });
+}
+
 /* ===== INICIALIZACIÓN ===== */
 if (document.readyState === "complete" || document.readyState === "interactive") {
   setTimeout(Init, 1);
@@ -368,8 +440,9 @@ function Init() {
 }
 
 function Loop() {
-  deltaTime = (new Date() - time) / 1000;
-  time = new Date();
+  var now = getFrameTimestamp();
+  deltaTime = Math.min(Math.max((now - time) / 1000, 0), MAX_DELTA_TIME);
+  time = now;
   Update();
   loopRequestId = requestAnimationFrame(Loop);
 }
@@ -391,22 +464,12 @@ function Start() {
   }, { passive: false });
   window.addEventListener("pointerdown", GlobalTap, { passive: false });
 
-  document.getElementById("btnRetry").addEventListener("click", restartGameInPlace);
+  bindTapAction(document.getElementById("btnRetry"), restartGameInPlace, "retry");
   document.getElementById("btnQuizOk").addEventListener("click", validarQuiz);
 
   var btnExit = document.getElementById("btnExitToMap");
   if (btnExit) {
-    var goBack = function (e) {
-      if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-      const mapParams = new URLSearchParams(window.location.search);
-      mapParams.set('view', 'prep');
-      window.location.href = '../index.html?' + mapParams.toString();
-    };
-    btnExit.addEventListener("click", goBack);
-    btnExit.addEventListener("touchstart", goBack, { passive: false });
+    bindTapAction(btnExit, goBackToMap, "back-map");
   }
 
   // Nuevo: botón 'Siguiente' que aparece después de responder
@@ -458,7 +521,10 @@ function Start() {
   cargarQuizJSON();
 
   window.addEventListener("blur", antiCheatGuard, { passive: true });
-  document.addEventListener("visibilitychange", function () { if (document.hidden) antiCheatGuard(); });
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) antiCheatGuard();
+    else time = getFrameTimestamp();
+  });
   window.addEventListener("pagehide", antiCheatGuard, { passive: true });
 
   document.addEventListener("keydown", blockShortcutsDuringQuiz, { capture: true });
@@ -466,12 +532,24 @@ function Start() {
 }
 
 /* ===== LÓGICA DE PORTADA INTEGRADA Y CUENTA REGRESIVA ===== */
+async function goBackToMap(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  try { await window.lockPortraitOrientation?.(); } catch (error) {}
+  const mapParams = new URLSearchParams(window.location.search);
+  mapParams.set('view', 'prep');
+  window.location.href = '../index.html?' + mapParams.toString();
+}
+
 function ConfigurarPortada() {
   const btnJugar = document.getElementById("btnJugarPortada");
+  const btnBack = document.getElementById("btnBackPortadaMap");
   const portada = document.getElementById("portadaOverlay");
 
   if (btnJugar) {
-    btnJugar.addEventListener("click", async () => {
+    bindTapAction(btnJugar, async () => {
       try { await window.lockLandscapeOrientation?.(); } catch (e) {}
       if (!canStartLandscapeGame()) return;
 
@@ -496,7 +574,11 @@ function ConfigurarPortada() {
 
       // 4. Iniciar la cuenta de 5 segundos
       runCountdown();
-    });
+    }, "play-cover");
+  }
+
+  if (btnBack) {
+    bindTapAction(btnBack, goBackToMap, "back-map");
   }
 }
 
@@ -530,7 +612,7 @@ async function runCountdown() {
       countdownActive = false;
       gameStarted = true;
       try { pauseBgMusic(); } catch (e) {}
-      time = new Date();
+      time = getFrameTimestamp();
 
       // 📝 Await the initial registration to ensure ultimo_intento_id is saved before any score updates
       await registrarIntentoInicial();
@@ -571,7 +653,7 @@ function resetGameState() {
   removeGameElements(nubes);
 
   if (textoScore) textoScore.innerText = "0";
-  if (suelo) suelo.style.left = "0px";
+  if (suelo) suelo.style.transform = "translate3d(0, 0, 0)";
   if (dino) {
     dino.style.bottom = sueloY + "px";
     dino.classList.remove("dino-estrellado");
@@ -593,7 +675,7 @@ function resetGameState() {
   var portada = document.getElementById("portadaOverlay");
   if (portada) portada.classList.remove("show");
 
-  time = new Date();
+  time = getFrameTimestamp();
 }
 
 async function restartGameInPlace(e) {
@@ -617,7 +699,7 @@ async function restartGameInPlace(e) {
     parado = false;
     gameStarted = true;
     restartingGame = false;
-    time = new Date();
+    time = getFrameTimestamp();
 
     if (!loopRequestId) Loop();
   }
@@ -722,7 +804,7 @@ function TocarSuelo() {
 }
 function MoverSuelo() {
   sueloX += velEscenario * deltaTime * gameVel;
-  suelo.style.left = -(sueloX % contenedor.clientWidth) + "px";
+  suelo.style.transform = "translate3d(" + (-(sueloX % contenedor.clientWidth)) + "px, 0, 0)";
 }
 function Estrellarse() {
   dino.classList.remove("dino-corriendo");
@@ -746,12 +828,18 @@ function CrearObstaculo() {
   if (Math.random() > 0.5) o.classList.add("cactus2");
   else o.classList.add("cactus1");
 
-  o.posX = stage.clientWidth; o.style.left = o.posX + "px"; obstaculos.push(o);
+  o.posX = stage.clientWidth;
+  o.style.left = "0px";
+  o.style.transform = "translate3d(" + o.posX + "px, 0, 0)";
+  obstaculos.push(o);
   tiempoHastaObstaculo = tiempoObstaculoMin + (Math.random() * (tiempoObstaculoMax - tiempoObstaculoMin)) / gameVel;
 }
 function CrearNube() {
   var n = document.createElement("div"); contenedor.appendChild(n);
-  n.classList.add("nube"); n.posX = contenedor.clientWidth; n.style.left = n.posX + "px";
+  n.classList.add("nube");
+  n.posX = contenedor.clientWidth;
+  n.style.left = "0px";
+  n.style.transform = "translate3d(" + n.posX + "px, 0, 0)";
   var minBottom = Math.max(70, contenedor.clientHeight * 0.28);
   var maxBottom = Math.max(minBottom + 20, contenedor.clientHeight * 0.78);
   n.style.bottom = minBottom + Math.random() * (maxBottom - minBottom) + "px"; nubes.push(n);
@@ -764,7 +852,7 @@ function MoverObstaculos() {
       obstaculos.splice(i, 1); GanarPuntos();
     } else {
       obstaculos[i].posX -= velEscenario * deltaTime * gameVel;
-      obstaculos[i].style.left =  obstaculos[i].posX + "px";
+      obstaculos[i].style.transform = "translate3d(" + obstaculos[i].posX + "px, 0, 0)";
     }
   }
 }
@@ -774,7 +862,7 @@ function MoverNubes() {
       nubes[i].parentNode.removeChild(nubes[i]); nubes.splice(i, 1);
     } else {
       nubes[i].posX -= velEscenario * deltaTime * gameVel * velNube;
-      nubes[i].style.left = nubes[i].posX + "px";
+      nubes[i].style.transform = "translate3d(" + nubes[i].posX + "px, 0, 0)";
     }
   }
 }
