@@ -2448,11 +2448,39 @@
     }
     body:has(#viewPrep.active) #hamburgerBtn,
     body:has(#loginOverlay.open) #hamburgerBtn,
-    body:has(#profileOverlay.open) #hamburgerBtn,
-    body:has(#scoresOverlay.open) #hamburgerBtn,
-    body:has(#rulesOverlay.open) #hamburgerBtn,
     body:has(#avatarOverlay.open) #hamburgerBtn {
       display: none !important;
+    }
+
+    body:has(#rulesOverlay.open) #hamburgerBtn span {
+      background: #000000;
+    }
+    body:has(#profileOverlay.open) #hamburgerBtn,
+    body:has(#scoresOverlay.open) #hamburgerBtn,
+    body:has(#rulesOverlay.open) #hamburgerBtn {
+      display: flex !important;
+      z-index: 2147483647;
+    }
+
+    body:has(.nav-links.open) #viewLanding {
+      z-index: 2147483643;
+    }
+
+    body:has(.nav-links.open) .top-nav {
+      z-index: 2147483644;
+    }
+
+    body:has(.nav-links.open) .mobile-nav-backdrop {
+      z-index: 2147483645;
+    }
+
+    body:has(.nav-links.open) .nav-links {
+      z-index: 2147483646;
+    }
+
+    body:has(.nav-links.open) #hamburgerBtn {
+      display: flex !important;
+      z-index: 2147483647;
     }
     .mobile-nav-backdrop.visible {
       opacity: 1;
@@ -13482,11 +13510,11 @@
         const hamburger = document.getElementById('hamburgerBtn');
         if (!hamburger) return;
 
-        if (viewId === 'viewLanding') {
-          hamburger.style.removeProperty('display');
-        } else {
+        if (viewId === 'viewPrep') {
           closeMobileMenu();
           hamburger.style.setProperty('display', 'none', 'important');
+        } else {
+          hamburger.style.removeProperty('display');
         }
       }
 
