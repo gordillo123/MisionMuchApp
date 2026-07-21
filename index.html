@@ -2448,24 +2448,34 @@
     }
 
 
+    body:has(#rulesOverlay.open) #hamburgerBtn span {
+      background: #000000;
+    }
+    body:has(#loginOverlay.open) #hamburgerBtn,
+    body:has(#profileOverlay.open) #hamburgerBtn,
+    body:has(#scoresOverlay.open) #hamburgerBtn,
+    body:has(#rulesOverlay.open) #hamburgerBtn,
+    body:has(#avatarOverlay.open) #hamburgerBtn {
+      z-index: 2147483647;
+    }
     body:has(.nav-links.open) #viewLanding {
-      z-index: 299999;
+      z-index: 2147483643;
     }
 
     body:has(.nav-links.open) .top-nav {
-      z-index: 300000;
+      z-index: 2147483644;
     }
 
     body:has(.nav-links.open) .mobile-nav-backdrop {
-      z-index: 300001;
+      z-index: 2147483645;
     }
 
     body:has(.nav-links.open) .nav-links {
-      z-index: 300002;
+      z-index: 2147483646;
     }
 
     body:has(.nav-links.open) #hamburgerBtn {
-      z-index: 300003;
+      z-index: 2147483647;
     }
     .mobile-nav-backdrop.visible {
       opacity: 1;
