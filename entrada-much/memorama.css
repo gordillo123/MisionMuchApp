@@ -126,16 +126,22 @@ body.memorama-body {
 .mm-btn-back {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   background: rgba(255, 255, 255, 0.08);
   color: var(--mm-white);
   border-radius: 999px;
-  padding: clamp(6px, 1.2dvh, 8px) clamp(10px, 3vw, 14px);
-  font-size: 0.85rem;
-  font-weight: 600;
+  padding: clamp(11px, 1.8dvh, 14px) clamp(16px, 4vw, 20px);
+  min-height: 48px;
+  font-size: 1rem;
+  font-weight: 700;
   cursor: pointer;
   transition: background 0.2s, transform 0.15s;
+}
+
+.mm-btn-back svg {
+  width: 20px;
+  height: 20px;
 }
 
 .mm-btn-back:active {
@@ -576,7 +582,9 @@ body.memorama-body {
 
 @media (max-width: 360px) {
   .mm-btn-back {
-    font-size: 0.74rem;
+    font-size: 0.92rem;
+    min-height: 46px;
+    padding: 10px 14px;
   }
 
   .mm-station-label {

@@ -109,9 +109,10 @@ body {
     position: absolute;
     top: 20px;
     left: 20px;
-    height: 42px;
-    padding: 0 18px 0 12px;
-    border-radius: 21px;
+    height: 52px;
+    min-height: 52px;
+    padding: 0 22px 0 16px;
+    border-radius: 999px;
     background: rgba(255, 255, 255, 0.12);
     color: white;
     border: 1.5px solid rgba(255, 255, 255, 0.25);
@@ -121,15 +122,17 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     z-index: 10;
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     text-decoration: none;
 }
 
 .btn-back-map svg {
+    width: 20px;
+    height: 20px;
     transition: transform 0.3s ease;
 }
 
@@ -441,19 +444,6 @@ main {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-    position: relative;
-}
-
-.partner-logos::before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: 8%;
-    right: 8%;
-    height: 3px;
-    background: #ffffff;
-    border-radius: 999px;
-    box-shadow: 0 0 12px rgba(255, 255, 255, 0.55);
 }
 
 .partner-logo {
@@ -499,9 +489,10 @@ main {
     .btn-back-map {
         top: 14px;
         left: 14px;
-        height: 36px;
-        padding: 0 14px 0 10px;
-        font-size: 0.85rem;
+        height: 48px;
+        min-height: 48px;
+        padding: 0 18px 0 14px;
+        font-size: 1rem;
     }
 
     .logo-institucional-container {
@@ -660,10 +651,11 @@ main {
     .btn-back-map {
         top: 15px;
         left: 15px;
-        height: 38px;
-        padding: 0 14px 0 10px;
-        font-size: 0.88rem;
-        border-radius: 19px;
+        height: 48px;
+        min-height: 48px;
+        padding: 0 18px 0 14px;
+        font-size: 1rem;
+        border-radius: 999px;
     }
 }
 
@@ -729,9 +721,10 @@ main {
     .btn-back-map {
         top: clamp(10px, 2svh, 15px);
         left: clamp(10px, 3vw, 15px);
-        height: clamp(34px, 5.2svh, 38px);
-        padding: 0 clamp(12px, 3vw, 14px) 0 10px;
-        font-size: clamp(0.78rem, 3.2vw, 0.88rem);
+        height: clamp(46px, 6.5svh, 52px);
+        min-height: 46px;
+        padding: 0 clamp(16px, 4vw, 20px) 0 14px;
+        font-size: clamp(0.95rem, 3.5vw, 1.05rem);
         border-radius: 999px;
     }
 
