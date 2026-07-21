@@ -2446,36 +2446,13 @@
       transition: opacity .25s ease, visibility .25s ease;
       z-index: 900;
     }
-
-
-    body:has(#rulesOverlay.open) #hamburgerBtn span {
-      background: #000000;
-    }
+    body:has(#viewPrep.active) #hamburgerBtn,
     body:has(#loginOverlay.open) #hamburgerBtn,
     body:has(#profileOverlay.open) #hamburgerBtn,
     body:has(#scoresOverlay.open) #hamburgerBtn,
     body:has(#rulesOverlay.open) #hamburgerBtn,
     body:has(#avatarOverlay.open) #hamburgerBtn {
-      z-index: 2147483647;
-    }
-    body:has(.nav-links.open) #viewLanding {
-      z-index: 2147483643;
-    }
-
-    body:has(.nav-links.open) .top-nav {
-      z-index: 2147483644;
-    }
-
-    body:has(.nav-links.open) .mobile-nav-backdrop {
-      z-index: 2147483645;
-    }
-
-    body:has(.nav-links.open) .nav-links {
-      z-index: 2147483646;
-    }
-
-    body:has(.nav-links.open) #hamburgerBtn {
-      z-index: 2147483647;
+      display: none !important;
     }
     .mobile-nav-backdrop.visible {
       opacity: 1;
@@ -13501,6 +13478,18 @@
         }
       }, 500);
 
+      function syncHamburgerForView(viewId = getActiveViewId()) {
+        const hamburger = document.getElementById('hamburgerBtn');
+        if (!hamburger) return;
+
+        if (viewId === 'viewLanding') {
+          hamburger.style.removeProperty('display');
+        } else {
+          closeMobileMenu();
+          hamburger.style.setProperty('display', 'none', 'important');
+        }
+      }
+
       function showView(viewId) {
         if (viewId !== 'viewLanding' && redirectInternalUserIfNeeded()) return;
 
@@ -13520,6 +13509,7 @@
         if (target) {
           target.classList.add('active');
           localStorage.setItem('much_current_view', viewId);
+          syncHamburgerForView(viewId);
 
           if (viewId === 'viewPrep') {
             fetchActiveStations().then(() => {
