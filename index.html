@@ -1546,15 +1546,6 @@
       box-shadow: 0 18px 0px var(--bg-deep);
     }
 
-    /* Ocultar el botón hamburguesa cuando una interfaz interna está abierta */
-    body.internal-interface-open #hamburgerBtn,
-    body:has(#loginOverlay.open) #hamburgerBtn,
-    body:has(#profileOverlay.open) #hamburgerBtn,
-    body:has(#scoresOverlay.open) #hamburgerBtn,
-    body:has(#rulesOverlay.open) #hamburgerBtn,
-    body:has(#avatarOverlay.open) #hamburgerBtn {
-      display: none !important;
-    }
 
     .btn-login-back {
       position: absolute;
@@ -2456,6 +2447,26 @@
       z-index: 900;
     }
 
+
+    body:has(.nav-links.open) #viewLanding {
+      z-index: 299999;
+    }
+
+    body:has(.nav-links.open) .top-nav {
+      z-index: 300000;
+    }
+
+    body:has(.nav-links.open) .mobile-nav-backdrop {
+      z-index: 300001;
+    }
+
+    body:has(.nav-links.open) .nav-links {
+      z-index: 300002;
+    }
+
+    body:has(.nav-links.open) #hamburgerBtn {
+      z-index: 300003;
+    }
     .mobile-nav-backdrop.visible {
       opacity: 1;
       visibility: visible;
@@ -11509,9 +11520,6 @@
     }
 
     @media (max-width: 760px) {
-      body:has(#rulesOverlay.avatar-overlay.open) #hamburgerBtn {
-        display: none !important;
-      }
 
       #rulesOverlay.avatar-overlay.open[class] .rules-modal {
         grid-template-rows: clamp(44px, 8.5dvh, 60px) minmax(0, 1fr) clamp(52px, 9dvh, 66px) !important;
@@ -13105,6 +13113,7 @@
           e.preventDefault();
           closeMobileMenu();
           openProfile();
+          settleMobileMenuClosed();
         };
       }
       if (btnCerrarPerfil) btnCerrarPerfil.onclick = () => profileOverlay.classList.remove('open');
@@ -13468,26 +13477,6 @@
         }
       }, 500);
 
-      const INTERNAL_INTERFACE_IDS = ['loginOverlay', 'profileOverlay', 'scoresOverlay', 'rulesOverlay', 'avatarOverlay'];
-
-      function isInternalInterfaceOpen() {
-        return INTERNAL_INTERFACE_IDS.some((id) => document.getElementById(id)?.classList.contains('open'));
-      }
-
-      function updateHamburgerVisibility(viewId = getActiveViewId()) {
-        const hamburger = document.getElementById('hamburgerBtn');
-        if (!hamburger) return;
-
-        const shouldHide = viewId !== 'viewLanding' || isInternalInterfaceOpen();
-        document.body.classList.toggle('internal-interface-open', shouldHide);
-
-        if (shouldHide) {
-          hamburger.style.setProperty('display', 'none', 'important');
-          closeMobileMenu();
-        } else {
-          hamburger.style.removeProperty('display');
-        }
-      }
       function showView(viewId) {
         if (viewId !== 'viewLanding' && redirectInternalUserIfNeeded()) return;
 
@@ -13518,7 +13507,6 @@
               moveToStation(savedStation);
             });
           }
-          updateHamburgerVisibility(viewId);
           
           syncSoundForView(viewId, true);
 
@@ -13539,14 +13527,6 @@
         if (backdrop) backdrop.classList.remove('visible');
       }
 
-      INTERNAL_INTERFACE_IDS.forEach((id) => {
-        const overlayEl = document.getElementById(id);
-        if (!overlayEl) return;
-
-        new MutationObserver(() => updateHamburgerVisibility())
-          .observe(overlayEl, { attributes: true, attributeFilter: ['class'] });
-      });
-      updateHamburgerVisibility();
       function ensureMobileNavMenu() {
         const menu = document.querySelector('.nav-links');
         if (!menu) return;
@@ -13687,23 +13667,41 @@
       }
       window.actualizarVisibilidadMenuRoles = actualizarVisibilidadMenuRoles;
 
+      function closeInternalMenuInterfaces(exceptId = '') {
+        ['scoresOverlay', 'rulesOverlay', 'profileOverlay', 'loginOverlay', 'avatarOverlay'].forEach((id) => {
+          if (id === exceptId) return;
+          document.getElementById(id)?.classList.remove('open');
+        });
+      }
+
+      function settleMobileMenuClosed() {
+        closeMobileMenu();
+        requestAnimationFrame(closeMobileMenu);
+        setTimeout(closeMobileMenu, 80);
+      }
+
       function handleNavButtonAction(buttonId) {
         closeMobileMenu();
-
         if (buttonId === 'btnInicio') {
+          closeInternalMenuInterfaces();
           showView('viewLanding');
+          settleMobileMenuClosed();
           return;
         }
 
         if (buttonId === 'btnPuntajes') {
+          closeInternalMenuInterfaces('scoresOverlay');
           if (scoresOverlay) scoresOverlay.classList.add('open');
           loadScores();
+          settleMobileMenuClosed();
           return;
         }
 
         if (buttonId === 'btnComoJugar') {
+          closeInternalMenuInterfaces('rulesOverlay');
           applyRulesModeForStart(false);
           if (rulesOverlay) rulesOverlay.classList.add('open');
+          settleMobileMenuClosed();
           return;
         }
 
@@ -13722,7 +13720,9 @@
         }
 
         if (buttonId === 'btnPerfil') {
+          closeInternalMenuInterfaces('profileOverlay');
           openProfile();
+          settleMobileMenuClosed();
         }
       }
 
