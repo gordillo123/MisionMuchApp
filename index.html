@@ -539,6 +539,20 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.45);
     }
 
+
+    .landing-sound-toggle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 42%),
+        linear-gradient(135deg, var(--msf-pink), var(--msf-yellow));
+      border: 3px solid rgba(255, 255, 255, 0.92);
+      box-shadow:
+        0 14px 30px rgba(255, 118, 180, 0.3),
+        0 4px 10px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
     @media (max-width: 992px) {
       .nav-slogan {
         font-size: 0.9rem;
@@ -557,14 +571,10 @@
 
       .landing-sound-toggle {
         position: fixed;
-        top: 0.7rem;
-        right: 4.05rem;
+        top: 0.45rem;
+        right: 4.15rem;
         z-index: 1010;
-        width: 42px;
-        height: 42px;
         margin-left: 0;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.08);
       }
     }
 
@@ -579,7 +589,7 @@
       }
 
       .landing-sound-toggle {
-        right: 3.85rem;
+        right: 4.05rem;
       }
     }
 
