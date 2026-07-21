@@ -43,11 +43,40 @@
     return Math.abs(hash).toString(36);
   }
 
+  function randomNumber() {
+    const cryptoObj = root?.crypto || (typeof globalThis !== 'undefined' ? globalThis.crypto : null);
+    if (cryptoObj && typeof cryptoObj.getRandomValues === 'function' && typeof Uint32Array !== 'undefined') {
+      const values = new Uint32Array(1);
+      cryptoObj.getRandomValues(values);
+      return values[0] / 0x100000000;
+    }
+    return Math.random();
+  }
+
+  function randomInt(maxExclusive) {
+    const max = Number(maxExclusive);
+    if (!Number.isFinite(max) || max <= 0) return 0;
+    return Math.floor(randomNumber() * max);
+  }
+
+  function randomToken(length = 8) {
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let token = '';
+    while (token.length < length) {
+      token += alphabet[randomInt(alphabet.length)];
+    }
+    return token;
+  }
+
   function shuffleArray(items) {
-    return items
-      .map((item) => ({ item, rank: Math.random() }))
-      .sort((a, b) => a.rank - b.rank)
-      .map(({ item }) => item);
+    const mixed = Array.isArray(items) ? items.slice() : [];
+    for (let index = mixed.length - 1; index > 0; index -= 1) {
+      const swapIndex = randomInt(index + 1);
+      const temp = mixed[index];
+      mixed[index] = mixed[swapIndex];
+      mixed[swapIndex] = temp;
+    }
+    return mixed;
   }
 
   function getOptionLabel(option) {
@@ -67,6 +96,87 @@
     const options = Array.isArray(rawOptions) ? rawOptions.map(getOptionLabel) : [];
     const identity = normalizeText([fallback].concat(options).join('|')) || JSON.stringify(question || {});
     return `q-${stableHash(identity)}`;
+  }
+
+  function isCorrectOption(option) {
+    if (!option || typeof option !== 'object') return false;
+    return option.correcta === true || option.esCorrecta === true || option.isCorrect === true || option.correct === true;
+  }
+
+  function getQuestionCorrectIndex(question, options) {
+    const numericIndex = Number(question?.correctIndex ?? question?.answerIndex ?? question?.correcta_index ?? question?.answer_index);
+    if (Number.isInteger(numericIndex) && numericIndex >= 0 && numericIndex < options.length) {
+      return numericIndex;
+    }
+
+    const rawOptions = question?.options ?? question?.opciones ?? question?.respuestas;
+    if (Array.isArray(rawOptions) && rawOptions.some((option) => option && typeof option === 'object')) {
+      const markedIndex = rawOptions.findIndex(isCorrectOption);
+      if (markedIndex >= 0 && markedIndex < options.length) return markedIndex;
+    }
+
+    const correctText = question?.correcta ?? question?.respuesta_correcta_texto ?? question?.correctAnswer ?? '';
+    if (correctText) {
+      const normalizedCorrect = normalizeText(correctText);
+      const textIndex = options.findIndex((option) => normalizeText(option) === normalizedCorrect);
+      if (textIndex >= 0) return textIndex;
+    }
+
+    return 0;
+  }
+
+  function shuffleQuestionOptions(question, preferredCorrectIndex) {
+    const rawOptions = question?.options ?? question?.opciones ?? question?.respuestas ?? [];
+    const options = Array.isArray(rawOptions) ? rawOptions.map(getOptionLabel) : [];
+    if (options.length < 2) {
+      const correctIndex = options.length ? getQuestionCorrectIndex(question, options) : 0;
+      return {
+        ...question,
+        options: options.slice(),
+        correctIndex,
+        ...(Object.prototype.hasOwnProperty.call(question || {}, 'answerIndex') ? { answerIndex: correctIndex } : {})
+      };
+    }
+
+    const sourceCorrectIndex = getQuestionCorrectIndex(question, options);
+    const mixed = shuffleArray(options.map((label, index) => ({
+      label,
+      isCorrect: index === sourceCorrectIndex
+    })));
+    let correctIndex = mixed.findIndex((item) => item.isCorrect);
+    if (correctIndex < 0) {
+      correctIndex = 0;
+      mixed[0].isCorrect = true;
+    }
+
+    const preferredIndexNumber = Number(preferredCorrectIndex);
+    const targetIndex = Number.isInteger(preferredIndexNumber)
+      ? ((preferredIndexNumber % mixed.length) + mixed.length) % mixed.length
+      : randomInt(mixed.length);
+
+    if (correctIndex !== targetIndex) {
+      const [correctItem] = mixed.splice(correctIndex, 1);
+      mixed.splice(targetIndex, 0, correctItem);
+      correctIndex = targetIndex;
+    }
+
+    const nextQuestion = {
+      ...question,
+      options: mixed.map((item) => item.label),
+      correctIndex
+    };
+
+    if (Object.prototype.hasOwnProperty.call(question || {}, 'answerIndex')) {
+      nextQuestion.answerIndex = correctIndex;
+    }
+    if (Object.prototype.hasOwnProperty.call(question || {}, 'correcta_index')) {
+      nextQuestion.correcta_index = correctIndex;
+    }
+    if (Object.prototype.hasOwnProperty.call(question || {}, 'answer_index')) {
+      nextQuestion.answer_index = correctIndex;
+    }
+
+    return nextQuestion;
   }
 
   function questionMatchesStation(question, stationKey) {
@@ -132,7 +242,7 @@
   function getOrCreateDevicePlayerId(storage) {
     const existing = safeStorageGet(storage, 'much_player_id') || safeStorageGet(storage, 'much_player_uid') || '';
     if (existing) return safePlayerPart(existing);
-    const generated = `player-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const generated = `player-${Date.now()}-${randomToken(8)}`;
     safeStorageSet(storage, 'much_player_id', generated);
     return generated;
   }
@@ -198,7 +308,7 @@
     return items
       .map((item) => {
         const weight = Math.min(10, 1 + getDifficultyScore(item));
-        return { item, rank: -Math.log(Math.random() || Number.MIN_VALUE) / weight };
+        return { item, rank: -Math.log(randomNumber() || Number.MIN_VALUE) / weight };
       })
       .sort((a, b) => a.rank - b.rank)
       .map(({ item }) => item);
@@ -301,6 +411,7 @@
     clearQuestionDeck,
     questionMatchesStation,
     shuffleArray,
+    shuffleQuestionOptions,
     weightedShuffleQuestions,
     getQuestionId,
     getDifficultyScore

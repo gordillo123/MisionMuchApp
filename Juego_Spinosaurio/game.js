@@ -74,6 +74,31 @@ var QUESTION_SECONDS = 15;
 var questionSecondsLeft = 0;
 var questionTimerInterval = null;
 
+function getQuizRandomNumber() {
+  var cryptoObj = window.crypto;
+  if (cryptoObj && typeof cryptoObj.getRandomValues === "function") {
+    var values = new Uint32Array(1);
+    cryptoObj.getRandomValues(values);
+    return values[0] / 0x100000000;
+  }
+  return Math.random();
+}
+
+function getQuizRandomInt(maxExclusive) {
+  var max = Number(maxExclusive);
+  if (!Number.isFinite(max) || max <= 0) return 0;
+  return Math.floor(getQuizRandomNumber() * max);
+}
+
+function getQuizRandomToken(length) {
+  var alphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
+  var token = "";
+  while (token.length < length) {
+    token += alphabet[getQuizRandomInt(alphabet.length)];
+  }
+  return token;
+}
+
 function normalizeSpinosaurioPlayerPart(value) {
   return String(value || '')
     .trim()
@@ -100,7 +125,7 @@ function getSpinosaurioAccountId() {
 function getSpinosaurioDeviceId() {
   const existing = sessionStorage.getItem('much_spinosaurio_device_id') || localStorage.getItem('much_spinosaurio_device_id');
   if (existing) return normalizeSpinosaurioPlayerPart(existing);
-  const generated = `spinosaurio-device-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const generated = `spinosaurio-device-${Date.now()}-${getQuizRandomToken(8)}`;
   sessionStorage.setItem('much_spinosaurio_device_id', generated);
   localStorage.setItem('much_spinosaurio_device_id', generated);
   return generated;
@@ -717,7 +742,7 @@ async function cargarQuizJSON() {
 function shuffleQuizOptionItems(items) {
   var mixed = items.slice();
   for (var i = mixed.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
+    var j = getQuizRandomInt(i + 1);
     var tmp = mixed[i];
     mixed[i] = mixed[j];
     mixed[j] = tmp;

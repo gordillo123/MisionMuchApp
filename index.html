@@ -11245,6 +11245,318 @@
       }
     }
 
+    /* Lectura final: textos inferiores de reglas mas grandes, claros y ajustados. */
+    #rulesOverlay.avatar-overlay.open[class] .rules-modal {
+      grid-template-rows: clamp(96px, 15.5dvh, 170px) minmax(0, 1fr) clamp(52px, 8.8dvh, 74px) !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open[class] .rules-content {
+      padding:
+        clamp(6px, 1.1dvh, 12px)
+        max(clamp(8px, 1.45vw, 18px), env(safe-area-inset-right))
+        clamp(6px, 1.1dvh, 12px)
+        max(clamp(8px, 1.45vw, 18px), env(safe-area-inset-left)) !important;
+      overflow: hidden !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open[class] .rules-board {
+      --rules-grid-gap: clamp(6px, 1.2vmin, 14px);
+      overflow: hidden !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open[class] .rules-board > .rule-card,
+    #rulesOverlay.avatar-overlay.open[class] .rules-board > .rule-card:last-child:nth-child(odd) {
+      gap: clamp(3px, 0.62vmin, 8px) !important;
+      padding: clamp(9px, 1.55vmin, 18px) !important;
+      justify-content: flex-start !important;
+      overflow: hidden !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open[class] .rule-card-head {
+      margin-bottom: clamp(2px, 0.55vmin, 7px) !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open[class] .rule-card-icon {
+      width: clamp(28px, min(7vw, 6.5dvh), 52px) !important;
+      height: clamp(28px, min(7vw, 6.5dvh), 52px) !important;
+      min-width: clamp(28px, min(7vw, 6.5dvh), 52px) !important;
+      font-size: clamp(14px, min(3.7vw, 3.2dvh), 27px) !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open[class] .rule-card-step {
+      min-width: clamp(26px, min(6vw, 4.8dvh), 42px) !important;
+      padding: clamp(2px, 0.42vmin, 5px) clamp(5px, 0.9vmin, 10px) !important;
+      font-size: clamp(8px, min(1.9vw, 1.8dvh), 12px) !important;
+      line-height: 1.1 !important;
+      letter-spacing: 0.04em !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open[class] .rule-card-title {
+      margin: 0 0 clamp(2px, 0.45vmin, 6px) !important;
+      font-size: clamp(15px, min(3.35vw, 2.75dvh), 23px) !important;
+      line-height: 1.08 !important;
+      overflow-wrap: anywhere !important;
+      hyphens: auto !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open[class] .rule-card-copy {
+      flex: 0 1 auto !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
+      font-size: clamp(14px, min(2.95vw, 2.45dvh), 19px) !important;
+      line-height: 1.18 !important;
+      font-weight: 850 !important;
+      overflow-wrap: anywhere !important;
+      word-break: normal !important;
+      hyphens: auto !important;
+      text-wrap: pretty !important;
+    }
+
+    @media (max-width: 760px) {
+      #rulesOverlay.avatar-overlay.open[class] .rules-modal {
+        grid-template-rows: clamp(46px, 9.4dvh, 64px) minmax(0, 1fr) clamp(40px, 7.4dvh, 54px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rules-header {
+        padding:
+          max(6px, env(safe-area-inset-top))
+          max(42px, env(safe-area-inset-right))
+          2px
+          max(42px, env(safe-area-inset-left)) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rules-modal .modal-title {
+        font-size: clamp(17px, 5.15vw, 26px) !important;
+        line-height: 1.02 !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rules-content {
+        padding:
+          clamp(4px, 0.9dvh, 8px)
+          max(6px, env(safe-area-inset-right))
+          clamp(4px, 0.9dvh, 8px)
+          max(6px, env(safe-area-inset-left)) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rules-board {
+        --rules-grid-gap: clamp(4px, 1vmin, 8px);
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rules-board > .rule-card,
+      #rulesOverlay.avatar-overlay.open[class] .rules-board > .rule-card:last-child:nth-child(odd) {
+        gap: clamp(2px, 0.55vmin, 5px) !important;
+        padding: clamp(7px, 1.35vmin, 11px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rule-card-head {
+        margin-bottom: clamp(1px, 0.38vmin, 4px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rule-card-icon {
+        width: clamp(23px, 6.2vw, 31px) !important;
+        height: clamp(23px, 6.2vw, 31px) !important;
+        min-width: clamp(23px, 6.2vw, 31px) !important;
+        font-size: clamp(12px, 3.15vw, 16px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rule-card-step {
+        min-width: clamp(22px, 5.7vw, 30px) !important;
+        padding: 2px 5px !important;
+        font-size: clamp(7px, 1.75vw, 9px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rule-card-title {
+        font-size: clamp(12px, min(3.28vw, 2.36dvh), 16px) !important;
+        line-height: 1.06 !important;
+        margin-bottom: clamp(1px, 0.28vmin, 3px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rule-card-copy {
+        font-size: clamp(11.8px, min(3.65vw, 2.35dvh), 15px) !important;
+        line-height: 1.14 !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rules-confirm {
+        max-height: clamp(38px, 6.8dvh, 52px) !important;
+        font-size: clamp(13px, 3.35vw, 17px) !important;
+      }
+    }
+
+    @media (max-width: 380px), (max-height: 620px) {
+      #rulesOverlay.avatar-overlay.open[class] .rules-modal {
+        grid-template-rows: clamp(44px, 8.9dvh, 58px) minmax(0, 1fr) clamp(38px, 7dvh, 50px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rules-content {
+        padding:
+          clamp(3px, 0.65dvh, 6px)
+          max(5px, env(safe-area-inset-right))
+          clamp(3px, 0.65dvh, 6px)
+          max(5px, env(safe-area-inset-left)) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rules-board {
+        --rules-grid-gap: clamp(3px, 0.85vmin, 6px);
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rules-board > .rule-card,
+      #rulesOverlay.avatar-overlay.open[class] .rules-board > .rule-card:last-child:nth-child(odd) {
+        padding: clamp(6px, 1.15vmin, 8px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rule-card-icon {
+        width: clamp(22px, 6.2vw, 28px) !important;
+        height: clamp(22px, 6.2vw, 28px) !important;
+        min-width: clamp(22px, 6.2vw, 28px) !important;
+        font-size: clamp(11px, 3vw, 15px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rule-card-title {
+        font-size: clamp(11.4px, min(3.25vw, 2.2dvh), 14px) !important;
+        line-height: 1.05 !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rule-card-copy {
+        font-size: clamp(11.6px, min(3.65vw, 2.25dvh), 14px) !important;
+        line-height: 1.12 !important;
+      }
+    }
+
+    /* Ajuste anti-desborde: mantener toda la pantalla de reglas dentro del viewport. */
+    #rulesOverlay.avatar-overlay.open[class] {
+      inset: 0 !important;
+      width: 100vw !important;
+      height: 100dvh !important;
+      max-width: 100vw !important;
+      max-height: 100dvh !important;
+      padding: 0 !important;
+      align-items: stretch !important;
+      justify-content: stretch !important;
+      overflow: hidden !important;
+      z-index: 1200 !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open[class] .rules-modal {
+      width: 100vw !important;
+      max-width: 100vw !important;
+      height: 100dvh !important;
+      max-height: 100dvh !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open[class] .rules-stage,
+    #rulesOverlay.avatar-overlay.open[class] .rules-board,
+    #rulesOverlay.avatar-overlay.open[class] .rules-board > .rule-card {
+      min-width: 0 !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open[class] .rules-footer {
+      min-height: 0 !important;
+      height: 100% !important;
+      margin: 0 !important;
+      padding:
+        clamp(4px, 0.8dvh, 8px)
+        max(clamp(10px, 2.2vw, 22px), env(safe-area-inset-right))
+        max(clamp(5px, 0.9dvh, 10px), env(safe-area-inset-bottom))
+        max(clamp(10px, 2.2vw, 22px), env(safe-area-inset-left)) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      overflow: hidden !important;
+    }
+
+    #rulesOverlay.avatar-overlay.open[class] .rules-confirm {
+      width: min(95vw, 540px) !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      height: clamp(50px, 7.8dvh, 70px) !important;
+      max-height: calc(100% - 2px) !important;
+      margin: 0 auto !important;
+      padding: 0 clamp(18px, 4.8vw, 36px) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-align: center !important;
+      line-height: 1 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      box-sizing: border-box !important;
+    }
+
+    @media (max-width: 760px) {
+      body:has(#rulesOverlay.avatar-overlay.open) #hamburgerBtn {
+        display: none !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rules-modal {
+        grid-template-rows: clamp(44px, 8.5dvh, 60px) minmax(0, 1fr) clamp(52px, 9dvh, 66px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .btn-back-regreso {
+        top: max(6px, env(safe-area-inset-top)) !important;
+        left: max(6px, env(safe-area-inset-left)) !important;
+        width: clamp(34px, 8.7vw, 40px) !important;
+        height: clamp(34px, 8.7vw, 40px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rules-content {
+        padding:
+          clamp(3px, 0.7dvh, 7px)
+          max(5px, env(safe-area-inset-right))
+          clamp(3px, 0.7dvh, 7px)
+          max(5px, env(safe-area-inset-left)) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rules-footer {
+        padding:
+          clamp(2px, 0.45dvh, 4px)
+          max(clamp(10px, 2.2vw, 18px), env(safe-area-inset-right))
+          max(clamp(2px, 0.45dvh, 4px), env(safe-area-inset-bottom))
+          max(clamp(10px, 2.2vw, 18px), env(safe-area-inset-left)) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rules-confirm {
+        width: min(96vw, 440px) !important;
+        height: clamp(44px, 7.7dvh, 58px) !important;
+        padding-inline: clamp(16px, 5vw, 28px) !important;
+        font-size: clamp(14px, 3.75vw, 18px) !important;
+      }
+    }
+
+    @media (max-width: 380px), (max-height: 620px) {
+      #rulesOverlay.avatar-overlay.open[class] .rules-modal {
+        grid-template-rows: clamp(40px, 8dvh, 54px) minmax(0, 1fr) clamp(52px, 9.2dvh, 62px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rules-content {
+        padding:
+          clamp(2px, 0.5dvh, 5px)
+          max(4px, env(safe-area-inset-right))
+          clamp(2px, 0.5dvh, 5px)
+          max(4px, env(safe-area-inset-left)) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rules-board > .rule-card,
+      #rulesOverlay.avatar-overlay.open[class] .rules-board > .rule-card:last-child:nth-child(odd) {
+        padding: clamp(5px, 1vmin, 7px) !important;
+      }
+
+      #rulesOverlay.avatar-overlay.open[class] .rules-confirm {
+        height: clamp(44px, 7.6dvh, 52px) !important;
+        font-size: clamp(13px, 3.55vw, 16px) !important;
+      }
+    }
+
     body.mission-reward-open {
       overflow: hidden;
     }
@@ -11270,18 +11582,18 @@
       display: flex;
       opacity: 1;
       pointer-events: auto;
+      overflow: hidden;
     }
 
     .mission-reward-panel {
       position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      place-items: center;
       width: 100%;
       height: 100%;
       max-height: 100dvh;
-      overflow-y: auto;
-      overflow-x: hidden;
+      overflow: hidden;
       border: 0;
       border-radius: 0;
       background: #ffffff;
@@ -11398,6 +11710,10 @@
       width: 100%;
       max-width: 520px;
       margin: 0 auto;
+      min-height: 0;
+      max-height: 100%;
+      justify-content: center;
+      overflow: hidden;
     }
 
     /* ── Avatar ── */
@@ -11495,6 +11811,7 @@
       min-width: 0;
       text-align: center;
       width: 100%;
+      overflow: hidden;
     }
 
     .mission-reward-kicker {
@@ -11732,48 +12049,22 @@
       }
     }
 
-    /* ── Responsive: pantallas muy pequeñas ── */
-    @media (max-width: 380px), (max-height: 680px) {
+    @media (max-height: 840px) {
       .mission-reward-panel {
-        padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
-      }
-
-      .mission-reward-content {
-        gap: 6px;
+        padding: max(10px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
       }
 
       .mission-reward-brand-top {
-        margin-bottom: 4px;
-        padding: 4px 10px;
+        margin-bottom: clamp(4px, 1dvh, 10px);
+        padding: 5px 16px;
       }
 
       .mission-reward-brand-top img {
-        height: clamp(70px, 15dvh, 112px);
-        max-width: 95vw;
+        height: clamp(64px, 12dvh, 105px);
       }
 
-      .mission-reward-brand-strip {
-        gap: 8px;
-        width: 100%;
-        margin-top: 10px;
-        padding: 8px 12px;
-      }
-
-      .mission-reward-brand-strip img,
-      .mission-reward-brand-strip .mission-brand-much,
-      .mission-reward-brand-strip .mission-brand-sbeel,
-      .mission-reward-brand-strip .mission-brand-planetario {
-        flex: 1 1 0;
-        width: 0;
-        height: clamp(26px, 6dvh, 36px);
-        min-width: 0;
-        max-width: none;
-      }
-
-      .mission-reward-brand-strip .mission-brand-sata {
-        flex: 0.78 1 0;
-        height: clamp(22px, 5dvh, 30px);
-        opacity: 0.65;
+      .mission-reward-content {
+        gap: clamp(6px, 1.4dvh, 12px);
       }
 
       .mission-reward-avatar-stage {
@@ -11781,34 +12072,26 @@
       }
 
       .mission-reward-avatar-ring {
-        width: clamp(90px, 22vw, 120px);
+        width: clamp(88px, 18dvh, 138px);
       }
 
-      .mission-reward-avatar-name {
-        font-size: clamp(0.78rem, 3vw, 0.9rem);
-        padding: 4px 14px;
+      .mission-reward-kicker {
+        margin-bottom: 5px;
       }
 
       .mission-reward-title {
-        font-size: clamp(1.4rem, 7vw, 2rem);
-        line-height: 1.05;
+        font-size: clamp(1.45rem, 5.8dvh, 2.35rem);
       }
 
       .mission-reward-subtitle {
         margin-top: 4px;
-        font-size: clamp(0.76rem, 3.2vw, 0.9rem);
-        line-height: 1.2;
+        font-size: clamp(0.82rem, 2.2dvh, 1rem);
+        line-height: 1.22;
       }
 
       .mission-ticket-callout {
-        margin-top: 8px;
-        padding: 8px 10px;
-        font-size: clamp(0.76rem, 3.2vw, 0.88rem);
-      }
-
-      .mission-ticket-callout strong {
-        margin-bottom: 2px;
-        font-size: clamp(1.05rem, 5.5vw, 1.4rem);
+        margin-top: 7px;
+        padding: 8px 12px;
       }
 
       .mission-ticket-options {
@@ -11817,37 +12100,170 @@
       }
 
       .mission-ticket-option {
-        grid-template-columns: 48px minmax(0, 1fr);
-        min-height: 64px;
-        gap: 10px;
+        min-height: clamp(62px, 12dvh, 78px);
         padding: 10px 12px;
-        border-width: 2px;
-        box-shadow: 0 3px 0 #e2e8f0, 0 6px 12px rgba(15, 23, 42, 0.06);
       }
 
-      .mission-ticket-icon {
-        padding: 5px;
+      .mission-reward-actions {
+        margin-top: 6px;
+      }
+
+      .mission-reward-continue {
+        min-height: clamp(46px, 7dvh, 54px);
+      }
+
+      .mission-reward-brand-strip {
+        margin-top: 8px;
+        padding: 8px 12px;
+      }
+
+      .mission-reward-brand-strip img {
+        height: clamp(26px, 5dvh, 40px);
+      }
+    }
+
+    /* ── Responsive: pantallas muy pequeñas ── */
+    @media (max-width: 380px), (max-height: 680px) {
+      .mission-reward-panel {
+        padding: max(4px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(4px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+      }
+
+      .mission-reward-content {
+        gap: 4px;
+      }
+
+      .mission-reward-brand-top {
+        margin-bottom: 1px;
+        padding: 1px 6px;
+        border-width: 1px;
         border-radius: 10px;
       }
 
+      .mission-reward-brand-top img {
+        height: clamp(34px, 8.5dvh, 58px);
+        max-width: 95vw;
+      }
+
+      .mission-reward-brand-strip {
+        gap: 4px;
+        width: 100%;
+        margin-top: 2px;
+        padding: 4px 7px;
+        border-radius: 12px;
+      }
+
+      .mission-reward-brand-strip img,
+      .mission-reward-brand-strip .mission-brand-much,
+      .mission-reward-brand-strip .mission-brand-sbeel,
+      .mission-reward-brand-strip .mission-brand-planetario {
+        flex: 1 1 0;
+        width: 0;
+        height: clamp(18px, 4.5dvh, 26px);
+        min-width: 0;
+        max-width: none;
+      }
+
+      .mission-reward-brand-strip .mission-brand-sata {
+        flex: 0.78 1 0;
+        height: clamp(16px, 4dvh, 23px);
+        opacity: 0.65;
+      }
+
+      .mission-reward-avatar-stage {
+        gap: 3px;
+      }
+
+      .mission-reward-avatar-ring {
+        width: clamp(44px, 12dvh, 62px);
+        border-width: 3px;
+      }
+
+      .mission-reward-avatar-ring::before {
+        inset: 4px;
+      }
+
+      .mission-reward-avatar-name {
+        font-size: clamp(0.58rem, 2.35dvh, 0.72rem);
+        padding: 2px 8px;
+      }
+
+      .mission-reward-kicker {
+        gap: 5px;
+        margin-bottom: 4px;
+        padding: 4px 9px;
+        font-size: clamp(0.58rem, 2.4dvh, 0.72rem);
+      }
+
+      .mission-reward-title {
+        font-size: clamp(1rem, 4.4dvh, 1.35rem);
+        line-height: 1;
+      }
+
+      .mission-reward-subtitle {
+        margin-top: 2px;
+        font-size: clamp(0.6rem, 2.25dvh, 0.74rem);
+        line-height: 1.1;
+      }
+
+      .mission-ticket-callout {
+        margin-top: 4px;
+        padding: 4px 7px;
+        border-width: 2px;
+        border-radius: 10px;
+        font-size: clamp(0.6rem, 2.25dvh, 0.72rem);
+      }
+
+      .mission-ticket-callout strong {
+        margin-bottom: 1px;
+        font-size: clamp(0.82rem, 3.15dvh, 1rem);
+      }
+
+      .mission-ticket-options {
+        gap: 4px;
+        margin-top: 4px;
+      }
+
+      .mission-ticket-option {
+        grid-template-columns: clamp(34px, 8dvh, 42px) minmax(0, 1fr);
+        min-height: clamp(42px, 9.5dvh, 54px);
+        gap: 7px;
+        padding: 5px 8px;
+        border-width: 2px;
+        border-radius: 12px;
+        box-shadow: 0 3px 0 #e2e8f0, 0 6px 12px rgba(15, 23, 42, 0.06);
+      }
+
+      .mission-ticket-option.is-selected::after {
+        top: 6px;
+        right: 6px;
+        width: 22px;
+        height: 22px;
+        font-size: 0.7rem;
+      }
+
+      .mission-ticket-icon {
+        padding: 4px;
+        border-radius: 9px;
+      }
+
       .mission-ticket-name {
-        font-size: clamp(0.95rem, 4.5vw, 1.15rem);
+        font-size: clamp(0.82rem, 3.05dvh, 0.98rem);
       }
 
       .mission-ticket-note {
         margin-top: 2px;
-        font-size: clamp(0.65rem, 2.8vw, 0.76rem);
-        line-height: 1.15;
+        font-size: clamp(0.56rem, 2.1dvh, 0.66rem);
+        line-height: 1.06;
       }
 
       .mission-reward-actions {
-        margin-top: 10px;
+        margin-top: 4px;
       }
 
       .mission-reward-continue {
-        min-height: 48px;
-        font-size: 0.95rem;
-        border-radius: 14px;
+        min-height: clamp(38px, 7.8dvh, 46px);
+        font-size: clamp(0.82rem, 2.9dvh, 0.94rem);
+        border-radius: 12px;
         box-shadow: 0 4px 0 #064e3b, 0 8px 16px rgba(15, 118, 110, 0.18);
       }
     }
@@ -14256,7 +14672,11 @@
           const raw = localStorage.getItem(MISSION_REWARD_CHOICE_KEY);
           if (!raw) return null;
           const saved = JSON.parse(raw);
-          return MISSION_TICKET_OPTIONS[saved?.key] || null;
+          const descriptor = `${saved?.key || ''} ${saved?.label || ''} ${saved?.acceso || ''} ${saved?.destino_boleto || ''}`.toLowerCase();
+          const savedKey = MISSION_TICKET_OPTIONS[saved?.key]
+            ? saved.key
+            : (descriptor.includes('planetario') ? 'planetario' : (descriptor.includes('much') || descriptor.includes('museo') ? 'much' : ''));
+          return MISSION_TICKET_OPTIONS[savedKey] || null;
         } catch (e) {
           return null;
         }
@@ -14270,6 +14690,8 @@
           key: option.key,
           label: option.label,
           acceso: option.acceso,
+          tipo_entrada: option.acceso,
+          destino_boleto: option.key,
           lugar: option.lugar,
           selectedAt: new Date().toISOString()
         }));
@@ -14291,7 +14713,8 @@
           premio: ticketOption.acceso,
           acceso: ticketOption.acceso,
           tipo_entrada: ticketOption.acceso,
-          destino_boleto: ticketOption.label,
+          destino_boleto: ticketOption.key,
+          destino_label: ticketOption.label,
           ticketChoice: {
             key: ticketOption.key,
             label: ticketOption.label
@@ -14495,7 +14918,7 @@
         }
 
         const prize = buildMissionPrize(option);
-        window.MuchLocalStorage?.setPrizeSelected?.(option);
+        saveMissionTicketChoice(option);
         window.MuchLocalStorage?.setClaimFlowStarted?.(true);
         localStorage.setItem('much_quiz_prize', JSON.stringify(prize));
         localStorage.setItem(MISSION_REWARD_CLAIMED_KEY, 'true');

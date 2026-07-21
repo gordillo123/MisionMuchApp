@@ -1,6 +1,12 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { createQuestionDeck, getDifficultyScore, getQuestionId } = require('../scripts/question-pool.js');
+const {
+  createQuestionDeck,
+  getDifficultyScore,
+  getQuestionId,
+  shuffleArray,
+  shuffleQuestionOptions
+} = require('../scripts/question-pool.js');
 
 test('createQuestionDeck returns unique station questions and no repeats within the same attempt', () => {
   const bank = [
@@ -51,6 +57,31 @@ test('createQuestionDeck uses stable fallback ids for questions without explicit
   };
 
   assert.equal(getQuestionId(question), getQuestionId({ ...question, options: question.options.slice() }));
+});
+
+test('shuffleArray returns a shuffled copy without mutating the original array', () => {
+  const source = ['a', 'b', 'c', 'd'];
+  const shuffled = shuffleArray(source);
+
+  assert.notEqual(shuffled, source);
+  assert.deepEqual(source, ['a', 'b', 'c', 'd']);
+  assert.deepEqual(shuffled.slice().sort(), source.slice().sort());
+});
+
+test('shuffleQuestionOptions moves options while preserving the correct answer index', () => {
+  const source = {
+    question: 'Pregunta de prueba',
+    options: ['Incorrecta A', 'Respuesta correcta', 'Incorrecta B', 'Incorrecta C'],
+    answerIndex: 1
+  };
+
+  const shuffled = shuffleQuestionOptions(source, 3);
+
+  assert.deepEqual(source.options, ['Incorrecta A', 'Respuesta correcta', 'Incorrecta B', 'Incorrecta C']);
+  assert.equal(shuffled.answerIndex, 3);
+  assert.equal(shuffled.correctIndex, 3);
+  assert.equal(shuffled.options[3], 'Respuesta correcta');
+  assert.equal(new Set(shuffled.options).size, source.options.length);
 });
 
 test('createQuestionDeck does not fall back to questions from another station', () => {

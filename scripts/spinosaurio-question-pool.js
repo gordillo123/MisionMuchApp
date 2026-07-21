@@ -52,6 +52,22 @@
     };
   }
 
+  function randomNumber() {
+    const cryptoObj = root?.crypto || (typeof globalThis !== 'undefined' ? globalThis.crypto : null);
+    if (cryptoObj && typeof cryptoObj.getRandomValues === 'function' && typeof Uint32Array !== 'undefined') {
+      const values = new Uint32Array(1);
+      cryptoObj.getRandomValues(values);
+      return values[0] / 0x100000000;
+    }
+    return Math.random();
+  }
+
+  function randomInt(maxExclusive) {
+    const max = Number(maxExclusive);
+    if (!Number.isFinite(max) || max <= 0) return 0;
+    return Math.floor(randomNumber() * max);
+  }
+
   function getHistoryKey(playerId) {
     return `much_spinosaurio_questions_${playerId || 'guest'}`;
   }
@@ -60,15 +76,25 @@
     const resolvedStorage = createStorage(storage);
     const historyKey = getHistoryKey(playerId);
     const rawHistory = resolvedStorage.getItem(historyKey);
-    const usedIds = rawHistory ? JSON.parse(rawHistory) : [];
+    let usedIds = [];
+    try {
+      const parsedHistory = rawHistory ? JSON.parse(rawHistory) : [];
+      usedIds = Array.isArray(parsedHistory) ? parsedHistory : [];
+    } catch (error) {
+      usedIds = [];
+    }
     const available = QUESTIONS.filter((question) => !usedIds.includes(question.id));
 
     if (!available.length) {
-      resolvedStorage.setItem(historyKey, JSON.stringify([]));
-      return QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
+      const lastUsedId = usedIds[usedIds.length - 1];
+      const nextCycleQuestions = QUESTIONS.filter((question) => question.id !== lastUsedId);
+      const cyclePool = nextCycleQuestions.length ? nextCycleQuestions : QUESTIONS;
+      const selected = cyclePool[randomInt(cyclePool.length)];
+      resolvedStorage.setItem(historyKey, JSON.stringify([selected.id]));
+      return selected;
     }
 
-    const selected = available[Math.floor(Math.random() * available.length)];
+    const selected = available[randomInt(available.length)];
     const nextHistory = usedIds.concat(selected.id);
     resolvedStorage.setItem(historyKey, JSON.stringify(nextHistory));
     return selected;

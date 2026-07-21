@@ -326,6 +326,109 @@
       }
     }
 
+    @media (max-width: 520px), (max-height: 720px) {
+      body {
+        overflow: hidden;
+        padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+      }
+
+      .registro-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        max-height: calc(100dvh - 16px);
+        overflow: hidden;
+        padding: clamp(10px, 2.5dvh, 18px) clamp(12px, 4vw, 18px);
+      }
+
+      .back-btn {
+        margin-bottom: clamp(6px, 1.4dvh, 10px);
+        padding: 7px 12px 7px 9px;
+        font-size: 0.82rem;
+      }
+
+      .logo-wrap {
+        margin-bottom: clamp(6px, 1.5dvh, 10px);
+      }
+
+      .brand-logo {
+        height: clamp(48px, 12dvh, 82px);
+      }
+
+      h2 {
+        font-size: clamp(1.05rem, 4.8vw, 1.35rem);
+        margin: 2px 0 clamp(5px, 1.3dvh, 9px);
+      }
+
+      p.lead {
+        margin-bottom: clamp(6px, 1.5dvh, 10px);
+        font-size: clamp(0.82rem, 3.5vw, 0.95rem);
+      }
+
+      .form-group {
+        margin-bottom: clamp(7px, 1.8dvh, 12px);
+      }
+
+      .form-group label {
+        margin-bottom: 4px;
+        font-size: clamp(0.82rem, 3.4vw, 0.95rem);
+      }
+
+      .form-group input {
+        min-height: 40px;
+        padding: clamp(8px, 1.8dvh, 11px) 11px;
+      }
+
+      .hint,
+      .error-msg {
+        margin-top: 3px;
+        font-size: clamp(0.68rem, 2.7vw, 0.78rem);
+        line-height: 1.12;
+      }
+
+      .submit-btn {
+        min-height: 44px;
+        padding: 10px 12px;
+        margin-top: 3px;
+      }
+
+      .brand-strip {
+        width: 100%;
+        gap: 6px;
+        margin-top: clamp(7px, 1.8dvh, 12px);
+        padding: 6px 8px;
+        border-radius: 12px;
+      }
+    }
+
+    @media (max-height: 590px) {
+      .brand-logo {
+        height: clamp(38px, 10dvh, 58px);
+      }
+
+      p.lead,
+      .hint {
+        display: none;
+      }
+
+      .form-group {
+        margin-bottom: 7px;
+      }
+
+      .form-group input {
+        min-height: 36px;
+        padding: 7px 10px;
+      }
+
+      .submit-btn {
+        min-height: 42px;
+      }
+
+      .brand-strip {
+        margin-top: 7px;
+      }
+    }
+
     /* === MODAL STYLES === */
     .modal-overlay {
       position: fixed;
@@ -505,8 +608,9 @@
                 acceso: dbBoleto.tipo_entrada || '',
                 premio: dbBoleto.tipo_entrada || '',
                 destino: dbBoleto.destino_boleto || '',
-                ubicacion: dbBoleto.seccion_boleto || '',
-                lugar: dbBoleto.seccion_boleto || ''
+                seccion: dbBoleto.seccion_boleto || '',
+                ubicacion: dbBoleto.lugar_boleto || dbBoleto.seccion_boleto || '',
+                lugar: dbBoleto.lugar_boleto || dbBoleto.seccion_boleto || ''
               });
               window.location.href = 'boleto.html?' + params.toString();
               return;
@@ -545,11 +649,12 @@
                 valido_hasta: latestBoleto.valido_hasta || '',
                 nombre: profile.nombre || '',
                 correo: profile.correo || '',
-                acceso: latestBoleto.tipo || '',
-                premio: latestBoleto.tipo || '',
+                acceso: latestBoleto.tipo_entrada || latestBoleto.tipo || '',
+                premio: latestBoleto.tipo_entrada || latestBoleto.tipo || '',
                 destino: latestBoleto.destino_boleto || '',
-                ubicacion: latestBoleto.seccion_boleto || '',
-                lugar: latestBoleto.seccion_boleto || ''
+                seccion: latestBoleto.seccion_boleto || '',
+                ubicacion: latestBoleto.lugar_boleto || latestBoleto.seccion_boleto || '',
+                lugar: latestBoleto.lugar_boleto || latestBoleto.seccion_boleto || ''
               });
               window.location.href = 'boleto.html?' + params.toString();
             }
@@ -649,11 +754,137 @@
       return prizeData?.tipo_entrada || prizeData?.acceso || prizeData?.label || prizeData?.premio || prizeData?.title || 'Premio';
     }
 
+    const MISSION_REWARD_CHOICE_KEY = 'much_mission_reward_ticket_choice';
+    const MISSION_TICKET_OPTIONS = {
+      planetario: {
+        key: 'planetario',
+        label: 'Planetario',
+        title: 'Boleto para el Planetario',
+        acceso: 'Planetario',
+        lugar: 'Planetario Tuxtla'
+      },
+      much: {
+        key: 'much',
+        label: 'MUCH',
+        title: 'MISION MUCH - Boleto MUCH',
+        acceso: 'MUCH',
+        lugar: 'Museo Chiapas de Ciencia y Tecnologia'
+      }
+    };
+
+    function normalizeTicketChoiceKey(...values) {
+      const descriptor = values
+        .flatMap((value) => {
+          if (!value) return [];
+          if (typeof value === 'object') {
+            return [
+              value.key,
+              value.label,
+              value.acceso,
+              value.tipo_entrada,
+              value.premio,
+              value.title,
+              value.destino,
+              value.destino_boleto,
+              value.destino_label,
+              value.lugar,
+              value.ticketChoice?.key,
+              value.ticketChoice?.label
+            ];
+          }
+          return [value];
+        })
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+
+      if (descriptor.includes('planetario')) return 'planetario';
+      if (descriptor.includes('much') || descriptor.includes('museo')) return 'much';
+      return '';
+    }
+
+    function readStoredTicketChoice() {
+      const candidates = [];
+      try {
+        const storageChoice = window.MuchLocalStorage?.getPrizeSelected?.();
+        if (storageChoice) candidates.push(storageChoice);
+      } catch (_) {}
+      try {
+        const rawChoice = localStorage.getItem(MISSION_REWARD_CHOICE_KEY);
+        if (rawChoice) candidates.push(JSON.parse(rawChoice));
+      } catch (_) {}
+      try {
+        const rawPrize = localStorage.getItem('much_quiz_prize');
+        if (rawPrize) candidates.push(JSON.parse(rawPrize));
+      } catch (_) {}
+
+      const key = normalizeTicketChoiceKey(...candidates);
+      return key ? MISSION_TICKET_OPTIONS[key] : null;
+    }
+
+    function getRequestedTicketOption(prizeData) {
+      const queryKey = normalizeTicketChoiceKey(
+        qs.get('destino'),
+        qs.get('ticket'),
+        qs.get('opcion'),
+        qs.get('acceso'),
+        qs.get('premio'),
+        qs.get('titulo')
+      );
+      const prizeKey = normalizeTicketChoiceKey(prizeData);
+      const storedKey = normalizeTicketChoiceKey(readStoredTicketChoice());
+      const key = queryKey || prizeKey || storedKey;
+      return MISSION_TICKET_OPTIONS[key || 'much'];
+    }
+
+    function applyTicketChoiceToPrize(prizeData = {}) {
+      const option = getRequestedTicketOption(prizeData);
+      const normalized = {
+        ...prizeData,
+        key: prizeData.key || `mision_much_boleto_${option.key}`,
+        title: option.title,
+        label: option.acceso,
+        premio: option.acceso,
+        acceso: option.acceso,
+        tipo_entrada: option.acceso,
+        destino_boleto: option.key,
+        destino_label: option.label,
+        ticketChoice: {
+          key: option.key,
+          label: option.label
+        },
+        lugar: option.lugar,
+        seccion_boleto: option.acceso,
+        sala: prizeData.sala || salaSlug,
+        date: prizeData.date || new Date().toISOString()
+      };
+
+      try {
+        window.MuchLocalStorage?.setPrizeSelected?.(option);
+        localStorage.setItem(MISSION_REWARD_CHOICE_KEY, JSON.stringify({
+          key: option.key,
+          label: option.label,
+          acceso: option.acceso,
+          tipo_entrada: option.acceso,
+          destino_boleto: option.key,
+          lugar: option.lugar,
+          selectedAt: new Date().toISOString()
+        }));
+      } catch (_) {}
+
+      return normalized;
+    }
+
     function getPrizeDescriptor(prizeData) {
       return [
         prizeData?.key,
         getTipoEntrada(prizeData),
-        prizeData?.title
+        prizeData?.title,
+        prizeData?.destino_boleto,
+        prizeData?.destino_label,
+        prizeData?.ticketChoice?.key,
+        prizeData?.ticketChoice?.label,
+        prizeData?.lugar
       ].filter(Boolean).join(' ').toLowerCase();
     }
 
@@ -900,13 +1131,21 @@
           emoji: '🎁',
           sala: salaSlug
         };
-        prizeData.folio = generatePrizeFolio(prizeData);
         try { localStorage.setItem('much_quiz_prize', JSON.stringify(prizeData)); } catch (_) { }
       }
 
-      if (!prizeData.folio) {
+      prizeData = applyTicketChoiceToPrize(prizeData);
+      try { localStorage.setItem('much_quiz_prize', JSON.stringify(prizeData)); } catch (_) { }
+
+      const expectedPrefix = getPrizeFolioPrefix(prizeData);
+      const currentFolio = String(prizeData.folio || '');
+      const folioMatchesChoice = expectedPrefix === 'PLAN'
+        ? currentFolio.startsWith('PLAN-')
+        : !currentFolio.startsWith('PLAN-');
+      if (!prizeData.folio || !folioMatchesChoice) {
         prizeData.folio = generatePrizeFolio(prizeData);
       }
+      try { localStorage.setItem('much_quiz_prize', JSON.stringify(prizeData)); } catch (_) { }
 
       // Guardar en BD
       try {

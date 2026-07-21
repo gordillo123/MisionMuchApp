@@ -1954,6 +1954,189 @@
       }
     }
 
+    body.streamlined-ticket {
+      width: 100%;
+      height: 100dvh;
+      min-height: 100dvh;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: clamp(6px, 1.6dvh, 16px) clamp(8px, 2vw, 16px);
+    }
+
+    body.streamlined-ticket .ticket-shell {
+      width: min(580px, 100%);
+      max-width: min(580px, 100%);
+      height: auto !important;
+      max-height: none !important;
+      overflow: visible !important;
+      transform-origin: center center;
+      transition: transform 0.16s ease;
+    }
+
+    body.streamlined-ticket .ticket-card {
+      display: block !important;
+      flex: none !important;
+      min-height: auto !important;
+      height: auto !important;
+      max-height: none !important;
+      overflow: hidden;
+    }
+
+    body.streamlined-ticket .ticket-download-slot .btn {
+      min-height: clamp(42px, 5.8dvh, 52px);
+      padding: 10px 12px;
+      font-size: clamp(0.82rem, 2.8vw, 0.98rem);
+      line-height: 1.08;
+    }
+
+    @media (max-width: 900px), (max-height: 900px) {
+      body.streamlined-ticket .ticket-shell {
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      body.streamlined-ticket .ticket-card {
+        border: 1px solid var(--border-color);
+        border-radius: clamp(16px, 4vw, 24px);
+        background: var(--ticket-bg);
+        box-shadow: 0 18px 52px rgba(2, 6, 23, .46);
+      }
+
+      body.streamlined-ticket .actions {
+        margin-top: clamp(4px, 1.2dvh, 12px);
+      }
+    }
+
+    @media (min-width: 700px) and (max-height: 900px) {
+      body.streamlined-ticket .ticket-card {
+        padding: 14px 16px;
+        border-radius: 20px;
+      }
+
+      body.streamlined-ticket .ticket-header {
+        gap: 6px;
+        margin-bottom: 8px;
+        padding-bottom: 10px;
+      }
+
+      body.streamlined-ticket .header-left {
+        min-height: 60px;
+      }
+
+      body.streamlined-ticket .logo-agencia {
+        width: min(74%, 260px);
+        max-width: 260px;
+        max-height: 66px;
+      }
+
+      body.streamlined-ticket .logo-destino {
+        height: 42px;
+        max-width: 140px;
+        padding: 3px 8px;
+      }
+
+      body.streamlined-ticket .planetarium-access-kicker {
+        margin-bottom: 8px;
+        padding: 4px 10px;
+        font-size: 0.68rem;
+      }
+
+      body.streamlined-ticket .congrats-banner {
+        margin-bottom: 10px;
+        padding: 8px 12px;
+      }
+
+      body.streamlined-ticket .congrats-text {
+        font-size: 1rem;
+      }
+
+      body.streamlined-ticket .main-group {
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+      }
+
+      body.streamlined-ticket .info-grid {
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+
+      body.streamlined-ticket .info-group,
+      body.streamlined-ticket .highlighted-group {
+        padding: 7px 9px;
+        border-radius: 10px;
+      }
+
+      body.streamlined-ticket .ticket-divider {
+        margin: 10px -16px;
+      }
+
+      body.streamlined-ticket .qr-section {
+        gap: 4px;
+        margin: 4px 0;
+      }
+
+      body.streamlined-ticket .qr-hint {
+        margin-bottom: 8px;
+      }
+
+      body.streamlined-ticket .ticket-restriction {
+        margin-bottom: 8px;
+        padding: 6px 12px;
+      }
+
+      body.streamlined-ticket .note {
+        display: none;
+      }
+
+      body.streamlined-ticket .ticket-download-slot {
+        margin-bottom: 8px;
+      }
+
+      body.streamlined-ticket .brand-strip {
+        width: calc(100% + 32px);
+        min-height: 46px;
+        margin: 8px -16px -14px;
+        padding: 7px 14px;
+      }
+
+      body.streamlined-ticket .brand-strip img {
+        height: 28px;
+        max-width: 92px;
+      }
+
+      body.streamlined-ticket .brand-strip .brand-much,
+      body.streamlined-ticket .brand-strip .brand-sbeel {
+        height: 32px;
+        max-width: 108px;
+      }
+
+      body.streamlined-ticket .brand-strip .brand-planetario {
+        height: 29px;
+        max-width: 96px;
+      }
+
+      body.streamlined-ticket .actions {
+        flex-direction: row;
+        gap: 10px;
+      }
+
+      body.streamlined-ticket .btn {
+        min-height: 42px;
+        padding: 9px 12px;
+        font-size: 0.82rem;
+      }
+    }
+
+    @media (max-height: 620px) {
+      body.streamlined-ticket .ticket-download-slot .btn {
+        min-height: 38px;
+        padding: 7px 10px;
+        font-size: 0.72rem;
+      }
+    }
+
     @media print {
       .actions {
         display: none;
@@ -2124,6 +2307,25 @@
         const date = value ? new Date(value) : fallback;
         return Number.isNaN(date.getTime()) ? fallback : date;
       };
+      const getTicketDestinationKey = (...values) => {
+        const descriptor = values.filter(Boolean).join(' ').toLowerCase();
+        if (descriptor.includes('planetario')) return 'planetario';
+        if (descriptor.includes('much') || descriptor.includes('museo')) return 'much';
+        return 'much';
+      };
+      const getDestinationMeta = (key) => key === 'planetario'
+        ? {
+            key: 'planetario',
+            acceso: 'Planetario',
+            titulo: 'Boleto para el Planetario',
+            ubicacion: 'Planetario Tuxtla'
+          }
+        : {
+            key: 'much',
+            acceso: 'MUCH',
+            titulo: 'Boleto MUCH',
+            ubicacion: 'Museo Chiapas de Ciencia y Tecnologia'
+          };
 
       const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
       let ticketData = null;
@@ -2133,8 +2335,9 @@
       if (hasUrlParams) {
         // Caso A: Redirección con parámetros URL
         const rawAccess = qs.get('acceso') || qs.get('premio') || qs.get('titulo') || 'MUCH';
-        const isPlanetario = /planetario/i.test(rawAccess) || /planetario/i.test(qs.get('destino') || '');
-        const acceso = isPlanetario ? 'Planetario' : rawAccess;
+        const destinationKey = getTicketDestinationKey(rawAccess, qs.get('destino'), qs.get('seccion'), qs.get('ubicacion'), qs.get('lugar'));
+        const destinationMeta = getDestinationMeta(destinationKey);
+        const acceso = destinationMeta.acceso;
         const folio = qs.get('folio') || qs.get('ticket') || '';
         const qr_token = qs.get('qr_token') || qs.get('token') || '';
         const estadoRaw = (qs.get('estado') || 'activo').toLowerCase();
@@ -2146,9 +2349,9 @@
           correo_usuario: qs.get('correo') || '—',
           telefono: qs.get('telefono') || '—',
           tipo_entrada: acceso,
-          destino_boleto: qs.get('destino') || '',
+          destino_boleto: destinationMeta.acceso,
           seccion_boleto: qs.get('seccion') || '',
-          lugar_boleto: qs.get('ubicacion') || qs.get('lugar') || '',
+          lugar_boleto: qs.get('ubicacion') || qs.get('lugar') || destinationMeta.ubicacion,
           folio: folio,
           qr_token: qr_token,
           qr_data: qs.get('qr_data') || '',
@@ -2235,10 +2438,16 @@
       }
 
       // ─── RENDERIZAR VISTA ───
+      const destinationKey = getTicketDestinationKey(ticketData.tipo_entrada, ticketData.destino_boleto, ticketData.seccion_boleto, ticketData.lugar_boleto);
+      const destinationMeta = getDestinationMeta(destinationKey);
+      const isPlanetario = destinationKey === 'planetario';
+      ticketData.tipo_entrada = destinationMeta.acceso;
+      ticketData.destino_boleto = destinationMeta.acceso;
+      ticketData.seccion_boleto = ticketData.seccion_boleto || destinationMeta.acceso;
+      ticketData.lugar_boleto = ticketData.lugar_boleto || destinationMeta.ubicacion;
       const acceso = ticketData.tipo_entrada;
-      const isPlanetario = /planetario/i.test(acceso) || /planetario/i.test(ticketData.destino_boleto || '');
-      const ubicacion = isPlanetario ? 'Planetario Tuxtla' : 'Museo Chiapas de Ciencia y Tecnología';
-      const titulo = ticketData.tipo_entrada || acceso || 'MUCH · Premio';
+      const ubicacion = destinationMeta.ubicacion;
+      const titulo = destinationMeta.titulo;
       const fechaEmision = parseDate(ticketData.valido_desde);
       const fechaVencimiento = parseDate(ticketData.valido_hasta, new Date(fechaEmision.getTime() + 7 * 24 * 60 * 60 * 1000));
       
@@ -2297,10 +2506,11 @@
       if (el('tTitle')) el('tTitle').textContent = titulo;
       
       const folioBoleto = ticketData.folio || 'Folio: ...';
+      const codigoBoleto = folioBoleto.replace('Folio:', '').trim() || ticketData.qr_token || '';
       if (el('tFolio')) el('tFolio').textContent = 'Folio: ' + folioBoleto.replace('Folio:', '').trim();
       
       const elAlfa = el('tAlfanumerico');
-      if (elAlfa) elAlfa.textContent = folioBoleto.replace('Folio:', '').trim();
+      if (elAlfa) elAlfa.textContent = codigoBoleto;
       
       if (el('tNombre')) el('tNombre').textContent = ticketData.nombre_usuario || '—';
       if (el('tPremio')) el('tPremio').textContent = acceso;
@@ -2331,10 +2541,38 @@
       // ─── GENERAR QR ───
       const container = document.getElementById("qrcode");
       const isStreamlinedTicket = document.body.classList.contains('streamlined-ticket');
-      const compactTicket = isStreamlinedTicket
-        && window.matchMedia('(max-width: 480px) and (max-height: 950px)').matches;
-      const spaciousTicket = isStreamlinedTicket
-        && window.matchMedia('(max-width: 480px) and (min-height: 701px) and (max-height: 950px)').matches;
+      const getResponsiveQrSize = () => {
+        const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 480;
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 800;
+        if (!isStreamlinedTicket) return 136;
+        if (viewportWidth <= 360 || viewportHeight <= 540) return 112;
+        if (viewportWidth <= 480 && viewportHeight <= 620) return 128;
+        if (viewportWidth <= 480 && viewportHeight <= 700) return 142;
+        if (viewportWidth <= 480 && viewportHeight <= 950) {
+          return Math.min(190, Math.max(154, Math.round(viewportHeight * 0.2)));
+        }
+        if (viewportWidth >= 700 && viewportHeight <= 900) return 136;
+        if (viewportHeight <= 760) return 142;
+        return 172;
+      };
+      const buildValidationUrl = (baseUrl) => {
+        const params = new URLSearchParams();
+        if (ticketData.qr_token) params.set('token', ticketData.qr_token);
+        if (ticketData.folio) params.set('folio', ticketData.folio);
+        if (codigoBoleto) params.set('codigo', codigoBoleto);
+
+        if (ticketData.qr_data) {
+          try {
+            const url = new URL(ticketData.qr_data, window.location.href);
+            if (ticketData.qr_token && !url.searchParams.get('token')) url.searchParams.set('token', ticketData.qr_token);
+            if (ticketData.folio && !url.searchParams.get('folio')) url.searchParams.set('folio', ticketData.folio);
+            if (codigoBoleto && !url.searchParams.get('codigo')) url.searchParams.set('codigo', codigoBoleto);
+            return url.toString();
+          } catch (_) {}
+        }
+
+        return `${baseUrl}/validar.html?${params.toString()}`;
+      };
 
       if (container) {
         const isLocal = window.location.href.includes('localhost') || window.location.href.includes('127.0.0.1');
@@ -2342,24 +2580,56 @@
           ? window.location.origin + '/Boleto_Digital'
           : 'https://gordillo123.github.io/MisionMuchApp/Boleto_Digital';
 
-        const validationUrl = ticketData.qr_data || (ticketData.qr_token
-          ? `${baseUrl}/validar.html?token=${encodeURIComponent(ticketData.qr_token)}`
-          : `${baseUrl}/validar.html?folio=${encodeURIComponent(ticketData.folio)}`);
+        const validationUrl = buildValidationUrl(baseUrl);
+        const qrSize = getResponsiveQrSize();
 
         console.log("QR apunta a:", validationUrl);
 
         container.innerHTML = '';
+        container.dataset.qrCode = validationUrl;
+        container.dataset.displayCode = codigoBoleto;
         new QRCode(container, {
           text: validationUrl,
-          width: spaciousTicket ? 190 : (compactTicket ? 154 : (isStreamlinedTicket ? 172 : 136)),
-          height: spaciousTicket ? 190 : (compactTicket ? 154 : (isStreamlinedTicket ? 172 : 136)),
+          width: qrSize,
+          height: qrSize,
           colorDark: "#000000",
           colorLight: "#ffffff",
           correctLevel: QRCode.CorrectLevel.M
         });
       } else {
-        container.innerHTML = '<span style="font-size:0.75rem;color:#94a3b8;">Código no disponible</span>';
+        console.warn('[BOLETO] Contenedor QR no disponible.');
       }
+
+      function fitTicketToViewport() {
+        const shell = document.querySelector('.ticket-shell');
+        if (!shell || !document.body.classList.contains('streamlined-ticket')) return;
+
+        shell.style.transform = 'none';
+        const rect = shell.getBoundingClientRect();
+        const gutterX = Math.max(12, Math.min(32, window.innerWidth * 0.04));
+        const gutterY = Math.max(10, Math.min(30, window.innerHeight * 0.035));
+        const availableWidth = Math.max(240, window.innerWidth - gutterX);
+        const availableHeight = Math.max(320, window.innerHeight - gutterY);
+        const nextScale = Math.min(1, availableWidth / Math.max(rect.width, 1), availableHeight / Math.max(rect.height, 1));
+        const fittedScale = Math.max(0.46, Math.floor(nextScale * 1000) / 1000);
+
+        shell.style.transform = `scale(${fittedScale})`;
+        document.body.dataset.ticketScale = String(fittedScale);
+      }
+
+      const scheduleTicketFit = () => {
+        requestAnimationFrame(() => {
+          fitTicketToViewport();
+          requestAnimationFrame(fitTicketToViewport);
+        });
+      };
+
+      scheduleTicketFit();
+      window.addEventListener('resize', scheduleTicketFit);
+      window.addEventListener('orientationchange', () => window.setTimeout(scheduleTicketFit, 120));
+      document.querySelectorAll('.ticket-shell img').forEach((image) => {
+        if (!image.complete) image.addEventListener('load', scheduleTicketFit, { once: true });
+      });
 
       // ─── DESCARGAR IMAGEN ───
       const btnDownload = document.getElementById('btnDownloadImage');
@@ -2371,29 +2641,47 @@
           let element = null;
           let origWidth = '';
           let origMaxW = '';
+          let shell = null;
+          let origShellTransform = '';
+          let origShellTransition = '';
           try {
             element = document.getElementById('boletoCaptura');
             if (!element) throw new Error('No se encontro el boleto para descargar.');
+            shell = element.closest('.ticket-shell');
             origWidth = element.style.width;
             origMaxW = element.style.maxWidth;
+            if (shell) {
+              origShellTransform = shell.style.transform;
+              origShellTransition = shell.style.transition;
+              shell.style.transition = 'none';
+              shell.style.transform = 'none';
+            }
             element.classList.add('is-capturing');
             element.style.width = '580px';
             element.style.maxWidth = '580px';
-            await new Promise((resolve) => requestAnimationFrame(resolve));
+            await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+            const captureWidth = Math.ceil(element.scrollWidth || element.getBoundingClientRect().width || 580);
+            const captureHeight = Math.ceil(element.scrollHeight || element.getBoundingClientRect().height || 820);
 
             const canvas = await html2canvas(element, {
-              scale: 3,
+              scale: Math.min(3, Math.max(2, window.devicePixelRatio || 2)),
               backgroundColor: null,
               useCORS: true,
-              windowWidth: 580
+              width: captureWidth,
+              height: captureHeight,
+              windowWidth: Math.max(captureWidth, document.documentElement.clientWidth),
+              windowHeight: Math.max(captureHeight, document.documentElement.clientHeight),
+              scrollX: 0,
+              scrollY: 0
             });
 
-            canvas.toBlob((blob) => {
-              const fileName = `Boleto_${isPlanetario ? 'Planetario' : 'MUCH'}_${ticketData.folio || Date.now()}.png`;
-              downloadImage(blob, fileName);
-              btnDownload.textContent = '¡Descargado! 📥';
-              setTimeout(() => { btnDownload.textContent = originalText; btnDownload.disabled = false; }, 2000);
-            }, 'image/png');
+            const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+            if (!blob) throw new Error('No se pudo crear la imagen del boleto.');
+            const fileName = `Boleto_${isPlanetario ? 'Planetario' : 'MUCH'}_${ticketData.folio || Date.now()}.png`;
+            downloadImage(blob, fileName);
+            btnDownload.textContent = 'Descargado';
+            setTimeout(() => { btnDownload.textContent = originalText; btnDownload.disabled = false; }, 2000);
           } catch (err) {
             console.error(err); alert("Error al descargar imagen.");
             btnDownload.textContent = originalText; btnDownload.disabled = false;
@@ -2403,12 +2691,24 @@
               element.style.maxWidth = origMaxW;
               element.classList.remove('is-capturing');
             }
+            if (shell) {
+              shell.style.transform = origShellTransform;
+              shell.style.transition = origShellTransition;
+            }
+            scheduleTicketFit();
           }
         });
       }
 
       function downloadImage(blob, fileName) {
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName || 'Boleto.png'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName || 'Boleto.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
       }
 
       // ─── SALIDA / FAREWELL OVERLAY ───

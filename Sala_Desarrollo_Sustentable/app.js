@@ -156,13 +156,19 @@ const DESARROLLO_REQUIRED_QUESTIONS = [
 const DESARROLLO_REQUIRED_STATION_KEY = `${STATION_KEY}-nuevas-v1`;
 const DESARROLLO_OPTIONAL_STATION_KEY = `${STATION_KEY}-complemento-v1`;
 // Función para mezclar arrays
-const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
+const shuffle = a => window.MuchQuestionPool?.shuffleArray
+  ? window.MuchQuestionPool.shuffleArray(a)
+  : a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
 
 function buildCorrectPositionPlan(count) {
   return shuffle(Array.from({ length: count }, (_, index) => index % 4));
 }
 
 function shuffleQuestionOptions(question, preferredCorrectIndex) {
+  if (window.MuchQuestionPool?.shuffleQuestionOptions) {
+    return window.MuchQuestionPool.shuffleQuestionOptions(question, preferredCorrectIndex);
+  }
+
   let sourceCorrectIndex = Number(question.correctIndex);
   const optionItems = (question.options || []).map((label, index) => ({
     label,
