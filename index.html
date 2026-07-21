@@ -1536,8 +1536,13 @@
       box-shadow: 0 18px 0px var(--bg-deep);
     }
 
-    /* Ocultar el botón hamburguesa cuando el login está abierto */
-    body:has(#loginOverlay.open) #hamburgerBtn {
+    /* Ocultar el botón hamburguesa cuando una interfaz interna está abierta */
+    body.internal-interface-open #hamburgerBtn,
+    body:has(#loginOverlay.open) #hamburgerBtn,
+    body:has(#profileOverlay.open) #hamburgerBtn,
+    body:has(#scoresOverlay.open) #hamburgerBtn,
+    body:has(#rulesOverlay.open) #hamburgerBtn,
+    body:has(#avatarOverlay.open) #hamburgerBtn {
       display: none !important;
     }
 
@@ -13453,6 +13458,26 @@
         }
       }, 500);
 
+      const INTERNAL_INTERFACE_IDS = ['loginOverlay', 'profileOverlay', 'scoresOverlay', 'rulesOverlay', 'avatarOverlay'];
+
+      function isInternalInterfaceOpen() {
+        return INTERNAL_INTERFACE_IDS.some((id) => document.getElementById(id)?.classList.contains('open'));
+      }
+
+      function updateHamburgerVisibility(viewId = getActiveViewId()) {
+        const hamburger = document.getElementById('hamburgerBtn');
+        if (!hamburger) return;
+
+        const shouldHide = viewId !== 'viewLanding' || isInternalInterfaceOpen();
+        document.body.classList.toggle('internal-interface-open', shouldHide);
+
+        if (shouldHide) {
+          hamburger.style.setProperty('display', 'none', 'important');
+          closeMobileMenu();
+        } else {
+          hamburger.style.removeProperty('display');
+        }
+      }
       function showView(viewId) {
         if (viewId !== 'viewLanding' && redirectInternalUserIfNeeded()) return;
 
@@ -13483,21 +13508,7 @@
               moveToStation(savedStation);
             });
           }
-          
-          // NUEVO: Mostrar el botón hamburguesa SÓLO en el inicio (viewLanding)
-          const hamburger = document.getElementById('hamburgerBtn');
-          if (hamburger) {
-            if (viewId === 'viewLanding') {
-              hamburger.style.setProperty('display', '', 'important');
-            } else {
-              hamburger.style.setProperty('display', 'none', 'important');
-              const navLinks = document.querySelector('.nav-links');
-              const mobileBackdrop = document.getElementById('mobileNavBackdrop');
-              if (navLinks) navLinks.classList.remove('open');
-              hamburger.classList.remove('active');
-              if (mobileBackdrop) mobileBackdrop.classList.remove('visible');
-            }
-          }
+          updateHamburgerVisibility(viewId);
           
           syncSoundForView(viewId, true);
 
@@ -13518,6 +13529,14 @@
         if (backdrop) backdrop.classList.remove('visible');
       }
 
+      INTERNAL_INTERFACE_IDS.forEach((id) => {
+        const overlayEl = document.getElementById(id);
+        if (!overlayEl) return;
+
+        new MutationObserver(() => updateHamburgerVisibility())
+          .observe(overlayEl, { attributes: true, attributeFilter: ['class'] });
+      });
+      updateHamburgerVisibility();
       function ensureMobileNavMenu() {
         const menu = document.querySelector('.nav-links');
         if (!menu) return;
