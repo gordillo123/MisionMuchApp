@@ -178,7 +178,7 @@ async function completeRoute(user, duplicateCheck = false) {
     [user.id_usuario]
   );
 
-  assert.equal(Number(summary.total_rows), 6, 'Debe existir una fila por estacion');
+  assert.equal(Number(summary.total_rows), 6, 'Debe existir una fila por estación');
   assert.equal(Number(summary.approved_count), 6, 'Las 6 estaciones deben quedar aprobadas');
   assert.equal(Number(summary.total_score), 65, 'Los puntos no deben duplicarse ni bajar');
 
@@ -204,7 +204,7 @@ function assertTicketCore(ticket, expectedDestino) {
 async function claimTicket(user, destino) {
   const lugar = destino === 'Planetario'
     ? 'Planetario Tuxtla'
-    : 'Museo Chiapas de Ciencia y Tecnologia';
+    : 'Museo Chiapas de Ciencia y Tecnología';
   const { data } = await request('POST', '/api/boletos', {
     headers: { 'x-user-id': String(user.id_usuario) },
     expected: [200, 201],
@@ -247,7 +247,7 @@ async function verifyMainFlow() {
 
   for (const stationId of [3, 4, 5]) {
     const questions = await request('GET', `/api/preguntas/${stationId}`);
-    assert.ok(questions.data.length >= 3, `Estacion ${stationId} sin preguntas suficientes`);
+    assert.ok(questions.data.length >= 3, `Estación ${stationId} sin preguntas suficientes`);
     for (const question of questions.data) {
       const correctCount = question.respuestas.filter((answer) => answer.es_correcta).length;
       assert.ok(question.respuestas.length >= 2, `Pregunta ${question.id_pregunta} sin respuestas suficientes`);
@@ -255,7 +255,7 @@ async function verifyMainFlow() {
       assert.ok(question.respuestas.some((answer) => !answer.es_correcta));
     }
   }
-  mark('Preguntas y respuestas', 'MySQL devuelve solo preguntas jugables con respuestas validas');
+  mark('Preguntas y respuestas', 'MySQL devuelve solo preguntas jugables con respuestas válidas');
 
   const answersUser = await createUser('answers', 'Codex Answers E2E', '9610000002');
   const questions = (await request('GET', '/api/preguntas/3')).data;
@@ -360,7 +360,7 @@ async function verifyMainFlow() {
   assert.equal(byFolio.data.qr_token, muchTicket.qr_token);
   assert.equal(byQr.data.folio, muchTicket.folio);
   assert.equal(byFolio.data.telefono_usuario, '9610000004');
-  mark('Folio, QR y telefono', 'Consultas publicas coinciden con MySQL');
+  mark('Folio, QR y teléfono', 'Consultas públicas coinciden con MySQL');
 
   const taquillaFolio = await request('GET', `/api/taquilla/boleto/folio/${muchTicket.folio}`, {
     headers: adminHeaders

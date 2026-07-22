@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MisiÃ³n MUCH - Panel Administrativo</title>
-  <meta name="description" content="Panel administrativo y de control de taquilla para el museo MisiÃ³n MUCH.">
+  <title>Misión MUCH - Panel Administrativo</title>
+  <meta name="description" content="Panel administrativo y de control de taquilla para el museo Misión MUCH.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -1665,12 +1665,12 @@
 
 <body class="splash-active">
   <!-- Splash inicial con logo institucional -->
-  <div class="splash-screen" id="adminSplashScreen" aria-label="Cargando MisiÃ³n MUCH" role="status">
+  <div class="splash-screen" id="adminSplashScreen" aria-label="Cargando Misión MUCH" role="status">
     <div class="splash-logo-wrap">
       <img
         class="splash-logo"
         src="assets/logo-institucional-aditech.png"
-        alt="Humanismo que Transforma - Agencia Digital TecnolÃ³gica del Estado"
+        alt="Humanismo que Transforma - Agencia Digital Tecnológica del Estado"
       >
     </div>
   </div>
@@ -1681,10 +1681,10 @@
       <div class="admin-auth-layout">
         <div class="admin-login-modal">
           <div class="modal-header">
-            <div class="login-badge">ðŸ”</div>
+            <div class="login-badge">🔐</div>
             <h2 class="modal-title">Entra con Google</h2>
             <p class="login-copy">
-              Para acceder al panel de administraciÃ³n o taquilla, inicia sesiÃ³n con tu cuenta institucional de Google.
+              Para acceder al panel de administración o taquilla, inicia sesión con tu cuenta institucional de Google.
             </p>
           </div>
 
@@ -1707,7 +1707,7 @@
     <footer class="admin-auth-footer">
       <div class="footer-container">
         <div class="footer-logos">
-          <img src="entrada-much/logo-much.png" alt="MUCH Â· Museo Chiapas" class="footer-logo footer-logo-much">
+          <img src="entrada-much/logo-much.png" alt="MUCH · Museo Chiapas" class="footer-logo footer-logo-much">
           <img src="entrada-much/logo-sata.png" alt="SATA" class="footer-logo footer-logo-sata">
           <img src="Sbeel_Dinosaurios/logo-sbeel-dinosaurios.png" alt="SBEEL Dinosaurios" class="footer-logo footer-logo-sbeel">
           <img src="assets/logo-planetario-tuxtla.svg" alt="Planetario Tuxtla" class="footer-logo footer-logo-planetario">
@@ -1719,13 +1719,13 @@
   <!-- Lock screen Denied Access -->
   <section class="denied-screen" id="deniedScreen" hidden>
     <div class="denied-card">
-      <div class="denied-badge">ðŸ”</div>
+      <div class="denied-badge">🔐</div>
       <h2>Acceso denegado</h2>
       <p id="deniedMessage">
-        Esta cuenta no tiene permisos suficientes para acceder al panel de administraciÃ³n. Por favor, inicia sesiÃ³n con una cuenta autorizada del MUCH o Planetario.
+        Esta cuenta no tiene permisos suficientes para acceder al panel de administración. Por favor, inicia sesión con una cuenta autorizada del MUCH o Planetario.
       </p>
       <button class="btn btn-solid" id="btnDeniedLogout" type="button" style="justify-self: center;">
-        â† Cerrar sesiÃ³n e intentar con otra cuenta
+        ← Cerrar sesión e intentar con otra cuenta
       </button>
     </div>
   </section>
@@ -1736,8 +1736,8 @@
     <aside class="sidebar">
       <div class="sidebar-brand" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div class="sidebar-logo">ðŸ—‚ï¸</div>
-          <h1 class="sidebar-title">MisiÃ³n MUCH</h1>
+          <div class="sidebar-logo">🗂️</div>
+          <h1 class="sidebar-title">Misión MUCH</h1>
         </div>
         <button class="btn btn-soft admin-sidebar-close" id="adminSidebarClose" type="button" style="display: none; border: 0; padding: 4px 8px; font-size: 1.2rem; cursor: pointer; color: var(--text-soft);">
           &times;
@@ -1758,8 +1758,8 @@
 
       <div class="sidebar-footer">
         <span class="sync-indicator" id="syncStatusIndicator">Datos sincronizados</span>
-        <a class="btn btn-solid" href="./index.html?view=landing" style="justify-content: center;">ðŸ  Regresar al Inicio</a>
-        <button class="btn btn-soft" id="btnLogoutAdmin" type="button">Cerrar sesiÃ³n ðŸšª</button>
+        <a class="btn btn-solid" href="./index.html?view=landing" style="justify-content: center;">🏠 Regresar al Inicio</a>
+        <button class="btn btn-soft" id="btnLogoutAdmin" type="button">Cerrar sesión 🚪</button>
       </div>
     </aside>
 
@@ -1768,7 +1768,7 @@
       <header class="topbar">
         <div class="topbar-title-wrap" style="display: flex; align-items: center; gap: 12px; width: 100%;">
           <button class="btn btn-soft admin-menu-toggle" id="adminMenuToggle" type="button" style="display: none; padding: 10px 14px; font-size: 1.2rem; border-radius: 12px; cursor: pointer; background: rgba(255,255,255,0.06); border: 1px solid var(--border);">
-            â˜°
+            ☰
           </button>
           <div>
             <h2 id="topbarTitle" style="margin: 0;">Cargando...</h2>
@@ -1776,8 +1776,8 @@
           </div>
         </div>
         <div class="topbar-actions">
-          <button class="btn btn-soft" id="btnRefreshTop" type="button">ðŸ”„ Actualizar</button>
-          <a class="btn btn-soft" href="./index.html?view=landing">ðŸ  Regresar al Inicio</a>
+          <button class="btn btn-soft" id="btnRefreshTop" type="button">🔄 Actualizar</button>
+          <a class="btn btn-soft" href="./index.html?view=landing">🏠 Regresar al Inicio</a>
         </div>
       </header>
 
@@ -1786,10 +1786,10 @@
         <!-- Views rendered dynamically in Javascript -->
       </div>
 
-      <!-- BotÃ³n de regreso al inicio en el pie del panel -->
+      <!-- Botón de regreso al inicio en el pie del panel -->
       <div class="main-footer-actions" style="margin-top: auto; display: flex; justify-content: center; padding-top: 24px; border-top: 1px solid var(--border);">
         <a class="btn btn-solid" href="./index.html?view=landing" style="padding: 12px 28px; font-size: 0.95rem;">
-          ðŸ  Regresar al Inicio
+          🏠 Regresar al Inicio
         </a>
       </div>
     </main>
@@ -1800,7 +1800,7 @@
     <div class="modal-card">
       <div class="modal-head">
         <h3>Asignar Roles a Usuario</h3>
-        <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.8rem;" onclick="window.closeRoleModal()">âœ•</button>
+        <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.8rem;" onclick="window.closeRoleModal()">✕</button>
       </div>
       <div class="modal-body">
         <p class="admin-auth-copy" style="text-align: left;" id="roleModalUserInfo">
@@ -1811,15 +1811,15 @@
           <div style="display: flex; flex-direction: column; gap: 10px;">
             <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
               <input type="checkbox" id="chkRoleUsuario" value="1" style="width: 18px; height: 18px;">
-              <strong>Usuario Normal</strong> (Permisos de recorrido y juego estÃ¡ndar)
+              <strong>Usuario Normal</strong> (Permisos de recorrido y juego estándar)
             </label>
             <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
               <input type="checkbox" id="chkRoleAdmin" value="2" style="width: 18px; height: 18px;">
-              <strong>Administrador</strong> (Acceso total al panel y modificaciÃ³n)
+              <strong>Administrador</strong> (Acceso total al panel y modificación)
             </label>
             <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
               <input type="checkbox" id="chkRoleTaquilla" value="3" style="width: 18px; height: 18px;">
-              <strong>Operador de Taquilla</strong> (Escaneo QR, canje y bÃºsqueda de boletos)
+              <strong>Operador de Taquilla</strong> (Escaneo QR, canje y búsqueda de boletos)
             </label>
           </div>
         </div>
@@ -1861,18 +1861,18 @@
     };
 
     const TABS_CONFIG = [
-      { id: 'dashboard', name: 'Dashboard', icon: 'ðŸ“Š', desc: 'Resumen global del estado del museo y mÃ©tricas.', adminOnly: true },
-      { id: 'usuarios', name: 'Usuarios', icon: 'ðŸ‘¥', desc: 'Listado completo de visitantes y control de accesos.', adminOnly: true },
-      // { id: 'roles', name: 'Roles y Permisos', icon: 'ðŸ”', desc: 'Matriz de asignaciÃ³n de privilegios de usuario.', adminOnly: true },
-      { id: 'estaciones', name: 'Estaciones', icon: 'ðŸ—ºï¸', desc: 'Estado y configuraciÃ³n de las salas del museo.', adminOnly: true },
-      // { id: 'preguntas', name: 'Preguntas y Trivia', icon: 'â“', desc: 'AdministraciÃ³n de preguntas por estaciÃ³n.', adminOnly: true },
-      { id: 'intentos', name: 'Intentos de Trivia', icon: 'ðŸ“', desc: 'Respuestas enviadas por los usuarios en las trivias.', adminOnly: true },
-      // { id: 'minijuegos', name: 'Minijuegos', icon: 'ðŸŽ®', desc: 'Registros de partidas del juego del dinosaurio.', adminOnly: true },
-      { id: 'boletos', name: 'Boletos Ganados', icon: 'ðŸŽŸï¸', desc: 'Control de folios generados para los visitantes.', adminOnly: true },
-      { id: 'tiempo-juego', name: 'ConfiguraciÃ³n del tiempo de juego', icon: 'â±ï¸', desc: 'Control de bloqueo entre participaciones y historial de premios.', adminOnly: true },
-      // { id: 'movimientos', name: 'Movimientos de Boletos', icon: 'ðŸ”„', desc: 'Log de auditorÃ­a especÃ­fico para folios.', adminOnly: true },
-      { id: 'taquilla', name: 'Taquilla y Escaneos', icon: 'ðŸ”', desc: 'ValidaciÃ³n manual, escaneo de cÃ³digos QR e historial de lecturas.', adminOnly: false },
-      { id: 'auditoria', name: 'AuditorÃ­a de Acciones', icon: 'ðŸ›¡ï¸', desc: 'Logs de seguridad y cambios operacionales.', adminOnly: true }
+      { id: 'dashboard', name: 'Dashboard', icon: '📊', desc: 'Resumen global del estado del museo y métricas.', adminOnly: true },
+      { id: 'usuarios', name: 'Usuarios', icon: '👥', desc: 'Listado completo de visitantes y control de accesos.', adminOnly: true },
+      // { id: 'roles', name: 'Roles y Permisos', icon: '🔐', desc: 'Matriz de asignación de privilegios de usuario.', adminOnly: true },
+      { id: 'estaciones', name: 'Estaciones', icon: '🗺️', desc: 'Estado y configuración de las salas del museo.', adminOnly: true },
+      // { id: 'preguntas', name: 'Preguntas y Trivia', icon: '❓', desc: 'Administración de preguntas por estación.', adminOnly: true },
+      { id: 'intentos', name: 'Intentos de Trivia', icon: '📝', desc: 'Respuestas enviadas por los usuarios en las trivias.', adminOnly: true },
+      // { id: 'minijuegos', name: 'Minijuegos', icon: '🎮', desc: 'Registros de partidas del juego del dinosaurio.', adminOnly: true },
+      { id: 'boletos', name: 'Boletos Ganados', icon: '🎟️', desc: 'Control de folios generados para los visitantes.', adminOnly: true },
+      { id: 'tiempo-juego', name: 'Configuración del tiempo de juego', icon: '⏱️', desc: 'Control de bloqueo entre participaciones y historial de premios.', adminOnly: true },
+      // { id: 'movimientos', name: 'Movimientos de Boletos', icon: '🔄', desc: 'Log de auditoría específico para folios.', adminOnly: true },
+      { id: 'taquilla', name: 'Taquilla y Escaneos', icon: '🔍', desc: 'Validación manual, escaneo de códigos QR e historial de lecturas.', adminOnly: false },
+      { id: 'auditoria', name: 'Auditoría de Acciones', icon: '🛡️', desc: 'Logs de seguridad y cambios operacionales.', adminOnly: true }
     ];
 
     const scannerState = {
@@ -2015,14 +2015,14 @@
       const hasAny = Boolean(day || month || year);
       if (!hasAny) return { iso: '', complete: true, error: '' };
       if (!day || !month || year.length < 4) {
-        return { iso: '', complete: false, error: 'Completa dia, mes y aÃ±o para aplicar el filtro.' };
+        return { iso: '', complete: false, error: 'Completa dia, mes y año para aplicar el filtro.' };
       }
 
       const dayNumber = Number(day);
       const monthNumber = Number(month);
       const yearNumber = Number(year);
       if (monthNumber < 1 || monthNumber > 12 || yearNumber < 2000) {
-        return { iso: '', complete: true, error: 'Revisa la fecha: usa dia, mes y aÃ±o validos.' };
+        return { iso: '', complete: true, error: 'Revisa la fecha: usa dia, mes y año validos.' };
       }
 
       const maxDay = new Date(yearNumber, monthNumber, 0).getDate();
@@ -2058,7 +2058,7 @@
           <div class="date-parts-row">
             <input class="form-input date-part-input" id="dateFilter${prefix}Day" type="text" inputmode="numeric" maxlength="2" placeholder="DD" aria-label="${label} dia" value="${parts.day}" oninput="window.handleDatePartChange('${filterKey}')">
             <input class="form-input date-part-input" id="dateFilter${prefix}Month" type="text" inputmode="numeric" maxlength="2" placeholder="MM" aria-label="${label} mes" value="${parts.month}" oninput="window.handleDatePartChange('${filterKey}')">
-            <input class="form-input date-part-input" id="dateFilter${prefix}Year" type="text" inputmode="numeric" maxlength="4" placeholder="AAAA" aria-label="${label} aÃ±o" value="${parts.year}" oninput="window.handleDatePartChange('${filterKey}')">
+            <input class="form-input date-part-input" id="dateFilter${prefix}Year" type="text" inputmode="numeric" maxlength="4" placeholder="AAAA" aria-label="${label} año" value="${parts.year}" oninput="window.handleDatePartChange('${filterKey}')">
             <span class="date-picker-wrap">
               <button class="date-picker-button" type="button" aria-label="Elegir ${label} en calendario" onclick="window.openDatePicker('${filterKey}')">&#128197;</button>
               <input class="native-date-picker" id="dateFilter${prefix}Picker" type="date" value="${state.dateFilters[filterKey] || ''}" aria-label="Calendario ${label}" onchange="window.handleDatePickerChange('${filterKey}', this.value)">
@@ -2133,7 +2133,7 @@
       if (!dateValue) return false;
       const rDate = new Date(dateValue);
       if (Number.isNaN(rDate.getTime())) return false;
-      
+
       const localYear = rDate.getFullYear();
       const localMonth = String(rDate.getMonth() + 1).padStart(2, '0');
       const localDay = String(rDate.getDate()).padStart(2, '0');
@@ -2272,7 +2272,7 @@
       const partsError = startParts.error || endParts.error;
       if (partsError || !startParts.complete || !endParts.complete) {
         const msg = document.getElementById('dateFilterMessage');
-        const message = partsError || 'Completa dia, mes y aÃ±o para aplicar el filtro.';
+        const message = partsError || 'Completa dia, mes y año para aplicar el filtro.';
         if (msg) {
           msg.textContent = message;
           msg.classList.add('error');
@@ -2318,8 +2318,8 @@
     // Core Auth Initialization
     async function initAuth() {
       const messageEl = document.getElementById('adminAuthMessage');
-      if (messageEl) messageEl.textContent = 'Iniciando validaciÃ³n de sesiÃ³n institucional...';
-      
+      if (messageEl) messageEl.textContent = 'Iniciando validación de sesión institucional...';
+
       try {
         const localUser = JSON.parse(localStorage.getItem('much_google_user') || 'null');
         if (!localUser) {
@@ -2330,7 +2330,7 @@
         // Verify real roles in the MySQL DB
         const res = await fetch(`${API_BASE_URL}/api/usuarios/${localUser.id_usuario}/roles`);
         if (!res.ok) throw new Error('No se pudieron consultar los roles del usuario.');
-        
+
         const data = await res.json();
         const userWithRoles = { ...localUser, roles: data.roles || [] };
         const access = window.MuchRoleAccess
@@ -2347,7 +2347,7 @@
         localStorage.setItem('much_google_user', JSON.stringify(userWithRoles));
 
         if (!state.isAdmin && !state.isTaquilla) {
-          showAccessDenied('Esta cuenta no cuenta con permisos de taquilla ni de administraciÃ³n.');
+          showAccessDenied('Esta cuenta no cuenta con permisos de taquilla ni de administración.');
           return;
         }
 
@@ -2374,8 +2374,8 @@
 
         setupUI();
       } catch (error) {
-        console.error('Error al inicializar sesiÃ³n:', error);
-        showAuthBarrier('Error al conectar con la base de datos o sesiÃ³n caducada.');
+        console.error('Error al inicializar sesión:', error);
+        showAuthBarrier('Error al conectar con la base de datos o sesión caducada.');
       }
     }
 
@@ -2409,7 +2409,7 @@
       // User info
       document.getElementById('userAvatar').src = state.user?.avatar_url || state.user?.picture || 'avatars/dino1.png';
       document.getElementById('userName').textContent = state.user?.nombre || state.user?.name || 'Administrador';
-      
+
       let roleLabel = 'Usuario';
       if (state.isAdmin) roleLabel = 'Administrador';
       else if (state.isTaquilla) roleLabel = 'Taquilla';
@@ -2443,7 +2443,7 @@
           return;
         }
 
-        // Ocultar pestaÃ±as adminOnly para usuarios que no son admin
+        // Ocultar pestañas adminOnly para usuarios que no son admin
         if (tab.adminOnly && !state.isAdmin) return;
 
         const el = document.createElement('li');
@@ -2482,7 +2482,7 @@
     async function loadTabContent(silent = false) {
       if (state.loading) return;
       if (!silent) showLoadingState();
-      
+
       const indicator = document.getElementById('syncStatusIndicator');
       indicator.textContent = 'Sincronizando...';
       indicator.className = 'sync-indicator syncing';
@@ -2490,7 +2490,7 @@
       try {
         if (state.activeTab === 'dashboard') {
           const res = await fetch(buildApiUrl('/api/admin/dashboard-stats'), { headers: getHeaders() });
-          if (!res.ok) throw new Error('Error al cargar mÃ©tricas del Dashboard.');
+          if (!res.ok) throw new Error('Error al cargar métricas del Dashboard.');
           state.stats = await res.json();
           renderDashboardView();
         } else {
@@ -2501,22 +2501,22 @@
               fetch(buildApiUrl('/api/admin/movimientos-boletos'), { headers: getHeaders() })
             ]);
             if (!resBoletos.ok || !resMovimientos.ok) throw new Error('Error al cargar datos de boletos.');
-            
+
             const boletos = await resBoletos.json();
             const movimientos = await resMovimientos.json();
-            
+
             state.records = boletos.map(b => ({
               ...b,
               movimientos: movimientos.filter(m => m.id_boleto === b.id_boleto)
             }));
-            
+
             renderActiveView();
           } else if (state.activeTab === 'tiempo-juego') {
             const [resConfig, resUsuarios] = await Promise.all([
               fetch(buildApiUrl('/api/admin/configuracion-juego', false), { headers: getHeaders() }),
               fetch(buildApiUrl('/api/admin/bloqueos-juego', false), { headers: getHeaders() })
             ]);
-            if (!resConfig.ok || !resUsuarios.ok) throw new Error('Error al cargar configuraciÃ³n del tiempo de juego.');
+            if (!resConfig.ok || !resUsuarios.ok) throw new Error('Error al cargar configuración del tiempo de juego.');
 
             state.playtimeConfig = await resConfig.json();
             state.records = await resUsuarios.json();
@@ -2565,8 +2565,8 @@
       const container = document.getElementById('viewContainers');
       container.innerHTML = `
         <div class="panel empty-state">
-          <span class="empty-state-icon">â³</span>
-          <strong>Sincronizando informaciÃ³n...</strong>
+          <span class="empty-state-icon">⏳</span>
+          <strong>Sincronizando información...</strong>
           <span>Conectando con la base de datos de MySQL local en el puerto 3306.</span>
         </div>
       `;
@@ -2576,10 +2576,10 @@
       const container = document.getElementById('viewContainers');
       container.innerHTML = `
         <div class="panel empty-state" style="border-color: rgba(239,68,68,0.3)">
-          <span class="empty-state-icon" style="color: var(--danger)">â›”</span>
-          <strong>Error de conexiÃ³n</strong>
+          <span class="empty-state-icon" style="color: var(--danger)">⛔</span>
+          <strong>Error de conexión</strong>
           <span>${escapeHtml(msg)}</span>
-          <button class="btn btn-solid" style="margin-top: 15px;" onclick="window.loadTabContent()">Reintentar conexiÃ³n</button>
+          <button class="btn btn-solid" style="margin-top: 15px;" onclick="window.loadTabContent()">Reintentar conexión</button>
         </div>
       `;
     }
@@ -2600,7 +2600,7 @@
           <div class="panel empty-state" style="margin-bottom: 20px;">
             <span class="empty-state-icon">&#128269;</span>
             <strong>No hay datos disponibles para esta fecha</strong>
-            <span>Selecciona otro rango de fechas para consultar tablas, tarjetas y estadisticas.</span>
+            <span>Selecciona otro rango de fechas para consultar tablas, tarjetas y estadísticas.</span>
           </div>
         `}
         <div class="metrics-grid">
@@ -2657,17 +2657,17 @@
         <div class="panel" style="margin-top: 24px;">
           <div class="panel-head">
             <div class="panel-title-wrap">
-              <h3>Intentos Realizados por Estacion</h3>
-              <p>Metricas por estacion dentro del rango de fechas seleccionado.</p>
+              <h3>Intentos realizados por estación</h3>
+              <p>Métricas por estación dentro del rango de fechas seleccionado.</p>
             </div>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Estacion</th>
-                  <th>Intentos Totales</th>
-                  <th>Popularidad Relativa</th>
+                  <th>Estación</th>
+                  <th>Intentos totales</th>
+                  <th>Popularidad relativa</th>
                 </tr>
               </thead>
               <tbody>
@@ -2700,7 +2700,7 @@
 
     function renderActiveView() {
       const container = document.getElementById('viewContainers');
-      
+
       // Determine columns based on Active tab
       let title = '';
       let placeholder = 'Buscar registros...';
@@ -2734,7 +2734,7 @@
           </div>
         `;
       } else if (state.activeTab === 'intentos') {
-        placeholder = 'Buscar por usuario o estaciÃ³n...';
+        placeholder = 'Buscar por usuario o estación...';
         filterHTML = `
           <div class="filter-chips">
             <button class="filter-chip ${filter === 'all' ? 'active' : ''}" onclick="window.setTabFilter('all')">Todos</button>
@@ -2743,7 +2743,7 @@
           </div>
         `;
       } else if (state.activeTab === 'auditoria') {
-        placeholder = 'Buscar en logs de auditorÃ­a...';
+        placeholder = 'Buscar en logs de auditoría...';
         filterHTML = `
           <div class="filter-chips">
             <button class="filter-chip ${filter === 'all' ? 'active' : ''}" onclick="window.setTabFilter('all')">Todos</button>
@@ -2774,7 +2774,7 @@
         <div class="panel">
           <div class="toolbar">
             <div class="search-wrap">
-              <span>ðŸ”Ž</span>
+              <span>🔎</span>
               <input id="searchInput" type="search" placeholder="${placeholder}" value="${escapeHtml(query)}" oninput="window.handleSearch(this.value)">
             </div>
             ${filterHTML}
@@ -2806,9 +2806,9 @@
         <div class="pagination-controls" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-top: 1px solid var(--border);">
           <span style="font-size: 0.88rem; color: var(--text-soft);">Mostrando ${start + 1} - ${Math.min(end, totalRecords)} de ${totalRecords} registros</span>
           <div style="display: flex; gap: 8px;">
-            <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.82rem; cursor: pointer;" ${state.currentPage === 1 ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''} onclick="window.changePage(${state.currentPage - 1})">â† Anterior</button>
-            <span style="font-size: 0.88rem; color: var(--text-main); font-weight: 700; align-self: center; padding: 0 8px;">PÃ¡g. ${state.currentPage} / ${totalPages}</span>
-            <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.82rem; cursor: pointer;" ${state.currentPage === totalPages ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''} onclick="window.changePage(${state.currentPage + 1})">Siguiente â†’</button>
+            <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.82rem; cursor: pointer;" ${state.currentPage === 1 ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''} onclick="window.changePage(${state.currentPage - 1})">← Anterior</button>
+            <span style="font-size: 0.88rem; color: var(--text-main); font-weight: 700; align-self: center; padding: 0 8px;">Pág. ${state.currentPage} / ${totalPages}</span>
+            <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.82rem; cursor: pointer;" ${state.currentPage === totalPages ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''} onclick="window.changePage(${state.currentPage + 1})">Siguiente →</button>
           </div>
         </div>
       `;
@@ -2965,14 +2965,14 @@
 
       container.innerHTML = `
         <div class="panel" style="margin-bottom: 20px;">
-          <h3 style="margin: 0 0 16px; font-family: 'Fredoka', sans-serif; color: var(--accent);">ConfiguraciÃ³n del tiempo de juego</h3>
+          <h3 style="margin: 0 0 16px; font-family: 'Fredoka', sans-serif; color: var(--accent);">Configuración del tiempo de juego</h3>
           <p style="margin: 0 0 20px; color: var(--text-soft); font-size: 0.92rem;">
-            Define cuÃ¡ntos dÃ­as debe esperar un usuario desde que completa todas las estaciones.
-            Al guardar, las fechas de desbloqueo activas se recalculan automÃ¡ticamente desde la fecha real de finalizaciÃ³n.
+            Define cuántos días debe esperar un usuario desde que completa todas las estaciones.
+            Al guardar, las fechas de desbloqueo activas se recalculan automáticamente desde la fecha real de finalización.
           </p>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; align-items: end;">
             <div>
-              <label class="form-label" for="playtimeCantidad">DÃ­as de bloqueo</label>
+              <label class="form-label" for="playtimeCantidad">Días de bloqueo</label>
               <input class="form-input" id="playtimeCantidad" type="number" min="1" max="3650" step="1" value="${Number(config.cantidad || 7)}">
             </div>
             <div>
@@ -2986,15 +2986,15 @@
             </div>
           </div>
           <p style="margin: 14px 0 0; font-size: 0.82rem; color: var(--text-dim);">
-            Valor actual: ${Number(config.cantidad || 7)} dÃ­a${Number(config.cantidad || 7) === 1 ? '' : 's'}${config.bloqueo_activo === false ? ' (bloqueo desactivado)' : ''}.
-            ${config.updated_at ? `Ãšltima actualizaciÃ³n: ${formatDate(config.updated_at, true)}.` : ''}
+            Valor actual: ${Number(config.cantidad || 7)} día${Number(config.cantidad || 7) === 1 ? '' : 's'}${config.bloqueo_activo === false ? ' (bloqueo desactivado)' : ''}.
+            ${config.updated_at ? `Última actualización: ${formatDate(config.updated_at, true)}.` : ''}
           </p>
         </div>
 
         <div class="panel">
           <div class="toolbar">
             <div class="search-wrap">
-              <span>ðŸ”Ž</span>
+              <span>🔎</span>
               <input id="searchInput" type="search" placeholder="Buscar por nombre, correo o estado..." value="${escapeHtml(query)}" oninput="window.handleSearch(this.value)">
             </div>
             <div class="filter-chips">
@@ -3008,17 +3008,17 @@
           <div class="table-wrap">
             ${paginated.length === 0 ? `
               <div class="empty-state">
-                <span class="empty-state-icon">ðŸ”Ž</span>
-                <strong>Sin registros de participaciÃ³n</strong>
-                <span>No hay usuarios con premios o participaciones registradas todavÃ­a.</span>
+                <span class="empty-state-icon">🔎</span>
+                <strong>Sin registros de participación</strong>
+                <span>No hay usuarios con premios o participaciones registradas todavía.</span>
               </div>
             ` : `
               <table>
                 <thead>
                   <tr>
                     <th>Usuario</th>
-                    <th>Fecha en que jugÃ³</th>
-                    <th>FinalizÃ³ el recorrido</th>
+                    <th>Fecha en que jugó</th>
+                    <th>Finalizó el recorrido</th>
                     <th>Fecha de reclamo</th>
                     <th>Puede volver a jugar</th>
                     <th>Estado</th>
@@ -3037,21 +3037,21 @@
                           <strong>${nombreSafe}</strong><br>
                           <span style="font-size: 0.8rem; color: var(--text-dim);">${correoSafe}</span>
                         </td>
-                        <td data-label="Fecha en que jugÃ³">${formatDate(row.fecha_jugo, true)}</td>
-                        <td data-label="FinalizÃ³ el recorrido">${formatPlaytimeDate(row.fecha_finalizacion || row.fecha_ganado)}</td>
+                        <td data-label="Fecha en que jugó">${formatDate(row.fecha_jugo, true)}</td>
+                        <td data-label="Finalizó el recorrido">${formatPlaytimeDate(row.fecha_finalizacion || row.fecha_ganado)}</td>
                         <td data-label="Fecha de reclamo">${formatDate(row.fecha_reclamado, true)}</td>
                         <td data-label="Puede volver a jugar"><strong>${formatPlaytimeDate(row.fecha_puede_volver_jugar)}</strong></td>
                         <td data-label="Estado"><span class="tag ${estado.cls}">${estado.text}</span></td>
-                        <td data-label="Tiempo restante">${escapeHtml(row.tiempo_restante || 'â€”')}</td>
+                        <td data-label="Tiempo restante">${escapeHtml(row.tiempo_restante || '—')}</td>
                         <td data-label="Acciones">
                           <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                            <button class="btn btn-soft" style="padding: 6px 10px; font-size: 0.75rem;" onclick="window.verHistorialTiempoJuego(${row.id_usuario}, '${nombreSafe.replace(/'/g, "\\'")}')">ðŸ“œ Historial</button>
+                            <button class="btn btn-soft" style="padding: 6px 10px; font-size: 0.75rem;" onclick="window.verHistorialTiempoJuego(${row.id_usuario}, '${nombreSafe.replace(/'/g, "\\'")}')">📜 Historial</button>
                             ${row.bloqueado ? `
-                              <button class="btn btn-soft" style="padding: 6px 10px; font-size: 0.75rem;" onclick="window.desbloquearUsuarioTiempoJuego(${row.id_usuario}, '${nombreSafe.replace(/'/g, "\\'")}')">ðŸ”“ Desbloquear</button>
-                              <button class="btn btn-soft" style="padding: 6px 10px; font-size: 0.75rem;" onclick="window.cambiarFechaTiempoJuego(${row.id_usuario}, '${nombreSafe.replace(/'/g, "\\'")}', '${row.fecha_puede_volver_jugar || ''}')">ðŸ“… Cambiar fecha</button>
+                              <button class="btn btn-soft" style="padding: 6px 10px; font-size: 0.75rem;" onclick="window.desbloquearUsuarioTiempoJuego(${row.id_usuario}, '${nombreSafe.replace(/'/g, "\\'")}')">🔓 Desbloquear</button>
+                              <button class="btn btn-soft" style="padding: 6px 10px; font-size: 0.75rem;" onclick="window.cambiarFechaTiempoJuego(${row.id_usuario}, '${nombreSafe.replace(/'/g, "\\'")}', '${row.fecha_puede_volver_jugar || ''}')">📅 Cambiar fecha</button>
                             ` : ''}
                             ${row.id_premio && row.estado_premio === 'reclamado' ? `
-                              <button class="btn btn-solid" style="padding: 6px 10px; font-size: 0.75rem;" onclick="window.marcarPremioEntregado(${row.id_premio})">âœ… Marcar entregado</button>
+                              <button class="btn btn-solid" style="padding: 6px 10px; font-size: 0.75rem;" onclick="window.marcarPremioEntregado(${row.id_premio})">✅ Marcar entregado</button>
                             ` : ''}
                           </div>
                         </td>
@@ -3078,7 +3078,7 @@
       const bloqueo_activo = Boolean(document.getElementById('playtimeActivo')?.checked);
 
       if (!Number.isInteger(cantidad) || cantidad < 1 || cantidad > 3650) {
-        alert('La cantidad debe ser un nÃºmero entero entre 1 y 3650 dÃ­as.');
+        alert('La cantidad debe ser un número entero entre 1 y 3650 días.');
         return;
       }
 
@@ -3090,11 +3090,11 @@
         });
         if (!res.ok) {
           const err = await res.json();
-          throw new Error(err.error || 'No se pudo guardar la configuraciÃ³n.');
+          throw new Error(err.error || 'No se pudo guardar la configuración.');
         }
         const data = await res.json();
         state.playtimeConfig = data.config;
-        let msg = 'ConfiguraciÃ³n guardada correctamente.';
+        let msg = 'Configuración guardada correctamente.';
         if (data.bloqueos_actualizados > 0) {
           msg += ` Se actualizaron ${data.bloqueos_actualizados} bloqueo(s) activo(s).`;
         }
@@ -3106,7 +3106,7 @@
     }
 
     async function desbloquearUsuarioTiempoJuego(idUsuario, nombre) {
-      if (!confirm(`Â¿Desbloquear manualmente a ${nombre}?`)) return;
+      if (!confirm(`¿Desbloquear manualmente a ${nombre}?`)) return;
       try {
         const res = await fetch(buildApiUrl(`/api/admin/bloqueos-juego/${idUsuario}/desbloquear`, false), {
           method: 'POST',
@@ -3125,12 +3125,12 @@
 
     async function cambiarFechaTiempoJuego(idUsuario, nombre, fechaActual) {
       const sugerencia = fechaActual ? new Date(fechaActual).toISOString().slice(0, 16) : '';
-      const nuevaFecha = prompt(`Nueva fecha y hora en que ${nombre} podrÃ¡ volver a jugar (formato local del navegador):`, sugerencia);
+      const nuevaFecha = prompt(`Nueva fecha y hora en que ${nombre} podrá volver a jugar (formato local del navegador):`, sugerencia);
       if (!nuevaFecha) return;
 
       const parsed = new Date(nuevaFecha);
       if (Number.isNaN(parsed.getTime())) {
-        alert('Fecha invÃ¡lida.');
+        alert('Fecha inválida.');
         return;
       }
 
@@ -3183,7 +3183,7 @@
                     <th>Entregado</th>
                     <th>Puede volver</th>
                     <th>Folio</th>
-                    <th>AcciÃ³n</th>
+                    <th>Acción</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -3197,9 +3197,9 @@
                       <td>${formatDate(p.fecha_reclamado, true)}</td>
                       <td>${formatDate(p.fecha_entregado, true)}</td>
                       <td>${formatDate(p.fecha_puede_volver_jugar, true)}</td>
-                      <td>${escapeHtml(p.folio || 'â€”')}</td>
+                      <td>${escapeHtml(p.folio || '—')}</td>
                       <td>
-                        ${p.estado === 'reclamado' ? `<button class="btn btn-soft" style="padding: 4px 8px; font-size: 0.72rem;" onclick="window.marcarPremioEntregado(${p.id_premio})">Marcar entregado</button>` : 'â€”'}
+                        ${p.estado === 'reclamado' ? `<button class="btn btn-soft" style="padding: 4px 8px; font-size: 0.72rem;" onclick="window.marcarPremioEntregado(${p.id_premio})">Marcar entregado</button>` : '—'}
                       </td>
                     </tr>
                   `).join('')}
@@ -3240,7 +3240,7 @@
     }
 
     async function marcarPremioEntregado(idPremio) {
-      if (!confirm('Â¿Marcar este premio como entregado?')) return;
+      if (!confirm('¿Marcar este premio como entregado?')) return;
       try {
         const res = await fetch(buildApiUrl(`/api/admin/premios/${idPremio}/entregado`, false), {
           method: 'POST',
@@ -3284,11 +3284,11 @@
 
         return `
           <div class="empty-state">
-            <span class="empty-state-icon">ðŸ”Ž</span>
+            <span class="empty-state-icon">🔎</span>
             <strong>${hasDateFilter ? 'No hay datos disponibles para esta fecha' : 'Sin coincidencias'}</strong>
             <span>${emptyMessage}</span>
             <span hidden>${hasFilters
-              ? 'No se encontraron registros que coincidan con los criterios de bÃºsqueda o filtros de fecha seleccionados.' 
+              ? 'No se encontraron registros que coincidan con los criterios de búsqueda o filtros de fecha seleccionados.'
               : 'No se encontraron registros activos en la base de datos local.'}</span>
           </div>
         `;
@@ -3329,13 +3329,13 @@
                       </td>
                       <td data-label="Acciones">
                         <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                          <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.78rem;" onclick="window.openRoleModal(${row.id_usuario}, '${escapeHtml(row.nombre)}', '${escapeHtml(row.roles)}')">ðŸ” Roles</button>
+                          <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.78rem;" onclick="window.openRoleModal(${row.id_usuario}, '${escapeHtml(row.nombre)}', '${escapeHtml(row.roles)}')">🔐 Roles</button>
                           ${row.activo ? `
-                            <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.78rem; border-color: rgba(234, 88, 12, 0.4); color: #ff9d6c; background: rgba(234, 88, 12, 0.1);" onclick="window.toggleActivoUsuario(${row.id_usuario}, '${escapeHtml(row.nombre)}', false)">ðŸš« Desactivar</button>
+                            <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.78rem; border-color: rgba(234, 88, 12, 0.4); color: #ff9d6c; background: rgba(234, 88, 12, 0.1);" onclick="window.toggleActivoUsuario(${row.id_usuario}, '${escapeHtml(row.nombre)}', false)">🚫 Desactivar</button>
                           ` : `
-                            <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.78rem; border-color: rgba(37, 99, 235, 0.4); color: #7cb3ff; background: rgba(37, 99, 235, 0.1);" onclick="window.toggleActivoUsuario(${row.id_usuario}, '${escapeHtml(row.nombre)}', true)">ðŸ”„ Activar</button>
+                            <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.78rem; border-color: rgba(37, 99, 235, 0.4); color: #7cb3ff; background: rgba(37, 99, 235, 0.1);" onclick="window.toggleActivoUsuario(${row.id_usuario}, '${escapeHtml(row.nombre)}', true)">🔄 Activar</button>
                           `}
-                          <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.78rem;" onclick="window.eliminarUsuario(${row.id_usuario}, '${escapeHtml(row.nombre)}')">ðŸ—‘ï¸ Quitar</button>
+                          <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.78rem;" onclick="window.eliminarUsuario(${row.id_usuario}, '${escapeHtml(row.nombre)}')">🗑️ Quitar</button>
                         </div>
                       </td>
                     </tr>
@@ -3403,7 +3403,7 @@
                     <tr>
                       <th>Usuario</th>
                       <th>Rol Asignado</th>
-                      <th>Fecha AsignaciÃ³n</th>
+                      <th>Fecha Asignación</th>
                       <th>Autorizado Por</th>
                     </tr>
                   </thead>
@@ -3423,7 +3423,7 @@
                   <th>Orden</th>
                   <th>ID</th>
                   <th>Sala</th>
-                  <th>Tipo DinÃ¡mica</th>
+                  <th>Tipo Dinámica</th>
                   <th>Score Requerido</th>
                   <th>Puntos Base</th>
                   <th>Estado</th>
@@ -3440,7 +3440,7 @@
                         <strong>${escapeHtml(row.nombre)}</strong><br>
                         <span style="font-size: 0.8rem; color: var(--text-soft);">${escapeHtml(row.descripcion)}</span>
                       </td>
-                      <td data-label="Tipo DinÃ¡mica">
+                      <td data-label="Tipo Dinámica">
                         <span class="tag tag-dark">${escapeHtml(row.tipo)}</span>
                       </td>
                       <td data-label="Score Requerido">${row.puntaje_minimo} pts</td>
@@ -3450,7 +3450,7 @@
                       </td>
                       <td data-label="Control">
                         <button class="switch-btn ${row.activa ? 'active' : 'inactive'}" onclick="window.toggleEstacion(${row.id_estacion})">
-                          ${row.activa ? 'ðŸŸ¢ Habilitada' : 'ðŸ”´ Deshabilitada'}
+                          ${row.activa ? '🟢 Habilitada' : '🔴 Deshabilitada'}
                         </button>
                       </td>
                     </tr>
@@ -3487,14 +3487,14 @@
                             <div class="trivia-question-header">
                               <strong style="font-size: 1rem;">ID #${q.id_pregunta}: ${escapeHtml(q.pregunta)}</strong>
                               <button class="switch-btn ${q.activa ? 'active' : 'inactive'}" style="padding: 4px 8px; font-size: 0.72rem;" onclick="window.togglePregunta(${q.id_pregunta})">
-                                ${q.activa ? 'ðŸŸ¢ Activa' : 'ðŸ”´ Inactiva'}
+                                ${q.activa ? '🟢 Activa' : '🔴 Inactiva'}
                               </button>
                             </div>
                             <div class="trivia-answers-grid">
                               ${q.respuestas.map(r => {
                                 return `
                                   <div class="trivia-answer-option ${r.es_correcta ? 'correct' : ''}">
-                                    <span>${r.es_correcta ? 'âœ…' : 'â€¢'}</span>
+                                    <span>${r.es_correcta ? '✅' : '•'}</span>
                                     <span>${escapeHtml(r.texto_respuesta)}</span>
                                   </div>
                                 `;
@@ -3516,12 +3516,12 @@
               <thead>
                 <tr>
                   <th>Usuario</th>
-                  <th>EstaciÃ³n</th>
+                  <th>Estación</th>
                   <th>Estatus</th>
                   <th>Aprobada</th>
-                  <th>PuntuaciÃ³n</th>
+                  <th>Puntuación</th>
                   <th>Aciertos / Errores</th>
-                  <th>Ãšltima ActualizaciÃ³n</th>
+                  <th>Última Actualización</th>
                 </tr>
               </thead>
               <tbody>
@@ -3533,7 +3533,7 @@
                         <strong>${escapeHtml(row.nombre_usuario)}</strong><br>
                         <span style="font-size: 0.8rem; color: var(--text-dim);">${escapeHtml(row.correo_usuario)}</span>
                       </td>
-                      <td data-label="EstaciÃ³n">
+                      <td data-label="Estación">
                         <strong>${escapeHtml(row.nombre_estacion)}</strong><br>
                         <span style="font-size: 0.75rem; color: var(--text-dim);">ID #${row.id_estacion}</span>
                       </td>
@@ -3543,12 +3543,12 @@
                       <td data-label="Aprobada">
                         <span class="tag ${row.aprobada ? 'tag-success' : 'tag-danger'}">${row.aprobada ? 'Aprobada' : 'Sin Aprobar'}</span>
                       </td>
-                      <td data-label="PuntuaciÃ³n" style="font-weight: 700; color: var(--accent);">${row.puntaje} pts</td>
+                      <td data-label="Puntuación" style="font-weight: 700; color: var(--accent);">${row.puntaje} pts</td>
                       <td data-label="Aciertos / Errores">
-                        <span style="color: var(--success); font-weight: 700;">${row.aciertos} âœ”</span> / 
-                        <span style="color: var(--danger); font-weight: 700;">${row.errores} âœ•</span>
+                        <span style="color: var(--success); font-weight: 700;">${row.aciertos} ✔</span> /
+                        <span style="color: var(--danger); font-weight: 700;">${row.errores} ✕</span>
                       </td>
-                      <td data-label="Ãšltima ActualizaciÃ³n">${formatDate(row.updated_at, true)}</td>
+                      <td data-label="Última Actualización">${formatDate(row.updated_at, true)}</td>
                     </tr>
                   `;
                 }).join('')}
@@ -3562,7 +3562,7 @@
               <thead>
                 <tr>
                   <th>Usuario</th>
-                  <th>EstaciÃ³n</th>
+                  <th>Estación</th>
                   <th>Resultado</th>
                   <th>Puntaje Obtenido</th>
                   <th>Aciertos / Errores</th>
@@ -3577,14 +3577,14 @@
                         <strong>${escapeHtml(row.nombre_usuario)}</strong><br>
                         <span style="font-size: 0.8rem; color: var(--text-dim);">${escapeHtml(row.correo_usuario)}</span>
                       </td>
-                      <td data-label="EstaciÃ³n"><strong>${escapeHtml(row.nombre_estacion)}</strong></td>
+                      <td data-label="Estación"><strong>${escapeHtml(row.nombre_estacion)}</strong></td>
                       <td data-label="Resultado">
                         <span class="tag ${row.aprobado ? 'tag-success' : 'tag-danger'}">${row.aprobado ? 'Aprobado' : 'Reprobado'}</span>
                       </td>
                       <td data-label="Puntaje Obtenido" style="font-weight: 800; color: var(--accent);">${row.puntaje} pts</td>
                       <td data-label="Aciertos / Errores">
-                        <span style="color: var(--success); font-weight: 700;">${row.aciertos} âœ”</span> / 
-                        <span style="color: var(--danger); font-weight: 700;">${row.errores} âœ•</span>
+                        <span style="color: var(--success); font-weight: 700;">${row.aciertos} ✔</span> /
+                        <span style="color: var(--danger); font-weight: 700;">${row.errores} ✕</span>
                       </td>
                       <td data-label="Fecha Intento">${formatDate(row.fecha_intento, true)}</td>
                     </tr>
@@ -3601,7 +3601,7 @@
                 <tr>
                   <th>Partida ID</th>
                   <th>Usuario</th>
-                  <th>EstaciÃ³n</th>
+                  <th>Estación</th>
                   <th>Estatus</th>
                   <th>Puntaje</th>
                   <th>Fecha Partida</th>
@@ -3616,7 +3616,7 @@
                         <strong>${escapeHtml(row.nombre_usuario)}</strong><br>
                         <span style="font-size: 0.8rem; color: var(--text-dim);">${escapeHtml(row.correo_usuario)}</span>
                       </td>
-                      <td data-label="EstaciÃ³n"><strong>${escapeHtml(row.nombre_estacion || 'Mini juego')}</strong></td>
+                      <td data-label="Estación"><strong>${escapeHtml(row.nombre_estacion || 'Mini juego')}</strong></td>
                       <td data-label="Estatus">
                         <span class="tag ${row.aprobado ? 'tag-success' : 'tag-danger'}">${row.aprobado ? 'Aprobado' : 'No aprobado'}</span>
                       </td>
@@ -3641,7 +3641,7 @@
                   <th>Secci&oacute;n</th>
                   <th>Estatus Acceso</th>
                   <th>Vencimiento</th>
-                  <th>GeneraciÃ³n</th>
+                  <th>Generación</th>
                   <th>Uso / Canje</th>
                   <th>Operador Canje</th>
                   <th>Acciones</th>
@@ -3725,24 +3725,24 @@
                         <span class="tag ${statusTag}">${esCanjeado ? 'Utilizado' : (row.estado === 'vencido' ? 'Vencido' : esVigente ? 'Disponible' : escapeHtml(row.estado))}</span>
                       </td>
                       <td data-label="Vencimiento">${formatDate(row.valido_hasta, true)}</td>
-                      <td data-label="GeneraciÃ³n">${formatDate(row.fecha_generacion, true)}</td>
+                      <td data-label="Generación">${formatDate(row.fecha_generacion, true)}</td>
                       <td data-label="Uso / Canje">${formatDate(row.fecha_uso || row.fecha_canje, true)}</td>
                       <td data-label="Operador Canje">
                         <strong style="color: var(--accent);">${escapeHtml(row.nombre_canjeador || 'Sin canjear')}</strong>
                       </td>
                       <td data-label="Acciones" style="display: flex; gap: 8px; flex-wrap: wrap;">
                         ${esVigente ? `
-                          <button class="btn btn-solid" style="padding: 6px 12px; font-size: 0.76rem; background: #10b981;" onclick="window.canjearBoletoTab(${row.id_boleto}, '${escapeHtml(row.folio)}')">ðŸŽŸï¸ Canjear</button>
+                          <button class="btn btn-solid" style="padding: 6px 12px; font-size: 0.76rem; background: #10b981;" onclick="window.canjearBoletoTab(${row.id_boleto}, '${escapeHtml(row.folio)}')">🎟️ Canjear</button>
                         ` : ''}
                         ${row.estado !== 'cancelado' ? `
-                          <button class="btn btn-solid" style="padding: 6px 12px; font-size: 0.76rem; background: #ea580c; color: white;" onclick="window.cancelarBoletoTab(${row.id_boleto}, '${escapeHtml(row.folio)}')">ðŸš« Desactivar</button>
+                          <button class="btn btn-solid" style="padding: 6px 12px; font-size: 0.76rem; background: #ea580c; color: white;" onclick="window.cancelarBoletoTab(${row.id_boleto}, '${escapeHtml(row.folio)}')">🚫 Desactivar</button>
                         ` : `
-                          <button class="btn btn-solid" style="padding: 6px 12px; font-size: 0.76rem; background: #2563eb; color: white;" onclick="window.activarBoletoTab(${row.id_boleto}, '${escapeHtml(row.folio)}')">ðŸ”„ Activar</button>
+                          <button class="btn btn-solid" style="padding: 6px 12px; font-size: 0.76rem; background: #2563eb; color: white;" onclick="window.activarBoletoTab(${row.id_boleto}, '${escapeHtml(row.folio)}')">🔄 Activar</button>
                         `}
-                        <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.76rem; background: #dc2626; color: white;" onclick="window.eliminarBoletoTab(${row.id_boleto}, '${escapeHtml(row.folio)}')">ðŸ—‘ï¸ Borrar</button>
-                        
+                        <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.76rem; background: #dc2626; color: white;" onclick="window.eliminarBoletoTab(${row.id_boleto}, '${escapeHtml(row.folio)}')">🗑️ Borrar</button>
+
                         <button class="btn btn-soft" style="padding: 6px 12px; font-size: 0.76rem; border-color: rgba(73, 198, 255, 0.4); color: var(--accent); background: rgba(73, 198, 255, 0.05);" onclick="window.toggleBoletoMovimientos(${row.id_boleto})">
-                          ðŸ”„ Historial (${row.movimientos ? row.movimientos.length : 0})
+                          🔄 Historial (${row.movimientos ? row.movimientos.length : 0})
                         </button>
                       </td>
                     </tr>
@@ -3798,11 +3798,11 @@
                 <tr>
                   <th>ID</th>
                   <th>Usuario</th>
-                  <th>Rol AcciÃ³n</th>
-                  <th>AcciÃ³n</th>
+                  <th>Rol Acción</th>
+                  <th>Acción</th>
                   <th>Tabla Afectada</th>
                   <th>Registro Afectado</th>
-                  <th>Detalle DescripciÃ³n</th>
+                  <th>Detalle Descripción</th>
                   <th>Fecha y Hora</th>
                 </tr>
               </thead>
@@ -3817,16 +3817,16 @@
                     <tr>
                       <td data-label="ID" style="font-family: monospace;">#${row.id_auditoria}</td>
                       <td data-label="Usuario">
-                        <strong>${escapeHtml(row.nombre_usuario || 'AnÃ³nimo')}</strong><br>
-                        <span style="font-size: 0.78rem; color: var(--text-dim);">${escapeHtml(row.correo_usuario || 'Visita pÃºblica')}</span>
+                        <strong>${escapeHtml(row.nombre_usuario || 'Anónimo')}</strong><br>
+                        <span style="font-size: 0.78rem; color: var(--text-dim);">${escapeHtml(row.correo_usuario || 'Visita pública')}</span>
                       </td>
-                      <td data-label="Rol AcciÃ³n">
-                        <span class="tag ${badge}">${escapeHtml(row.rol_accion || 'PÃºblico')}</span>
+                      <td data-label="Rol Acción">
+                        <span class="tag ${badge}">${escapeHtml(row.rol_accion || 'Público')}</span>
                       </td>
-                      <td data-label="AcciÃ³n"><strong style="color: var(--accent);">${escapeHtml(row.accion)}</strong></td>
+                      <td data-label="Acción"><strong style="color: var(--accent);">${escapeHtml(row.accion)}</strong></td>
                       <td data-label="Tabla Afectada" class="muted">${escapeHtml(row.tabla_afectada || 'General')}</td>
                       <td data-label="Registro Afectado" style="font-family: monospace;">#${row.id_registro || 'N/A'}</td>
-                      <td data-label="Detalle DescripciÃ³n">${escapeHtml(row.descripcion)}</td>
+                      <td data-label="Detalle Descripción">${escapeHtml(row.descripcion)}</td>
                       <td data-label="Fecha y Hora">${formatDate(row.fecha_accion, true)}</td>
                     </tr>
                   `;
@@ -3836,7 +3836,7 @@
           `;
 
         default:
-          return `<div class="empty-state">No hay tabla definida para este mÃ³dulo.</div>`;
+          return `<div class="empty-state">No hay tabla definida para este módulo.</div>`;
       }
     }
 
@@ -3867,7 +3867,7 @@
           method: 'PUT',
           headers: getHeaders()
         });
-        if (!res.ok) throw new Error('No se pudo modificar el estado de la estaciÃ³n.');
+        if (!res.ok) throw new Error('No se pudo modificar el estado de la estación.');
         loadTabContent(true);
       } catch (error) {
         alert(error.message);
@@ -3891,7 +3891,7 @@
     window.openRoleModal = function(idUsuario, nombre, rolesString) {
       state.selectedUserIdForRoles = idUsuario;
       document.getElementById('roleModalUserInfo').innerHTML = `Modificando los roles asignados en MySQL para <strong>${escapeHtml(nombre)}</strong> (ID #${idUsuario}).`;
-      
+
       const rolesArray = (rolesString || '').split(', ');
       document.getElementById('chkRoleUsuario').checked = rolesArray.includes('usuario');
       document.getElementById('chkRoleAdmin').checked = rolesArray.includes('admin');
@@ -3933,7 +3933,7 @@
     // Usuarios Quick Actions
     window.toggleActivoUsuario = async function(idUsuario, nombre, nuevoEstado) {
       const accionStr = nuevoEstado ? 'ACTIVAR' : 'DESACTIVAR';
-      if (!confirm(`Â¿EstÃ¡s seguro de que deseas ${accionStr} la cuenta de ${nombre}?`)) return;
+      if (!confirm(`¿Estás seguro de que deseas ${accionStr} la cuenta de ${nombre}?`)) return;
       try {
         const res = await fetch(`${API_BASE_URL}/api/admin/usuarios/${idUsuario}/toggle-activo`, {
           method: 'POST',
@@ -3952,7 +3952,7 @@
     };
 
     window.eliminarUsuario = async function(idUsuario, nombre) {
-      if (!confirm(`âš ï¸ Â¡ATENCIÃ“N! Â¿EstÃ¡s seguro de que deseas ELIMINAR permanentemente la cuenta de ${nombre}? Esta acciÃ³n no se puede deshacer y borrarÃ¡ todo su progreso, intentos de trivias, boletos e historial.`)) return;
+      if (!confirm(`⚠️ ¡ATENCIÓN! ¿Estás seguro de que deseas ELIMINAR permanentemente la cuenta de ${nombre}? Esta acción no se puede deshacer y borrará todo su progreso, intentos de trivias, boletos e historial.`)) return;
       try {
         const res = await fetch(`${API_BASE_URL}/api/admin/usuarios/${idUsuario}`, {
           method: 'DELETE',
@@ -3971,12 +3971,12 @@
 
     // Boletos Quick Actions
     window.canjearBoletoTab = async function(idBoleto, folio) {
-      if (!confirm(`Â¿EstÃ¡s seguro de que deseas marcar como CANJEADO el boleto ${folio}?`)) return;
+      if (!confirm(`¿Estás seguro de que deseas marcar como CANJEADO el boleto ${folio}?`)) return;
       try {
         const res = await fetch(`${API_BASE_URL}/api/taquilla/boletos/${idBoleto}/canjear`, {
           method: 'POST',
           headers: getHeaders(),
-          body: JSON.stringify({ observaciones: 'Canje rÃ¡pido desde tabla de administrador' })
+          body: JSON.stringify({ observaciones: 'Canje rápido desde tabla de administrador' })
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'No se pudo canjear el boleto.');
@@ -3987,12 +3987,12 @@
     };
 
     window.cancelarBoletoTab = async function(idBoleto, folio) {
-      if (!confirm(`Â¿EstÃ¡s seguro de que deseas DESACTIVAR el boleto ${folio}?`)) return;
+      if (!confirm(`¿Estás seguro de que deseas DESACTIVAR el boleto ${folio}?`)) return;
       try {
         const res = await fetch(`${API_BASE_URL}/api/taquilla/boletos/${idBoleto}/cancelar`, {
           method: 'POST',
           headers: getHeaders(),
-          body: JSON.stringify({ observaciones: 'DesactivaciÃ³n desde tabla de administrador' })
+          body: JSON.stringify({ observaciones: 'Desactivación desde tabla de administrador' })
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'No se pudo desactivar el boleto.');
@@ -4003,12 +4003,12 @@
     };
 
     window.activarBoletoTab = async function(idBoleto, folio) {
-      if (!confirm(`Â¿EstÃ¡s seguro de que deseas ACTIVAR el boleto ${folio}?`)) return;
+      if (!confirm(`¿Estás seguro de que deseas ACTIVAR el boleto ${folio}?`)) return;
       try {
         const res = await fetch(`${API_BASE_URL}/api/admin/boletos/${idBoleto}/activar`, {
           method: 'POST',
           headers: getHeaders(),
-          body: JSON.stringify({ observaciones: 'ActivaciÃ³n desde tabla de administrador' })
+          body: JSON.stringify({ observaciones: 'Activación desde tabla de administrador' })
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'No se pudo activar el boleto.');
@@ -4019,7 +4019,7 @@
     };
 
     window.eliminarBoletoTab = async function(idBoleto, folio) {
-      if (!confirm(`Â¿EstÃ¡s seguro de que deseas ELIMINAR permanentemente el boleto ${folio}? Esta acciÃ³n borrarÃ¡ todo su historial y no se puede deshacer.`)) return;
+      if (!confirm(`¿Estás seguro de que deseas ELIMINAR permanentemente el boleto ${folio}? Esta acción borrará todo su historial y no se puede deshacer.`)) return;
       try {
         const res = await fetch(`${API_BASE_URL}/api/admin/boletos/${idBoleto}`, {
           method: 'DELETE',
@@ -4038,34 +4038,34 @@
     // =========================================================================
     function renderTaquillaView() {
       const container = document.getElementById('viewContainers');
-      
+
       container.innerHTML = `
         <div class="scanner-grid">
           <div class="scanner-panel">
             <div class="panel">
               <div class="panel-head" style="margin-bottom: 12px;">
                 <div class="panel-title-wrap">
-                  <h3>CÃ¡mara QR e Ingreso Manual</h3>
+                  <h3>Cámara QR e Ingreso Manual</h3>
                   <p>Escanea el QR de premio del visitante o escribe su folio manualmente.</p>
                 </div>
-                <span id="scannerHardwareStatus" style="font-size: 0.8rem; font-weight: 700; color: var(--text-dim);">CÃ¡mara inactiva</span>
+                <span id="scannerHardwareStatus" style="font-size: 0.8rem; font-weight: 700; color: var(--text-dim);">Cámara inactiva</span>
               </div>
 
               <div class="scanner-reader-box">
                 <div id="ticketReader"></div>
                 <div class="scanner-placeholder" id="scannerPlaceholder">
                   <div>
-                    <strong>EscÃ¡ner apagado</strong>
+                    <strong>Escáner apagado</strong>
                     <span style="font-size: 0.85rem; display: block; margin-top: 5px; color: var(--text-soft)">
-                      Presiona "Iniciar escaneo" para activar la cÃ¡mara web/mÃ³vil.
+                      Presiona "Iniciar escaneo" para activar la cámara web/móvil.
                     </span>
                   </div>
                 </div>
               </div>
 
               <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="btn btn-solid" id="btnStartScan" style="flex: 1;">ðŸ“· Iniciar escaneo</button>
-                <button class="btn btn-soft" id="btnStopScan" style="flex: 1;" disabled>âœ• Detener cÃ¡mara</button>
+                <button class="btn btn-solid" id="btnStartScan" style="flex: 1;">📷 Iniciar escaneo</button>
+                <button class="btn btn-soft" id="btnStopScan" style="flex: 1;" disabled>✕ Detener cámara</button>
               </div>
 
               <div style="border-top: 1px solid var(--border); margin-top: 20px; padding-top: 20px; display: grid; gap: 12px;">
@@ -4073,7 +4073,7 @@
                   <label class="form-label" for="manualTicketInput">Ingreso manual de Folio o URL QR</label>
                   <input class="form-input" id="manualTicketInput" type="text" placeholder="Ejemplo: MUCH-171690 o pegue la URL del QR">
                 </div>
-                <button class="btn btn-soft" id="btnValidateManual">ðŸŽŸï¸ Validar Boleto</button>
+                <button class="btn btn-soft" id="btnValidateManual">🎟️ Validar Boleto</button>
                 <p id="scannerFeedback" style="margin: 0; font-size: 0.85rem; color: var(--text-soft); font-weight: 600;">Esperando lectura de boleto...</p>
               </div>
             </div>
@@ -4084,7 +4084,7 @@
             <div class="panel" style="min-height: 100%;">
               <div class="panel-head">
                 <div class="panel-title-wrap">
-                  <h3>Ficha de ValidaciÃ³n</h3>
+                  <h3>Ficha de Validación</h3>
                   <p>Detalle de validez del boleto consultado.</p>
                 </div>
                 <span id="scanCheckedAt" style="font-size: 0.8rem; color: var(--text-dim);">Sin consulta</span>
@@ -4092,9 +4092,9 @@
 
               <div id="scanResultBody">
                 <div class="scanner-details-card" style="text-align: center; color: var(--text-soft); padding: 40px 20px;">
-                  <span style="font-size: 2.2rem; display: block; margin-bottom: 10px;">ðŸ§¾</span>
-                  <strong>NingÃºn boleto consultado</strong>
-                  <span>Escanea un cÃ³digo QR o ingresa un folio para consultar la base de datos en tiempo real.</span>
+                  <span style="font-size: 2.2rem; display: block; margin-bottom: 10px;">🧾</span>
+                  <strong>Ningún boleto consultado</strong>
+                  <span>Escanea un código QR o ingresa un folio para consultar la base de datos en tiempo real.</span>
                 </div>
               </div>
             </div>
@@ -4110,7 +4110,7 @@
           </div>
           <div class="toolbar" style="margin-bottom: 14px;">
             <div class="search-wrap" style="max-width: 360px;">
-              <span>ðŸ”Ž</span>
+              <span>🔎</span>
               <input id="taquillaSearchInput" type="search" placeholder="Filtrar escaneos..." oninput="window.handleSearch(this.value)">
             </div>
             ${renderDateFiltersHTML()}
@@ -4137,7 +4137,7 @@
 
     function renderTaquillaLogsTable() {
       const query = (state.queries[state.activeTab] || '').toLowerCase().trim();
-      
+
       const yearFilter = state.dateFilters?.year || '';
       const specificFilter = state.dateFilters?.specific || '';
       const normalizedFilters = normalizeDateFilters();
@@ -4172,11 +4172,11 @@
           : (hasFilters ? 'No se encontraron escaneos que coincidan con los criterios seleccionados.' : 'No se registran escaneos de boletos en la base de datos local.');
         tableWrap.innerHTML = `
           <div class="empty-state">
-            <span class="empty-state-icon">ðŸ”Ž</span>
+            <span class="empty-state-icon">🔎</span>
             <strong>${hasDateFilter ? 'No hay datos disponibles para esta fecha' : 'Sin coincidencias'}</strong>
             <span>${emptyMessage}</span>
             <span hidden>${hasFilters
-              ? 'No se encontraron escaneos que coincidan con los criterios de bÃºsqueda o filtros de fecha seleccionados.' 
+              ? 'No se encontraron escaneos que coincidan con los criterios de búsqueda o filtros de fecha seleccionados.'
               : 'No se registran escaneos de boletos en la base de datos local.'}</span>
           </div>
         `;
@@ -4209,7 +4209,7 @@
                   </td>
                   <td data-label="Tipo">${escapeHtml(row.tipo_entrada || 'Sin tipo')}</td>
                   <td data-label="Secci&oacute;n">${escapeHtml(row.seccion_boleto || row.destino_boleto || '-')}</td>
-                  <td data-label="Operador"><strong style="color: var(--accent);">${escapeHtml(row.nombre_operador || 'PÃºblico / Auto')}</strong></td>
+                  <td data-label="Operador"><strong style="color: var(--accent);">${escapeHtml(row.nombre_operador || 'Público / Auto')}</strong></td>
                   <td data-label="Resultado"><span class="tag ${outcomeTag}">${escapeHtml(row.resultado)}</span></td>
                   <td data-label="Fecha y Hora">${formatDate(row.fecha_escaneo, true)}</td>
                   <td data-label="Observaciones" class="muted">${escapeHtml(row.observaciones || 'Ninguna')}</td>
@@ -4250,7 +4250,7 @@
       const lookupValue = folio || lookup;
 
       if (!lookupValue) {
-        setScannerFeedback('Por favor, ingresa un folio o apunta la cÃ¡mara a un cÃ³digo QR.', 'error');
+        setScannerFeedback('Por favor, ingresa un folio o apunta la cámara a un código QR.', 'error');
         return;
       }
 
@@ -4261,7 +4261,7 @@
 
       scannerState.isValidating = true;
       setScannerFeedback(`Validando boleto: ${lookupValue}...`);
-      
+
       const scanResultBody = document.getElementById('scanResultBody');
       const scanCheckedAt = document.getElementById('scanCheckedAt');
 
@@ -4306,11 +4306,11 @@
             });
           }
           setScannerFeedback(`El boleto ${lookupValue} no existe en la base de datos.`, 'error');
-          renderScanResultCard(null, lookupValue, 'No se encontrÃ³ coincidencia.');
+          renderScanResultCard(null, lookupValue, 'No se encontró coincidencia.');
           return;
         }
 
-        // Guardamos el folio validado para evitar escaneos duplicados por la cÃ¡mara
+        // Guardamos el folio validado para evitar escaneos duplicados por la cámara
         scannerState.lastFolio = ticketData.folio || lookupValue;
 
         // Validate ticket status
@@ -4320,7 +4320,7 @@
         let wasJustRedeemed = false;
 
         let outcome = 'valido';
-        let feedbackMessage = `Boleto ${ticketData.folio} validado con Ã©xito. Acceso Autorizado.`;
+        let feedbackMessage = `Boleto ${ticketData.folio} validado con éxito. Acceso autorizado.`;
         let feedbackTone = 'success';
 
         // AUTOMATIC CANJE (Redeem immediately if active/vigente and not yet redeemed)
@@ -4329,7 +4329,7 @@
             const canjearRes = await fetch(`${API_BASE_URL}/api/taquilla/boletos/${ticketData.id_boleto}/canjear`, {
               method: 'POST',
               headers,
-              body: JSON.stringify({ observaciones: 'Canje automÃ¡tico al escanear QR en taquilla' })
+              body: JSON.stringify({ observaciones: 'Canje automático al escanear QR en taquilla' })
             });
             if (canjearRes.ok) {
               ticketData.estado = 'canjeado';
@@ -4338,27 +4338,27 @@
               isVigente = false;
               isCanjeado = true;
               wasJustRedeemed = true;
-              feedbackMessage = `Boleto ${ticketData.folio} validado y canjeado con Ã©xito. Acceso Autorizado.`;
+              feedbackMessage = `Boleto ${ticketData.folio} validado y canjeado con éxito. Acceso autorizado.`;
             } else {
               const errData = await canjearRes.json();
-              console.warn('[SCANNER] FallÃ³ canje automÃ¡tico:', errData.error);
+              console.warn('[SCANNER] Falló canje automático:', errData.error);
             }
           } catch (eCanje) {
-            console.error('[SCANNER] Error en peticiÃ³n de canje automÃ¡tico:', eCanje);
+            console.error('[SCANNER] Error en petición de canje automático:', eCanje);
           }
         }
 
         if (isCanjeado && !wasJustRedeemed) {
           outcome = 'duplicado';
-          feedbackMessage = `Boleto ${ticketData.folio} ya fue canjeado previamente. Acceso Rechazado.`;
+          feedbackMessage = `Boleto ${ticketData.folio} ya fue canjeado previamente. Acceso rechazado.`;
           feedbackTone = 'error';
         } else if (stateVal.toLowerCase() === 'vencido') {
           outcome = 'vencido';
-          feedbackMessage = `Boleto ${ticketData.folio} esta vencido. Acceso Rechazado.`;
+          feedbackMessage = `Boleto ${ticketData.folio} está vencido. Acceso rechazado.`;
           feedbackTone = 'error';
         } else if (stateVal.toLowerCase() === 'cancelado') {
           outcome = 'cancelado';
-          feedbackMessage = `Boleto ${ticketData.folio} se encuentra cancelado. Acceso Rechazado.`;
+          feedbackMessage = `Boleto ${ticketData.folio} se encuentra cancelado. Acceso rechazado.`;
           feedbackTone = 'error';
         }
 
@@ -4371,20 +4371,20 @@
             id_boleto: ticketData.id_boleto,
             qr_token: ticketData.qr_token || ticketData.folio || 'manual_entry',
             resultado: outcome,
-            observaciones: `ValidaciÃ³n por taquillero. Resultado: ${outcome}`
+            observaciones: `Validación por taquillero. Resultado: ${outcome}`
           })
           });
         }
 
         setScannerFeedback(feedbackMessage, feedbackTone);
         renderScanResultCard(ticketData, lookupValue, feedbackMessage, wasJustRedeemed);
-        
+
         // Refresh logs table
         loadTabContent(true);
       } catch (error) {
         console.error(error);
         setScannerFeedback('Error al consultar el boleto en el servidor local.', 'error');
-        renderScanResultCard(null, lookupValue, 'Error de conexiÃ³n.');
+        renderScanResultCard(null, lookupValue, 'Error de conexión.');
       } finally {
         scannerState.isValidating = false;
       }
@@ -4393,15 +4393,15 @@
     function renderScanResultCard(ticket, rawInput, feedback, wasJustRedeemed = false) {
       const scanResultBody = document.getElementById('scanResultBody');
       const scanCheckedAt = document.getElementById('scanCheckedAt');
-      
-      scanCheckedAt.textContent = `LeÃ­do: ${new Date().toLocaleTimeString()}`;
+
+      scanCheckedAt.textContent = `Leído: ${new Date().toLocaleTimeString()}`;
 
       if (!ticket) {
         scanResultBody.innerHTML = `
           <div class="scanner-details-card" style="border-color: rgba(239,68,68,0.25)">
             <div style="text-align: center;">
-              <span class="tag tag-danger">No VÃ¡lido</span>
-              <h4 style="margin: 12px 0 6px; font-family: Fredoka, sans-serif; font-size: 1.2rem;">Boleto InvÃ¡lido o Inexistente</h4>
+              <span class="tag tag-danger">No Válido</span>
+              <h4 style="margin: 12px 0 6px; font-family: Fredoka, sans-serif; font-size: 1.2rem;">Boleto Inválido o Inexistente</h4>
               <p style="margin: 0; font-size: 0.85rem; color: var(--text-soft);">${escapeHtml(feedback)}</p>
             </div>
             <div class="folio-code" style="text-align: center; justify-content: center; background: rgba(239,68,68,0.06); border-color: rgba(239,68,68,0.12); color: #ff8b8b;">
@@ -4419,7 +4419,7 @@
       let badgeLabel = 'Vigente - Autorizado';
       if (wasJustRedeemed) {
         badgeClass = 'tag-success';
-        badgeLabel = 'Canjeado con Ã‰xito - Autorizado';
+        badgeLabel = 'Canjeado con Éxito - Autorizado';
       } else if (isCanjeado) {
         badgeClass = 'tag-warning';
         badgeLabel = 'Canjeado - Rechazado';
@@ -4435,7 +4435,7 @@
         <div class="scanner-details-card" style="border-color: ${(isVigente || wasJustRedeemed) ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}">
           <div style="text-align: center; display: grid; gap: 8px;">
             <span class="tag ${badgeClass}">${badgeLabel}</span>
-            <h4 style="margin: 6px 0 0; font-family: Fredoka, sans-serif; font-size: 1.25rem;">Premio MisiÃ³n MUCH</h4>
+            <h4 style="margin: 6px 0 0; font-family: Fredoka, sans-serif; font-size: 1.25rem;">Premio Misión MUCH</h4>
             <span style="font-size: 0.8rem; color: var(--text-dim);">${escapeHtml(feedback)}</span>
           </div>
 
@@ -4446,14 +4446,14 @@
           <div class="scanner-meta-grid">
             <div class="scanner-meta-item">
               <span>Visitante</span>
-              <strong>${escapeHtml(ticket.nombre_usuario || 'AnÃ³nimo')}</strong>
+              <strong>${escapeHtml(ticket.nombre_usuario || 'Anónimo')}</strong>
             </div>
             <div class="scanner-meta-item">
               <span>Correo</span>
               <strong>${escapeHtml(ticket.correo_usuario || 'Sin correo')}</strong>
             </div>
             <div class="scanner-meta-item">
-              <span>GeneraciÃ³n</span>
+              <span>Generación</span>
               <strong>${formatDate(ticket.fecha_generacion)}</strong>
             </div>
             <div class="scanner-meta-item">
@@ -4472,12 +4472,12 @@
 
           ${isVigente ? `
             <button class="btn btn-solid" style="background: linear-gradient(135deg, #10b981, #059669); margin-top: 10px;" onclick="window.canjearBoletoTaquilla(${ticket.id_boleto}, '${escapeHtml(ticket.folio)}')">
-              ðŸŽŸï¸ Canjear y Registrar Acceso
+              🎟️ Canjear y Registrar Acceso
             </button>
           ` : ''}
           ${ticket.estado !== 'cancelado' ? `
             <button class="btn btn-danger" onclick="window.cancelarBoletoTaquilla(${ticket.id_boleto}, '${escapeHtml(ticket.folio)}')">
-              ðŸš« Cancelar Boleto permanente
+              🚫 Cancelar Boleto permanente
             </button>
           ` : ''}
         </div>
@@ -4485,7 +4485,7 @@
     }
 
     window.canjearBoletoTaquilla = async function(idBoleto, folio) {
-      if (!confirm(`Â¿Confirmas el canje e ingreso fÃ­sico para el boleto ${folio}?`)) return;
+      if (!confirm(`¿Confirmas el canje e ingreso físico para el boleto ${folio}?`)) return;
       try {
         const res = await fetch(`${API_BASE_URL}/api/taquilla/boletos/${idBoleto}/canjear`, {
           method: 'POST',
@@ -4502,16 +4502,16 @@
     };
 
     window.cancelarBoletoTaquilla = async function(idBoleto, folio) {
-      if (!confirm(`Â¿Confirmas la cancelaciÃ³n definitiva del boleto ${folio}?`)) return;
+      if (!confirm(`¿Confirmas la cancelación definitiva del boleto ${folio}?`)) return;
       try {
         const res = await fetch(`${API_BASE_URL}/api/taquilla/boletos/${idBoleto}/cancelar`, {
           method: 'POST',
           headers: getHeaders(),
-          body: JSON.stringify({ observaciones: 'CancelaciÃ³n directa en mÃ³dulo taquilla' })
+          body: JSON.stringify({ observaciones: 'Cancelación directa en módulo taquilla' })
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Error al cancelar.');
-        setScannerFeedback(`Boleto ${folio} cancelado con Ã©xito.`, 'error');
+        setScannerFeedback(`Boleto ${folio} cancelado con éxito.`, 'error');
         validateTicket(folio, true);
       } catch (error) {
         alert(error.message);
@@ -4528,13 +4528,13 @@
     async function startScanner() {
       const hasSecure = window.isSecureContext || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       if (!hasSecure) {
-        setScannerFeedback('El escaneo por cÃ¡mara requiere conexiÃ³n segura HTTPS o localhost.', 'error');
+        setScannerFeedback('El escaneo por cámara requiere conexión segura HTTPS o localhost.', 'error');
         return;
       }
 
       try {
-        document.getElementById('scannerHardwareStatus').textContent = 'Iniciando cÃ¡mara...';
-        
+        document.getElementById('scannerHardwareStatus').textContent = 'Iniciando cámara...';
+
         if (!scannerState.instance) {
           scannerState.instance = new Html5Qrcode('ticketReader');
         }
@@ -4545,29 +4545,29 @@
           async (decodedText) => {
             const now = Date.now();
             if (decodedText === scannerState.lastPayload && now - scannerState.lastScanAt < 2000) return;
-            
+
             scannerState.lastPayload = decodedText;
             scannerState.lastScanAt = now;
             await validateTicket(decodedText);
           },
-          () => {} // Ignorar lecturas vacÃ­as
+          () => {} // Ignorar lecturas vacías
         );
 
         scannerState.active = true;
         document.getElementById('scannerPlaceholder').classList.add('hidden');
         document.getElementById('btnStartScan').disabled = true;
         document.getElementById('btnStopScan').disabled = false;
-        document.getElementById('scannerHardwareStatus').textContent = 'ðŸŸ¢ CÃ¡mara Activa';
+        document.getElementById('scannerHardwareStatus').textContent = '🟢 Cámara Activa';
       } catch (error) {
         console.error(error);
-        document.getElementById('scannerHardwareStatus').textContent = 'Error cÃ¡mara';
-        setScannerFeedback('No se pudo iniciar la cÃ¡mara. Otorga permisos o escribe el folio manualmente.', 'error');
+        document.getElementById('scannerHardwareStatus').textContent = 'Error cámara';
+        setScannerFeedback('No se pudo iniciar la cámara. Otorga permisos o escribe el folio manualmente.', 'error');
       }
     }
 
     async function stopScanner() {
       if (!scannerState.instance || !scannerState.active) return;
-      
+
       try {
         await scannerState.instance.stop();
       } catch (error) {
@@ -4577,7 +4577,7 @@
         document.getElementById('scannerPlaceholder').classList.remove('hidden');
         document.getElementById('btnStartScan').disabled = false;
         document.getElementById('btnStopScan').disabled = true;
-        document.getElementById('scannerHardwareStatus').textContent = 'CÃ¡mara apagada';
+        document.getElementById('scannerHardwareStatus').textContent = 'Cámara apagada';
       }
     }
 
@@ -4586,7 +4586,7 @@
       const messageEl = document.getElementById('adminAuthMessage');
       messageEl.className = 'login-note';
       messageEl.textContent = 'Redirigiendo a Google...';
-      
+
       try {
         const user = await window.iniciarSesionConGoogle();
         if (user) {
@@ -4597,7 +4597,7 @@
       } catch (error) {
         console.error(error);
         messageEl.className = 'login-note error';
-        messageEl.textContent = error.message || 'Error al iniciar sesiÃ³n con Google.';
+        messageEl.textContent = error.message || 'Error al iniciar sesión con Google.';
       }
     });
 
@@ -4663,7 +4663,7 @@
     const adminMenuToggle = document.getElementById('adminMenuToggle');
     const adminSidebarClose = document.getElementById('adminSidebarClose');
     const sidebar = document.querySelector('.sidebar');
-    
+
     if (adminMenuToggle && sidebar) {
       adminMenuToggle.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -4694,7 +4694,7 @@
       }
     });
 
-    // Evitar que el botÃ³n "atrÃ¡s" del navegador muestre el panel sin sesiÃ³n activa
+    // Evitar que el botón "atrás" del navegador muestre el panel sin sesión activa
     window.addEventListener('pageshow', (event) => {
       const localUser = JSON.parse(localStorage.getItem('much_google_user') || 'null');
       if (!localUser) {

@@ -1,11 +1,11 @@
-﻿// Validar ubicaciÃ³n antes de permitir jugar
+﻿// Validar ubicación antes de permitir jugar
 (function() {
   // DESACTIVADO TEMPORALMENTE para permitir pruebas y juego remoto
   return;
 
   const raw = sessionStorage.getItem('much_last_location_verification');
   let valid = false;
-  let msg = 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicaciÃ³n.';
+  let msg = 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicación.';
   if (raw) {
     try {
       const verif = JSON.parse(raw);
@@ -14,26 +14,26 @@
       if (transcurrido <= vigenciaMs && verif.dentro_del_museo) {
         valid = true;
       } else if (transcurrido > vigenciaMs) {
-        msg = 'La verificaciÃ³n de ubicaciÃ³n ha expirado. Por favor, verifÃ­cala de nuevo.';
+        msg = 'La verificación de ubicación ha expirado. Por favor, verifícala de nuevo.';
       } else {
-        msg = verif.mensaje_resultado || 'No te encuentras en el Museo Chiapas de Ciencia y TecnologÃ­a.';
+        msg = verif.mensaje_resultado || 'No te encuentras en el Museo Chiapas de Ciencia y Tecnología.';
       }
     } catch (e) {}
   }
   if (!valid) {
     alert(msg);
-    window.location.href = '../index.html?reason=location_required&msg=' + encodeURIComponent(msg);
-    throw new Error('Acceso denegado: ubicaciÃ³n no vÃ¡lida.');
+    window.location.href = '../index.htmlÁreason=location_required&msg=' + encodeURIComponent(msg);
+    throw new Error('Acceso denegado: ubicación no válida.');
   }
 })();
 
-/* =================== Datos de ConfiguraciÃ³n =================== */
+/* =================== Datos de Configuración =================== */
 const params = new URLSearchParams(location.search);
 const SALA = params.get('sala') || 'biodiversidad';
 const STATION_KEY = (SALA || 'biodiversidad').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
 
-// ðŸ›¡ï¸ BLINDAJE NIVEL DIOS: Guardar en memoria PERMANENTE
+// 🛡️ BLINDAJE NIVEL DIOS: Guardar en memoria PERMANENTE
 const LUGAR_EN_URL = (params.get('lugar') || '').trim();
 if (LUGAR_EN_URL) {
   localStorage.setItem('much_lugar_seguro', LUGAR_EN_URL);
@@ -48,8 +48,8 @@ const BIODIVERSIDAD_REQUIRED_QUESTIONS = [
   {
     id: 'biodiversidad-dispersion-semillas-mono-arana',
     sala: 'biodiversidad',
-    text: 'Â¿CuÃ¡l de los siguientes animales ayuda a dispersar semillas?',
-    options: ['Mono araÃ±a', 'Cocodrilo', 'Tortuga marina', 'TiburÃ³n'],
+    text: '¿Cuál de los siguientes animales ayuda a dispersar semillas?',
+    options: ['Mono araña', 'Cocodrilo', 'Tortuga marina', 'Tiburón'],
     correctIndex: 0,
     points: 10,
     _biodiversityRequired: true
@@ -57,8 +57,8 @@ const BIODIVERSIDAD_REQUIRED_QUESTIONS = [
   {
     id: 'biodiversidad-no-dispersa-semillas-tiburon',
     sala: 'biodiversidad',
-    text: 'Â¿CuÃ¡l de los siguientes animales no ayuda a dispersar semillas?',
-    options: ['TucÃ¡n', 'MurciÃ©lago frugÃ­voro', 'Mono araÃ±a', 'TiburÃ³n'],
+    text: '¿Cuál de los siguientes animales no ayuda a dispersar semillas?',
+    options: ['Tucán', 'Murciélago frugívoro', 'Mono araña', 'Tiburón'],
     correctIndex: 3,
     points: 10,
     _biodiversityRequired: true
@@ -66,7 +66,7 @@ const BIODIVERSIDAD_REQUIRED_QUESTIONS = [
   {
     id: 'biodiversidad-serpiente-no-importancia-medica-mazacuata',
     sala: 'biodiversidad',
-    text: 'Â¿CuÃ¡l de las siguientes serpientes no es considerada de importancia mÃ©dica?',
+    text: '¿Cuál de las siguientes serpientes no es considerada de importancia médica?',
     options: ['Nauyaca', 'Coralillo', 'Cascabel', 'Mazacuata o boa'],
     correctIndex: 3,
     points: 10,
@@ -74,7 +74,7 @@ const BIODIVERSIDAD_REQUIRED_QUESTIONS = [
   }
 ];
 const BIODIVERSIDAD_OPTIONAL_STATION_KEY = `${STATION_KEY}-complemento-v1`;
-// FunciÃ³n para mezclar arrays
+// Función para mezclar arrays
 const shuffle = a => window.MuchQuestionPool?.shuffleArray
   ? window.MuchQuestionPool.shuffleArray(a)
   : a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
@@ -182,9 +182,9 @@ function buildBiodiversityQuestionDeck(questions) {
   return shuffle(questions).slice(0, NUM_QUESTIONS);
 }
 
-// Placeholder: Se llenarÃ¡ desde el JSON
+// Placeholder: Se llenará desde el JSON
 let QUESTIONS = [];
-// ðŸ”’ BANDERA DE SEGURIDAD (Evita dobles registros al dar clic rÃ¡pido)
+// 🔒 BANDERA DE SEGURIDAD (Evita dobles registros al dar clic rápido)
 let quizIniciando = false;
 
 function clearStationQuestionDeck() {
@@ -294,7 +294,7 @@ async function guardarResultadoEstacionMySQL({ puntaje_total, num_correctas, num
       });
     }
 
-    // Pasar parÃ¡metros al primer nivel directamente
+    // Pasar parámetros al primer nivel directamente
     await progreso.guardarProgresoUsuario(estacionId, {
       puntaje: puntaje_total,
       aciertos: num_correctas,
@@ -306,7 +306,7 @@ async function guardarResultadoEstacionMySQL({ puntaje_total, num_correctas, num
   }
 }
 
-// â° FUNCIÃ“N CRÃTICA: Obtener hora exacta de MÃ©xico
+// ⏰ FUNCIÓN CRÍTICA: Obtener hora exacta de México
 function getMexicoTime() {
   const parts = getMexicoDateParts();
   const hour = parts.hour === '24' ? '00' : parts.hour;
@@ -334,7 +334,7 @@ async function loadPreguntas() {
           console.log('[loadPreguntas] Fetch exitoso. Total:', bank.length);
         }
       } catch (fErr) {
-        console.warn('[loadPreguntas] Fetch fallÃ³ (CORS o Red):', fErr);
+        console.warn('[loadPreguntas] Fetch falló (CORS o Red):', fErr);
       }
     }
 
@@ -348,7 +348,7 @@ async function loadPreguntas() {
     const normalize = (it) => {
       const id = it.id ?? it.id_pregunta ?? it.codigo ?? '';
       const sala = it.sala ?? it.sala_codigo ?? it.estacion ?? it.station ?? '';
-      const text = it.text ?? it.pregunta ?? it.enunciado ?? 'Â¿...?';
+      const text = it.text ?? it.pregunta ?? it.enunciado ?? '¿...?';
       const desc = it.desc ?? it.descripcion ?? '';
       let options = it.options ?? it.opciones ?? it.respuestas ?? [];
       let correctIndex = it.correctIndex ?? it.correcta_index;
@@ -401,14 +401,14 @@ async function loadPreguntas() {
     return QUESTIONS;
   } catch (err) {
     console.error('[loadPreguntas] ERROR FATAL:', err);
-    // Banco de emergencia Ãºltimo recurso
+    // Banco de emergencia último recurso
     QUESTIONS = [{ text: 'Error al cargar preguntas. Revisa la consola.', options: ['Reintentar'], correctIndex: 0, points: 0, desc: '' }];
     return QUESTIONS;
   }
 }
 
 // ------------------------------------------------------------
-// 2. GESTIÃ“N DE PARTIDAS (DB TRACKING)
+// 2. GESTIÓN DE PARTIDAS (DB TRACKING)
 // ------------------------------------------------------------
 
 async function startQuizInDB() {
@@ -434,18 +434,18 @@ async function startQuizInDB() {
     });
 
     if (!result?.id_intento) {
-      console.info('[Sync] Intento remoto no disponible; el quiz continÃºa en modo local.');
+      console.info('[Sync] Intento remoto no disponible; el quiz continúa en modo local.');
       quizIniciando = false;
       return null;
     }
 
-    console.log("âœ… Intento iniciado en MySQL. ID Intento:", result.id_intento);
+    console.log("✅ Intento iniciado en MySQL. ID Intento:", result.id_intento);
 
     sessionStorage.setItem('much_current_attempt_id', result.id_intento);
     return result.id_intento;
 
   } catch (e) {
-    console.error("ExcepciÃ³n al iniciar quiz en MySQL:", e);
+    console.error("Excepción al iniciar quiz en MySQL:", e);
     quizIniciando = false;
     return null;
   }
@@ -459,7 +459,7 @@ async function endQuizInDB({ puntaje_total, num_correctas, num_preguntas }) {
     const attemptId = sessionStorage.getItem('much_current_attempt_id');
     if (!attemptId) return;
 
-    console.log(`ðŸ Finalizando intento ${attemptId} en MySQL...`);
+    console.log(`🏁 Finalizando intento ${attemptId} en MySQL...`);
 
     const isPassed = num_correctas >= 7;
 
@@ -470,7 +470,7 @@ async function endQuizInDB({ puntaje_total, num_correctas, num_preguntas }) {
       aprobado: isPassed
     });
 
-    console.log("âœ… Intento actualizado en MySQL al finalizar.");
+    console.log("✅ Intento actualizado en MySQL al finalizar.");
 
   } catch (e) { console.warn('Error endQuizInDB en MySQL:', e); }
 }
@@ -622,7 +622,7 @@ class UIManager {
 
   playCompletionSound() {
     try {
-      const audio = new Audio('../Sonidos/Estacion completada.mp3');
+      const audio = new Audio('../Sonidos/Estación completada.mp3');
       audio.play().catch(e => console.warn('No se pudo reproducir audio de completado:', e));
     } catch (e) {
       console.warn('Error al reproducir audio:', e);
@@ -664,7 +664,7 @@ class UIManager {
       if (idx === correctIdx) btn.classList.add('option-btn--correct');
     });
 
-    if (e.status) e.status.textContent = 'âŒ Â¡Incorrecto! (Se detectÃ³ cambio de pantalla)';
+    if (e.status) e.status.textContent = '❌ ¡Incorrecto! (Se detectó cambio de pantalla)';
     this.playIncorrectSound();
     
     s.answers.push({ qIndex: s.idx, question: q.text, choice: 'Trampa (Foco perdido)', correct: false });
@@ -711,9 +711,9 @@ class UIManager {
     document.body.appendChild(overlay);
 
     overlay.innerHTML = `
-      <h1 style="font-size: clamp(24px, 6vw, 42px); font-weight: 900; margin-bottom: 12px; letter-spacing: 1px;">ðŸš« PANTALLA BLOQUEADA</h1>
+      <h1 style="font-size: clamp(24px, 6vw, 42px); font-weight: 900; margin-bottom: 12px; letter-spacing: 1px;">🚫 PANTALLA BLOQUEADA</h1>
       <p style="font-size: clamp(16px, 4vw, 22px); max-width: 600px; line-height: 1.4; margin-bottom: 20px;">
-        Se ha detectado cambio de pantalla de manera persistente. Los puntos de esta estaciÃ³n han sido invalidados.
+        Se ha detectado cambio de pantalla de manera persistente. Los puntos de esta estación han sido invalidados.
       </p>
       <div style="font-size: clamp(30px, 8vw, 48px); font-weight: 900;" id="cheatCountdown">15 s</div>
     `;
@@ -735,7 +735,7 @@ class UIManager {
         aprobada: false
       });
     } catch (e) {
-      console.warn('Error al invalidar estaciÃ³n por trampa:', e);
+      console.warn('Error al invalidar estación por trampa:', e);
     }
 
     let seconds = 15;
@@ -757,7 +757,7 @@ class UIManager {
 
   updateQuestionTimerDisplay() {
     if (!this.e.questionTimer) return;
-    this.e.questionTimer.textContent = `â³ ${this.questionCountdown} s`;
+    this.e.questionTimer.textContent = `⏳ ${this.questionCountdown} s`;
     this.e.questionTimer.classList.toggle('low', this.questionCountdown <= 5 && this.questionCountdown > 3);
     this.e.questionTimer.classList.toggle('urgent', this.questionCountdown <= 3);
   }
@@ -809,7 +809,7 @@ class UIManager {
       this.render();
       return;
     }
-    // El nuevo deadline se crearÃ¡ en render() cuando se llame startQuestionTimer()
+    // El nuevo deadline se creará en render() cuando se llame startQuestionTimer()
     this.render();
   }
 
@@ -821,7 +821,7 @@ class UIManager {
     s.locked = true;
     s.selected = null;
 
-    if (e.status) e.status.textContent = 'â° Se acabÃ³ el tiempo. Respuesta incorrecta.';
+    if (e.status) e.status.textContent = '⏰ Se acabó el tiempo. Respuesta incorrecta.';
     [...e.options.querySelectorAll('.option-btn')].forEach((btn, idx) => {
       btn.disabled = true;
       const correctIdx = QUESTIONS[s.idx].correctIndex;
@@ -849,7 +849,7 @@ class UIManager {
       }
     })();
 
-    if (e.questionTimer) e.questionTimer.textContent = 'â³ 0 s';
+    if (e.questionTimer) e.questionTimer.textContent = '⏳ 0 s';
     this.sound.wrong();
 
     setTimeout(() => {
@@ -880,13 +880,13 @@ class UIManager {
   clock() {
     const tick = () => {
       const t = new Date(), hh = String(t.getHours()).padStart(2, '0'), mm = String(t.getMinutes()).padStart(2, '0');
-      if (this.e.timer) this.e.timer.textContent = `â° ${hh}:${mm}`;
+      if (this.e.timer) this.e.timer.textContent = `⏰ ${hh}:${mm}`;
       setTimeout(tick, 10_000);
     }; tick();
   }
 
   redirectToRegistration() {
-    // Redirigir al mapa principal en la vista de preparaciÃ³n
+    // Redirigir al mapa principal en la vista de preparación
     const searchParams = new URLSearchParams(window.location.search);
 
     window.location.href = '../index.html?' + searchParams.toString();
@@ -1032,10 +1032,10 @@ class UIManager {
         }, { countAttempt: true });
 
         e.finalTitle.classList.remove('visually-hidden');
-        e.finalTitle.textContent = 'Sigue explorando âœ¨';
+        e.finalTitle.textContent = 'Sigue explorando ✨';
         window.MuchStationCompletion?.clearInline(
           e.finalMsg,
-          `Lograste un ${Math.round(s.correct / QUESTIONS.length * 100)} %. AÃºn no completas esta estaciÃ³n, pero cada intento te acerca mÃ¡s. Presiona Â«Intentar de nuevoÂ» cuando quieras seguir explorando.`
+          `Lograste un ${Math.round(s.correct / QUESTIONS.length * 100)} %. Aún no completas esta estación, pero cada intento te acerca más. Presiona «Intentar de nuevo» cuando quieras seguir explorando.`
         );
         e.giftRow.classList.add('d-none');
         e.retryRow.classList.remove('d-none');
@@ -1056,12 +1056,12 @@ class UIManager {
       const col = document.createElement('div'); col.className = 'col-12';
       const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'option-btn';
       btn.setAttribute('data-index', i);
-      btn.innerHTML = `<span class="emoji">ðŸ”¹</span><span>${label}</span>`;
+      btn.innerHTML = `<span class="emoji">🔹</span><span>${label}</span>`;
       btn.addEventListener('click', () => this.choose(i));
       col.appendChild(btn); e.options.appendChild(col);
     });
 
-    e.nextBtn.textContent = s.idx === QUESTIONS.length - 1 ? 'Finalizar ðŸŽ‰' : 'Siguiente âž¡ï¸';
+    e.nextBtn.textContent = s.idx === QUESTIONS.length - 1 ? 'Finalizar 🎉' : 'Siguiente ➡️';
     this.updateScoreboard();
     if (e.hint) e.hint.textContent = 'Consejo: solo puedes elegir una respuesta.';
     this.startQuestionTimer();
@@ -1080,11 +1080,11 @@ class UIManager {
       if (idx === i && i !== correctIdx) btn.classList.add('option-btn--incorrect');
     });
     if (i === correctIdx) {
-      if (e.status) e.status.textContent = 'âœ… Â¡Correcto!';
+      if (e.status) e.status.textContent = '✅ ¡Correcto!';
       s.points += q.points; s.correct += 1;
       this.sound.correct(); this.confetti.launch(40);
     } else {
-      if (e.status) e.status.textContent = 'âŒ Â¡Incorrecto!';
+      if (e.status) e.status.textContent = '❌ ¡Incorrecto!';
       this.sound.wrong();
     }
     s.answers.push({ qIndex: s.idx, question: q.text, choice: q.options[i], correct: i === correctIdx });
@@ -1111,7 +1111,7 @@ class UIManager {
 
   next() {
     const s = this.state, { e } = this;
-    if (s.selected === null) { if (e.status) e.status.textContent = 'âš ï¸ Selecciona una respuesta.'; return; }
+    if (s.selected === null) { if (e.status) e.status.textContent = '⚠️ Selecciona una respuesta.'; return; }
     e.nextBtn.disabled = true; setTimeout(() => { e.nextBtn.disabled = false; }, 180);
     this.advanceToNextQuestion();
   }
@@ -1160,11 +1160,11 @@ function verifyStationActive(estacionId) {
     .then(progreso => progreso.comprobarEstacionActiva(estacionId))
     .then(active => {
       if (!active) {
-        alert('Esta estaciÃ³n se encuentra inactiva o cerrada.');
+        alert('Esta estación se encuentra inactiva o cerrada.');
         window.location.href = '../index.html';
       }
     })
-    .catch(err => console.warn('No se pudo verificar el estado de la estaciÃ³n:', err));
+    .catch(err => console.warn('No se pudo verificar el estado de la estación:', err));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1206,7 +1206,7 @@ document.addEventListener('DOMContentLoaded', () => {
       miniMapAvatarImg.src = `../avatars/dino1.png`; // Fallback
     }
 
-    // 2. Obtener EstaciÃ³n Actual
+    // 2. Obtener Estación Actual
     const stations = {
       '1': { x: 80, y: 18 },
       '2': { x: 56, y: 42 },
@@ -1216,10 +1216,10 @@ document.addEventListener('DOMContentLoaded', () => {
       '6': { x: 42, y: 66 }
     };
 
-    // Identificar sala actual para forzar la posiciÃ³n correcta
+    // Identificar sala actual para forzar la posición correcta
     let currentStationId = localStorage.getItem('much_current_station') || '3';
     
-    // Si estamos en biodiversidad, forzamos la estaciÃ³n 3
+    // Si estamos en biodiversidad, forzamos la estación 3
     if (window.location.pathname.includes('SALA-Biodiversidad-y-Conocimiento')) {
       currentStationId = '3';
     } else if (window.location.pathname.includes('Juego_Spinosaurio')) {

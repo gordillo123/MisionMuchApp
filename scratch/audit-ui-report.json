@@ -132,7 +132,7 @@
       },
       {
         "stationId": "4",
-        "rulesTitle": "Sala B de Energia",
+        "rulesTitle": "Sala B de Energía",
         "url": "http://localhost:3000/sala_energia/index.html?from=portada&sala=energia",
         "expectedPath": "/sala_energia/index.html",
         "ok": true

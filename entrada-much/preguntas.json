@@ -12,7 +12,7 @@
     "points": 10
   },
   {
-    "text": "🦖 ¿Cuántos dinosaurios hay en el recorrido Sbeel?",
+    "text": "🦖 ¿Cuántos dinosaurios hay en el recorrido SBEEL?",
     "options": ["12", "16", "36", "24"],
     "correctIndex": 1,
     "points": 10
@@ -24,7 +24,7 @@
     "points": 10
   },
   {
-    "text": "🦖 ¿Cuántos dinosaurios hay aparte de los del recorrido Sbeel?",
+    "text": "🦖 ¿Cuántos dinosaurios hay aparte de los del recorrido SBEEL?",
     "options": ["12", "5", "10", "16"],
     "correctIndex": 0,
     "points": 10

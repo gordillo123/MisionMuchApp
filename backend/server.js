@@ -225,7 +225,7 @@ async function evaluarBloqueoPorIntentos(connection, idUsuario, idEstacion) {
     fecha_finalizacion: new Date().toISOString(),
     fecha_puede_volver: fechaPuedeVolver.toISOString(),
     fecha_puede_volver_texto: playtime.formatFechaMX(fechaPuedeVolver),
-    mensaje: bloqueoGlobal?.mensaje || playtime.buildMensajeBloqueoIntentos(fechaPuedeVolver, bloqueoGlobal?.premio?.detalle_bloqueo || 'esta estacion')
+    mensaje: bloqueoGlobal?.mensaje || playtime.buildMensajeBloqueoIntentos(fechaPuedeVolver, bloqueoGlobal?.premio?.detalle_bloqueo || 'esta estación')
   };
 
   return { fallos, bloqueo };
@@ -650,7 +650,7 @@ app.post('/api/auth/google', async (req, res) => {
     if (correosEspeciales.includes(correo)) {
       const adminRoleId = await obtenerOCrearRolId(
         'admin',
-        'Administrador general del sistema con acceso completo a metricas y registros'
+        'Administrador general del sistema con acceso completo a métricas y registros'
       );
       const taquillaRoleId = await obtenerOCrearRolId(
         'taquilla',
@@ -1135,7 +1135,7 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
   const { id_usuario, id_estacion, puntaje, aciertos, errores, aprobado, finalizado } = req.body;
 
   if (!id_usuario || !id_estacion) {
-    return res.status(400).json({ error: 'Faltan parametros: id_usuario o id_estacion' });
+    return res.status(400).json({ error: 'Faltan parámetros: id_usuario o id_estacion' });
   }
 
   const connection = await pool.getConnection();
@@ -1148,7 +1148,7 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
     const [[estacion]] = await connection.query('SELECT activa, nombre, puntos, puntaje_minimo FROM estaciones WHERE id_estacion = ?', [id_estacion]);
     if (!estacion || !estacion.activa) {
       await connection.rollback();
-      return res.status(403).json({ error: 'La estacion se encuentra inactiva.' });
+      return res.status(403).json({ error: 'La estación se encuentra inactiva.' });
     }
 
     const [[progress]] = await connection.query(
@@ -1193,7 +1193,7 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
 
       await connection.commit();
       return res.status(200).json({
-        message: 'Intento de estacion activo reutilizado.',
+        message: 'Intento de estación activo reutilizado.',
         id_intento: activeAttempt.id_intento,
         finalizado: false,
         aprobado: false,
@@ -1219,7 +1219,7 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
     await connection.commit();
 
     res.status(201).json({
-      message: 'Intento de estacion registrado correctamente.',
+      message: 'Intento de estación registrado correctamente.',
       id_intento: result.insertId,
       finalizado: intentoFinalizado,
       aprobado: aprobadoValidado,
@@ -1290,7 +1290,7 @@ app.put('/api/intentos/:id_intento', permitirJugador, verificarBloqueoJugador, a
 
     if (!intentoActual.activa) {
       await connection.rollback();
-      return res.status(403).json({ error: 'La estacion se encuentra inactiva.' });
+      return res.status(403).json({ error: 'La estación se encuentra inactiva.' });
     }
 
     const validacionEstacion = evaluarAprobacionEstacion(intentoActual, puntaje, aprobado);
@@ -1315,7 +1315,7 @@ app.put('/api/intentos/:id_intento', permitirJugador, verificarBloqueoJugador, a
     await connection.commit();
 
     res.json({
-      message: 'Intento de estacion actualizado correctamente.',
+      message: 'Intento de estación actualizado correctamente.',
       finalizado: intentoFinalizado,
       aprobado: aprobadoValidado,
       intentos_fallidos: intentos.fallos,
@@ -1544,7 +1544,7 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
     const seccionBoleto = destinoNormalizado ? (esBoletoPlanetario(destinoNormalizado) ? 'Planetario' : 'MUCH') : '';
     const lugarBoleto = typeof lugar === 'string' && lugar.trim()
       ? lugar.trim()
-      : (destinoNormalizado ? (esBoletoPlanetario(destinoNormalizado) ? 'Planetario Tuxtla' : 'Museo Chiapas de Ciencia y Tecnologia') : '');
+      : (destinoNormalizado ? (esBoletoPlanetario(destinoNormalizado) ? 'Planetario Tuxtla' : 'Museo Chiapas de Ciencia y Tecnología') : '');
     const ticketMetadata = recibioSeleccionBoleto ? {
       tipo_entrada: tipoEntradaNormalizado,
       destino_boleto: destinoNormalizado,
@@ -1879,7 +1879,7 @@ app.post('/api/taquilla/boletos/:id_boleto/canjear', permitirTaquillaOAdmin, asy
       );
       return res.status(400).json({
         error: 'boleto_vencido',
-        mensaje: 'El boleto esta vencido y no puede validarse.'
+        mensaje: 'El boleto está vencido y no puede validarse.'
       });
     }
 
@@ -1908,7 +1908,7 @@ app.post('/api/taquilla/boletos/:id_boleto/canjear', permitirTaquillaOAdmin, asy
     if (!canjeResult.affectedRows) {
       return res.status(409).json({
         error: 'boleto_no_disponible',
-        mensaje: 'El boleto ya no esta disponible para validarse.'
+        mensaje: 'El boleto ya no está disponible para validarse.'
       });
     }
 

@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MisiÃ³n MUCH</title>
+  <title>Misión MUCH</title>
   <meta name="description"
-    content="Un emocionante juego de preguntas sobre diversidad, dinosaurios, animales, ciencia y tecnologÃ­a." />
+    content="Un emocionante juego de preguntas sobre diversidad, dinosaurios, animales, ciencia y tecnología." />
   <link rel="preload" as="image" href="assets/logo-institucional-aditech.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -20,9 +20,9 @@
   </script>
   <link rel="stylesheet" href="assets/station-completion.css" />
   <style>
-    /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-       MISIÃ“N MUCH â€” STYLES (TODO EN UNO)
-    â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ────────────────────────────────────────────────
+       MISIÓN MUCH — STYLES (TODO EN UNO)
+    ────────────────────────────────────────────────── */
     :root {
       --msf-red: #F23F3A;
       --msf-pink: #FF76B4;
@@ -46,8 +46,8 @@
       --transition: 0.25s cubic-bezier(.17, .67, .83, .67);
     }
 
-    /* â•â•â•â• OVERRIDES PARA QUE LA SECCIÃ“N DE REGLAS QUEPA EN UNA SOLA VISTA â•â•â•â• */
-    /* Ajustes responsivos que reducen mÃ¡rgenes, tamaÃ±os y ilustraciones para evitar scroll vertical */
+    /* ════ OVERRIDES PARA QUE LA SECCIÓN DE REGLAS QUEPA EN UNA SOLA VISTA ════ */
+    /* Ajustes responsivos que reducen márgenes, tamaños y ilustraciones para evitar scroll vertical */
     @media (max-height: 900px), (max-width: 900px) {
       .rules-modal {
         width: 100vw;
@@ -138,7 +138,7 @@
         font-size: 1.05rem;
       }
 
-      /* Ocultamos las ilustraciones para ganar espacio vertical sin alterar diseÃ±o de tarjetas */
+      /* Ocultamos las ilustraciones para ganar espacio vertical sin alterar diseño de tarjetas */
       .rules-illustration,
       .rules-dino-art,
       .rules-illustration-compass {
@@ -242,7 +242,7 @@
       }
     }
 
-    /* PatrÃ³n geomÃ©trico hexagonal sutil */
+    /* Patrón geométrico hexagonal sutil */
     .bg-particles::before {
       content: '';
       position: absolute;
@@ -342,7 +342,7 @@
       min-width: 0;
     }
 
-    /* TOOLTIP Â¿SABÃAS QUE? */
+    /* TOOLTIP ¿SABÍAS QUE? */
     .badge::before {
       content: attr(data-fact);
       position: absolute;
@@ -391,9 +391,9 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Label Â¿SabÃ­as que? dentro del tooltip */
+    /* Label ¿Sabías que? dentro del tooltip */
     .badge::before {
-      content: "ðŸ’¡ Â¿SabÃ­as que?\A" attr(data-fact);
+      content: "💡 ¿Sabías que?\A" attr(data-fact);
       white-space: pre-line;
     }
 
@@ -441,7 +441,7 @@
       margin: 0 0.2rem;
     }
 
-    /* Gradientes temÃ¡ticos premium para cada palabra */
+    /* Gradientes temáticos premium para cada palabra */
     .nav-slogan .juega {
       background: linear-gradient(135deg, #FFC549 0%, #FFA500 100%);
       -webkit-background-clip: text;
@@ -1277,7 +1277,7 @@
       }
     }
 
-    /* ðŸ“± OPTIMIZACIÃ“N COMPLETA PARA ANDROID / MÃ“VIL EN HORIZONTAL (LANDSCAPE) */
+    /* 📱 OPTIMIZACIÓN COMPLETA PARA ANDROID / MÓVIL EN HORIZONTAL (LANDSCAPE) */
     @media (max-height: 520px) and (orientation: landscape) {
       .main-area {
         padding: 1rem;
@@ -1320,7 +1320,7 @@
         border-width: 1px;
       }
 
-      /* Hero Glass mucho mÃ¡s pequeÃ±o */
+      /* Hero Glass mucho más pequeño */
       .hero-glass {
         padding: 2.2rem 2rem 0.8rem;
         border-radius: 20px;
@@ -1370,7 +1370,7 @@
         gap: 0.5rem;
       }
 
-      /* Vista de PreparaciÃ³n (Prep View) - DistribuciÃ³n en columnas */
+      /* Vista de Preparación (Prep View) - Distribución en columnas */
       .intro-container {
         display: flex;
         flex-direction: row;
@@ -3028,7 +3028,7 @@
       justify-content: center;
     }
 
-    /* â•â•â•â• ESTILOS MEJORADOS PARA MODAL DE REGLAS â•â•â•â• */
+    /* ════ ESTILOS MEJORADOS PARA MODAL DE REGLAS ════ */
     .rules-modal {
       position: relative;
       width: min(1080px, 96vw);
@@ -3310,7 +3310,7 @@
     }
 
     .rule-card-ornate .rule-card-head::before {
-      content: "âœ¦  âœ¦  âœ¦";
+      content: "✦  ✦  ✦";
       position: absolute;
       top: -0.78rem;
       left: 50%;
@@ -3799,7 +3799,7 @@
       transform: translateY(-1px) scale(0.98);
     }
 
-    /* â•â•â•â• MEJORAR VISTA DE PREP TAMBIÃ‰N â•â•â•â• */
+    /* ════ MEJORAR VISTA DE PREP TAMBIÉN ════ */
     .intro-container {
       position: relative;
     }
@@ -4168,7 +4168,7 @@
       }
     }
 
-    /* ðŸ‘¤ PERFIL MODAL */
+    /* 👤 PERFIL MODAL */
     .profile-card {
       background: rgba(20, 21, 35, 0.98);
       backdrop-filter: blur(20px);
@@ -4392,7 +4392,7 @@
       color: #A0A4B8;
     }
 
-    /* SECCIÃ“N CARD */
+    /* SECCIÓN CARD */
     .profile-section-card {
       display: flex;
       align-items: center;
@@ -4817,7 +4817,7 @@
       color: white;
     }
 
-    /* ðŸ“± MÃ“DULOS Y DIÃLOGOS COMPACTOS PARA MÃ“VIL EN HORIZONTAL (LANDSCAPE) */
+    /* 📱 MÓDULOS Y DIÁLOGOS COMPACTOS PARA MÓVIL EN HORIZONTAL (LANDSCAPE) */
     @media (max-height: 520px) {
       .avatar-modal {
         max-height: 96vh;
@@ -5025,9 +5025,9 @@
       }
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ════════════════════════════════════════════════════════════
        ESTILOS DEL ADMINISTRADOR (MODAL)
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ════════════════════════════════════════════════════════════ */
     .admin-overlay {
       position: fixed;
       inset: 0;
@@ -6215,7 +6215,7 @@
       }
     }
 
-    /* Ajuste final del modal de reglas para telÃ©fonos y pantallas angostas. */
+    /* Ajuste final del modal de reglas para teléfonos y pantallas angostas. */
     @media (max-width: 760px) {
       .rules-modal,
       .start-rules-mode .rules-modal {
@@ -6940,7 +6940,7 @@
       }
     }
 
-    /* Station 2 (Spinosaurio) rules theme in prep panel */
+    /* Station 2 (Espinosaurio) rules theme in prep panel */
     .rules-list.station2-rules-list li {
       background: linear-gradient(140deg, rgba(16, 185, 129, 0.18), rgba(59, 130, 246, 0.14));
       border: 1px solid rgba(16, 185, 129, 0.34);
@@ -6963,7 +6963,7 @@
       font-size: 0.92rem;
     }
 
-    /* Station 2 (Spinosaurio) rules theme in modal */
+    /* Station 2 (Espinosaurio) rules theme in modal */
     #rulesOverlay.spino-station-rules-mode .rules-modal {
       border-color: #10b981;
       box-shadow: 0 20px 0px #0f172a;
@@ -7004,7 +7004,7 @@
       color: #0f3d33;
     }
 
-    /* Station 6 (Sbeel) rules theme in prep panel */
+    /* Station 6 (SBEEL) rules theme in prep panel */
     .rules-list.sbeel-station-rules-list li {
       background: linear-gradient(142deg, rgba(251, 191, 36, 0.2), rgba(45, 212, 191, 0.18));
       border: 1px solid rgba(14, 116, 144, 0.36);
@@ -7027,7 +7027,7 @@
       font-size: 0.92rem;
     }
 
-    /* Station 6 (Sbeel) rules theme in modal */
+    /* Station 6 (SBEEL) rules theme in modal */
     #rulesOverlay.sbeel-station-rules-mode .rules-modal {
       border-color: #0ea5e9;
       box-shadow: 0 20px 0px #0f172a;
@@ -7286,7 +7286,7 @@
       }
     }
 
-    /* Station 4 (Sala B - Energia) rules theme in prep panel */
+    /* Station 4 (Sala B - Energía) rules theme in prep panel */
     .rules-list.energy-station-rules-list {
       display: grid;
       gap: 0.7rem;
@@ -7346,7 +7346,7 @@
       text-wrap: balance;
     }
 
-    /* Station 4 (Sala B - Energia) rules theme in modal */
+    /* Station 4 (Sala B - Energía) rules theme in modal */
     #rulesOverlay.energy-station-rules-mode .rules-modal {
       border-color: #0284c7;
       box-shadow: 0 20px 0px #0f172a;
@@ -8849,7 +8849,7 @@
       }
     }
 
-    /* Presentacion final para instrucciones de la mision Spinosaurio. */
+    /* Presentación final para instrucciones de la misión Espinosaurio. */
     #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-modal {
       width: min(1220px, 98vw);
       height: min(96dvh, 900px);
@@ -10007,7 +10007,7 @@
         display: none;
       }
     }
-    /* â•â•â•â• GLOBAL OVERRIDES FOR RULE CARDS AND BUTTONS â•â•â•â• */
+    /* ════ GLOBAL OVERRIDES FOR RULE CARDS AND BUTTONS ════ */
     .rules-board {
       grid-template-rows: none !important;
       grid-auto-rows: max-content !important;
@@ -10041,7 +10041,7 @@
       margin-top: 0 !important;
     }
 
-    /* Override final: Spinosaurio debe llenar la pantalla sin scroll. */
+    /* Override final: Espinosaurio debe llenar la pantalla sin scroll. */
     #rulesOverlay.avatar-overlay.open.spino-station-rules-mode .rules-modal {
       width: 100vw !important;
       height: 100dvh !important;
@@ -11613,9 +11613,9 @@
       overflow: hidden;
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       PANTALLA DE FELICITACIÃ“N â€“ Fondo 100 % blanco, sin bordes
-       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════════════════════════════════════════
+       PANTALLA DE FELICITACIÓN – Fondo 100 % blanco, sin bordes
+       ═══════════════════════════════════════════════════════════ */
     .mission-reward-overlay {
       position: fixed;
       inset: 0;
@@ -11660,7 +11660,7 @@
       transform: translateY(0) scale(1);
     }
 
-    /* â”€â”€ Confetti â”€â”€ */
+    /* ── Confetti ── */
     .mission-confetti {
       position: absolute;
       inset: 0;
@@ -11681,7 +11681,7 @@
       transform: translate3d(0, 0, 0) rotate(var(--piece-rotate, 0deg));
     }
 
-    /* â”€â”€ Logos superiores â”€â”€ */
+    /* ── Logos superiores ── */
     .mission-reward-brand-top,
     .mission-reward-brand-strip {
       position: relative;
@@ -11716,7 +11716,7 @@
       filter: drop-shadow(0 6px 14px rgba(15, 23, 42, 0.16));
     }
 
-    /* â”€â”€ Barra de logos inferior â”€â”€ */
+    /* ── Barra de logos inferior ── */
     .mission-reward-brand-strip {
       gap: clamp(10px, 3vw, 20px);
       margin-top: clamp(16px, 3vw, 26px);
@@ -11751,7 +11751,7 @@
       height: clamp(34px, 7vw, 50px);
     }
 
-    /* â”€â”€ Layout de contenido â”€â”€ */
+    /* ── Layout de contenido ── */
     .mission-reward-content {
       position: relative;
       display: flex;
@@ -11768,7 +11768,7 @@
       overflow: hidden;
     }
 
-    /* â”€â”€ Avatar â”€â”€ */
+    /* ── Avatar ── */
     .mission-reward-avatar-stage {
       display: flex;
       flex-direction: column;
@@ -11858,7 +11858,7 @@
       border: 1.5px solid rgba(14, 165, 233, 0.15);
     }
 
-    /* â”€â”€ Textos â”€â”€ */
+    /* ── Textos ── */
     .mission-reward-copy {
       min-width: 0;
       text-align: center;
@@ -11920,7 +11920,7 @@
       margin-bottom: 2px;
     }
 
-    /* â”€â”€ Tarjetas de selecciÃ³n â”€â”€ */
+    /* ── Tarjetas de selección ── */
     .mission-ticket-options {
       display: grid;
       grid-template-columns: 1fr;
@@ -12014,7 +12014,7 @@
       line-height: 1.2;
     }
 
-    /* â”€â”€ BotÃ³n Continuar â”€â”€ */
+    /* ── Botón Continuar ── */
     .mission-reward-actions {
       display: flex;
       justify-content: center;
@@ -12055,7 +12055,7 @@
       background: #cbd5e1;
     }
 
-    /* â”€â”€ Animaciones â”€â”€ */
+    /* ── Animaciones ── */
     @keyframes mission-avatar-jump {
       0%, 100% {
         transform: translateY(0) rotate(-1.5deg) scale(1);
@@ -12094,7 +12094,7 @@
       }
     }
 
-    /* â”€â”€ Responsive: pantallas â‰¤ 720px â”€â”€ */
+    /* ── Responsive: pantallas ≤ 720px ── */
     @media (max-width: 720px) {
       .mission-reward-panel {
         padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
@@ -12174,7 +12174,7 @@
       }
     }
 
-    /* â”€â”€ Responsive: pantallas muy pequeÃ±as â”€â”€ */
+    /* ── Responsive: pantallas muy pequeñas ── */
     @media (max-width: 380px), (max-height: 680px) {
       .mission-reward-panel {
         padding: max(4px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(4px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
@@ -12366,9 +12366,9 @@
   </svg>
 
   <!-- SPLASH SCREEN: cubre toda la app durante 1.5 segundos antes de revelar la pantalla principal. -->
-  <div class="splash-screen" id="splashScreen" aria-label="Cargando Mision MUCH" role="status">
+  <div class="splash-screen" id="splashScreen" aria-label="Cargando Misión MUCH" role="status">
     <div class="splash-logo-wrap">
-      <img class="splash-logo" src="assets/logo-institucional-aditech.png" alt="Humanismo que Transforma - Agencia Digital Tecnologica del Estado">
+      <img class="splash-logo" src="assets/logo-institucional-aditech.png" alt="Humanismo que Transforma - Agencia Digital Tecnológica del Estado">
     </div>
   </div>
   <script>
@@ -12400,57 +12400,57 @@
 
   <!-- ORIENTATION OVERLAY -->
   <div id="orientationOverlay">
-    <div style="font-size: 4rem; margin-bottom: 1rem;">ðŸ”„</div>
+    <div style="font-size: 4rem; margin-bottom: 1rem;">🔄</div>
     <h2 style="font-family: 'Outfit', sans-serif; font-size: 2rem; margin-bottom: 0.5rem; color: #E2C288;">Gira tu dispositivo</h2>
-    <p style="font-size: 1.1rem; max-width: 85%; margin: 0 auto; line-height: 1.5; color: #A0A4B8;">Para disfrutar de la mejor experiencia, pon tu celular en posiciÃ³n horizontal (acostado).</p>
+    <p style="font-size: 1.1rem; max-width: 85%; margin: 0 auto; line-height: 1.5; color: #A0A4B8;">Para disfrutar de la mejor experiencia, pon tu celular en posición horizontal (acostado).</p>
   </div>
 
   <!-- FONDO ANIMADO -->
   <div class="bg-particles" id="bgParticles"></div>
 
-  <!-- BOTÃ“N HAMBURGER (MÃ³vil) -->
+  <!-- BOTÓN HAMBURGER (Móvil) -->
   <div class="hamburger" id="hamburgerBtn">
     <span></span><span></span><span></span>
   </div>
   <div class="mobile-nav-backdrop" id="mobileNavBackdrop"></div>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  <!-- ══════════════════════════════════════════════
        VISTA 1: INICIO / LANDING
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  ══════════════════════════════════════════════ -->
   <section class="view-section active" id="viewLanding" data-include="modules/landing.html">
     <!-- El contenido se carga desde modules/landing.html -->
   </section>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       VISTA 2: PREPARACIÃ“N (REGLAS Y MAPA)
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ══════════════════════════════════════════════
+       VISTA 2: PREPARACIÓN (REGLAS Y MAPA)
+  ══════════════════════════════════════════════ -->
   <section class="view-section" id="viewPrep" style="background: var(--bg-deep); flex-direction: column;" data-include="modules/prep.html">
     <!-- El contenido se carga desde modules/prep.html -->
   </section>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       MODAL SELECCIÃ“N AVATAR
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ══════════════════════════════════════════════
+       MODAL SELECCIÓN AVATAR
+  ══════════════════════════════════════════════ -->
   <!-- PERFIL OVERLAY -->
   <div class="avatar-overlay" id="profileOverlay" data-include="modules/profile.html"></div>
   <div class="avatar-overlay" id="loginOverlay" data-include="modules/login.html"></div>
 
   <div class="avatar-overlay" id="avatarOverlay" data-include="modules/avatar_selection.html"></div>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  <!-- ══════════════════════════════════════════════
        MODAL ADMINISTRADOR
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  ══════════════════════════════════════════════ -->
   <div class="admin-overlay" id="adminOverlay">
     <div class="admin-modal-content">
       <button class="admin-close-btn" id="btnCloseAdmin">&times;</button>
       
       <section class="admin-auth-screen" id="adminAuthScreen">
         <div class="admin-auth-card">
-          <div class="admin-auth-badge">ðŸ›¡ï¸</div>
+          <div class="admin-auth-badge">🛡️</div>
           <p class="admin-auth-eyebrow">Acceso administrativo</p>
-          <h1>Inicia sesiÃ³n para entrar al panel</h1>
+          <h1>Inicia sesión para entrar al panel</h1>
           <p class="admin-auth-copy">
-            Este acceso esta conectado con MySQL y solo permite las cuentas autorizadas del MUCH y Planetario.
+            Este acceso está conectado con MySQL y solo permite las cuentas autorizadas del MUCH y Planetario.
           </p>
 
           <form class="admin-auth-form" id="adminLoginForm">
@@ -12460,9 +12460,9 @@
               <option value="muchtuxtla@gmail.com">muchtuxtla@gmail.com</option>
             </select>
 
-            <label class="admin-auth-label" for="adminPassword">ContraseÃ±a</label>
+            <label class="admin-auth-label" for="adminPassword">Contraseña</label>
             <input class="admin-auth-input" id="adminPassword" type="password" autocomplete="current-password"
-              placeholder="Escribe la contraseÃ±a del administrador" required>
+              placeholder="Escribe la contraseña del administrador" required>
 
             <button class="admin-auth-button" id="btnAdminLogin" type="submit">Entrar al administrador</button>
 
@@ -12477,7 +12477,7 @@
       <div class="page-shell" id="adminShell" hidden>
         <header class="topbar">
           <div class="brand">
-            <div class="brand-badge">ðŸ—‚ï¸</div>
+            <div class="brand-badge">🗂️</div>
             <div class="brand-copy">
               <p>Panel interno</p>
               <h1>Administrador de Folios</h1>
@@ -12488,7 +12488,7 @@
           <div class="topbar-actions">
             <span class="admin-session-chip" id="adminSessionChip" hidden>Administrador</span>
             <button class="solid-button" id="btnRefreshTop" type="button">Actualizar datos</button>
-            <button class="soft-button" id="btnLogoutAdmin" type="button" hidden>Cerrar sesiÃ³n</button>
+            <button class="soft-button" id="btnLogoutAdmin" type="button" hidden>Cerrar sesión</button>
           </div>
         </header>
 
@@ -12499,25 +12499,25 @@
               <span class="value" id="metricTotal">0</span>
               <span class="hint">Conteo de la vista actual</span>
             </div>
-            <div class="metric-icon">ðŸ§¾</div>
+            <div class="metric-icon">🧾</div>
           </article>
 
           <article class="metric-card valid">
             <div>
-              <span class="label">Folios validos</span>
+              <span class="label">Folios válidos</span>
               <span class="value" id="metricValid">0</span>
               <span class="hint">Vigentes y listos para uso</span>
             </div>
-            <div class="metric-icon">âœ…</div>
+            <div class="metric-icon">✅</div>
           </article>
 
           <article class="metric-card invalid">
             <div>
-              <span class="label">Folios invalidos</span>
+              <span class="label">Folios inválidos</span>
               <span class="value" id="metricInvalid">0</span>
               <span class="hint">Canjeados, vencidos o incompletos</span>
             </div>
-            <div class="metric-icon">â›”</div>
+            <div class="metric-icon">⛔</div>
           </article>
         </section>
 
@@ -12525,10 +12525,10 @@
           <section class="panel">
             <div class="panel-head">
               <div>
-                <h2>Escaner de boletos</h2>
+                <h2>Escáner de boletos</h2>
                 <p>Escanea el QR del boleto o captura el folio/ID para consultar todos los datos del registro en tiempo real.</p>
               </div>
-              <span class="scanner-support" id="scannerSupport">Camara detenida</span>
+              <span class="scanner-support" id="scannerSupport">Cámara detenida</span>
             </div>
 
             <div class="scanner-layout">
@@ -12538,20 +12538,20 @@
                   <div class="scanner-placeholder" id="scannerPlaceholder">
                     <div>
                       <strong>Listo para escanear</strong>
-                      <span>Presiona "Iniciar escaner" y apunta al QR del boleto para leerlo al instante.</span>
+                      <span>Presiona "Iniciar escáner" y apunta al QR del boleto para leerlo al instante.</span>
                     </div>
                   </div>
                 </div>
 
                 <div class="scanner-actions">
-                  <button class="solid-button" id="btnStartScanner" type="button">Iniciar escaner</button>
-                  <button class="soft-button" id="btnStopScanner" type="button" disabled>Detener camara</button>
+                  <button class="solid-button" id="btnStartScanner" type="button">Iniciar escáner</button>
+                  <button class="soft-button" id="btnStopScanner" type="button" disabled>Detener cámara</button>
                 </div>
               </div>
 
               <div class="scanner-side">
                 <p class="scanner-side-note">
-                  El QR del boleto trae una URL con el folio. Si la camara no abre, pega aqui el folio, el ID o la URL del QR y el panel lo consultara contra la BD.
+                  El QR del boleto trae una URL con el folio. Si la cámara no abre, pega aquí el folio, el ID o la URL del QR y el panel lo consultará contra la BD.
                 </p>
 
                 <label class="manual-label" for="manualTicketInput">Folio, ID o contenido del QR</label>
@@ -12571,7 +12571,7 @@
             <div class="panel-head">
               <div>
                 <h2>Resultado del escaneo</h2>
-                <p>Revision inmediata con todos los campos registrados del boleto y su status actual.</p>
+                <p>Revisión inmediata con todos los campos registrados del boleto y su estado actual.</p>
               </div>
               <span id="scanCheckedAt">Sin lectura</span>
             </div>
@@ -12579,8 +12579,8 @@
             <div class="scan-result-shell" id="scanResultBody">
               <div class="scan-result-placeholder">
                 <div>
-                  <strong>Aun no se ha validado un boleto.</strong>
-                  <span>Cuando escanees un QR o pegues un folio/ID, aqui veras toda la informacion sincronizada desde la BD.</span>
+                  <strong>Aún no se ha validado un boleto.</strong>
+                  <span>Cuando escanees un QR o pegues un folio/ID, aquí verás toda la información sincronizada desde la BD.</span>
                 </div>
               </div>
             </div>
@@ -12589,8 +12589,8 @@
 
         <section class="toolbar" id="toolbar">
           <label class="search-wrap" for="searchInput">
-            <span>ðŸ”Ž</span>
-            <input id="searchInput" type="search" autocomplete="off" placeholder="Buscar por ID, folio, nombre, correo, telefono o tipo de entrada">
+            <span>🔎</span>
+            <input id="searchInput" type="search" autocomplete="off" placeholder="Buscar por ID, folio, nombre, correo, teléfono o tipo de entrada">
           </label>
           <button class="soft-button" id="btnClear" type="button">Limpiar</button>
           <button class="soft-button" id="btnRefresh" type="button">Recargar</button>
@@ -12599,7 +12599,7 @@
         <div class="filter-row" id="filterRow">
           <button class="filter-chip active" type="button" data-filter="all">Todos</button>
           <button class="filter-chip" type="button" data-filter="vigente">Vigentes</button>
-          <button class="filter-chip" type="button" data-filter="invalid">Invalidos</button>
+          <button class="filter-chip" type="button" data-filter="invalid">Inválidos</button>
           <button class="filter-chip" type="button" data-filter="canjeado">Canjeados</button>
           <button class="filter-chip" type="button" data-filter="vencido">Vencidos</button>
           <button class="filter-chip" type="button" data-filter="sin_folio">Sin folio</button>
@@ -12621,20 +12621,20 @@
                   <th>ID</th>
                   <th>Nombre</th>
                   <th>Correo</th>
-                  <th>Telefono</th>
+                  <th>Teléfono</th>
                   <th>Folio</th>
                   <th>Tipo de entrada</th>
                   <th>Estatus BD</th>
                   <th>Status</th>
-                  <th>Valido desde</th>
-                  <th>Valido hasta</th>
+                  <th>Válido desde</th>
+                  <th>Válido hasta</th>
                   <th>Fecha de registro</th>
                 </tr>
               </thead>
               <tbody id="tableBody">
                 <tr>
                   <td colspan="11" class="empty-state">
-                    <strong>Cargando informacion...</strong>
+                    <strong>Cargando información...</strong>
                     <span>Espera un momento mientras se consultan los folios.</span>
                   </td>
                 </tr>
@@ -12652,12 +12652,12 @@
     </div>
   </div>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       MODAL CÃ“MO JUGAR
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  <!-- ══════════════════════════════════════════════
+       MODAL CÓMO JUGAR
+  ══════════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════════
        MODAL PUNTUAJES (LEADERBOARD)
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  ══════════════════════════════════════════════ -->
   <div class="avatar-overlay" id="scoresOverlay" data-include="modules/scores.html"></div>
 
   <div class="avatar-overlay" id="rulesOverlay" data-include="modules/rules.html"></div>
@@ -12666,22 +12666,22 @@
   <script src="scripts/station-completion.js"></script>
   <script type="module" src="./mysql-utils.js"></script>
   <script>
-    /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-       MISIÃ“N MUCH â€” LOGIC (TODO EN UNO)
-    â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ────────────────────────────────────────────────
+       MISIÓN MUCH — LOGIC (TODO EN UNO)
+    ────────────────────────────────────────────────── */
     const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
 
     const avatars = [
       { id: 'humano1', name: 'Explorador', cat: 'human' },
       { id: 'humana2', name: 'Curadora', cat: 'human' },
       { id: 'humano3', name: 'Aventurero', cat: 'human' },
-      { id: 'cientifico1', name: 'CientÃ­fico', cat: 'human' },
-      { id: 'cientifica2', name: 'CientÃ­fica', cat: 'human' },
-      { id: 'humana4', name: 'BiÃ³loga', cat: 'human' },
+      { id: 'cientifico1', name: 'Científico', cat: 'human' },
+      { id: 'cientifica2', name: 'Científica', cat: 'human' },
+      { id: 'humana4', name: 'Bióloga', cat: 'human' },
       { id: 'dino1', name: 'T-Rex', cat: 'dino' },
       { id: 'dino2', name: 'Triceratops', cat: 'dino' },
       { id: 'dino3', name: 'Estegosaurio', cat: 'dino' },
-      { id: 'dino4', name: 'PterodÃ¡ctilo', cat: 'dino' },
+      { id: 'dino4', name: 'Pterodáctilo', cat: 'dino' },
       { id: 'dino5', name: 'Velociraptor', cat: 'dino' },
       { id: 'dino6', name: 'Brontosaurio', cat: 'dino' },
       { id: 'dino7', name: 'Anquilosaurio', cat: 'dino' },
@@ -12704,8 +12704,8 @@
         if (window.APP_MODULES && window.APP_MODULES[url]) {
           el.innerHTML = window.APP_MODULES[url];
         } else {
-          console.error('MÃ³dulo no encontrado en APP_MODULES:', url);
-          el.innerHTML = `<div style="color:white; padding:20px;">Error: MÃ³dulo no encontrado (${url})</div>`;
+          console.error('Módulo no encontrado en APP_MODULES:', url);
+          el.innerHTML = `<div style="color:white; padding:20px;">Error: Módulo no encontrado (${url})</div>`;
         }
       });
     }
@@ -12718,7 +12718,7 @@
             activeStationIds = new Set(stations.map(s => String(s.id_estacion)));
             console.log('[Sync] Estaciones activas cargadas:', Array.from(activeStationIds));
             
-            // Si la estaciÃ³n actual es inactiva, mover a la primera activa
+            // Si la estación actual es inactiva, mover a la primera activa
             if (activeStationIds && !activeStationIds.has(String(currentStation))) {
               const firstActive = Array.from(activeStationIds).find(id => id !== '1') || '1';
               currentStation = firstActive;
@@ -12858,7 +12858,7 @@
           card.innerHTML = `
             <div class="av-img-wrap"><img src="avatars/${av.id}.png" class="av-img"></div>
             <p class="av-name">${av.name}</p>
-            <div class="av-check">âœ“</div>
+            <div class="av-check">✓</div>
           `;
           card.onclick = () => {
             document.querySelectorAll('.av-card').forEach(c => c.classList.remove('selected'));
@@ -12984,13 +12984,13 @@
         if (ticketsListEl) ticketsListEl.innerHTML = '<p style="color:#A0A4B8;font-size:0.85rem;">Cargando boletos...</p>';
 
         if (isGuest) {
-          // LÃ³gica local para Invitados
+          // Lógica local para Invitados
           const localCompleted = getCompletedStations();
           const estaciones = [
             { id: 1, nombre: 'Entrada MUCH', puntos_base: 10, key: '1', detalle: 'Memorama en 1 min' },
             { id: 2, nombre: 'Espinosaurio', puntos_base: 15, key: '2', detalle: '15 saltos' },
             { id: 3, nombre: 'Biodiversidad y Conocimiento', puntos_base: 10, key: '3', detalle: '10 preguntas' },
-            { id: 4, nombre: 'Sala de EnergÃ­a', puntos_base: 10, key: '4', detalle: '10 preguntas' },
+            { id: 4, nombre: 'Sala de Energía', puntos_base: 10, key: '4', detalle: '10 preguntas' },
             { id: 5, nombre: 'Desarrollo Sustentable', puntos_base: 10, key: '5', detalle: '10 preguntas' },
             { id: 6, nombre: 'SBEEL Dinosaurios', puntos_base: 10, key: '6', detalle: 'Rompecabezas' }
           ];
@@ -13044,13 +13044,13 @@
           if (stationsGridEl) stationsGridEl.innerHTML = gridHtml;
           if (ticketsListEl) ticketsListEl.innerHTML = `
             <div class="no-tickets-msg">
-              AÃºn no has ganado boletos.<br>
-              <strong>Â¡Inicia sesiÃ³n con Google</strong> para registrar tu progreso y reclamar tus entradas gratuitas!
+              Aún no has ganado boletos.<br>
+              <strong>¡Inicia sesión con Google</strong> para registrar tu progreso y reclamar tus entradas gratuitas!
             </div>
           `;
 
         } else {
-          // LÃ³gica remota (Usuario Google)
+          // Lógica remota (Usuario Google)
           try {
             const userId = googleUser.id_usuario || googleUser.id;
             const res = await fetch(`${API_BASE_URL}/api/usuarios/${userId}/perfil`);
@@ -13061,7 +13061,7 @@
 
             const data = await res.json();
             
-            // Asignar datos de perfil bÃ¡sicos
+            // Asignar datos de perfil básicos
             if (nameEl) nameEl.innerText = data.usuario.nombre || 'Explorador';
             if (emailEl) emailEl.innerText = data.usuario.correo || '';
             if (regDateEl) {
@@ -13102,7 +13102,7 @@
             if (!data.boletos || data.boletos.length === 0) {
               ticketsHtml = `
                 <div class="no-tickets-msg">
-                  AÃºn no has ganado boletos. Completa el recorrido para obtener tu recompensa.
+                  Aún no has ganado boletos. Completa el recorrido para obtener tu recompensa.
                 </div>
               `;
             } else {
@@ -13129,7 +13129,7 @@
 
           } catch (error) {
             console.error('Error al cargar datos remotos de perfil:', error);
-            if (regDateEl) regDateEl.innerText = 'Error de conexiÃ³n';
+            if (regDateEl) regDateEl.innerText = 'Error de conexión';
             if (stationsGridEl) stationsGridEl.innerHTML = '<p style="color:#ef4444;font-size:0.85rem;">No se pudieron sincronizar las estaciones con el servidor.</p>';
             if (ticketsListEl) ticketsListEl.innerHTML = '<p style="color:#ef4444;font-size:0.85rem;">No se pudieron sincronizar los boletos con el servidor.</p>';
           }
@@ -13186,7 +13186,7 @@
         }));
 
         const intentoRows = intentos.map((row, index) => ({
-          name: getPlayerName(row, `Spinosaurio ${index + 1}`),
+          name: getPlayerName(row, `Espinosaurio ${index + 1}`),
           score: Number(row.puntaje ?? 0),
           avatar: avatars[(index + 5) % avatars.length].id,
           date: row.created_at || ''
@@ -13294,7 +13294,7 @@
       try {
         googleUser = JSON.parse(localStorage.getItem('much_google_user') || 'null');
       } catch (error) {
-        console.warn('No se pudo leer la sesion de Google guardada:', error);
+        console.warn('No se pudo leer la sesión de Google guardada:', error);
         googleUser = null;
       }
 
@@ -13371,7 +13371,7 @@
           console.log('[Sync] Progreso mapeado:', completedMap);
           localStorage.setItem('much_completed_stations', JSON.stringify(completedMap));
           
-          // Si la estaciÃ³n actual guardada es menor o no existe, actualizarla a la estaciÃ³n mÃ¡s alta alcanzada
+          // Si la estación actual guardada es menor o no existe, actualizarla a la estación más alta alcanzada
           const savedStation = localStorage.getItem('much_current_station');
           if (!savedStation || Number(savedStation) < maxStationId) {
             const nextStation = Math.min(6, maxStationId);
@@ -13393,7 +13393,7 @@
 
       async function sincronizarUsuarioMySQL() {
         const session = await window.obtenerSesionActual();
-        console.log('[Login] Sesion actual:', session);
+        console.log('[Login] Sesión actual:', session);
         if (!session?.user) return null;
 
         const user = await window.obtenerUsuarioActual();
@@ -13416,7 +13416,7 @@
           }
           googleUser = window.normalizarUsuarioMySQL(usuarioVerificado);
           localStorage.setItem('much_google_user', JSON.stringify(googleUser));
-          // Sincronizar el progreso de la BD despuÃ©s de verificar el usuario
+          // Sincronizar el progreso de la BD después de verificar el usuario
           await actualizarVisibilidadMenuRoles();
           if (redirectInternalUserIfNeeded(googleUser)) return googleUser;
           if (typeof window.asegurarConsentimientoPrivacidad === 'function') {
@@ -13451,8 +13451,8 @@
             loginNote.innerText = 'Redirigiendo a Google...';
             await window.iniciarSesionConGoogle();
           } catch (error) {
-            console.error('[Login] Error iniciando sesion con Google:', error);
-            loginNote.innerText = 'No se pudo iniciar sesion con Google. Revisa la conexion con MySQL.';
+            console.error('[Login] Error iniciando sesión con Google:', error);
+            loginNote.innerText = 'No se pudo iniciar sesión con Google. Revisa la conexión con MySQL.';
           }
         };
 
@@ -13463,7 +13463,7 @@
 
       initGoogleLogin();
 
-      // LÃ³gica para alternar entre login y registro (solo visual para la prueba)
+      // Lógica para alternar entre login y registro (solo visual para la prueba)
       let isRegisterMode = false;
       function toggleLoginMode(e) {
         if (e) e.preventDefault();
@@ -13476,23 +13476,23 @@
         const toggleLink = document.getElementById('btnToggleLogin');
 
         if (isRegisterMode) {
-          title.innerText = 'RegÃ­strate con Google';
+          title.innerText = 'Regístrate con Google';
           copy.innerText = 'Crea tu cuenta de explorador en segundos usando Google.';
           btnText.innerText = 'Registrarse con Google';
-          toggleText.innerText = 'Â¿Ya tienes cuenta?';
-          toggleLink.innerText = 'Inicia sesiÃ³n aquÃ­';
+          toggleText.innerText = '¿Ya tienes cuenta?';
+          toggleLink.innerText = 'Inicia sesión aquí';
         } else {
           title.innerText = 'Entra con Google';
-          copy.innerText = 'Para guardar tu avance en la misiÃ³n, inicia sesiÃ³n con tu cuenta de Google.';
+          copy.innerText = 'Para guardar tu avance en la misión, inicia sesión con tu cuenta de Google.';
           btnText.innerText = 'Continuar con Google';
-          toggleText.innerText = 'Â¿No tienes cuenta?';
-          toggleLink.innerText = 'Registrarse aquÃ­';
+          toggleText.innerText = '¿No tienes cuenta?';
+          toggleLink.innerText = 'Registrarse aquí';
         }
       }
 
-      // El botÃ³n de toggle puede no estar cargado aÃºn si includeHTML es asÃ­ncrono
+      // El botón de toggle puede no estar cargado aún si includeHTML es asíncrono
       // pero en este caso includeHTML se llama justo antes de registrar eventos
-      // y asumiendo que los mÃ³dulos ya estÃ¡n cargados en APP_MODULES.
+      // y asumiendo que los módulos ya están cargados en APP_MODULES.
       setTimeout(() => {
         const toggleBtn = document.getElementById('btnToggleLogin');
         if (toggleBtn) toggleBtn.onclick = toggleLoginMode;
@@ -13543,7 +13543,7 @@
               if (typeof updateCompletedStationsOnMap === 'function') {
                 updateCompletedStationsOnMap();
               }
-              // TambiÃ©n restaurar avatar y mover a la estaciÃ³n actual
+              // También restaurar avatar y mover a la estación actual
               const savedStation = localStorage.getItem('much_current_station') || currentStation || '1';
               moveToStation(savedStation);
             });
@@ -13551,7 +13551,7 @@
           
           syncSoundForView(viewId, true);
 
-          // Limpiar el parÃ¡metro ?view= de la URL para que no cause saltos al recargar
+          // Limpiar el parámetro ?view= de la URL para que no cause saltos al recargar
           const url = new URL(window.location);
           url.searchParams.delete('view');
           window.history.replaceState({}, '', url);
@@ -13574,11 +13574,11 @@
 
         const desiredOrder = ['btnInicio', 'btnPuntajes', 'btnComoJugar', 'btnAdmin', 'btnTaquilla', 'btnPerfil'];
         const labels = {
-          btnInicio: ['ðŸ ', 'Inicio', '#'],
-          btnPuntajes: ['ðŸ†', 'Puntajes', '#'],
+          btnInicio: ['🏠', 'Inicio', '#'],
+          btnPuntajes: ['🏆', 'Puntajes', '#'],
           btnComoJugar: ['?', 'Ayuda', '#'],
-          btnAdmin: ['ðŸ›¡ï¸', 'Admin', 'ADMINISTRADOR.html'],
-          btnTaquilla: ['ðŸŽŸï¸', 'Taquilla', 'ADMINISTRADOR.html?section=taquilla']
+          btnAdmin: ['🛡️', 'Admin', 'ADMINISTRADOR.html'],
+          btnTaquilla: ['🎟️', 'Taquilla', 'ADMINISTRADOR.html?section=taquilla']
         };
 
         if (!document.getElementById('btnAdmin')) {
@@ -13825,8 +13825,8 @@
             ? new Intl.DateTimeFormat('es-MX', { dateStyle: 'long', timeStyle: 'short' }).format(new Date(fechaLocal))
             : '';
           window.MuchStationCompletion?.showFloatingNotice({
-            badge: 'Mision completada',
-            title: 'Aun no puedes volver a jugar',
+            badge: 'Misión completada',
+            title: 'Aún no puedes volver a jugar',
             body: fechaTexto
               ? `Podras volver a jugar el ${fechaTexto}.`
               : 'Tu recorrido sigue bloqueado temporalmente.',
@@ -13946,13 +13946,13 @@
         {
           icon: '&#129513;',
           step: '01',
-          title: '&iexcl;Conoce el reto de Sbeel!',
+          title: '&iexcl;Conoce el reto de SBEEL!',
           copy: 'Antes de comenzar, observa el rompecabezas y prep&aacute;rate para armarlo con mucha atenci&oacute;n.'
         },
         {
           icon: '&#127775;',
           step: '02',
-          title: '&iexcl;Bienvenido al reto de Sbeel!',
+          title: '&iexcl;Bienvenido al reto de SBEEL!',
           copy: 'Prep&aacute;rate para vivir una aventura divertida mientras completas el rompecabezas.'
         },
         {
@@ -13977,7 +13977,7 @@
           icon: '&#127942;',
           step: '06',
           title: '&iexcl;Completa el reto y gana!',
-          copy: 'Si armas el rompecabezas antes de que termine el tiempo, completas la estaci&oacute;n de Sbeel y ganas tus puntos del reto.'
+          copy: 'Si armas el rompecabezas antes de que termine el tiempo, completas la estaci&oacute;n de SBEEL y ganas tus puntos del reto.'
         }
       ];
 
@@ -14231,53 +14231,53 @@
         [SPINO_STATION_ID]: {
           stationKey: SPINO_STATION_ID,
           prepListClass: 'station2-rules-list',
-          prepTitle: 'Reglas Estacion 2 - Spinosaurio',
+          prepTitle: 'Reglas Estación 2 - Espinosaurio',
           overlayModeClass: 'spino-station-rules-mode',
-          overlayTitle: 'Mision Espinosaurio',
-          overlaySubtitle: 'Estas son las reglas secretas de la estacion 2. Cumple el reto y gana tus 15 puntos.',
+          overlayTitle: 'Misión Espinosaurio',
+          overlaySubtitle: 'Estas son las reglas de la estación 2. Cumple el reto y gana tus 15 puntos.',
           buildPrepMarkup: buildStation2PrepRulesMarkup,
           buildOverlayMarkup: buildStation2RulesBoardMarkup
         },
         [BIODIVERSITY_STATION_ID]: {
           stationKey: BIODIVERSITY_STATION_ID,
           prepListClass: 'biodiversity-station-rules-list',
-          prepTitle: 'Reglas Estacion 3 - Sala A - Biodiversidad',
+          prepTitle: 'Reglas Estación 3 - Sala A - Biodiversidad y Conocimiento',
           overlayModeClass: 'biodiversity-station-rules-mode',
           boardClass: 'biodiversity-rules-board',
           overlayTitle: 'Sala A - Biodiversidad',
-          overlaySubtitle: 'Explora animales, plantas y ecosistemas. Responde 10 preguntas y logra 7 aciertos para completar tu mision verde.',
+          overlaySubtitle: 'Explora animales, plantas y ecosistemas. Responde 10 preguntas y logra 7 aciertos para completar tu misión verde.',
           buildPrepMarkup: buildStation3PrepRulesMarkup,
           buildOverlayMarkup: buildStation3RulesBoardMarkup
         },
         [ENERGY_STATION_ID]: {
           stationKey: ENERGY_STATION_ID,
           prepListClass: 'energy-station-rules-list',
-          prepTitle: 'Reglas Estacion 4 - Sala B - Energia',
+          prepTitle: 'Reglas Estación 4 - Sala B - Energía',
           overlayModeClass: 'energy-station-rules-mode',
           boardClass: 'energy-rules-board',
-          overlayTitle: 'Sala B de Energia',
-          overlaySubtitle: 'Explora las formas de energia, responde 10 preguntas del Area de Energia y consigue minimo 7 aciertos para completar tu mision.',
+          overlayTitle: 'Sala B de Energía',
+          overlaySubtitle: 'Explora las formas de energía, responde 10 preguntas del Área de Energía y consigue mínimo 7 aciertos para completar tu misión.',
           buildPrepMarkup: buildStation4PrepRulesMarkup,
           buildOverlayMarkup: buildStation4RulesBoardMarkup
         },
         [SUSTAINABLE_STATION_ID]: {
           stationKey: SUSTAINABLE_STATION_ID,
           prepListClass: 'sustainable-station-rules-list',
-          prepTitle: 'Reglas Estacion 5 - Sala C - Desarrollo Sustentable',
+          prepTitle: 'Reglas Estación 5 - Sala C - Desarrollo Sustentable',
           overlayModeClass: 'sustainable-station-rules-mode',
           boardClass: 'sustainable-rules-board',
           overlayTitle: 'Sala C - Desarrollo Sustentable',
-          overlaySubtitle: 'Descubre acciones para cuidar el planeta, responde 10 preguntas del Area de Desarrollo Sustentable y consigue minimo 7 aciertos para completar tu mision.',
+          overlaySubtitle: 'Descubre acciones para cuidar el planeta, responde 10 preguntas del Área de Desarrollo Sustentable y consigue mínimo 7 aciertos para completar tu misión.',
           buildPrepMarkup: buildStation5PrepRulesMarkup,
           buildOverlayMarkup: buildStation5RulesBoardMarkup
         },
         [SBEEL_STATION_ID]: {
           stationKey: SBEEL_STATION_ID,
           prepListClass: 'sbeel-station-rules-list',
-          prepTitle: 'Reglas Estacion 6 - Sbeel',
+          prepTitle: 'Reglas Estación 6 - SBEEL Dinosaurios',
           overlayModeClass: 'sbeel-station-rules-mode',
-          overlayTitle: 'Mision Sbeel',
-          overlaySubtitle: 'Sigue estas reglas del rompecabezas, vence el tiempo y completa la estacion 6.',
+          overlayTitle: 'Misión SBEEL Dinosaurios',
+          overlaySubtitle: 'Sigue estas reglas del rompecabezas, vence el tiempo y completa la estación 6.',
           buildPrepMarkup: buildStation6PrepRulesMarkup,
           buildOverlayMarkup: buildStation6RulesBoardMarkup
         }
@@ -14350,24 +14350,24 @@
 
         if (prepRulesTitle) {
           if (isStation2) {
-            prepRulesTitle.textContent = 'Reglas Estacion 2 Â· Spinosaurio';
+            prepRulesTitle.textContent = 'Reglas Estación 2 · Espinosaurio';
           } else if (isStation3) {
-            prepRulesTitle.textContent = 'Reglas Estacion 3 Â· Sala A Biodiversidad';
+            prepRulesTitle.textContent = 'Reglas Estación 3 · Sala A - Biodiversidad y Conocimiento';
           } else if (isStation4) {
-            prepRulesTitle.textContent = 'Reglas Estacion 4 - Sala B de Energia';
+            prepRulesTitle.textContent = 'Reglas Estación 4 - Sala B de Energía';
           } else if (isStation6) {
-            prepRulesTitle.textContent = 'Reglas Estacion 6 Â· Sbeel';
+            prepRulesTitle.textContent = 'Reglas Estación 6 · SBEEL Dinosaurios';
           } else {
             prepRulesTitle.textContent = 'Reglas';
           }
         }
 
         if (prepRulesTitle && isStation3) {
-          prepRulesTitle.textContent = 'Reglas Estacion 3 - Sala A - Biodiversidad';
+          prepRulesTitle.textContent = 'Reglas Estación 3 - Sala A - Biodiversidad y Conocimiento';
         }
 
         if (prepRulesTitle && isStation5) {
-          prepRulesTitle.textContent = 'Reglas Estacion 5 - Sala C - Desarrollo Sustentable';
+          prepRulesTitle.textContent = 'Reglas Estación 5 - Sala C - Desarrollo Sustentable';
         }
       }
 
@@ -14425,14 +14425,14 @@
       function setRulesModeForStartLegacy(isStartingGame) {
         pendingStartAfterRules = isStartingGame;
         if (rulesOverlay) rulesOverlay.classList.toggle('start-rules-mode', isStartingGame);
-        if (rulesTitle) rulesTitle.innerText = isStartingGame ? 'Antes de jugar' : 'CÃ³mo Jugar';
+        if (rulesTitle) rulesTitle.innerText = isStartingGame ? 'Antes de jugar' : 'Cómo Jugar';
         if (rulesSubtitle) {
           rulesSubtitle.innerText = isStartingGame
-            ? 'Lee estas reglas rÃ¡pidas antes de entrar a la estaciÃ³n.'
-            : 'Lee estas reglas clave para completar tu recorrido cientÃ­fico dentro del museo.';
+            ? 'Lee estas reglas rápidas antes de entrar a la estación.'
+            : 'Lee estas reglas clave para completar tu recorrido científico dentro del museo.';
         }
         if (btnCerrarReglas) {
-          btnCerrarReglas.innerText = isStartingGame ? 'Enterado, jugar!' : 'Â¡Entendido!';
+          btnCerrarReglas.innerText = isStartingGame ? '?Enterado, a jugar!' : '¡Entendido!';
         }
       }
 
@@ -14450,13 +14450,13 @@
           rulesSubtitle.innerText = stationConfig
             ? stationConfig.overlaySubtitle
             : (isStartingGame
-              ? 'Lee estas reglas rapidas antes de entrar a la estacion.'
-              : 'Lee estas reglas clave para completar tu recorrido cientifico dentro del museo.');
+              ? 'Lee estas reglas rápidas antes de entrar a la estación.'
+              : 'Lee estas reglas clave para completar tu recorrido científico dentro del museo.');
         }
         if (btnCerrarReglas) {
           btnCerrarReglas.innerText = stationConfig
-            ? 'Listo, vamos al reto!'
-            : (isStartingGame ? 'Enterado, jugar!' : 'Entendido!');
+            ? '?Listo, vamos al reto!'
+            : (isStartingGame ? '?Enterado, a jugar!' : '?Entendido!');
         }
 
         return;
@@ -14470,41 +14470,41 @@
 
         if (rulesTitle) {
           if (isStation2Start) {
-            rulesTitle.innerText = 'Mision Espinosaurio';
+            rulesTitle.innerText = 'Misión Espinosaurio';
           } else if (isStation3Start) {
             rulesTitle.innerText = 'Sala A - Biodiversidad';
           } else if (isStation4Start) {
-            rulesTitle.innerText = 'Sala B de Energia';
+            rulesTitle.innerText = 'Sala B de Energía';
           } else if (isStation5Start) {
             rulesTitle.innerText = 'Sala C - Desarrollo Sustentable';
           } else if (isStation6Start) {
-            rulesTitle.innerText = 'Mision Sbeel';
+            rulesTitle.innerText = 'Misión SBEEL Dinosaurios';
           } else {
             rulesTitle.innerText = isStartingGame ? 'Antes de jugar' : 'Como Jugar';
           }
         }
         if (rulesSubtitle) {
           if (isStation2Start) {
-            rulesSubtitle.innerText = 'Estas son las reglas secretas de la estacion 2. Cumple el reto y gana tus 15 puntos.';
+            rulesSubtitle.innerText = 'Estas son las reglas de la estación 2. Cumple el reto y gana tus 15 puntos.';
           } else if (isStation3Start) {
-            rulesSubtitle.innerText = 'Explora animales, plantas y ecosistemas. Responde 10 preguntas y logra 7 aciertos para completar tu mision verde.';
+            rulesSubtitle.innerText = 'Explora animales, plantas y ecosistemas. Responde 10 preguntas y logra 7 aciertos para completar tu misión verde.';
           } else if (isStation4Start) {
-            rulesSubtitle.innerText = 'Explora las formas de energia, responde 10 preguntas del Area de Energia y consigue minimo 7 aciertos para completar tu mision.';
+            rulesSubtitle.innerText = 'Explora las formas de energía, responde 10 preguntas del Área de Energía y consigue mínimo 7 aciertos para completar tu misión.';
           } else if (isStation5Start) {
-            rulesSubtitle.innerText = 'Descubre acciones para cuidar el planeta, responde 10 preguntas del Area de Desarrollo Sustentable y consigue minimo 7 aciertos para completar tu mision.';
+            rulesSubtitle.innerText = 'Descubre acciones para cuidar el planeta, responde 10 preguntas del Área de Desarrollo Sustentable y consigue mínimo 7 aciertos para completar tu misión.';
           } else if (isStation6Start) {
-            rulesSubtitle.innerText = 'Sigue estas reglas del rompecabezas, vence el tiempo y completa la estacion 6.';
+            rulesSubtitle.innerText = 'Sigue estas reglas del rompecabezas, vence el tiempo y completa la estación 6.';
           } else {
             rulesSubtitle.innerText = isStartingGame
-              ? 'Lee estas reglas rapidas antes de entrar a la estacion.'
-              : 'Lee estas reglas clave para completar tu recorrido cientifico dentro del museo.';
+              ? 'Lee estas reglas rápidas antes de entrar a la estación.'
+              : 'Lee estas reglas clave para completar tu recorrido científico dentro del museo.';
           }
         }
         if (btnCerrarReglas) {
           if (isStation2Start || isStation3Start || isStation4Start || isStation5Start || isStation6Start) {
             btnCerrarReglas.innerText = 'Listo, vamos al reto!';
           } else {
-            btnCerrarReglas.innerText = isStartingGame ? 'Enterado, jugar!' : 'Entendido!';
+            btnCerrarReglas.innerText = isStartingGame ? '?Enterado, a jugar!' : '?Entendido!';
           }
         }
       }
@@ -14541,7 +14541,7 @@
         });
       }
 
-      // BotÃ³n regreso desde vista de preparaciÃ³n
+      // Botón regreso desde vista de preparación
       document.getElementById('btnBackPrep').onclick = () => {
         showView('viewLanding');
       };
@@ -14567,7 +14567,7 @@
         applyAvatarToUI(selectedAvatar);
         showView('viewPrep');
 
-        // PosiciÃ³n inicial del avatar (EstaciÃ³n 1 - Entrada)
+        // Posición inicial del avatar (Estación 1 - Entrada)
         setTimeout(() => {
           moveToStation(1);
         }, 500);
@@ -14585,7 +14585,7 @@
         window.history.replaceState({}, '', cleanUrl.pathname + (query ? `?${query}` : ''));
       }
 
-      // NUEVO: LÃ³gica para manejar el regreso desde las estaciones y persistencia
+      // NUEVO: Lógica para manejar el regreso desde las estaciones y persistencia
       async function checkStatePersistence() {
         if (redirectInternalUserIfNeeded()) return;
 
@@ -14609,7 +14609,7 @@
           }
         }
 
-        // Por defecto al refrescar, mostrar el menÃº principal.
+        // Por defecto al refrescar, mostrar el menú principal.
         showView('viewLanding');
       }
 
@@ -14627,7 +14627,7 @@
         }
       });
 
-      // 5. LÃ³gica de Movimiento en el Mapa
+      // 5. Lógica de Movimiento en el Mapa
       const stations = {
         '1': { x: 80, y: 18 },
         '2': { x: 56, y: 42 },
@@ -14654,9 +14654,9 @@
         much: {
           key: 'much',
           label: 'MUCH',
-          title: 'MISION MUCH - Boleto MUCH',
+          title: 'MISIÓN MUCH - Boleto MUCH',
           acceso: 'MUCH',
-          lugar: 'Museo Chiapas de Ciencia y Tecnologia',
+          lugar: 'Museo Chiapas de Ciencia y Tecnología',
           image: 'entrada-much/logo-much.png',
           alt: 'Museo MUCH',
           note: 'Sigue descubriendo ciencia y aventura.'
@@ -14836,7 +14836,7 @@
           <div class="mission-reward-panel">
             <div class="mission-confetti" aria-hidden="true"></div>
             <div class="mission-reward-brand-top" aria-label="Identidad institucional">
-              <img src="Juego_Spinosaurio/logo-agencia.png" alt="Humanismo que Transforma Â· Agencia Digital TecnolÃ³gica del Estado">
+              <img src="Juego_Spinosaurio/logo-agencia.png" alt="Humanismo que Transforma · Agencia Digital Tecnológica del Estado">
             </div>
             <div class="mission-reward-content">
               <div class="mission-reward-avatar-stage">
@@ -14850,7 +14850,7 @@
               </div>
 
               <div class="mission-reward-copy">
-                <span class="mission-reward-kicker">MisiÃ³n MUCH completada</span>
+                <span class="mission-reward-kicker">Misión MUCH completada</span>
                 <h2 id="missionRewardTitle" class="mission-reward-title">&iexcl;Felicidades, explorador!</h2>
                 <p class="mission-reward-subtitle">Completaste todas las estaciones y terminaste tu misi&oacute;n cient&iacute;fica.</p>
                 <div class="mission-ticket-callout">
@@ -14881,7 +14881,7 @@
               </div>
             </div>
             <div class="mission-reward-brand-strip" aria-label="Logos institucionales">
-              <img src="entrada-much/logo-much.png" alt="MUCH Â· Museo Chiapas" class="mission-brand-much">
+              <img src="entrada-much/logo-much.png" alt="MUCH · Museo Chiapas" class="mission-brand-much">
               <img src="entrada-much/logo-sata.png" alt="SATA" class="mission-brand-sata">
               <img src="Sbeel_Dinosaurios/logo-sbeel-dinosaurios.png" alt="SBEEL Dinosaurios" class="mission-brand-sbeel">
               <img src="assets/logo-planetario-tuxtla.svg" alt="Planetario Tuxtla" class="mission-brand-planetario">
@@ -15027,9 +15027,9 @@
         const completed = getCompletedStations();
         if (!areAllRewardStationsCompleted(completed)) {
           window.MuchStationCompletion?.showFloatingNotice({
-            badge: 'Mision en progreso',
-            title: 'Tu recompensa aun no esta lista',
-            body: 'Sigue explorando y completa todas las estaciones obligatorias para desbloquear tu boleto gratis y celebrar tu mision cientifica.',
+            badge: 'Misión en progreso',
+            title: 'Tu recompensa aún no está lista',
+            body: 'Sigue explorando y completa todas las estaciones obligatorias para desbloquear tu boleto gratis y celebrar tu misión científica.',
             detailLabel: 'Meta actual',
             detailValue: 'Terminar el recorrido'
           });
@@ -15050,7 +15050,7 @@
           checkEl.setAttribute('aria-hidden', 'true');
           marker.appendChild(checkEl);
         }
-        // Cruz si fallÃ³ o estÃ¡ bloqueada, palomita si completÃ³
+        // Cruz si falló o está bloqueada, palomita si completó
         if (isFailed || isBlocked) {
           checkEl.innerHTML = '&#10006;';
         } else {
@@ -15080,11 +15080,11 @@
             if (isCompleted) {
               marker.classList.add('completed');
               marker.classList.remove('failed');
-              marker.innerHTML = 'âœ“';
+              marker.innerHTML = '✓';
             } else if (isFailed || isBlocked) {
               marker.classList.remove('completed');
               marker.classList.add('failed');
-              marker.innerHTML = 'âœ—';
+              marker.innerHTML = '✗';
             } else {
               marker.classList.remove('completed');
               marker.classList.remove('failed');
@@ -15113,7 +15113,7 @@
             marker.classList.toggle('completed', isCompleted);
             marker.classList.toggle('failed', isFailed || isBlocked);
 
-            // Verificar si estÃ¡ activa
+            // Verificar si está activa
             if (activeStationIds) {
               const isActive = activeStationIds.has(String(stationId));
               marker.classList.toggle('disabled', !isActive);
@@ -15121,9 +15121,9 @@
 
             if (numberEl) {
               if (isFailed || isBlocked) {
-                numberEl.textContent = 'âœ–';
+                numberEl.textContent = '✖';
               } else if (isCompleted) {
-                numberEl.textContent = 'âœ“';
+                numberEl.textContent = '✓';
               } else {
                 numberEl.textContent = stationId;
               }
@@ -15132,10 +15132,10 @@
             marker.setAttribute(
               'title',
               isCompleted
-                ? `Estacion ${stationId} completada`
+                ? `Estación ${stationId} completada`
                 : (isFailed || isBlocked)
-                ? `Estacion ${stationId} bloqueada`
-                : `Estacion ${stationId} pendiente`
+                ? `Estación ${stationId} bloqueada`
+                : `Estación ${stationId} pendiente`
             );
           });
           updateRewardClaimUI(completed);
@@ -15166,7 +15166,7 @@
           updateCompletedStationsOnMap();
           syncPrepRulesForStation(currentStation);
 
-          // Bloquear el botÃ³n de comenzar si la estaciÃ³n ya estÃ¡ completada, fallida, bloqueada o inactiva
+          // Bloquear el botón de comenzar si la estación ya está completada, fallida, bloqueada o inactiva
           const completed = getCompletedStations();
           const failed = getFailedStations();
           const blocked = getBlockedStations();
@@ -15175,22 +15175,22 @@
           if (btnComenzar) {
             const isActive = !activeStationIds || activeStationIds.has(String(stationId));
             if (!isActive) {
-              btnComenzar.innerHTML = 'ðŸ”’ ESTACIÃ“N INACTIVA';
+              btnComenzar.innerHTML = '🔒 ESTACIÓN INACTIVA';
               btnComenzar.style.background = '#e11d48';
               btnComenzar.style.opacity = '0.7';
               btnComenzar.style.pointerEvents = 'none';
             } else if (completed[String(stationId)]) {
-              btnComenzar.innerHTML = 'ðŸ”’ ESTACIÃ“N COMPLETADA';
+              btnComenzar.innerHTML = '🔒 ESTACIÓN COMPLETADA';
               btnComenzar.style.background = '#00B487';
               btnComenzar.style.opacity = '0.7';
               btnComenzar.style.pointerEvents = 'none';
             } else if (failed[String(stationId)] || blocked[String(stationId)]) {
-              btnComenzar.innerHTML = 'ðŸ”’ ESTACIÃ“N BLOQUEADA';
+              btnComenzar.innerHTML = '🔒 ESTACIÓN BLOQUEADA';
               btnComenzar.style.background = '#e11d48';
               btnComenzar.style.opacity = '0.7';
               btnComenzar.style.pointerEvents = 'none';
             } else {
-              btnComenzar.innerHTML = 'ðŸš€ Â¡COMENZAR!';
+              btnComenzar.innerHTML = '🚀 ¡COMENZAR!';
               btnComenzar.style.background = '';
               btnComenzar.style.opacity = '';
               btnComenzar.style.pointerEvents = '';
@@ -15217,7 +15217,7 @@
         if (!resetAllowed.ok) {
           window.MuchStationCompletion?.showFloatingNotice({
             badge: 'Recorrido bloqueado',
-            title: 'Aun no puedes reiniciar',
+            title: 'Aún no puedes reiniciar',
             body: resetAllowed.message || 'Debes esperar a la fecha permitida para volver a jugar.',
             ctaLabel: 'Entendido'
           });
@@ -15225,22 +15225,22 @@
         }
 
         const confirmMessage = isTestReset
-          ? 'Â¿Reiniciar estaciones en modo prueba? Se borrara el progreso local, intentos y bloqueos para volver a empezar desde la estacion 1.'
-          : 'Â¿EstÃ¡s seguro de que deseas reiniciar el progreso de todas las estaciones? Las palomitas verdes se desmarcarÃ¡n.';
+          ? '¿Reiniciar estaciones en modo prueba? Se borrará el progreso local, intentos y bloqueos para volver a empezar desde la estación 1.'
+          : '¿Estás seguro de que deseas reiniciar el progreso de todas las estaciones? Las palomitas verdes se desmarcarán.';
 
         if (confirm(confirmMessage)) {
-          // Limpiar localmente despues de confirmar con la base de datos.
+          // Limpiar localmente después de confirmar con la base de datos.
           try {
             if (typeof window.reiniciarProgresoUsuario === 'function') {
               await window.reiniciarProgresoUsuario({ force: isTestReset, testMode: isTestReset });
-              console.log('[Sync] Progreso de base de datos reiniciado con exito.');
+              console.log('[Sync] Progreso de base de datos reiniciado con éxito.');
             }
           } catch (err) {
             console.error('Error al reiniciar progreso en la base de datos:', err);
             window.MuchStationCompletion?.showFloatingNotice({
               badge: 'No se pudo reiniciar',
-              title: 'Intenta mas tarde',
-              body: 'El servidor no confirmo el reinicio del recorrido. Tu progreso local se conserva.',
+              title: 'Intenta más tarde',
+              body: 'El servidor no confirm? el reinicio del recorrido. Tu progreso local se conserva.',
               ctaLabel: 'Entendido'
             });
             return;
@@ -15271,7 +15271,7 @@
           window.MuchStationCompletion?.showFloatingNotice({
             badge: isTestReset ? 'Modo prueba' : 'Recorrido reiniciado',
             title: 'Estaciones reiniciadas',
-            body: 'Ya puedes volver a probar el recorrido desde la estacion 1.',
+            body: 'Ya puedes volver a probar el recorrido desde la estación 1.',
             ctaLabel: 'Entendido'
           });
           return;
@@ -15375,8 +15375,8 @@
 
         window.MuchStationCompletion?.showFloatingNotice({
           badge: 'Aventura en espera',
-          title: 'Coloca tu avatar en la estacion correcta',
-          body: 'Tu avatar aun no esta en esta estacion. Muevelo al marcador indicado en el mapa y despues presiona comenzar para entrar a la aventura.',
+          title: 'Coloca tu avatar en la estación correcta',
+          body: 'Tu avatar aún no está en esta estación. Muévelo al marcador indicado en el mapa y después presiona comenzar para entrar a la aventura.',
           detailLabel: 'Consejo',
           detailValue: 'Busca el punto iluminado'
         });
@@ -15384,7 +15384,7 @@
 
       document.getElementById('btnComenzar').onclick = async () => {
         const btnComenzar = document.getElementById('btnComenzar');
-        const originalHTML = btnComenzar ? btnComenzar.innerHTML : 'ðŸš€ Â¡COMENZAR!';
+        const originalHTML = btnComenzar ? btnComenzar.innerHTML : '🚀 ¡COMENZAR!';
 
         if (window.asegurarJuegoPermitido) {
           try {
@@ -15394,11 +15394,11 @@
           }
         }
 
-        // Verificar ubicaciÃ³n vigente antes de comenzar cualquier estaciÃ³n
-        let estadoUbi = window.comprobarUbicacionVigente ? window.comprobarUbicacionVigente() : { ok: false, message: 'FunciÃ³n de ubicaciÃ³n no disponible.' };
+        // Verificar ubicación vigente antes de comenzar cualquier estación
+        let estadoUbi = window.comprobarUbicacionVigente ? window.comprobarUbicacionVigente() : { ok: false, message: 'Función de ubicación no disponible.' };
         
         if (!estadoUbi.ok) {
-          // Si no estÃ¡ vigente localmente, intentar restaurar desde el servidor primero (silenciosamente)
+          // Si no está vigente localmente, intentar restaurar desde el servidor primero (silenciosamente)
           if (window.intentarRestaurarVerificacionDesdeServidor) {
             try {
               const res = await window.intentarRestaurarVerificacionDesdeServidor();
@@ -15406,18 +15406,18 @@
                 estadoUbi = { ok: true };
               }
             } catch (e) {
-              console.error('Error al intentar restaurar ubicaciÃ³n:', e);
+              console.error('Error al intentar restaurar ubicación:', e);
             }
           }
         }
 
         if (!estadoUbi.ok) {
-          // Si sigue sin estar validada, disparar la geolocalizaciÃ³n de forma interactiva justo en este momento
+          // Si sigue sin estar validada, disparar la geolocalización de forma interactiva justo en este momento
           if (window.verificarUbicacionYRegistrar) {
             try {
               if (btnComenzar) {
                 btnComenzar.disabled = true;
-                btnComenzar.innerHTML = 'â³ VALIDANDO GPS...';
+                btnComenzar.innerHTML = '⏳ VALIDANDO GPS...';
                 btnComenzar.style.opacity = '0.7';
               }
 
@@ -15425,16 +15425,16 @@
               if (res.ok) {
                 estadoUbi = { ok: true };
                 window.MuchStationCompletion?.showFloatingNotice({
-                  badge: 'ðŸ“ UbicaciÃ³n OK',
-                  title: 'Â¡UbicaciÃ³n validada!',
-                  body: 'EstÃ¡s en el Museo Chiapas de Ciencia y TecnologÃ­a. Â¡Que comience el juego!',
-                  detailLabel: 'AcciÃ³n',
+                  badge: '📍 Ubicación OK',
+                  title: '¡Ubicación validada!',
+                  body: 'Estás en el Museo Chiapas de Ciencia y Tecnología. ¡Que comience el juego!',
+                  detailLabel: 'Acción',
                   detailValue: 'Listo para jugar'
                 });
               } else {
                 window.MuchStationCompletion?.showFloatingNotice({
-                  badge: 'ðŸ“ UbicaciÃ³n incorrecta',
-                  title: 'No estÃ¡s en el museo',
+                  badge: '📍 Ubicación incorrecta',
+                  title: 'No estás en el museo',
                   body: res.message,
                   detailLabel: 'GPS',
                   detailValue: 'Acceso denegado'
@@ -15442,11 +15442,11 @@
               }
             } catch (e) {
               window.MuchStationCompletion?.showFloatingNotice({
-                badge: 'ðŸ“ Error GPS',
-                title: 'Error de validaciÃ³n',
-                body: 'OcurriÃ³ un error al obtener tu geolocalizaciÃ³n: ' + e.message,
+                badge: '📍 Error GPS',
+                title: 'Error de validación',
+                body: 'Ocurrió un error al obtener tu geolocalización: ' + e.message,
                 detailLabel: 'Detalle',
-                detailValue: 'ReintÃ©ntalo'
+                detailValue: 'Reinténtalo'
               });
             } finally {
               if (btnComenzar) {
@@ -15459,18 +15459,18 @@
         }
 
         if (!estadoUbi.ok) {
-          // Si despuÃ©s de todo no se pudo verificar, detenemos el flujo
+          // Si después de todo no se pudo verificar, detenemos el flujo
           return;
         }
 
         const completed = getCompletedStations();
         if (completed[currentStation]) {
           window.MuchStationCompletion?.showFloatingNotice({
-            badge: 'Estacion ya completada',
+            badge: 'Estación ya completada',
             title: 'Excelente trabajo, explorador',
-            body: 'Esta estacion ya fue completada con exito. Continua con la siguiente aventura para seguir avanzando en tu mision cientifica.',
+            body: 'Esta estación ya fue completada con éxito. Continúa con la siguiente aventura para seguir avanzando en tu misión científica.',
             detailLabel: 'Siguiente paso',
-            detailValue: 'Avanza a otra estacion'
+            detailValue: 'Avanza a otra estación'
           });
           return;
         }
@@ -15484,13 +15484,13 @@
         rulesOverlay.classList.add('open');
       };
 
-      // 6. Hamburguesa MÃ³vil
+      // 6. Hamburguesa Móvil
       const hamburger = document.getElementById('hamburgerBtn');
       const navLinks = document.querySelector('.nav-links');
       const mobileBackdrop = document.getElementById('mobileNavBackdrop');
       const topNav = document.querySelector('.top-nav');
 
-      // Mover el backdrop de navegaciÃ³n mÃ³vil dentro de .top-nav para evitar problemas de stacking context en iOS/Android
+      // Mover el backdrop de navegación móvil dentro de .top-nav para evitar problemas de stacking context en iOS/Android
       if (mobileBackdrop && topNav) {
         topNav.appendChild(mobileBackdrop);
       }
@@ -15524,7 +15524,7 @@
       }
 
       // ==========================================
-      // FUNCIONES DE GEOLOCALIZACIÃ“N DEL MUSEO
+      // FUNCIONES DE GEOLOCALIZACIÓN DEL MUSEO
       // ==========================================
       window.triggerLocationCheck = async () => {
         const btn = document.getElementById('btnVerifyLocation');
@@ -15536,42 +15536,42 @@
           
           if (res.ok) {
             if (btn) {
-              btn.innerHTML = 'âœ… UbicaciÃ³n Validada';
+              btn.innerHTML = '✅ Ubicación Validada';
               btn.style.background = 'linear-gradient(135deg, #00B487, #00D2C4)';
               btn.style.opacity = '1';
             }
             window.MuchStationCompletion?.showFloatingNotice({
-              badge: 'ðŸ“ UbicaciÃ³n OK',
-              title: 'Â¡UbicaciÃ³n validada!',
-              body: 'UbicaciÃ³n validada. EstÃ¡s en el Museo Chiapas de Ciencia y TecnologÃ­a y ya puedes jugar.',
-              detailLabel: 'AcciÃ³n',
+              badge: '📍 Ubicación OK',
+              title: '¡Ubicación validada!',
+              body: 'Ubicación validada. Estás en el Museo Chiapas de Ciencia y Tecnología y ya puedes jugar.',
+              detailLabel: 'Acción',
               detailValue: 'Listo para jugar'
             });
           } else {
             if (btn) {
               btn.disabled = false;
-              btn.innerHTML = 'ðŸ“ Verificar ubicaciÃ³n';
+              btn.innerHTML = '📍 Verificar ubicación';
               btn.style.opacity = '1';
             }
             window.MuchStationCompletion?.showFloatingNotice({
-              badge: 'ðŸ“ Error de ubicaciÃ³n',
-              title: 'No estÃ¡s en el museo',
+              badge: '📍 Error de ubicación',
+              title: 'No estás en el museo',
               body: res.message,
               detailLabel: 'Intento',
-              detailValue: 'Reintentar verificaciÃ³n'
+              detailValue: 'Reintentar verificación'
             });
           }
         } catch (e) {
           console.error(e);
           if (btn) {
             btn.disabled = false;
-            btn.innerHTML = 'ðŸ“ Verificar ubicaciÃ³n';
+            btn.innerHTML = '📍 Verificar ubicación';
             btn.style.opacity = '1';
           }
           window.MuchStationCompletion?.showFloatingNotice({
-            badge: 'ðŸ“ Error',
-            title: 'Error de verificaciÃ³n',
-            body: 'OcurriÃ³ un error inesperado al comprobar tu ubicaciÃ³n. IntÃ©ntalo de nuevo.',
+            badge: '📍 Error',
+            title: 'Error de verificación',
+            body: 'Ocurrió un error inesperado al comprobar tu ubicación. Inténtalo de nuevo.',
             detailLabel: 'Detalle',
             detailValue: e.message
           });
@@ -15591,11 +15591,11 @@
                 estado = { ok: true };
               }
             } catch (e) {
-              console.error('Error al intentar restaurar ubicaciÃ³n desde servidor:', e);
+              console.error('Error al intentar restaurar ubicación desde servidor:', e);
             }
           }
           if (estado.ok) {
-            btn.innerHTML = 'âœ… UbicaciÃ³n Validada';
+            btn.innerHTML = '✅ Ubicación Validada';
             btn.style.background = 'linear-gradient(135deg, #00B487, #00D2C4)';
           }
         }
@@ -15605,12 +15605,12 @@
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('reason') === 'playtime_blocked') {
           const storedMsg = localStorage.getItem('much_playtime_block_msg');
-          const msg = urlParams.get('msg') || storedMsg || 'Tu misiÃ³n ya fue completada. Debes esperar para comenzar una nueva aventura.';
+          const msg = urlParams.get('msg') || storedMsg || 'Tu misión ya fue completada. Debes esperar para comenzar una nueva aventura.';
           try { localStorage.removeItem('much_playtime_block_msg'); } catch (_) {}
           window.setTimeout(() => {
             window.MuchStationCompletion?.showFloatingNotice({
-              badge: 'â³ MisiÃ³n completada',
-              title: 'Â¡Tu misiÃ³n ya fue completada!',
+              badge: '⏳ Misión completada',
+              title: '¡Tu misión ya fue completada!',
               body: msg,
               ctaLabel: 'Entendido'
             });
@@ -15618,10 +15618,10 @@
           return;
         }
         if (urlParams.get('reason') === 'location_required') {
-          const msg = urlParams.get('msg') || 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicaciÃ³n.';
+          const msg = urlParams.get('msg') || 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicación.';
           window.setTimeout(() => {
             window.MuchStationCompletion?.showFloatingNotice({
-              badge: 'ðŸ“ UbicaciÃ³n requerida',
+              badge: '📍 Ubicación requerida',
               title: 'Acceso restringido',
               body: msg,
               detailLabel: 'Requisito',
@@ -15635,9 +15635,9 @@
       checkRedirectReason();
     });
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ════════════════════════════════════════════════════════════
        ADMINISTRADOR MODAL - FUNCIONALIDAD
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ════════════════════════════════════════════════════════════ */
     
     const ADMIN_VISUAL_ONLY = false;
     const ADMIN_ALLOWED_EMAILS = [
@@ -15902,7 +15902,7 @@
       }
 
       setAdminAuthLoading(true);
-      setAdminAuthMessage('Validando sesion contra MySQL...');
+      setAdminAuthMessage('Validando sesión contra MySQL...');
 
       try {
         const user = await getVerifiedAdminUser();
@@ -15910,12 +15910,12 @@
           showAdminShell(user);
           await bootstrapAdminDashboard();
           startTicketSync();
-          setAdminAuthMessage(`Sesion iniciada como ${email}.`, 'success');
+          setAdminAuthMessage(`Sesión iniciada como ${email}.`, 'success');
         } else {
-          await showAdminLogin('Primero inicia sesion con Google usando una cuenta administradora.', 'error');
+          await showAdminLogin('Primero inicia sesión con Google usando una cuenta administradora.', 'error');
         }
       } catch (error) {
-        await showAdminLogin(error?.message || 'No se pudo validar la sesion en MySQL.', 'error');
+        await showAdminLogin(error?.message || 'No se pudo validar la sesión en MySQL.', 'error');
       } finally {
         setAdminAuthLoading(false);
       }
@@ -15926,7 +15926,7 @@
         await stopScanner();
       }
       localStorage.removeItem(ADMIN_SESSION_KEY);
-      await showAdminLogin('Sesion cerrada correctamente.');
+      await showAdminLogin('Sesión cerrada correctamente.');
     }
 
     function stopTicketSync() {
@@ -16116,12 +16116,12 @@
             <div class="scan-meta-item"><span>ID</span><strong>${escapeHtml(data.recordId)}</strong></div>
             <div class="scan-meta-item"><span>Nombre</span><strong>${escapeHtml(data.participant)}</strong></div>
             <div class="scan-meta-item"><span>Correo</span><strong>${escapeHtml(data.email)}</strong></div>
-            <div class="scan-meta-item"><span>Telefono</span><strong>${escapeHtml(data.phone)}</strong></div>
+            <div class="scan-meta-item"><span>Teléfono</span><strong>${escapeHtml(data.phone)}</strong></div>
             <div class="scan-meta-item"><span>Tipo de entrada</span><strong>${escapeHtml(data.ticketType)}</strong></div>
             <div class="scan-meta-item"><span>Estatus BD</span><strong>${escapeHtml(data.dbStatus)}</strong></div>
             <div class="scan-meta-item"><span>Status</span><strong>${escapeHtml(data.status)}</strong></div>
-            <div class="scan-meta-item"><span>Valido desde</span><strong>${escapeHtml(data.validFrom)}</strong></div>
-            <div class="scan-meta-item"><span>Valido hasta</span><strong>${escapeHtml(data.validUntil)}</strong></div>
+            <div class="scan-meta-item"><span>Válido desde</span><strong>${escapeHtml(data.validFrom)}</strong></div>
+            <div class="scan-meta-item"><span>Válido hasta</span><strong>${escapeHtml(data.validUntil)}</strong></div>
             <div class="scan-meta-item"><span>Fecha de registro</span><strong>${escapeHtml(data.createdAt)}</strong></div>
           </div>
           ${data.rawValue ? `<div class="scan-raw"><span>Contenido leido</span>${escapeHtml(data.rawValue)}</div>` : ''}
@@ -16139,11 +16139,11 @@
       if (!lookupValue || (!folio && !looksLikeId)) {
         setScannerFeedback('Ingresa un folio, ID o contenido del QR.', 'error');
         renderScanResultCard({
-          badgeLabel: 'Invalido', badgeTone: 'invalid', title: 'No se reconocio el boleto',
+          badgeLabel: 'Inválido', badgeTone: 'invalid', title: 'No se reconoció el boleto',
           description: 'El contenido no corresponde a un folio o ID valido.',
           recordId: 'Sin ID', folio: 'Sin folio', participant: 'Sin coincidencia',
-          email: 'Sin correo', phone: 'Sin telefono', ticketType: 'Sin tipo',
-          dbStatus: 'Sin estatus', status: 'Invalido', validFrom: 'Sin fecha',
+          email: 'Sin correo', phone: 'Sin teléfono', ticketType: 'Sin tipo',
+          dbStatus: 'Sin estatus', status: 'Inválido', validFrom: 'Sin fecha',
           validUntil: 'Sin fecha', createdAt: 'Sin fecha', rawValue
         });
         return;
@@ -16159,11 +16159,11 @@
         if (!record) {
           setScannerFeedback(`No existe un boleto con el folio o ID ${lookupValue}.`, 'error');
           renderScanResultCard({
-            badgeLabel: 'Invalido', badgeTone: 'invalid', title: 'Folio no encontrado',
+            badgeLabel: 'Inválido', badgeTone: 'invalid', title: 'Folio no encontrado',
             description: 'No existe un boleto registrado con ese folio o ID.',
             recordId: 'Sin ID', folio: folio || lookupValue, participant: 'Sin coincidencia',
-            email: 'Sin correo', phone: 'Sin telefono', ticketType: 'Sin tipo',
-            dbStatus: 'Sin estatus', status: 'Invalido', validFrom: 'Sin fecha',
+            email: 'Sin correo', phone: 'Sin teléfono', ticketType: 'Sin tipo',
+            dbStatus: 'Sin estatus', status: 'Inválido', validFrom: 'Sin fecha',
             validUntil: 'Sin fecha', createdAt: 'Sin fecha', rawValue
           });
           return;
@@ -16171,7 +16171,7 @@
 
         const statusInfo = getStatusInfo(record);
         renderScanResultCard({
-          badgeLabel: statusInfo.isValid ? 'Valido' : 'Invalido',
+          badgeLabel: statusInfo.isValid ? 'Válido' : 'Inválido',
           badgeTone: getScanTone(statusInfo),
           title: getScanHeadline(statusInfo),
           description: getScanDescription(record, statusInfo),
@@ -16179,7 +16179,7 @@
           folio: record.folio || lookupValue,
           participant: record.nombre || 'Sin nombre',
           email: record.correo || 'Sin correo',
-          phone: record.telefono || 'Sin telefono',
+          phone: record.telefono || 'Sin teléfono',
           ticketType: record.tipo_entrada || 'Sin tipo',
           dbStatus: record.estatus || 'Sin estatus',
           status: statusInfo.label,
@@ -16198,11 +16198,11 @@
       } catch (error) {
         setScannerFeedback('No se pudo consultar el boleto.', 'error');
         renderScanResultCard({
-          badgeLabel: 'Invalido', badgeTone: 'invalid', title: 'Error de consulta',
+          badgeLabel: 'Inválido', badgeTone: 'invalid', title: 'Error de consulta',
           description: error?.message || 'No fue posible consultar el boleto.',
           recordId: 'Sin ID', folio: lookupValue, participant: 'Sin coincidencia',
-          email: 'Sin correo', phone: 'Sin telefono', ticketType: 'Sin tipo',
-          dbStatus: 'Sin estatus', status: 'Invalido', validFrom: 'Sin fecha',
+          email: 'Sin correo', phone: 'Sin teléfono', ticketType: 'Sin tipo',
+          dbStatus: 'Sin estatus', status: 'Inválido', validFrom: 'Sin fecha',
           validUntil: 'Sin fecha', createdAt: 'Sin fecha', rawValue
         });
       }
@@ -16225,13 +16225,13 @@
         window.location.hostname === '127.0.0.1';
 
       if (!hasSecureContext) {
-        setScannerSupport('La camara solo funciona en HTTPS o localhost.', 'error');
+        setScannerSupport('La cámara solo funciona en HTTPS o localhost.', 'error');
         setScannerFeedback('Usa el campo manual si abriste fuera de HTTPS.', 'error');
         return;
       }
 
       if (typeof Html5Qrcode === 'undefined') {
-        setScannerSupport('No se pudo cargar la libreria del escaner.', 'error');
+        setScannerSupport('No se pudo cargar la librería del escáner.', 'error');
         setScannerFeedback('Pega el folio manualmente.', 'error');
         return;
       }
@@ -16254,13 +16254,13 @@
 
         scannerState.active = true;
         updateScannerControls();
-        setScannerSupport('Camara activa');
-        setScannerFeedback('Escaner listo. Apunta al QR del boleto.');
+        setScannerSupport('Cámara activa');
+        setScannerFeedback('Escáner listo. Apunta al QR del boleto.');
       } catch (error) {
         scannerState.active = false;
         updateScannerControls();
-        setScannerSupport('No se pudo abrir la camara.', 'error');
-        setScannerFeedback('Revisa permisos de camara o valida el folio manualmente.', 'error');
+        setScannerSupport('No se pudo abrir la cámara.', 'error');
+        setScannerFeedback('Revisa permisos de cámara o valida el folio manualmente.', 'error');
       }
     }
 
@@ -16268,7 +16268,7 @@
       if (!scannerState.instance || !scannerState.active) {
         scannerState.active = false;
         updateScannerControls();
-        setScannerSupport('Camara detenida');
+        setScannerSupport('Cámara detenida');
         return;
       }
 
@@ -16276,11 +16276,11 @@
         await scannerState.instance.stop();
         await scannerState.instance.clear();
       } catch (error) {
-        console.warn('No se pudo detener el escaner limpiamente:', error);
+        console.warn('No se pudo detener el escáner limpiamente:', error);
       } finally {
         scannerState.active = false;
         updateScannerControls();
-        setScannerSupport('Camara detenida');
+        setScannerSupport('Cámara detenida');
       }
     }
 
@@ -16292,11 +16292,11 @@
 
       updateScannerControls();
       if (!hasSecureContext) {
-        setScannerSupport('La camara requiere HTTPS o localhost.', 'error');
+        setScannerSupport('La cámara requiere HTTPS o localhost.', 'error');
         setScannerFeedback('Tambien puedes validar el boleto pegando el folio manualmente.');
         return;
       }
-      setScannerSupport('Camara detenida');
+      setScannerSupport('Cámara detenida');
       setScannerFeedback('Esperando un boleto para validar.');
     }
 
@@ -16369,7 +16369,7 @@
         const rowId = row.id ?? 'Sin ID';
         const participantName = row.nombre || 'Sin nombre';
         const participantEmail = row.correo || 'Sin correo';
-        const participantPhone = row.telefono || 'Sin telefono';
+        const participantPhone = row.telefono || 'Sin teléfono';
         const folio = row.folio ? escapeHtml(row.folio) : 'Sin folio';
         const folioClass = row.folio ? 'folio-code' : 'folio-code empty';
         const ticketType = row.tipo_entrada || 'Sin tipo';
@@ -16383,13 +16383,13 @@
             <td data-label="ID" class="muted">${escapeHtml(String(rowId))}</td>
             <td data-label="Nombre">${escapeHtml(participantName)}</td>
             <td data-label="Correo" class="muted">${escapeHtml(participantEmail)}</td>
-            <td data-label="Telefono" class="muted">${escapeHtml(participantPhone)}</td>
+            <td data-label="Teléfono" class="muted">${escapeHtml(participantPhone)}</td>
             <td data-label="Folio"><span class="${folioClass}">${folio}</span></td>
             <td data-label="Tipo de entrada" class="muted">${escapeHtml(ticketType)}</td>
             <td data-label="Estatus BD" class="muted">${escapeHtml(dbStatus)}</td>
             <td data-label="Status"><span class="status-badge ${row._status.className}">${row._status.label}</span></td>
-            <td data-label="Valido desde" class="muted">${escapeHtml(validFrom)}</td>
-            <td data-label="Valido hasta" class="muted">${escapeHtml(validUntil)}</td>
+            <td data-label="Válido desde" class="muted">${escapeHtml(validFrom)}</td>
+            <td data-label="Válido hasta" class="muted">${escapeHtml(validUntil)}</td>
             <td data-label="Fecha de registro" class="muted">${escapeHtml(createdAt)}</td>
           </tr>
         `;
@@ -16404,7 +16404,7 @@
 
       if (state.error) {
         els.resultsHint.textContent = 'Error consultando la base de datos.';
-        els.updatedAt.textContent = 'Ultimo intento sin exito';
+        els.updatedAt.textContent = 'Último intento sin éxito';
         return;
       }
 
@@ -16513,7 +16513,7 @@
         if (document.hidden && scannerState.active) {
           stopScanner();
         }
-      }); 
+      });
 
       window.addEventListener('beforeunload', () => {
         if (scannerState.active) {

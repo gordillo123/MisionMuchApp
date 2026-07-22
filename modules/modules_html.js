@@ -300,7 +300,7 @@ window.APP_MODULES = {
 
       <div class="profile-actions">
         <button class="btn-profile-action btn-profile-primary" id="btnCambiarAvatar">Cambiar Avatar</button>
-        <button class="btn-profile-action btn-profile-danger" onclick="window.cerrarSesion ? window.cerrarSesion() : (localStorage.clear(), location.reload());">Cerrar Sesión</button>
+        <button class="btn-profile-action btn-profile-danger" onclick="window.cerrarSesion ? window.cerrarSesion() : (localStorage.clear(), location.reload());">Cerrar sesión</button>
       </div>
     </div>
 

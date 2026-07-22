@@ -98,7 +98,7 @@ async function createAuditTicket() {
       reclamar: true,
       tipo_entrada: 'MUCH',
       destino_boleto: 'MUCH',
-      lugar: 'Museo Chiapas de Ciencia y Tecnologia'
+      lugar: 'Museo Chiapas de Ciencia y Tecnología'
     })
   });
   if (!res.ok) {
@@ -150,7 +150,7 @@ function seedScript() {
       acceso: 'MUCH',
       tipo_entrada: 'MUCH',
       destino_boleto: 'MUCH',
-      lugar: 'Museo Chiapas de Ciencia y Tecnologia'
+      lugar: 'Museo Chiapas de Ciencia y Tecnología'
     }));
   };
 }

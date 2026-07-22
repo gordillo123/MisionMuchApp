@@ -86,8 +86,8 @@ test('shuffleQuestionOptions moves options while preserving the correct answer i
 
 test('createQuestionDeck does not fall back to questions from another station', () => {
   const bank = [
-    { id: 'energia-1', text: 'Energia 1', options: ['A', 'B'], correctIndex: 0, sala: 'energia' },
-    { id: 'energia-2', text: 'Energia 2', options: ['A', 'B'], correctIndex: 0, sala: 'energia' }
+    { id: 'energia-1', text: 'Energía 1', options: ['A', 'B'], correctIndex: 0, sala: 'energia' },
+    { id: 'energia-2', text: 'Energía 2', options: ['A', 'B'], correctIndex: 0, sala: 'energia' }
   ];
 
   const deck = createQuestionDeck({
@@ -163,9 +163,9 @@ test('createQuestionDeck keeps Sala A, Sala B and Sala C pools isolated', () => 
     { id: 'bio-1', text: 'Bio 1', options: ['A', 'B'], correctIndex: 0, sala: 'biodiversidad' },
     { id: 'bio-2', text: 'Bio 2', options: ['A', 'B'], correctIndex: 0, sala: 'biodiversidad' },
     { id: 'bio-3', text: 'Bio 3', options: ['A', 'B'], correctIndex: 0, sala: 'biodiversidad' },
-    { id: 'ene-1', text: 'Energia 1', options: ['A', 'B'], correctIndex: 0, sala: 'energia' },
-    { id: 'ene-2', text: 'Energia 2', options: ['A', 'B'], correctIndex: 0, sala: 'energia' },
-    { id: 'ene-3', text: 'Energia 3', options: ['A', 'B'], correctIndex: 0, sala: 'energia' },
+    { id: 'ene-1', text: 'Energía 1', options: ['A', 'B'], correctIndex: 0, sala: 'energia' },
+    { id: 'ene-2', text: 'Energía 2', options: ['A', 'B'], correctIndex: 0, sala: 'energia' },
+    { id: 'ene-3', text: 'Energía 3', options: ['A', 'B'], correctIndex: 0, sala: 'energia' },
     { id: 'sus-1', text: 'Sustentable 1', options: ['A', 'B'], correctIndex: 0, sala: 'desarrollo-sustentable' },
     { id: 'sus-2', text: 'Sustentable 2', options: ['A', 'B'], correctIndex: 0, sala: 'desarrollo-sustentable' },
     { id: 'sus-3', text: 'Sustentable 3', options: ['A', 'B'], correctIndex: 0, sala: 'desarrollo-sustentable' }

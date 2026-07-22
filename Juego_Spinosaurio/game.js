@@ -1,11 +1,11 @@
-﻿// Validar ubicaciÃ³n antes de permitir jugar
+﻿// Validar ubicación antes de permitir jugar
 (function() {
   // DESACTIVADO TEMPORALMENTE para permitir pruebas y juego remoto
   return;
 
   const raw = sessionStorage.getItem('much_last_location_verification');
   let valid = false;
-  let msg = 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicaciÃ³n.';
+  let msg = 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicación.';
   if (raw) {
     try {
       const verif = JSON.parse(raw);
@@ -14,16 +14,16 @@
       if (transcurrido <= vigenciaMs && verif.dentro_del_museo) {
         valid = true;
       } else if (transcurrido > vigenciaMs) {
-        msg = 'La verificaciÃ³n de ubicaciÃ³n ha expirado. Por favor, verifÃ­cala de nuevo.';
+        msg = 'La verificación de ubicación ha expirado. Por favor, verifícala de nuevo.';
       } else {
-        msg = verif.mensaje_resultado || 'No te encuentras en el Museo Chiapas de Ciencia y TecnologÃ­a.';
+        msg = verif.mensaje_resultado || 'No te encuentras en el Museo Chiapas de Ciencia y Tecnología.';
       }
     } catch (e) {}
   }
   if (!valid) {
     alert(msg);
-    window.location.href = '../index.html?reason=location_required&msg=' + encodeURIComponent(msg);
-    throw new Error('Acceso denegado: ubicaciÃ³n no vÃ¡lida.');
+    window.location.href = '../index.htmlÁreason=location_required&msg=' + encodeURIComponent(msg);
+    throw new Error('Acceso denegado: ubicación no válida.');
   }
 })();
 
@@ -32,7 +32,7 @@ function getMexicoTime() {
   return new Date().toISOString();
 }
 
-/* ===== BLINDAJE POI: Captura de ubicaciÃ³n desde URL ===== */
+/* ===== BLINDAJE POI: Captura de ubicación desde URL ===== */
 (function () {
   const params = new URLSearchParams(window.location.search);
   const lugarURL = params.get('lugar');
@@ -153,17 +153,17 @@ function resolveSpinosaurioQuizData() {
   }
 
   return {
-    title: 'Â¡Pregunta final del Espinosaurio!',
+    title: '¡Pregunta final del Espinosaurio!',
     subtitle: 'Responde con cuidado',
-    question: 'Â¿QuÃ© tipo de dinosaurio era el Espinosaurio?',
-    options: ['HerbÃ­voro', 'CarnÃ­voro', 'Dinosaurio volador', 'Dinosaurio marino pequeÃ±o'],
+    question: '¿Qué tipo de dinosaurio era el Espinosaurio?',
+    options: ['Herbívoro', 'Carnívoro', 'Dinosaurio volador', 'Dinosaurio marino pequeño'],
     answerIndex: 1
   };
 }
 
 function playCompletionSound() {
   try {
-    const audio = new Audio('../Sonidos/Estacion completada.mp3');
+    const audio = new Audio('../Sonidos/Estación completada.mp3');
     audio.play().catch(e => console.warn('No se pudo reproducir audio de completado:', e));
   } catch (e) {
     console.warn('Error al reproducir audio:', e);
@@ -185,7 +185,7 @@ function markStationCompleted() {
     completed[STATION_ID] = true;
     localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
   } catch (e) {
-    console.warn('No se pudo marcar estaciÃ³n completa:', e);
+    console.warn('No se pudo marcar estación completa:', e);
   }
 }
 
@@ -291,11 +291,11 @@ async function guardarSpinosaurioEnMySQL(puntajeFinal, aprobado) {
       aprobada: aprobado
     });
   } catch (error) {
-    console.error('[MySQL DB] No se pudo guardar Spinosaurio:', error);
+    console.error('[MySQL DB] No se pudo guardar Espinosaurio:', error);
   }
 }
 
-// ðŸ›‘ Variables de la cuenta regresiva y estado del juego
+// 🛑 Variables de la cuenta regresiva y estado del juego
 var countdownActive = false;
 var gameStarted = false;
 var restartingGame = false;
@@ -369,7 +369,7 @@ function bindTapAction(element, handler, key) {
   element.addEventListener("click", run, { passive: false });
 }
 
-/* ===== INICIALIZACIÃ“N ===== */
+/* ===== INICIALIZACIÓN ===== */
 if (document.readyState === "complete" || document.readyState === "interactive") {
   setTimeout(Init, 1);
 } else {
@@ -398,10 +398,10 @@ function showLockoutScreen() {
   overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.98); z-index: 1000000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-family: system-ui, -apple-system, sans-serif; text-align: center; padding: 20px;';
   
   overlay.innerHTML = `
-    <div style="font-size: clamp(3rem, 10vh, 5rem); margin-bottom: 20px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));">âš ï¸</div>
+    <div style="font-size: clamp(3rem, 10vh, 5rem); margin-bottom: 20px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));">⚠️</div>
     <h2 style="font-size: clamp(1.8rem, 5vh, 2.5rem); margin-bottom: 12px; color: #ef4444; font-weight: 900; letter-spacing: 0.5px;">Acceso Bloqueado Temporalmente</h2>
     <p style="font-size: clamp(1rem, 3vh, 1.25rem); max-width: 550px; margin-bottom: 24px; line-height: 1.6; color: #cbd5e1; font-weight: 500;">
-      Se ha detectado un cambio de pantalla persistente (bÃºsqueda de respuestas). El acceso a esta estaciÃ³n se ha bloqueado temporalmente por seguridad.
+      Se ha detectado un cambio de pantalla persistente (búsqueda de respuestas). El acceso a esta estación se ha bloqueado temporalmente por seguridad.
     </p>
     <div id="lockoutCountdown" style="font-size: clamp(2rem, 6vh, 3.5rem); font-weight: 900; color: #f59e0b; background: rgba(245, 158, 11, 0.1); border: 2px solid rgba(245, 158, 11, 0.3); padding: 8px 32px; border-radius: 999px; margin-bottom: 24px; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.15);">--s</div>
     <button id="btnLockoutExit" style="appearance: none; border: 2px solid rgba(255, 255, 255, 0.5); cursor: pointer; padding: 12px 24px; border-radius: 14px; font-weight: 800; font-size: 16px; color: white; background: rgba(255,255,255,0.1); transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">Volver al mapa</button>
@@ -436,14 +436,14 @@ async function inicializarProgresoSpinosaurio() {
     const progreso = await import('../mysql-utils.js');
     const active = await progreso.comprobarEstacionActiva(2);
     if (!active) {
-      alert('Esta estaciÃ³n se encuentra inactiva o cerrada.');
+      alert('Esta estación se encuentra inactiva o cerrada.');
       window.location.href = '../index.html';
       return;
     }
     await progreso.inicializarProgresoUsuario(2);
-    console.log("Progreso de Spinosaurio inicializado en MySQL.");
+    console.log("Progreso de Espinosaurio inicializado en MySQL.");
   } catch (error) {
-    console.error("Error al inicializar progreso de Spinosaurio:", error);
+    console.error("Error al inicializar progreso de Espinosaurio:", error);
   }
 }
 
@@ -460,7 +460,7 @@ function Init() {
   }, { passive: true });
 
   Start();
-  ConfigurarPortada(); // Arranca escuchando el botÃ³n de la portada integrada
+  ConfigurarPortada(); // Arranca escuchando el botón de la portada integrada
   inicializarProgresoSpinosaurio();
 }
 
@@ -472,7 +472,7 @@ function Loop() {
   loopRequestId = requestAnimationFrame(Loop);
 }
 
-/* ===== START (AsignaciÃ³n de eventos y elementos) ===== */
+/* ===== START (Asignación de eventos y elementos) ===== */
 function Start() {
   gameOver = document.querySelector(".game-over");
   suelo = document.querySelector(".suelo");
@@ -497,7 +497,7 @@ function Start() {
     bindTapAction(btnExit, goBackToMap, "back-map");
   }
 
-  // Nuevo: botÃ³n 'Siguiente' que aparece despuÃ©s de responder
+  // Nuevo: botón 'Siguiente' que aparece después de responder
   try {
     const btnNext = document.getElementById("btnQuizNext");
     if (btnNext) {
@@ -507,13 +507,13 @@ function Start() {
         try { window.lockPortraitOrientation?.(); } catch (e) {}
         window.location.href = '../index.html?' + mapParams.toString();
         return;
-        // Navegar a la siguiente estaciÃ³n basada en localStorage (misma lÃ³gica que index.html)
+        // Navegar a la siguiente estación basada en localStorage (misma lógica que index.html)
         try {
           const searchParams = new URLSearchParams(window.location.search);
           // Valor esperado ya actualizado en validarQuiz() a '3' tras completar
           let target = localStorage.getItem('much_current_station') || '3';
 
-          // Si por alguna razÃ³n target es la misma estaciÃ³n actual, avanzar 1
+          // Si por alguna razón target es la misma estación actual, avanzar 1
           if (target === STATION_ID) {
             target = String(Number(target) + 1);
           }
@@ -556,7 +556,7 @@ function Start() {
   document.addEventListener("contextmenu", function (e) { if (quizVisible) e.preventDefault(); });
 }
 
-/* ===== LÃ“GICA DE PORTADA INTEGRADA Y CUENTA REGRESIVA ===== */
+/* ===== LÓGICA DE PORTADA INTEGRADA Y CUENTA REGRESIVA ===== */
 async function goBackToMap(e) {
   if (e) {
     e.preventDefault();
@@ -629,7 +629,7 @@ async function runCountdown() {
       overlay.innerText = count;
       if (jumpSound) { jumpSound.currentTime = 0; jumpSound.play().catch(() => { }); }
     } else if (count === 0) {
-      overlay.innerText = "Â¡YA!";
+      overlay.innerText = "¡YA!";
       overlay.style.color = "#00c9b7";
     } else {
       clearInterval(timer);
@@ -639,10 +639,10 @@ async function runCountdown() {
       try { pauseBgMusic(); } catch (e) {}
       time = getFrameTimestamp();
 
-      // ðŸ“ Await the initial registration to ensure ultimo_intento_id is saved before any score updates
+      // 📝 Await the initial registration to ensure ultimo_intento_id is saved before any score updates
       await registrarIntentoInicial();
 
-      Loop(); // ðŸš€ ARRANCA EL JUEGO
+      Loop(); // 🚀 ARRANCA EL JUEGO
     }
   }, 1000);
 }
@@ -796,7 +796,7 @@ function HandleKeyDown(ev) {
   }
 }
 
-/* ===== UPDATE (LÃ³gica de movimiento y colisiones) ===== */
+/* ===== UPDATE (Lógica de movimiento y colisiones) ===== */
 function Update() {
   if (orientationBlocked) return;
   if (parado) return;
@@ -983,11 +983,11 @@ function stopQuestionTimer() {
 
 function handleQuestionTimeout() {
   try {
-    const msg = document.getElementById('quizMsg'); if (msg) { msg.textContent = 'Se acabÃ³ el tiempo. La respuesta se considera incorrecta.'; msg.className = 'quiz-msg err'; }
+    const msg = document.getElementById('quizMsg'); if (msg) { msg.textContent = 'Se acabó el tiempo. La respuesta se considera incorrecta.'; msg.className = 'quiz-msg err'; }
     var inputs = document.querySelectorAll('input[name="q1"]'); inputs.forEach(inp => inp.disabled = true);
     try { document.getElementById('btnQuizNext').style.display = 'none'; } catch (e) {}
     try { document.getElementById('btnQuizOk').textContent = 'Volver a jugar'; } catch (e) {}
-    // Reiniciar juego Espinosaurio automÃ¡ticamente despuÃ©s de una pequeÃ±a pausa
+    // Reiniciar juego Espinosaurio automáticamente después de una pequeña pausa
     setTimeout(() => { location.reload(); }, 1400);
   } catch (e) { console.warn('handleQuestionTimeout error', e); }
 }
@@ -997,8 +997,8 @@ function mostrarQuiz() {
 
   if (!quizData) {
     quizData = {
-        title: "Â¡Pregunta final del Espinosaurio!", subtitle: "Responde con cuidado",
-        question: "Â¿QuÃ© tipo de dinosaurio era el Espinosaurio?", options: ["HerbÃ­voro", "CarnÃ­voro", "Dinosaurio volador", "Dinosaurio marino pequeÃ±o"], answerIndex: 1
+        title: "¡Pregunta final del Espinosaurio!", subtitle: "Responde con cuidado",
+        question: "¿Qué tipo de dinosaurio era el Espinosaurio?", options: ["Herbívoro", "Carnívoro", "Dinosaurio volador", "Dinosaurio marino pequeño"], answerIndex: 1
       };
   }
 
@@ -1048,7 +1048,7 @@ async function validarQuiz() {
   }
 
   if (!sel) {
-    window.MuchStationCompletion?.clearInline(msg, 'Selecciona una opciÃ³n. ðŸ˜‰');
+    window.MuchStationCompletion?.clearInline(msg, 'Selecciona una opción. 😉');
     msg.className = "quiz-msg err";
     return;
   }
@@ -1073,7 +1073,7 @@ async function validarQuiz() {
 
   if (Number(sel.value) === quizAnswerIndex) {
     window.MuchStationCompletion?.clearInline(msg);
-    msg.textContent = 'Â¡Respuesta correcta! EstaciÃ³n completada con Ã©xito. ðŸŽ‰';
+    msg.textContent = '¡Respuesta correcta! Estación completada con éxito. 🎉';
     msg.className = "quiz-msg ok";
 
     const btnNext = document.getElementById('btnQuizNext');
@@ -1086,7 +1086,7 @@ async function validarQuiz() {
     playVictoryMusic();
     playCompletionSound();
 
-    // Marcar completado y avanzar avatar, guardando solo una vez por estaciÃ³n
+    // Marcar completado y avanzar avatar, guardando solo una vez por estación
     var alreadyCompleted = isStationCompleted(STATION_ID);
     if (!alreadyCompleted) {
       markStationCompleted();
@@ -1118,7 +1118,7 @@ async function validarQuiz() {
 
   } else {
     window.MuchStationCompletion?.clearInline(msg);
-    msg.textContent = 'Respuesta incorrecta. El Spinosaurio quedÃ³ incompleto.';
+    msg.textContent = 'Respuesta incorrecta. El Espinosaurio quedó incompleto.';
     msg.className = "quiz-msg err";
     const btnNext = document.getElementById('btnQuizNext');
     if (btnNext) {
@@ -1128,7 +1128,7 @@ async function validarQuiz() {
     if (btnOk) btnOk.disabled = true;
     playIncorrectSound();
 
-    // Forzar la estaciÃ³n a Incompleta (en local y BD), borrando progreso previo
+    // Forzar la estación a Incompleta (en local y BD), borrando progreso previo
     await guardarSpinosaurioEnMySQL(0, false);
 
     // Retrasar 1.8 segundos para los efectos visuales/sonoros antes de mostrar el aviso flotante
@@ -1172,7 +1172,7 @@ async function marcarIncorrectoPorTrampa() {
   playIncorrectSound();
   var msg = document.getElementById("quizMsg");
   if (msg) {
-    msg.textContent = "Â¡SE DETECTÃ“ CAMBIO DE PANTALLA! Pregunta marcada como INCORRECTA.";
+    msg.textContent = "¡SE DETECTÓ CAMBIO DE PANTALLA! Pregunta marcada como INCORRECTA.";
     msg.className = "quiz-msg err";
   }
   var labels = document.querySelectorAll('.quiz-opt');
@@ -1216,9 +1216,9 @@ function blockCheatScreen() {
     document.body.appendChild(cheatOverlay);
   }
   cheatOverlay.innerHTML = `
-    <h1 style="font-size: clamp(24px, 6vw, 42px); font-weight: 900; margin-bottom: 12px; letter-spacing: 1px;">ðŸš« PANTALLA BLOQUEADA</h1>
+    <h1 style="font-size: clamp(24px, 6vw, 42px); font-weight: 900; margin-bottom: 12px; letter-spacing: 1px;">🚫 PANTALLA BLOQUEADA</h1>
     <p style="font-size: clamp(16px, 4vw, 22px); max-width: 600px; line-height: 1.4; margin-bottom: 20px;">
-      Se ha detectado cambio de pantalla de manera persistente. Los puntos de esta estaciÃ³n han sido invalidados.
+      Se ha detectado cambio de pantalla de manera persistente. Los puntos de esta estación han sido invalidados.
     </p>
     <div style="font-size: clamp(30px, 8vw, 48px); font-weight: 900;" id="cheatCountdown">10 s</div>
   `;
@@ -1312,7 +1312,7 @@ function initMiniMap() {
     miniMapAvatarImg.src = `../avatars/dino1.png`; // Fallback
   }
 
-  // 2. Obtener EstaciÃ³n Actual
+  // 2. Obtener Estación Actual
   const stations = {
     '1': { x: 80, y: 18 },
     '2': { x: 56, y: 42 },
@@ -1322,7 +1322,7 @@ function initMiniMap() {
     '6': { x: 42, y: 66 }
   };
 
-  // Identificar sala actual para forzar la posiciÃ³n correcta
+  // Identificar sala actual para forzar la posición correcta
   let currentStationId = localStorage.getItem('much_current_station') || '2';
   
   if (window.location.pathname.includes('Juego_Spinosaurio')) {

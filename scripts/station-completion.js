@@ -6,7 +6,7 @@
     '3': 'Biodiversidad y Conocimiento',
     '4': 'Sala de Energía',
     '5': 'Desarrollo Sustentable',
-    '6': 'Sbeel Dinosaurios'
+    '6': 'SBEEL Dinosaurios'
   };
   var STATION_MESSAGES = {
     '1': {
@@ -37,7 +37,7 @@
     '6': {
       badge: 'Misión completada',
       title: '¡Excelente trabajo, explorador!',
-      body: 'Has completado <strong>Sbeel Dinosaurios</strong> y cerraste tu misión MUCH con gran talento. Sigue celebrando todo lo que descubriste en el museo.'
+      body: 'Has completado <strong>SBEEL Dinosaurios</strong> y cerraste tu misión MUCH con gran talento. Sigue celebrando todo lo que descubriste en el museo.'
     }
   };
 

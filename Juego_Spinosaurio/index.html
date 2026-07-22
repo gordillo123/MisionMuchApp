@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport"
     content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
-  <title>Juego Spinosaurio</title>
+  <title>Juego Espinosaurio</title>
 
   <script src="../assets/navigation-guard.js"></script>
   <script src="../assets/role-access.js"></script>
@@ -88,7 +88,7 @@
       }
     }
 
-    /* BotÃ³n Retry */
+    /* Botón Retry */
     .retry-wrap {
       position: fixed;
       inset: 0;
@@ -148,7 +148,7 @@
       transform: translate(-50%, 0);
     }
 
-    /* BotÃ³n Regresar al Mapa (Circular PÃºrpura como el Mapa) */
+    /* Botón Regresar al Mapa (Circular Púrpura como el Mapa) */
     .btn-regresar-mapa {
       position: absolute;
       top: 1.5rem;
@@ -950,7 +950,7 @@
       }
     }
 
-    /* Ajuste responsivo final: Spinosaurio se mantiene en horizontal en mÃ³vil */
+    /* Ajuste responsivo final: Spinosaurio se mantiene en horizontal en móvil */
     :root {
       --game-scale: 1;
     }
@@ -1714,8 +1714,8 @@
   <div id="orientationLock" class="orientation-lock" role="dialog" aria-modal="true" aria-live="polite">
     <div class="orientation-lock__card">
       <div class="orientation-lock__icon" aria-hidden="true"></div>
-      <h2>Gira tu telÃ©fono</h2>
-      <p>Para jugar la estaciÃ³n 2, coloca tu telÃ©fono en posiciÃ³n horizontal.</p>
+      <h2>Gira tu teléfono</h2>
+      <p>Para jugar la estación 2, coloca tu teléfono en posición horizontal.</p>
     </div>
   </div>
 
@@ -1755,20 +1755,20 @@
         </div>
 
         <button id="btnExitToMap" class="exit-map-btn" type="button" aria-label="Salir al mapa" title="Salir al mapa de estaciones">
-          <span class="exit-map-btn__icon" aria-hidden="true">ðŸšª</span>
+          <span class="exit-map-btn__icon" aria-hidden="true">🚪</span>
           <span class="exit-map-btn__label">Salir</span>
         </button>
       </div>
       <div class="suelo"></div>
       <div class="dino dino-corriendo"></div>
       <div class="score">0</div>
-      <div id="quizWarning" class="quiz-warning" aria-live="polite">PrepÃ¡rate: al llegar a 15 puntos habrÃ¡ una pregunta.</div>
+      <div id="quizWarning" class="quiz-warning" aria-live="polite">Prepárate: al llegar a 15 puntos habrá una pregunta.</div>
       <div class="game-over">FIN DEL JUEGO</div>
     </div>
   </div>
 
   <div class="retry-wrap" id="retryWrap">
-    <button class="btn-retry" id="btnRetry">ðŸ” Intentar de nuevo</button>
+    <button class="btn-retry" id="btnRetry">🔁 Intentar de nuevo</button>
   </div>
 
   <div id="quizOverlay" class="quiz-overlay" aria-hidden="true">
@@ -1801,7 +1801,7 @@
   <script src="game.js?v=5" defer></script>
 
   <script>
-    /* Prevenir comportamientos indeseados en dispositivos tÃ¡ctiles */
+    /* Prevenir comportamientos indeseados en dispositivos táctiles */
     document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
     let lastTouchEnd = 0;
     document.addEventListener('touchend', e => {

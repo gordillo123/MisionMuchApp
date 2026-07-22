@@ -32,11 +32,11 @@
 
   const STATIONS = {
     '1': { id: '1', nombre: 'Taquilla', puntos: 10 },
-    '2': { id: '2', nombre: 'Spinosaurio', puntos: 15 },
+    '2': { id: '2', nombre: 'Espinosaurio', puntos: 15 },
     '3': { id: '3', nombre: 'Biodiversidad', puntos: 10 },
-    '4': { id: '4', nombre: 'Energia', puntos: 10 },
+    '4': { id: '4', nombre: 'Energía', puntos: 10 },
     '5': { id: '5', nombre: 'Desarrollo Sustentable', puntos: 10 },
-    '6': { id: '6', nombre: 'Sbeel', puntos: 10 }
+    '6': { id: '6', nombre: 'SBEEL Dinosaurios', puntos: 10 }
   };
 
   const REQUIRED_REWARD_STATIONS = ['1', '2', '3', '4', '5', '6'];
@@ -104,7 +104,7 @@
 
   function getStation(stationId) {
     const id = toStationId(stationId);
-    return STATIONS[id] || { id, nombre: `Estacion ${id}`, puntos: 0 };
+    return STATIONS[id] || { id, nombre: `Estación ${id}`, puntos: 0 };
   }
 
   function getRequiredScore(stationId) {
@@ -263,7 +263,7 @@
 
   function blockByFailedAttempts(stationId, attemptRecord = {}, options = {}) {
     const station = getStation(stationId);
-    const stationName = station?.nombre ? `la estacion ${station.nombre}` : 'esta estacion';
+    const stationName = station?.nombre ? `la estación ${station.nombre}` : 'esta estación';
     const finishedAt = nowIso();
     const blockDays = options.dias_bloqueo || options.cantidad_bloqueo || getConfiguredBlockDays();
     const nextDate = options.fecha_puede_volver || addDays(finishedAt, blockDays).toISOString();
@@ -530,7 +530,7 @@
       key,
       label: option.label || option.destino_boleto || (key === 'planetario' ? 'Planetario' : 'MUCH'),
       acceso: option.acceso || option.tipo_entrada || (key === 'planetario' ? 'Planetario' : 'MUCH'),
-      lugar: option.lugar || (key === 'planetario' ? 'Planetario Tuxtla' : 'Museo Chiapas de Ciencia y Tecnologia'),
+      lugar: option.lugar || (key === 'planetario' ? 'Planetario Tuxtla' : 'Museo Chiapas de Ciencia y Tecnología'),
       selectedAt: option.selectedAt || nowIso()
     };
     writeJson(KEYS.premioSeleccionado, prize);

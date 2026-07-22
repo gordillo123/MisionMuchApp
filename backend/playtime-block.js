@@ -50,7 +50,7 @@ function buildMensajeBloqueo(fechaPuedeVolver) {
   return `¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrás volver a jugar el ${formatFechaMX(fechaPuedeVolver)}.`;
 }
 
-function buildMensajeBloqueoIntentos(fechaPuedeVolver, estacionNombre = 'esta estacion') {
+function buildMensajeBloqueoIntentos(fechaPuedeVolver, estacionNombre = 'esta estación') {
   return `Has agotado tus 3 intentos en esta estación. Tu acceso al juego ha sido bloqueado temporalmente. Podrás volver a jugar después de una semana.`;
 }
 
@@ -327,7 +327,7 @@ function createPlaytimeBlockService(pool) {
     const restanteMs = msRestantes(fechaPuedeVolver);
     const motivoBloqueo = premio?.motivo_bloqueo || 'reclamo_boleto';
     const mensaje = motivoBloqueo === 'intentos'
-      ? buildMensajeBloqueoIntentos(fechaPuedeVolver, premio.detalle_bloqueo || 'esta estacion')
+      ? buildMensajeBloqueoIntentos(fechaPuedeVolver, premio.detalle_bloqueo || 'esta estación')
       : buildMensajeBloqueo(fechaPuedeVolver);
     return {
       bloqueado: true,
@@ -490,8 +490,8 @@ function createPlaytimeBlockService(pool) {
       [idEstacion]
     );
     const nombreEstacion = estacion?.nombre
-      ? `la estacion ${estacion.nombre}`
-      : `la estacion ${idEstacion}`;
+      ? `la estación ${estacion.nombre}`
+      : `la estación ${idEstacion}`;
     const [[bloqueoActivo]] = await conn.query(
       `SELECT *
        FROM premios

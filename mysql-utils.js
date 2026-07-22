@@ -5,13 +5,13 @@
 const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
 
 // ==========================================
-// CONFIGURACIÃ“N DE GEOLOCALIZACIÃ“N DEL MUSEO
+// CONFIGURACIÓN DE GEOLOCALIZACIÓN DEL MUSEO
 // ==========================================
-const DIRECCION_MUSEO = "Calz. Cerro Hueco 3000, Rivera Cerro Hueco, FSTSE, 29094 Tuxtla GutiÃ©rrez, Chiapas";
-const LATITUD_MUSEO = 16.72248; // Coloca la latitud real aquÃ­ (ej: 16.72248)
-const LONGITUD_MUSEO = -93.09100; // Coloca la longitud real aquÃ­ (ej: -93.09100)
+const DIRECCION_MUSEO = "Calz. Cerro Hueco 3000, Rivera Cerro Hueco, FSTSE, 29094 Tuxtla Gutiérrez, Chiapas";
+const LATITUD_MUSEO = 16.72248; // Coloca la latitud real aquí (ej: 16.72248)
+const LONGITUD_MUSEO = -93.09100; // Coloca la longitud real aquí (ej: -93.09100)
 const RADIO_PERMITIDO_METROS = 150;
-const TIEMPO_VALIDACION_MINUTOS = 15; // 15 minutos de vigencia de verificaciÃ³n
+const TIEMPO_VALIDACION_MINUTOS = 15; // 15 minutos de vigencia de verificación
 
 function calcularDistanciaHaversine(lat1, lon1, lat2, lon2) {
   const R = 6371e3; // Radio de la Tierra en metros
@@ -44,23 +44,23 @@ async function guardarVerificacionUbicacion(datos) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(datos)
     });
-    if (!res.ok) throw new Error('Error en el servidor al guardar verificaciÃ³n');
+    if (!res.ok) throw new Error('Error en el servidor al guardar verificación');
     const data = await res.json();
     return data;
   } catch (e) {
-    console.error('Error guardando verificaciÃ³n de ubicaciÃ³n en base de datos:', e.message);
+    console.error('Error guardando verificación de ubicación en base de datos:', e.message);
     throw e;
   }
 }
 
 async function verificarUbicacionYRegistrar() {
   return new Promise((resolve) => {
-    // VerificaciÃ³n de ubicaciÃ³n desactivada temporalmente para facilitar pruebas y juego remoto.
-    // Esto evita requerir permisos GPS (que fallan en HTTP mÃ³vil) y confirmaciones.
+    // Verificación de ubicación desactivada temporalmente para facilitar pruebas y juego remoto.
+    // Esto evita requerir permisos GPS (que fallan en HTTP móvil) y confirmaciones.
     const verifLocal = {
       dentro_del_museo: true,
       timestamp: Date.now(),
-      mensaje_resultado: 'UbicaciÃ³n vÃ¡lida (VerificaciÃ³n de geolocalizaciÃ³n desactivada temporalmente).'
+      mensaje_resultado: 'Ubicación válida (Verificación de geolocalización desactivada temporalmente).'
     };
     sessionStorage.setItem('much_last_location_verification', JSON.stringify(verifLocal));
     
@@ -75,24 +75,24 @@ async function verificarUbicacionYRegistrar() {
 
 function comprobarUbicacionVigente() {
   try {
-    // Simular verificaciÃ³n de ubicaciÃ³n exitosa temporalmente para pruebas y juego remoto
+    // Simular verificación de ubicación exitosa temporalmente para pruebas y juego remoto
     const verifLocal = {
       dentro_del_museo: true,
       timestamp: Date.now(),
-      mensaje_resultado: 'UbicaciÃ³n vÃ¡lida (VerificaciÃ³n de geolocalizaciÃ³n desactivada temporalmente).'
+      mensaje_resultado: 'Ubicación válida (Verificación de geolocalización desactivada temporalmente).'
     };
     sessionStorage.setItem('much_last_location_verification', JSON.stringify(verifLocal));
-    return { ok: true, message: 'UbicaciÃ³n vÃ¡lida (VerificaciÃ³n desactivada).' };
+    return { ok: true, message: 'Ubicación válida (Verificación desactivada).' };
   } catch (e) {
-    console.error('Error al comprobar vigencia de ubicaciÃ³n:', e);
-    return { ok: true, message: 'UbicaciÃ³n vÃ¡lida (VerificaciÃ³n desactivada).' };
+    console.error('Error al comprobar vigencia de ubicación:', e);
+    return { ok: true, message: 'Ubicación válida (Verificación desactivada).' };
   }
 }
 
 function asegurarUbicacionVigente() {
   const estado = comprobarUbicacionVigente();
   if (!estado.ok) {
-    throw new Error('AcciÃ³n bloqueada: ' + estado.message);
+    throw new Error('Acción bloqueada: ' + estado.message);
   }
 }
 
@@ -186,9 +186,9 @@ function sincronizarBloqueoPorIntentos(data = {}) {
 
     if (window.MuchStationCompletion?.showFloatingNotice) {
       window.MuchStationCompletion.showFloatingNotice({
-        badge: 'EstaciÃ³n bloqueada',
-        title: 'LÃ­mite de intentos superado',
-        body: `Has agotado tus 3 intentos en esta estaciÃ³n. EstarÃ¡ bloqueada hasta el <b>${b.fecha_puede_volver_texto}</b>.<br><br>Puedes seguir jugando en las demÃ¡s estaciones.`,
+        badge: 'Estación bloqueada',
+        title: 'Límite de intentos superado',
+        body: `Has agotado tus 3 intentos en esta estación. Estará bloqueada hasta el <b>${b.fecha_puede_volver_texto}</b>.<br><br>Puedes seguir jugando en las demás estaciones.`,
         ctaLabel: 'Regresar al mapa',
         onCta: () => {
           if (typeof showView === 'function') {
@@ -197,7 +197,7 @@ function sincronizarBloqueoPorIntentos(data = {}) {
         }
       });
     } else {
-      alert(`Has superado el lÃ­mite de intentos en esta estaciÃ³n. EstarÃ¡ bloqueada hasta el ${b.fecha_puede_volver_texto}.`);
+      alert(`Has superado el límite de intentos en esta estación. Estará bloqueada hasta el ${b.fecha_puede_volver_texto}.`);
       if (typeof showView === 'function') {
         showView('viewPrep');
       }
@@ -223,14 +223,14 @@ function mostrarAvisoBloqueoJuego(estado) {
   const fecha = estado?.fecha_puede_volver_texto || '';
   const esBloqueoPorIntentos = estado?.motivo_bloqueo === 'intentos';
   const mensaje = estado?.mensaje || (esBloqueoPorIntentos
-    ? `Has agotado tus 3 intentos en esta estaciÃ³n. Tu acceso al juego ha sido bloqueado temporalmente. PodrÃ¡s volver a jugar despuÃ©s de una semana.`
+    ? `Has agotado tus 3 intentos en esta estación. Tu acceso al juego ha sido bloqueado temporalmente. Podrás volver a jugar después de una semana.`
     : fecha
-    ? `Â¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrÃ¡s volver a jugar el ${fecha}.`
-    : 'Tu misiÃ³n ya fue completada. Debes esperar para comenzar una nueva aventura.');
+    ? `¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrás volver a jugar el ${fecha}.`
+    : 'Tu misión ya fue completada. Debes esperar para comenzar una nueva aventura.');
   if (window.MuchStationCompletion?.showFloatingNotice) {
     window.MuchStationCompletion.showFloatingNotice({
-      badge: esBloqueoPorIntentos ? 'Limite de intentos' : 'â³ MisiÃ³n completada',
-      title: esBloqueoPorIntentos ? 'Juego bloqueado temporalmente' : 'Â¡Aventura completada!',
+      badge: esBloqueoPorIntentos ? 'Limite de intentos' : '⏳ Misión completada',
+      title: esBloqueoPorIntentos ? 'Juego bloqueado temporalmente' : '¡Aventura completada!',
       body: mensaje.replace(/\n/g, '<br>'),
       ctaLabel: 'Entendido'
     });
@@ -242,15 +242,15 @@ function mostrarAvisoBloqueoJuego(estado) {
 function mostrarAvisoFinalizacionJuego(finalizacion) {
   if (!finalizacion?.recorrido_completado || !finalizacion.fecha_puede_volver_texto) return;
   const fecha = finalizacion.fecha_puede_volver_texto;
-  const mensaje = `Â¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrÃ¡s volver a jugar el ${fecha}.`;
+  const mensaje = `¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrás volver a jugar el ${fecha}.`;
   localStorage.setItem('much_playtime_block_msg', finalizacion.mensaje || mensaje);
   window.MuchLocalStorage?.completeRoute?.(finalizacion);
   invalidarCacheBloqueoJuego();
 
   if (window.MuchStationCompletion?.showFloatingNotice) {
     window.MuchStationCompletion.showFloatingNotice({
-      badge: 'ðŸ† Aventura completada',
-      title: 'Â¡Aventura completada!',
+      badge: '🏆 Aventura completada',
+      title: '¡Aventura completada!',
       body: mensaje.replace(/\n/g, '<br>'),
       ctaLabel: 'Ver mi recompensa'
     });
@@ -309,16 +309,16 @@ async function consultarUltimaVerificacion() {
     if (sessionId) params.append('session_id', sessionId);
 
     const res = await fetch(`${API_BASE_URL}/api/verificaciones-ubicacion/ultima?${params.toString()}`);
-    if (!res.ok) throw new Error('Error al obtener la Ãºltima verificaciÃ³n');
+    if (!res.ok) throw new Error('Error al obtener la última verificación');
     return await res.json();
   } catch (e) {
-    console.error('Error al consultar Ãºltima verificaciÃ³n:', e);
+    console.error('Error al consultar última verificación:', e);
     return null;
   }
 }
 
 async function intentarRestaurarVerificacionDesdeServidor() {
-  // Deshabilitado por solicitud del usuario para forzar solicitud de GPS en cada sesiÃ³n nueva
+  // Deshabilitado por solicitud del usuario para forzar solicitud de GPS en cada sesión nueva
   return { ok: false };
 }
 
@@ -364,10 +364,10 @@ async function obtenerUsuarioActual() {
   return obtenerUsuarioLocal();
 }
 
-// Iniciar sesiÃ³n con Google (utiliza el login simulado/real integrado)
+// Iniciar sesión con Google (utiliza el login simulado/real integrado)
 async function iniciarSesionConGoogle() {
-  // Para pruebas rÃ¡pidas en local sin depender de credenciales GCP obligatorias en todos los equipos,
-  // abriremos un modal de diÃ¡logo nativo interactivo elegante si el script de Google no se ha cargado,
+  // Para pruebas rápidas en local sin depender de credenciales GCP obligatorias en todos los equipos,
+  // abriremos un modal de diálogo nativo interactivo elegante si el script de Google no se ha cargado,
   // permitiendo ingresar nombre y correo, simulando una ventana de Google de forma premium.
   // Si se prefiere usar las credenciales de Google GSI oficiales, se pueden pasar al backend.
   
@@ -397,7 +397,7 @@ async function iniciarSesionConGoogle() {
           color: white;
           position: relative;
         ">
-          <div style="font-size: 40px; margin-bottom: 10px;">ðŸ›¡ï¸</div>
+          <div style="font-size: 40px; margin-bottom: 10px;">🛡️</div>
           <h2 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 700; background: linear-gradient(90deg, #ffc000, #ff8000); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Google Login</h2>
           <p style="margin: 0 0 20px 0; font-size: 14px; color: #a0aec0;">Simulador de Acceso Seguro para desarrollo local</p>
           
@@ -423,7 +423,7 @@ async function iniciarSesionConGoogle() {
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(60,84,180,0.4);
-          ">Iniciar SesiÃ³n con Google</button>
+          ">Iniciar sesión con Google</button>
           
           <button id="sim-google-btn-cancel" style="
             margin-top: 12px;
@@ -466,13 +466,13 @@ async function iniciarSesionConGoogle() {
         });
 
         if (!res.ok) {
-          throw new Error('Error al conectar con el backend de autenticaciÃ³n.');
+          throw new Error('Error al conectar con el backend de autenticación.');
         }
 
         const data = await res.json();
         console.log('[Auth] Login exitoso:', data);
 
-        // Invalidar ubicaciÃ³n previa del usuario e invitado para exigir verificaciÃ³n fresca
+        // Invalidar ubicación previa del usuario e invitado para exigir verificación fresca
         const sessionId = localStorage.getItem('much_session_id');
         const userId = data.id_usuario;
         sessionStorage.removeItem('much_last_location_verification');
@@ -485,11 +485,11 @@ async function iniciarSesionConGoogle() {
               body: JSON.stringify({ user_id: userId, session_id: sessionId })
             });
           } catch (e) {
-            console.error('Error al invalidar ubicaciÃ³n al iniciar sesiÃ³n:', e);
+            console.error('Error al invalidar ubicación al iniciar sesión:', e);
           }
         }
 
-        // Guardar sesiÃ³n en localStorage
+        // Guardar sesión en localStorage
         const sessionUser = {
           id: data.id_usuario,
           id_usuario: data.id_usuario,
@@ -536,11 +536,11 @@ async function iniciarSesionConGoogle() {
         // Disparar evento para actualizar vistas
         window.dispatchEvent(new Event('storage'));
         
-        // Recargar pÃ¡gina para aplicar sesiÃ³n limpia en index.html
+        // Recargar página para aplicar sesión limpia en index.html
         window.location.reload();
         resolve(data);
       } catch (error) {
-        alert(`No se pudo establecer conexiÃ³n con el backend Express. AsegÃºrate de que estÃ© corriendo en ${API_BASE_URL}`);
+        alert(`No se pudo establecer conexión con el backend Express. Asegúrate de que esté corriendo en ${API_BASE_URL}`);
         console.error(error);
         reject(error);
       }
@@ -554,7 +554,7 @@ async function iniciarSesionConGoogle() {
 }
 
 async function cerrarSesion(options = {}) {
-  console.log('ðŸšª Cerrando sesiÃ³n y limpiando datos del usuario...');
+  console.log('🚪 Cerrando sesión y limpiando datos del usuario...');
   
   // Obtener IDs antes de borrar storage
   const user = obtenerUsuarioLocal();
@@ -569,7 +569,7 @@ async function cerrarSesion(options = {}) {
         body: JSON.stringify({ user_id: userId, session_id: sessionId })
       });
     } catch (e) {
-      console.error('Error al invalidar ubicaciÃ³n en el servidor:', e);
+      console.error('Error al invalidar ubicación en el servidor:', e);
     }
   }
 
@@ -579,7 +579,7 @@ async function cerrarSesion(options = {}) {
   localStorage.clear();
   sessionStorage.clear();
 
-  // Conservar la ubicaciÃ³n QR para conveniencia del usuario en el museo
+  // Conservar la ubicación QR para conveniencia del usuario en el museo
   if (lugarSeguro) {
     localStorage.setItem('much_lugar_seguro', lugarSeguro);
   }
@@ -615,7 +615,7 @@ async function verificarUsuarioEnTabla() {
 
     const data = await res.json();
     if (data.exists === false) {
-      console.info('[Auth] SesiÃ³n local descartada porque el usuario no existe en backend.');
+      console.info('[Auth] Sesión local descartada porque el usuario no existe en backend.');
       localStorage.removeItem('much_google_user');
       sessionStorage.removeItem('much_current_attempt_id');
       return null;
@@ -711,7 +711,7 @@ function crearModalConsentimientoPrivacidad() {
         <p style="margin: 0; color: #f6c453; font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;">Acceso requerido</p>
         <h2 id="muchPrivacyTitle" style="margin: 0; font-size: clamp(24px, 5vw, 34px); line-height: 1.08;">Aviso de privacidad</h2>
         <p style="margin: 0; color: #c7d2fe; font-size: 15px; line-height: 1.5;">
-          Para continuar con Mision MUCH necesitamos tu aceptacion del uso de datos de la cuenta para guardar progreso, premios y actividad de juego.
+          Para continuar con Misión MUCH necesitamos tu aceptación del uso de datos de la cuenta para guardar progreso, premios y actividad de juego.
         </p>
       </div>
 
@@ -808,7 +808,7 @@ function mostrarModalConsentimientoPrivacidad() {
       } catch (error) {
         if (error instanceof TypeError && String(error.message || '').toLowerCase().includes('fetch')) {
           aceptarConsentimientoPrivacidadLocalPendiente();
-          console.warn('[Privacidad] Backend no disponible; consentimiento guardado localmente para sincronizar despues.');
+          console.warn('[Privacidad] Backend no disponible; consentimiento guardado localmente para sincronizar después.');
           modal.style.display = 'none';
           resolve({ acepto_privacidad: true, privacidad_aceptada_en: new Date().toISOString(), pendiente_sync: true });
           return;
@@ -855,7 +855,7 @@ async function consultarEstaciones() {
   }
 }
 
-// Comprobar si una estaciÃ³n especÃ­fica estÃ¡ activa
+// Comprobar si una estación específica está activa
 async function comprobarEstacionActiva(estacionId) {
   try {
     const estaciones = await consultarEstaciones();
@@ -867,7 +867,7 @@ async function comprobarEstacionActiva(estacionId) {
   }
 }
 
-// Guardar progreso del usuario en una estaciÃ³n
+// Guardar progreso del usuario en una estación
 async function guardarProgresoUsuario(estacionId, extra = {}) {
   asegurarUbicacionVigente();
   await asegurarJuegoPermitido();
@@ -923,7 +923,7 @@ async function guardarProgresoUsuario(estacionId, extra = {}) {
   }
 }
 
-// Inicializar progreso del usuario al entrar a una estaciÃ³n
+// Inicializar progreso del usuario al entrar a una estación
 async function inicializarProgresoUsuario(estacionId) {
   asegurarUbicacionVigente();
   await asegurarJuegoPermitido();
@@ -931,7 +931,7 @@ async function inicializarProgresoUsuario(estacionId) {
   const userId = obtenerIdUsuarioLocal(user);
   if (!userId) return null;
 
-  // Limpiar el estado de completado en el almacenamiento local al iniciar la estaciÃ³n
+  // Limpiar el estado de completado en el almacenamiento local al iniciar la estación
   try {
     // No borrar estaciones ya completadas al entrar. Los intentos fallidos se guardan aparte.
   } catch (e) {
@@ -1001,7 +1001,7 @@ async function reiniciarProgresoUsuario(options = {}) {
   }
 }
 
-// Guardar intento en una estaciÃ³n
+// Guardar intento en una estación
 async function guardarIntentoEstacion(estacionId, intento = {}) {
   asegurarUbicacionVigente();
   await asegurarJuegoPermitido();
@@ -1050,7 +1050,7 @@ async function guardarIntentoEstacion(estacionId, intento = {}) {
   }
 }
 
-// Actualizar intento de estaciÃ³n existente
+// Actualizar intento de estación existente
 async function actualizarIntentoEstacion(idIntento, intento = {}) {
   asegurarUbicacionVigente();
   await asegurarJuegoPermitido();
@@ -1120,7 +1120,7 @@ async function guardarPartidaMinijuego(partida = {}) {
       },
       body: JSON.stringify({
         id_usuario: userId,
-        id_estacion: 2, // Spinosaurio es la estaciÃ³n 2
+        id_estacion: 2, // Spinosaurio es la estación 2
         puntaje: Number(partida.puntaje || 0),
         aprobado: Boolean(partida.aprobado)
       })
@@ -1214,18 +1214,18 @@ async function generarBoletoFinal(reclamar = false) {
   }
 }
 
-// MÃ©todos legacy para retrocompatibilidad
+// Métodos legacy para retrocompatibilidad
 async function iniciarJuego(nombreJugador) {
   console.log('Iniciar juego:', nombreJugador);
 }
 async function cargarPreguntas(codigoEstacion) {
-  console.log('Cargar preguntas de estaciÃ³n:', codigoEstacion);
+  console.log('Cargar preguntas de estación:', codigoEstacion);
 }
 async function responderPregunta(preguntaId, opcionId) {
   console.log('Responder pregunta:', preguntaId, opcionId);
 }
 
-// InyecciÃ³n en el objeto global window
+// Inyección en el objeto global window
 window.initMySQLApi = initMySQLApi;
 window.obtenerSesionActual = obtenerSesionActual;
 window.obtenerUsuarioActual = obtenerUsuarioActual;

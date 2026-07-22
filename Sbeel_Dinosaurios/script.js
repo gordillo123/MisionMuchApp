@@ -1,11 +1,11 @@
-﻿// Validar ubicaciÃ³n antes de permitir jugar
+﻿// Validar ubicación antes de permitir jugar
 (function() {
   // DESACTIVADO TEMPORALMENTE para permitir pruebas y juego remoto
   return;
 
   const raw = sessionStorage.getItem('much_last_location_verification');
   let valid = false;
-  let msg = 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicaciÃ³n.';
+  let msg = 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicación.';
   if (raw) {
     try {
       const verif = JSON.parse(raw);
@@ -14,21 +14,21 @@
       if (transcurrido <= vigenciaMs && verif.dentro_del_museo) {
         valid = true;
       } else if (transcurrido > vigenciaMs) {
-        msg = 'La verificaciÃ³n de ubicaciÃ³n ha expirado. Por favor, verifÃ­cala de nuevo.';
+        msg = 'La verificación de ubicación ha expirado. Por favor, verifícala de nuevo.';
       } else {
-        msg = verif.mensaje_resultado || 'No te encuentras en el Museo Chiapas de Ciencia y TecnologÃ­a.';
+        msg = verif.mensaje_resultado || 'No te encuentras en el Museo Chiapas de Ciencia y Tecnología.';
       }
     } catch (e) {}
   }
   if (!valid) {
     alert(msg);
-    window.location.href = '../index.html?reason=location_required&msg=' + encodeURIComponent(msg);
-    throw new Error('Acceso denegado: ubicaciÃ³n no vÃ¡lida.');
+    window.location.href = '../index.htmlÁreason=location_required&msg=' + encodeURIComponent(msg);
+    throw new Error('Acceso denegado: ubicación no válida.');
   }
 })();
 
 /**
- * Sbeel Dinosaurios - Puzzle Script
+ * SBEEL Dinosaurios - Puzzle Script
  * Rompecabezas 3x3 con imagen aleatoria y arrastre por mouse/touch.
  */
 
@@ -52,19 +52,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const PUZZLE_IMAGES = [
         {
             src: 'dino.png',
-            label: 'Dinosaurio de Sbeel'
+            label: 'Dinosaurio de SBEEL'
         },
         {
             src: 'sbeel-valle-dinosaurios.png',
-            label: 'Valle de dinosaurios de Sbeel'
+            label: 'Valle de dinosaurios de SBEEL'
         },
         {
             src: 'sbeel-triceratops.png',
-            label: 'Triceratops de Sbeel'
+            label: 'Triceratops de SBEEL'
         },
         {
             src: 'sbeel-sauropodo.png',
-            label: 'Sauropodo de Sbeel'
+            label: 'Saurópodo de SBEEL'
         }
     ];
 
@@ -109,13 +109,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const progreso = await import('../mysql-utils.js');
             const active = await progreso.comprobarEstacionActiva(6);
             if (!active) {
-                alert('Esta estaciÃ³n se encuentra inactiva o cerrada.');
+                alert('Esta estación se encuentra inactiva o cerrada.');
                 window.location.href = '../index.html';
                 return;
             }
             await progreso.inicializarProgresoUsuario(6);
             
-            // Forzar el estado de la estaciÃ³n a Incompleta en localStorage y base de datos
+            // Forzar el estado de la estación a Incompleta en localStorage y base de datos
             // No borrar el completado local al entrar; los fallos reales se guardan como intentos.
 
             await progreso.guardarProgresoUsuario(STATION_ID, {
@@ -455,7 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function playCompletionSound() {
         try {
-            const audio = new Audio('../Sonidos/Estacion completada.mp3');
+            const audio = new Audio('../Sonidos/Estación completada.mp3');
             audio.play().catch(e => console.warn('No se pudo reproducir audio de completado:', e));
         } catch (e) {
             console.warn('Error al reproducir audio:', e);
@@ -477,7 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
             completed[STATION_ID] = true;
             localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
         } catch (e) {
-            console.warn('No se pudo marcar la estaciÃ³n como completa:', e);
+            console.warn('No se pudo marcar la estación como completa:', e);
         }
     }
 
@@ -585,7 +585,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     aprobada: false
                 });
             } catch (e) {
-                console.warn('Error al marcar Sbeel incompleto al salir:', e);
+                console.warn('Error al marcar SBEEL incompleto al salir:', e);
             }
         }
         window.location.href = '../index.html?view=prep';
@@ -657,7 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         stationId: '6',
                         badge: 'Nuevo intento',
                         title: 'Sigue explorando, vas muy bien',
-                        body: 'El tiempo se terminÃ³ esta vez, pero ya tienes otra oportunidad para completar el reto. Respira, observa con calma y vuelve a intentarlo.',
+                        body: 'El tiempo se terminó esta vez, pero ya tienes otra oportunidad para completar el reto. Respira, observa con calma y vuelve a intentarlo.',
                         nextStationName: 'Nuevo intento',
                         detailLabel: 'Tu siguiente paso',
                         detailValue: 'Cierra este mensaje para volver a intentarlo',

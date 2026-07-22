@@ -26,13 +26,13 @@ const routeChecks = [
   { name: 'Administrador', path: '/ADMINISTRADOR.html', session: 'admin', adminActions: true },
   { name: 'Registro boleto', path: '/Boleto_Digital/registro.html', session: 'none' },
   { name: 'Boleto digital', path: '/Boleto_Digital/boleto.html', session: 'ticket', ticketActions: true },
-  { name: 'Validacion QR', path: null, session: 'admin', validateActions: true },
+  { name: 'Validación QR', path: null, session: 'admin', validateActions: true },
   { name: 'Entrada MUCH', path: '/entrada-much/index.html', session: 'player' },
   { name: 'Entrada portada', path: '/entrada-much/portada.html', session: 'player' },
-  { name: 'Spinosaurio', path: '/Juego_Spinosaurio/index.html', session: 'player' },
-  { name: 'Spinosaurio portada', path: '/Juego_Spinosaurio/portada.html', session: 'player' },
+  { name: 'Espinosaurio', path: '/Juego_Spinosaurio/index.html', session: 'player' },
+  { name: 'Espinosaurio portada', path: '/Juego_Spinosaurio/portada.html', session: 'player' },
   { name: 'Biodiversidad', path: '/SALA-Biodiversidad-y-Conocimiento/index.html', session: 'player' },
-  { name: 'Energia', path: '/sala_energia/index.html', session: 'player' },
+  { name: 'Energía', path: '/sala_energia/index.html', session: 'player' },
   { name: 'Desarrollo sustentable', path: '/Sala_Desarrollo_Sustentable/index.html', session: 'player' },
   { name: 'SBEEL Dinosaurios', path: '/Sbeel_Dinosaurios/index.html', session: 'player' }
 ];
@@ -157,7 +157,7 @@ async function completeRouteAndClaim(user) {
       reclamar: true,
       tipo_entrada: 'MUCH',
       destino_boleto: 'MUCH',
-      lugar: 'Museo Chiapas de Ciencia y Tecnologia'
+      lugar: 'Museo Chiapas de Ciencia y Tecnología'
     }
   });
 }
@@ -250,13 +250,13 @@ async function auditPage(route, viewport, data) {
   if (route.ticketActions) {
     await page.locator('#tAlfanumerico').waitFor({ timeout: 10000 });
     const folioText = await page.locator('#tAlfanumerico').innerText();
-    assert.ok(folioText.includes(data.ticket.folio), 'La pantalla de boleto no muestra el codigo de MySQL');
+    assert.ok(folioText.includes(data.ticket.folio), 'La pantalla de boleto no muestra el código de MySQL');
     await page.locator('#qrcode canvas, #qrcode img').first().waitFor({ state: 'attached', timeout: 10000 });
     const qrSize = await page.locator('#qrcode canvas, #qrcode img').first().evaluate((node) => ({
       width: Number(node.getAttribute('width') || node.naturalWidth || node.clientWidth || 0),
       height: Number(node.getAttribute('height') || node.naturalHeight || node.clientHeight || 0)
     }));
-    assert.ok(qrSize.width >= 100 && qrSize.height >= 100, 'El QR no tiene dimensiones validas');
+    assert.ok(qrSize.width >= 100 && qrSize.height >= 100, 'El QR no tiene dimensiones válidas');
 
     const downloadPromise = page.waitForEvent('download', { timeout: 20000 });
     await page.locator('#btnDownloadImage').click();
@@ -280,7 +280,7 @@ async function auditPage(route, viewport, data) {
           break;
         }
       }
-      assert.ok(validated, 'El boton de validacion QR no marco el boleto como validado');
+      assert.ok(validated, 'El botón de validación QR no marcó el boleto como validado');
     }
   }
 
@@ -374,7 +374,7 @@ async function main() {
 
   mark('Pantallas responsive', `${results.length} cargas verificadas sin errores de consola`);
   mark('Boton Descargar boleto', 'Genero un archivo PNG desde la pantalla del boleto');
-  mark('Validacion QR UI', 'Canje con sesion real de admin/taquilla');
+  mark('Validación QR UI', 'Canje con sesión real de admin/taquilla');
   console.log(JSON.stringify({ ok: true, testId, checks, results }, null, 2));
 }
 
