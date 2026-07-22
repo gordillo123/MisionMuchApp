@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" data-orientation="landscape">
 
 <head>
@@ -88,7 +88,7 @@
       }
     }
 
-    /* Botón Retry */
+    /* BotÃ³n Retry */
     .retry-wrap {
       position: fixed;
       inset: 0;
@@ -148,7 +148,7 @@
       transform: translate(-50%, 0);
     }
 
-    /* Botón Regresar al Mapa (Circular Púrpura como el Mapa) */
+    /* BotÃ³n Regresar al Mapa (Circular PÃºrpura como el Mapa) */
     .btn-regresar-mapa {
       position: absolute;
       top: 1.5rem;
@@ -950,7 +950,7 @@
       }
     }
 
-    /* Ajuste responsivo final: Spinosaurio se mantiene en horizontal en móvil */
+    /* Ajuste responsivo final: Spinosaurio se mantiene en horizontal en mÃ³vil */
     :root {
       --game-scale: 1;
     }
@@ -1714,8 +1714,8 @@
   <div id="orientationLock" class="orientation-lock" role="dialog" aria-modal="true" aria-live="polite">
     <div class="orientation-lock__card">
       <div class="orientation-lock__icon" aria-hidden="true"></div>
-      <h2>Gira tu teléfono</h2>
-      <p>Para jugar la estación 2, coloca tu teléfono en posición horizontal.</p>
+      <h2>Gira tu telÃ©fono</h2>
+      <p>Para jugar la estaciÃ³n 2, coloca tu telÃ©fono en posiciÃ³n horizontal.</p>
     </div>
   </div>
 
@@ -1755,20 +1755,20 @@
         </div>
 
         <button id="btnExitToMap" class="exit-map-btn" type="button" aria-label="Salir al mapa" title="Salir al mapa de estaciones">
-          <span class="exit-map-btn__icon" aria-hidden="true">🚪</span>
+          <span class="exit-map-btn__icon" aria-hidden="true">ðŸšª</span>
           <span class="exit-map-btn__label">Salir</span>
         </button>
       </div>
       <div class="suelo"></div>
       <div class="dino dino-corriendo"></div>
       <div class="score">0</div>
-      <div id="quizWarning" class="quiz-warning" aria-live="polite">Prepárate: al llegar a 15 puntos habrá una pregunta.</div>
+      <div id="quizWarning" class="quiz-warning" aria-live="polite">PrepÃ¡rate: al llegar a 15 puntos habrÃ¡ una pregunta.</div>
       <div class="game-over">FIN DEL JUEGO</div>
     </div>
   </div>
 
   <div class="retry-wrap" id="retryWrap">
-    <button class="btn-retry" id="btnRetry">🔁 Intentar de nuevo</button>
+    <button class="btn-retry" id="btnRetry">ðŸ” Intentar de nuevo</button>
   </div>
 
   <div id="quizOverlay" class="quiz-overlay" aria-hidden="true">
@@ -1794,10 +1794,6 @@
 
   <audio id="jumpSound" src="jump.mp3" preload="auto"></audio>
 
-  <script type="module">
-    import '../supabase-client.js';
-  </script>
-
   <script src="../scripts/orientation-manager.js"></script>
   <script src="../scripts/much-local-storage.js"></script>
   <script src="../scripts/station-completion.js"></script>
@@ -1805,7 +1801,7 @@
   <script src="game.js?v=5" defer></script>
 
   <script>
-    /* Prevenir comportamientos indeseados en dispositivos táctiles */
+    /* Prevenir comportamientos indeseados en dispositivos tÃ¡ctiles */
     document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
     let lastTouchEnd = 0;
     document.addEventListener('touchend', e => {
@@ -1857,3 +1853,4 @@
 </body>
 
 </html>
+

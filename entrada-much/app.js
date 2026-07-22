@@ -1,11 +1,11 @@
-// Validar ubicación antes de permitir jugar
+﻿// Validar ubicaciÃ³n antes de permitir jugar
 (function() {
   // DESACTIVADO TEMPORALMENTE para permitir pruebas y juego remoto
   return;
 
   const raw = sessionStorage.getItem('much_last_location_verification');
   let valid = false;
-  let msg = 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicación.';
+  let msg = 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicaciÃ³n.';
   if (raw) {
     try {
       const verif = JSON.parse(raw);
@@ -14,31 +14,31 @@
       if (transcurrido <= vigenciaMs && verif.dentro_del_museo) {
         valid = true;
       } else if (transcurrido > vigenciaMs) {
-        msg = 'La verificación de ubicación ha expirado. Por favor, verifícala de nuevo.';
+        msg = 'La verificaciÃ³n de ubicaciÃ³n ha expirado. Por favor, verifÃ­cala de nuevo.';
       } else {
-        msg = verif.mensaje_resultado || 'No te encuentras en el Museo Chiapas de Ciencia y Tecnología.';
+        msg = verif.mensaje_resultado || 'No te encuentras en el Museo Chiapas de Ciencia y TecnologÃ­a.';
       }
     } catch (e) {}
   }
   if (!valid) {
     alert(msg);
     window.location.href = '../index.html?reason=location_required&msg=' + encodeURIComponent(msg);
-    throw new Error('Acceso denegado: ubicación no válida.');
+    throw new Error('Acceso denegado: ubicaciÃ³n no vÃ¡lida.');
   }
 })();
 
-/* =================== Datos de Configuración =================== */
+/* =================== Datos de ConfiguraciÃ³n =================== */
 const params = new URLSearchParams(location.search);
 const SALA = params.get('sala') || 'Entrada';
 const STATION_KEY = (SALA || 'entrada').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
 
-// 🛡️ BLINDAJE NIVEL DIOS: Guardar en memoria PERMANENTE
+// ðŸ›¡ï¸ BLINDAJE NIVEL DIOS: Guardar en memoria PERMANENTE
 const LUGAR_EN_URL = params.get('lugar');
 if (LUGAR_EN_URL && LUGAR_EN_URL.trim() !== "") {
   localStorage.setItem('much_lugar_seguro', LUGAR_EN_URL);
 } else if (!LUGAR_EN_URL && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')) {
-  // En desarrollo local sin parámetro, limpiamos cache para evitar datos viejos
+  // En desarrollo local sin parÃ¡metro, limpiamos cache para evitar datos viejos
   localStorage.removeItem('much_lugar_seguro');
 }
 // Lo saca de la memoria (si no hay nada, pone Sin Especificar)
@@ -83,7 +83,7 @@ function generatePrizeFolio(prizeData) {
   const suffix = buildRandomCode(getPrizeFolioLength(prizeData));
   return `${prefix}-${suffix}`;
 }
-// Función para mezclar arrays
+// FunciÃ³n para mezclar arrays
 const shuffle = a => window.MuchQuestionPool?.shuffleArray
   ? window.MuchQuestionPool.shuffleArray(a)
   : a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
@@ -130,9 +130,9 @@ function distributeQuestionOptions(questions) {
   return questions.map((question, index) => shuffleQuestionOptions(question, positionPlan[index]));
 }
 
-// Placeholder: Se llenará desde el JSON
+// Placeholder: Se llenarÃ¡ desde el JSON
 let QUESTIONS = [];
-// 🔒 BANDERA DE SEGURIDAD (Evita dobles registros al dar clic rápido)
+// ðŸ”’ BANDERA DE SEGURIDAD (Evita dobles registros al dar clic rÃ¡pido)
 let quizIniciando = false;
 
 function clearStationQuestionDeck() {
@@ -187,7 +187,7 @@ function ensureBgMusic() { try { if (!window.bgMusic) { window.bgMusic = new Aud
 function playBgMusic() { try { pauseBgMusic(); } catch (e) {} }
 function pauseBgMusic() { try { if (window.bgMusic && !window.bgMusic.paused) window.bgMusic.pause(); } catch (e) {} }
 
-// ⏰ FUNCIÓN CRÍTICA: Obtener hora exacta de México
+// â° FUNCIÃ“N CRÃTICA: Obtener hora exacta de MÃ©xico
 function getMexicoTime() {
   const ahora = new Date();
   const offsetMexico = ahora.getTimezoneOffset() * 60000;
@@ -216,7 +216,7 @@ async function loadPreguntas() {
           console.log('[loadPreguntas] Fetch exitoso. Total:', bank.length);
         }
       } catch (fErr) {
-        console.warn('[loadPreguntas] Fetch falló (CORS o Red):', fErr);
+        console.warn('[loadPreguntas] Fetch fallÃ³ (CORS o Red):', fErr);
       }
     }
 
@@ -301,7 +301,7 @@ async function loadPreguntas() {
 }
 
 // ------------------------------------------------------------
-// 2. GESTIÓN DE PARTIDAS (DB TRACKING)
+// 2. GESTIÃ“N DE PARTIDAS (DB TRACKING)
 // ------------------------------------------------------------
 
 async function startQuizInDB() {
@@ -309,7 +309,7 @@ async function startQuizInDB() {
   quizIniciando = true;
 
   try {
-    const progreso = await import('../supabase-utils.js');
+    const progreso = await import('../mysql-utils.js');
     const estacionId = 1; // Station 1 (Entrada MUCH)
 
     sessionStorage.removeItem('much_current_attempt_id');
@@ -327,18 +327,18 @@ async function startQuizInDB() {
     });
 
     if (!result?.id_intento) {
-      console.info('[Sync] Intento remoto no disponible; el quiz continúa en modo local.');
+      console.info('[Sync] Intento remoto no disponible; el quiz continÃºa en modo local.');
       quizIniciando = false;
       return null;
     }
 
-    console.log("✅ Intento iniciado en MySQL. ID Intento:", result.id_intento);
+    console.log("âœ… Intento iniciado en MySQL. ID Intento:", result.id_intento);
 
     sessionStorage.setItem('much_current_attempt_id', result.id_intento);
     return result.id_intento;
 
   } catch (e) {
-    console.error("Excepción al iniciar quiz en MySQL:", e);
+    console.error("ExcepciÃ³n al iniciar quiz en MySQL:", e);
     quizIniciando = false;
     startQuizLocal();
     return null;
@@ -349,11 +349,11 @@ async function endQuizInDB({ puntaje_total, num_correctas, num_preguntas }) {
   saveQuizResultLocal({ puntaje_total, num_correctas, num_preguntas });
 
   try {
-    const progreso = await import('../supabase-utils.js');
+    const progreso = await import('../mysql-utils.js');
     const attemptId = sessionStorage.getItem('much_current_attempt_id');
     if (!attemptId) return;
 
-    console.log(`🏁 Finalizando intento ${attemptId} en MySQL...`);
+    console.log(`ðŸ Finalizando intento ${attemptId} en MySQL...`);
 
     const isPassed = num_correctas >= Math.ceil(num_preguntas * 0.7);
 
@@ -364,13 +364,13 @@ async function endQuizInDB({ puntaje_total, num_correctas, num_preguntas }) {
       aprobado: isPassed
     });
 
-    console.log("✅ Intento actualizado en MySQL al finalizar.");
+    console.log("âœ… Intento actualizado en MySQL al finalizar.");
 
   } catch (e) { console.warn('Error endQuizInDB en MySQL:', e); }
 }
 
 // ------------------------------------------------------------
-// 🌟 NUEVO: FUNCIÓN PARA COMPROBAR LÍMITE DE BOLETOS DIARIOS
+// ðŸŒŸ NUEVO: FUNCIÃ“N PARA COMPROBAR LÃMITE DE BOLETOS DIARIOS
 // ------------------------------------------------------------
 async function checkLimiteBoletos() {
   try {
@@ -381,7 +381,7 @@ async function checkLimiteBoletos() {
     console.log(`Boletos entregados hoy en el museo: ${count}`);
     return count >= DAILY_TICKET_LIMIT;
   } catch (e) {
-    console.error("Excepción en checkLimiteBoletos:", e);
+    console.error("ExcepciÃ³n en checkLimiteBoletos:", e);
     return false;
   }
 }
@@ -485,9 +485,9 @@ class Confetti {
 class PrizeManager {
   constructor() {
     this.PRIZES = [
-      { key: 'museo', title: 'MUCH · Museo', label: 'Entrada al Museo MUCH', lugar: 'Museo Chiapas (MUCH)', emoji: '🏛️' },
-      { key: 'planetario', title: 'MUCH · Planetario', label: 'Entrada al Planetario MUCH', lugar: 'Planetario MUCH', emoji: '🔭' },
-      { key: 'general', title: 'MUCH · Visita General', label: 'Visita General (Museo + Planetario)', lugar: 'Museo y Planetario', emoji: '🌟' },
+      { key: 'museo', title: 'MUCH Â· Museo', label: 'Entrada al Museo MUCH', lugar: 'Museo Chiapas (MUCH)', emoji: 'ðŸ›ï¸' },
+      { key: 'planetario', title: 'MUCH Â· Planetario', label: 'Entrada al Planetario MUCH', lugar: 'Planetario MUCH', emoji: 'ðŸ”­' },
+      { key: 'general', title: 'MUCH Â· Visita General', label: 'Visita General (Museo + Planetario)', lugar: 'Museo y Planetario', emoji: 'ðŸŒŸ' },
     ];
   }
   random() { return this.PRIZES[Math.floor(Math.random() * this.PRIZES.length)]; }
@@ -548,7 +548,7 @@ class UIManager {
     };
     localStorage.setItem('much_quiz_prize', JSON.stringify(prizeData));
 
-    // Pasamos el parámetro a registro
+    // Pasamos el parÃ¡metro a registro
     window.location.href = '../Boleto_Digital/registro.html' + window.location.search;
   }
 
@@ -578,12 +578,12 @@ class UIManager {
   }
 
   startFocusDetection() {
-    // Anti-trampas desactivado: no invalidamos la ronda al cambiar de pestaña.
+    // Anti-trampas desactivado: no invalidamos la ronda al cambiar de pestaÃ±a.
   }
 
   handleVisibilityChange() {
     if (document.hidden) {
-      // Ventana oculta: reiniciar progreso de sesión inmediatamente
+      // Ventana oculta: reiniciar progreso de sesiÃ³n inmediatamente
       if (this.questionTimer) {
         clearTimeout(this.questionTimer);
         this.questionTimer = null;
@@ -597,7 +597,7 @@ class UIManager {
       if (this.e && this.e.qIndex) this.e.qIndex.textContent = '1';
       if (this.e && this.e.pointsEl) this.e.pointsEl.textContent = '0';
       if (this.e && this.e.correctCount) this.e.correctCount.textContent = '0';
-      if (this.e && this.e.questionTimer) this.e.questionTimer.textContent = `⏳ ${this.questionCountdown} s`;
+      if (this.e && this.e.questionTimer) this.e.questionTimer.textContent = `â³ ${this.questionCountdown} s`;
       setTimeout(() => window.location.reload(), 100);
       return;
     }
@@ -613,7 +613,7 @@ class UIManager {
 
   updateQuestionTimerDisplay() {
     if (!this.e.questionTimer) return;
-    this.e.questionTimer.textContent = `⏳ ${this.questionCountdown} s`;
+    this.e.questionTimer.textContent = `â³ ${this.questionCountdown} s`;
     this.e.questionTimer.classList.toggle('low', this.questionCountdown <= 5 && this.questionCountdown > 3);
     this.e.questionTimer.classList.toggle('urgent', this.questionCountdown <= 3);
   }
@@ -665,7 +665,7 @@ class UIManager {
       this.render();
       return;
     }
-    // El nuevo deadline se creará en render() cuando se llame startQuestionTimer()
+    // El nuevo deadline se crearÃ¡ en render() cuando se llame startQuestionTimer()
     this.render();
   }
 
@@ -677,7 +677,7 @@ class UIManager {
     s.locked = true;
     s.selected = null;
 
-    if (e.status) e.status.textContent = '⏰ Se acabó el tiempo. Respuesta incorrecta.';
+    if (e.status) e.status.textContent = 'â° Se acabÃ³ el tiempo. Respuesta incorrecta.';
     [...e.options.querySelectorAll('.option-btn')].forEach((btn, idx) => {
       btn.disabled = true;
       const correctIdx = QUESTIONS[s.idx].correctIndex;
@@ -697,7 +697,7 @@ class UIManager {
       try {
         const attemptId = sessionStorage.getItem('much_current_attempt_id');
         if (attemptId) {
-          const progreso = await import('../supabase-utils.js');
+          const progreso = await import('../mysql-utils.js');
           await progreso.guardarRespuestaUsuario(attemptId, 1, q.text, "Tiempo agotado", false);
         }
       } catch (err) {
@@ -705,7 +705,7 @@ class UIManager {
       }
     })();
 
-    if (e.questionTimer) e.questionTimer.textContent = '⏳ 0 s';
+    if (e.questionTimer) e.questionTimer.textContent = 'â³ 0 s';
     this.sound.wrong();
 
     setTimeout(() => {
@@ -738,7 +738,7 @@ class UIManager {
   clock() {
     const tick = () => {
       const t = new Date(), hh = String(t.getHours()).padStart(2, '0'), mm = String(t.getMinutes()).padStart(2, '0');
-      if (this.e.timer) this.e.timer.textContent = `⏰ ${hh}:${mm}`;
+      if (this.e.timer) this.e.timer.textContent = `â° ${hh}:${mm}`;
       setTimeout(tick, 10_000);
     }; tick();
   }
@@ -796,10 +796,10 @@ class UIManager {
           const limiteAlcanzado = await checkLimiteBoletos();
           if (limiteAlcanzado) {
             e.finalTitle.classList.remove('visually-hidden');
-            e.finalTitle.textContent = '¡Felicidades, eres un experto! 🧠';
+            e.finalTitle.textContent = 'Â¡Felicidades, eres un experto! ðŸ§ ';
             window.MuchStationCompletion?.clearInline(
               e.finalMsg,
-              'Lo sentimos, los boletos para esta sala se han agotado por hoy. ¡Vuelve a intentarlo mañana!'
+              'Lo sentimos, los boletos para esta sala se han agotado por hoy. Â¡Vuelve a intentarlo maÃ±ana!'
             );
             e.retryRow.classList.remove('d-none');
           } else {
@@ -814,7 +814,7 @@ class UIManager {
           window.MuchStationCompletion?.renderInline(e.finalMsg, {
             stationId: '1',
             nextStationId: '2',
-            badge: 'Estación completada',
+            badge: 'EstaciÃ³n completada',
             onReturnToMap: () => {
               this.goBackToMap();
             }
@@ -829,7 +829,7 @@ class UIManager {
           try { playBgMusic(); } catch (e) {}
           this.confetti.launch(120);
 
-          // Avanzar progreso y marcar estación 1 completada en local storage
+          // Avanzar progreso y marcar estaciÃ³n 1 completada en local storage
           localStorage.setItem('much_current_station', '2');
           let completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
           completed['1'] = true;
@@ -838,16 +838,16 @@ class UIManager {
           // Guardar progreso en el backend
           (async () => {
             try {
-              const progreso = await import('../supabase-utils.js');
+              const progreso = await import('../mysql-utils.js');
               await progreso.guardarProgresoUsuario(1, {
                 puntaje: puntajeFinal,
                 aciertos: s.correct,
                 errores: 0,
                 aprobada: true
               });
-              console.log("✅ Progreso de Estación 1 guardado exitosamente en MySQL.");
+              console.log("âœ… Progreso de EstaciÃ³n 1 guardado exitosamente en MySQL.");
             } catch (err) {
-              console.error("Error al guardar progreso de Estación 1:", err);
+              console.error("Error al guardar progreso de EstaciÃ³n 1:", err);
             }
           })();
         }
@@ -861,7 +861,7 @@ class UIManager {
         }, { countAttempt: true });
 
         e.finalTitle.classList.remove('visually-hidden');
-        e.finalTitle.textContent = 'Buen intento 👀';
+        e.finalTitle.textContent = 'Buen intento ðŸ‘€';
         window.MuchStationCompletion?.clearInline(e.finalMsg, 'Sigue explorando el museo.');
         e.retryRow.classList.remove('d-none');
         this.playIncorrectSound();
@@ -882,12 +882,12 @@ class UIManager {
       const col = document.createElement('div'); col.className = 'col-12';
       const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'option-btn';
       btn.setAttribute('data-index', i);
-      btn.innerHTML = `<span class="emoji">🔹</span><span>${label}</span>`;
+      btn.innerHTML = `<span class="emoji">ðŸ”¹</span><span>${label}</span>`;
       btn.addEventListener('click', () => this.choose(i));
       col.appendChild(btn); e.options.appendChild(col);
     });
 
-    e.nextBtn.textContent = s.idx === QUESTIONS.length - 1 ? 'Finalizar 🎉' : 'Siguiente ➡️';
+    e.nextBtn.textContent = s.idx === QUESTIONS.length - 1 ? 'Finalizar ðŸŽ‰' : 'Siguiente âž¡ï¸';
     this.updateScoreboard();
     if (e.hint) e.hint.textContent = 'Consejo: solo puedes elegir una respuesta.';
     this.startQuestionTimer();
@@ -906,11 +906,11 @@ class UIManager {
       if (idx === i && i !== correctIdx) btn.classList.add('option-btn--incorrect');
     });
     if (i === correctIdx) {
-      if (e.status) e.status.textContent = '✅ ¡Correcto!';
+      if (e.status) e.status.textContent = 'âœ… Â¡Correcto!';
       s.points += q.points; s.correct += 1;
       this.sound.correct(); this.confetti.launch(40);
     } else {
-      if (e.status) e.status.textContent = '❌ ¡Incorrecto!';
+      if (e.status) e.status.textContent = 'âŒ Â¡Incorrecto!';
       this.sound.wrong();
     }
     s.answers.push({ qIndex: s.idx, question: q.text, choice: q.options[i], correct: i === correctIdx });
@@ -921,7 +921,7 @@ class UIManager {
       try {
         const attemptId = sessionStorage.getItem('much_current_attempt_id');
         if (attemptId) {
-          const progreso = await import('../supabase-utils.js');
+          const progreso = await import('../mysql-utils.js');
           await progreso.guardarRespuestaUsuario(attemptId, 1, q.text, q.options[i], i === correctIdx);
         }
       } catch (err) {
@@ -937,7 +937,7 @@ class UIManager {
 
   next() {
     const s = this.state, { e } = this;
-    if (s.selected === null) { if (e.status) e.status.textContent = '⚠️ Selecciona una respuesta.'; return; }
+    if (s.selected === null) { if (e.status) e.status.textContent = 'âš ï¸ Selecciona una respuesta.'; return; }
     e.nextBtn.disabled = true; setTimeout(() => { e.nextBtn.disabled = false; }, 180);
     this.advanceToNextQuestion();
   }
@@ -982,15 +982,15 @@ const sound = new SoundFX(elements.soundToggle || null);
 const confetti = new Confetti(document.getElementById('confetti'));
 
 function verifyStationActive(estacionId) {
-  import('../supabase-utils.js')
+  import('../mysql-utils.js')
     .then(progreso => progreso.comprobarEstacionActiva(estacionId))
     .then(active => {
       if (!active) {
-        alert('Esta estación se encuentra inactiva o cerrada.');
+        alert('Esta estaciÃ³n se encuentra inactiva o cerrada.');
         window.location.href = '../index.html';
       }
     })
-    .catch(err => console.warn('No se pudo verificar el estado de la estación:', err));
+    .catch(err => console.warn('No se pudo verificar el estado de la estaciÃ³n:', err));
 }
 
 // === INICIALIZAR MINI-MAPA ===
@@ -1007,7 +1007,7 @@ function initMiniMap() {
     miniMapAvatarImg.src = `../avatars/dino1.png`; // Fallback
   }
 
-  // 2. Obtener Estación Actual
+  // 2. Obtener EstaciÃ³n Actual
   const stations = {
     '1': { x: 80, y: 18 },
     '2': { x: 56, y: 42 },
@@ -1017,8 +1017,8 @@ function initMiniMap() {
     '6': { x: 42, y: 66 }
   };
 
-  // Identificar sala actual para forzar la posición correcta
-  let currentStationId = '1'; // Entrada es Estación 1
+  // Identificar sala actual para forzar la posiciÃ³n correcta
+  let currentStationId = '1'; // Entrada es EstaciÃ³n 1
   
   const pos = stations[currentStationId];
   if (pos) {
@@ -1055,3 +1055,4 @@ document.addEventListener('DOMContentLoaded', () => {
     start();
   }
 });
+

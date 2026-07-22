@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
   id_usuario INT AUTO_INCREMENT PRIMARY KEY,
   nombre VARCHAR(150) NOT NULL,
   correo VARCHAR(150) NOT NULL UNIQUE,
+  telefono VARCHAR(20) NULL,
   google_id VARCHAR(255) UNIQUE,
   avatar_url TEXT NULL,
   fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -78,6 +79,10 @@ CREATE TABLE IF NOT EXISTS progreso_usuario (
   id_estacion INT NOT NULL,
   completada BOOLEAN DEFAULT FALSE,
   aprobada BOOLEAN DEFAULT FALSE,
+  fallida BOOLEAN NOT NULL DEFAULT FALSE,
+  bloqueada BOOLEAN NOT NULL DEFAULT FALSE,
+  fecha_bloqueo TIMESTAMP NULL,
+  fecha_puede_volver_jugar TIMESTAMP NULL,
   puntaje INT DEFAULT 0,
   aciertos INT DEFAULT 0,
   errores INT DEFAULT 0,
@@ -117,7 +122,8 @@ CREATE TABLE IF NOT EXISTS respuestas_usuario (
   CONSTRAINT fk_ru_intento FOREIGN KEY (id_intento) REFERENCES intentos_estacion (id_intento) ON DELETE CASCADE,
   CONSTRAINT fk_ru_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
   CONSTRAINT fk_ru_pregunta FOREIGN KEY (id_pregunta) REFERENCES preguntas (id_pregunta) ON DELETE CASCADE,
-  CONSTRAINT fk_ru_respuesta FOREIGN KEY (id_respuesta) REFERENCES respuestas (id_respuesta) ON DELETE CASCADE
+  CONSTRAINT fk_ru_respuesta FOREIGN KEY (id_respuesta) REFERENCES respuestas (id_respuesta) ON DELETE CASCADE,
+  UNIQUE KEY unique_intento_usuario_pregunta (id_intento, id_usuario, id_pregunta)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 10. Tabla: imagenes_rompecabezas
@@ -225,4 +231,63 @@ CREATE TABLE IF NOT EXISTS verificaciones_ubicacion (
   fecha_verificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_vu_usuario FOREIGN KEY (user_id) REFERENCES usuarios (id_usuario) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 17. Tabla: configuracion_juego
+CREATE TABLE IF NOT EXISTS configuracion_juego (
+  id_config INT AUTO_INCREMENT PRIMARY KEY,
+  bloqueo_activo BOOLEAN NOT NULL DEFAULT TRUE,
+  cantidad INT NOT NULL DEFAULT 7,
+  unidad ENUM('dias', 'semanas', 'meses') NOT NULL DEFAULT 'dias',
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  updated_by INT NULL,
+  CONSTRAINT fk_config_updated_by FOREIGN KEY (updated_by) REFERENCES usuarios (id_usuario) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 18. Tabla: participaciones
+CREATE TABLE IF NOT EXISTS participaciones (
+  id_participacion INT AUTO_INCREMENT PRIMARY KEY,
+  id_usuario INT NOT NULL,
+  fecha_inicio TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  fecha_fin TIMESTAMP NULL,
+  estado ENUM('en_curso', 'ganado', 'reclamado', 'habilitado') NOT NULL DEFAULT 'en_curso',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_participaciones_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
+  INDEX idx_participaciones_usuario (id_usuario),
+  INDEX idx_participaciones_estado (estado)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 19. Tabla: premios
+CREATE TABLE IF NOT EXISTS premios (
+  id_premio INT AUTO_INCREMENT PRIMARY KEY,
+  id_usuario INT NOT NULL,
+  id_participacion INT NULL,
+  id_boleto INT NULL,
+  estado ENUM('pendiente', 'reclamado', 'entregado') NOT NULL DEFAULT 'pendiente',
+  fecha_ganado TIMESTAMP NULL,
+  fecha_reclamado TIMESTAMP NULL,
+  fecha_entregado TIMESTAMP NULL,
+  fecha_finalizacion TIMESTAMP NULL,
+  fecha_puede_volver_jugar TIMESTAMP NULL,
+  cantidad_bloqueo INT NULL,
+  unidad_bloqueo ENUM('dias', 'semanas', 'meses') NULL,
+  motivo_bloqueo VARCHAR(50) NULL,
+  detalle_bloqueo VARCHAR(255) NULL,
+  ciclo_reiniciado_at TIMESTAMP NULL,
+  id_estacion_bloqueo INT NULL,
+  intentos_realizados INT DEFAULT 3,
+  fecha_bloqueo TIMESTAMP NULL,
+  estado_bloqueo VARCHAR(50) DEFAULT 'activo',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_premios_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
+  CONSTRAINT fk_premios_participacion FOREIGN KEY (id_participacion) REFERENCES participaciones (id_participacion) ON DELETE SET NULL,
+  CONSTRAINT fk_premios_boleto FOREIGN KEY (id_boleto) REFERENCES boletos (id_boleto) ON DELETE SET NULL,
+  INDEX idx_premios_usuario (id_usuario),
+  INDEX idx_premios_estado (estado),
+  INDEX idx_premios_fecha_volver (fecha_puede_volver_jugar)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO configuracion_juego (bloqueo_activo, cantidad, unidad)
+SELECT TRUE, 7, 'dias'
+WHERE NOT EXISTS (SELECT 1 FROM configuracion_juego LIMIT 1);
 

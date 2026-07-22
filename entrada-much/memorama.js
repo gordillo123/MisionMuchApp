@@ -1,6 +1,6 @@
-/**
- * Memorama del MUCH — Estación 1
- * Reemplaza la trivia anterior manteniendo integración con progreso y puntaje.
+﻿/**
+ * Memorama del MUCH â€” EstaciÃ³n 1
+ * Reemplaza la trivia anterior manteniendo integraciÃ³n con progreso y puntaje.
  */
 (function () {
   'use strict';
@@ -11,12 +11,12 @@
   const NUM_PAIRS = 6;
 
   const CARD_PAIRS = [
-    { id: 'dino', emoji: '🦴', label: 'Fósil' },
-    { id: 'planeta', emoji: '🪐', label: 'Planeta' },
-    { id: 'micro', emoji: '🔬', label: 'Microscopio' },
-    { id: 'satelite', emoji: '🛰️', label: 'Satélite' },
-    { id: 'boleto', emoji: '🎟️', label: 'Boleto MUCH' },
-    { id: 'lupa', emoji: '🔍', label: 'Lupa' }
+    { id: 'dino', emoji: 'ðŸ¦´', label: 'FÃ³sil' },
+    { id: 'planeta', emoji: 'ðŸª', label: 'Planeta' },
+    { id: 'micro', emoji: 'ðŸ”¬', label: 'Microscopio' },
+    { id: 'satelite', emoji: 'ðŸ›°ï¸', label: 'SatÃ©lite' },
+    { id: 'boleto', emoji: 'ðŸŽŸï¸', label: 'Boleto MUCH' },
+    { id: 'lupa', emoji: 'ðŸ”', label: 'Lupa' }
   ];
 
   const state = {
@@ -190,20 +190,20 @@
   }
   // --- Base de datos ---
   function verifyStationActive() {
-    import('../supabase-utils.js')
+    import('../mysql-utils.js')
       .then((m) => m.comprobarEstacionActiva(Number(STATION_ID)))
       .then((active) => {
         if (!active) {
-          alert('Esta estación se encuentra inactiva o cerrada.');
+          alert('Esta estaciÃ³n se encuentra inactiva o cerrada.');
           goBackToMap();
         }
       })
-      .catch((err) => console.warn('No se pudo verificar estación:', err));
+      .catch((err) => console.warn('No se pudo verificar estaciÃ³n:', err));
   }
 
   async function startGameInDB() {
     try {
-      const progreso = await import('../supabase-utils.js');
+      const progreso = await import('../mysql-utils.js');
       await progreso.inicializarProgresoUsuario(Number(STATION_ID));
       const result = await progreso.guardarIntentoEstacion(Number(STATION_ID), {
         puntaje: 0,
@@ -216,7 +216,7 @@
         sessionStorage.setItem('much_current_attempt_id', result.id_intento);
       }
     } catch (err) {
-      console.warn('[Memorama] Modo local — sin sincronización remota:', err);
+      console.warn('[Memorama] Modo local â€” sin sincronizaciÃ³n remota:', err);
     }
   }
 
@@ -225,7 +225,7 @@
     state.completionSaved = true;
 
     try {
-      const progreso = await import('../supabase-utils.js');
+      const progreso = await import('../mysql-utils.js');
 
       if (state.attemptId) {
         await progreso.actualizarIntentoEstacion(state.attemptId, {
@@ -269,7 +269,7 @@
       btn.setAttribute('aria-label', 'Carta oculta');
       btn.innerHTML = `
         <div class="mm-card-inner">
-          <div class="mm-card-face mm-card-back" aria-hidden="true">✨</div>
+          <div class="mm-card-face mm-card-back" aria-hidden="true">âœ¨</div>
           <div class="mm-card-face mm-card-front">
             <span class="mm-card-emoji">${card.emoji}</span>
             <span class="mm-card-label">${card.label}</span>
@@ -377,9 +377,9 @@
       window.MuchStationCompletion.renderInline(els.victoryHost, {
         stationId: STATION_ID,
         nextStationId: '2',
-        badge: 'Estación completada',
-        title: '¡Estación completada!',
-        body: 'Encontraste todos los pares y completaste la <strong>Estación 1</strong>. Sumaste 10 puntos para tu misión científica. Regresa al mapa para continuar el recorrido MUCH.',
+        badge: 'EstaciÃ³n completada',
+        title: 'Â¡EstaciÃ³n completada!',
+        body: 'Encontraste todos los pares y completaste la <strong>EstaciÃ³n 1</strong>. Sumaste 10 puntos para tu misiÃ³n cientÃ­fica. Regresa al mapa para continuar el recorrido MUCH.',
         detailLabel: 'Marcador',
         detailValue: `${finalScore} pts`,
         ctaLabel: 'Volver al mapa',
@@ -445,12 +445,12 @@
     els.btnContinue?.addEventListener('click', goBackToMap);
     els.btnBackStart?.addEventListener('click', goBackToMap);
     els.btnBackGame?.addEventListener('click', () => {
-      if (state.gameStarted && !confirm('¿Salir del memorama? Tu partida actual se perderá.')) return;
+      if (state.gameStarted && !confirm('Â¿Salir del memorama? Tu partida actual se perderÃ¡.')) return;
       stopTimer();
       goBackToMap();
     });
     els.btnBackBottom?.addEventListener('click', () => {
-      if (state.gameStarted && !confirm('¿Salir del memorama? Tu partida actual se perderá.')) return;
+      if (state.gameStarted && !confirm('Â¿Salir del memorama? Tu partida actual se perderÃ¡.')) return;
       stopTimer();
       goBackToMap();
     });
@@ -476,3 +476,4 @@
     init();
   }
 })();
+

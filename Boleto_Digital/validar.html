@@ -6,6 +6,7 @@
   <title>Validación Entrada MUCH</title>
   
   <style>
+    *, *::before, *::after { box-sizing: border-box; }
     body { font-family: system-ui, sans-serif; background: #0f172a; color: white; text-align: center; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
     .card { background: #1e293b; padding: 30px; border-radius: 20px; width: 100%; max-width: 400px; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
     h1 { color: #22d3ee; margin: 0 0 20px 0; }
@@ -46,6 +47,20 @@
     const statusBox = document.getElementById('statusBox');
     const details = document.getElementById('details');
     const btnCanjear = document.getElementById('btnCanjear');
+
+    function obtenerOperadorLocal() {
+      try {
+        const rawUser = localStorage.getItem('much_google_user');
+        return rawUser ? JSON.parse(rawUser) : null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function operadorPuedeCanjear(user) {
+      const roles = Array.isArray(user?.roles) ? user.roles.map((rol) => String(rol).toLowerCase()) : [];
+      return Boolean((user?.id_usuario || user?.id) && (roles.includes('admin') || roles.includes('taquilla')));
+    }
 
     // 1. Obtener ID de la URL (soporta ?folio=... o ?ticket=...)
     const params = new URLSearchParams(window.location.search);
@@ -116,18 +131,23 @@
         } else {
           statusBox.textContent = 'DISPONIBLE';
           statusBox.className = 'status valid';
-          btnCanjear.style.display = 'block';
+          const operador = obtenerOperadorLocal();
+          const puedeCanjear = operadorPuedeCanjear(operador);
+          btnCanjear.style.display = puedeCanjear ? 'block' : 'none';
+
+          if (!puedeCanjear) {
+            details.innerHTML += `<p style="color:#facc15; font-weight:bold; margin-top:10px; border-top:1px solid #333; padding-top:10px">Inicia sesiÃ³n como Administrador o Taquilla para validar este boleto.</p>`;
+          }
 
           btnCanjear.onclick = async () => {
             btnCanjear.disabled = true;
             btnCanjear.textContent = 'Validando...';
             try {
-              // Simulamos x-user-id como 1 (Administrador) para fines de validación rápida
               const updateRes = await fetch(`${API_BASE_URL}/api/taquilla/boletos/${data.id_boleto}/canjear`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
-                  'x-user-id': '1' // ID de administrador o taquilla por defecto para el log
+                  'x-user-id': String(operador.id_usuario || operador.id)
                 },
                 body: JSON.stringify({ observaciones: 'Canje manual vía escaneo QR rápido' })
               });

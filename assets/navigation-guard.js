@@ -89,7 +89,7 @@
           }
         }
       })
-      .catch(err => console.error('[Guard] Error de sincronización de bloqueo:', err));
+      .catch(err => console.info('[Guard] No se pudo sincronizar bloqueo en este momento:', err.message || err));
   }
 
   // Verificar si la navegación proviene del flujo interno de la app en la misma pestaña

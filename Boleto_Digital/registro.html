@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -11,9 +11,7 @@
   </script>
   <link rel="stylesheet" href="styles.css" />
 
-  <!-- Supabase JS (BASE MUCH) -->
   <script src="../scripts/much-local-storage.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     *, *::before, *::after {
@@ -509,7 +507,7 @@
 <body>
   <div class="registro-container">
     <button id="btnBackRegistro" class="back-btn" type="button" aria-label="Regresar">
-      <span class="back-btn-icon">←</span>
+      <span class="back-btn-icon">â†</span>
       <span>Regresar</span>
     </button>
 
@@ -517,31 +515,31 @@
       <img src="../Juego_Spinosaurio/logo-agencia.png" alt="Agencia Digital" class="brand-logo">
     </div>
 
-    <h2>Regístrate para reclamar tu recompensa 🐆</h2>
+    <h2>RegÃ­strate para reclamar tu recompensa ðŸ†</h2>
     <p class="lead">Gracias por visitar el MUCH</p>
 
     <form id="registroForm" autocomplete="off" novalidate>
       <div class="form-group">
         <label for="nombre">Nombre completo</label>
         <input type="text" id="nombre" name="nombre" required inputmode="text" minlength="6" maxlength="80"
-          placeholder="Ej. Jose Navarro Solorzano" title="Escribe tu nombre completo (mínimo 2 palabras)." />
+          placeholder="Ej. Jose Navarro Solorzano" title="Escribe tu nombre completo (mÃ­nimo 2 palabras)." />
         <div class="hint">Se permiten acentos y espacios. Escribe tu nombre y al menos un apellido para personalizar tu boleto.</div>
         <div class="error-msg" id="err-nombre"></div>
       </div>
 
       <div class="form-group">
-        <label for="correo">Correo electrónico</label>
+        <label for="correo">Correo electrÃ³nico</label>
         <input type="email" id="correo" name="correo" required inputmode="email" maxlength="120"
           placeholder="tucorreo@dominio.com" autocomplete="email" />
-        <div class="hint">Debe ser un correo válido (evita temporales).</div>
+        <div class="hint">Debe ser un correo vÃ¡lido (evita temporales).</div>
         <div class="error-msg" id="err-correo"></div>
       </div>
 
       <div class="form-group">
-        <label for="telefono">Número de teléfono</label>
+        <label for="telefono">NÃºmero de telÃ©fono</label>
         <input type="tel" id="telefono" name="telefono" required inputmode="numeric" pattern="[0-9]{10}" maxlength="10"
-          placeholder="Agrega 10 dígitos" title="Solo números, de 10 dígitos." />
-        <div class="hint">Solo 10 dígitos.</div>
+          placeholder="Agrega 10 dÃ­gitos" title="Solo nÃºmeros, de 10 dÃ­gitos." />
+        <div class="hint">Solo 10 dÃ­gitos.</div>
         <div class="error-msg" id="err-telefono"></div>
       </div>
 
@@ -559,9 +557,9 @@
   <!-- WELCOME MODAL -->
   <div id="welcomeModal" class="modal-overlay">
     <div class="modal-card">
-      <span class="modal-icon">🎉</span>
-      <h3 class="modal-title">¡Gracias por participar!</h3>
-      <p class="modal-text">Para hacer válido el boleto agrega tu <strong>nombre completo</strong>.</p>
+      <span class="modal-icon">ðŸŽ‰</span>
+      <h3 class="modal-title">Â¡Gracias por participar!</h3>
+      <p class="modal-text">Para hacer vÃ¡lido el boleto agrega tu <strong>nombre completo</strong>.</p>
       <button id="closeModalBtn" class="btn-modal">Continuar</button>
     </div>
   </div>
@@ -615,7 +613,7 @@
               window.location.href = 'boleto.html?' + params.toString();
               return;
             } else {
-              console.warn('[REGISTRO] Boleto en Local Storage no verificado o inválido. Limpiando cache.');
+              console.warn('[REGISTRO] Boleto en Local Storage no verificado o invÃ¡lido. Limpiando cache.');
               localStorage.removeItem('much_user_ticket');
             }
           }
@@ -674,31 +672,11 @@
       window.location.href = '../index.html';
     });
 
-    // ---------- Supabase Client (BASE MUCH) ----------
-    const SUPABASE_URL = 'https://qwgaeorsymfispmtsbut.supabase.co';
-    const SUPABASE_ANON_KEY =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3Z2Flb3JzeW1maXNwbXRzYnV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzODcyODUsImV4cCI6MjA3Nzk2MzI4NX0.FThZIIpz3daC9u8QaKyRTpxUeW0v4QHs5sHX2s1U1eo';
-    const SUPABASE_PUBLIC_OPTIONS = {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        detectSessionInUrl: false
-      }
-    };
-
-    let supabaseClient = null;
-    if (window.supabase && typeof window.supabase.createClient === 'function') {
-      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_PUBLIC_OPTIONS);
-      console.log('[REGISTRO] Supabase client inicializado');
-    } else {
-      console.error('[REGISTRO] Supabase JS no disponible:', window.supabase);
-    }
-
     const qs = new URLSearchParams(location.search);
     const salaSlug = qs.get('sala') || 'energia';
 
     // ---------- Validadores ----------
-    const reNombre = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:[ \t]+[A-Za-zÁÉÍÓÚÜÑáéíóúüñ'.-]+){1,}$/;
+    const reNombre = /^[A-Za-zÃÃ‰ÃÃ“ÃšÃœÃ‘Ã¡Ã©Ã­Ã³ÃºÃ¼Ã±]+(?:[ \t]+[A-Za-zÃÃ‰ÃÃ“ÃšÃœÃ‘Ã¡Ã©Ã­Ã³ÃºÃ¼Ã±'.-]+){1,}$/;
     const reEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
     const rePhone = /^\d{10}$/;
     const disposableDomains = ["10minutemail.com", "guerrillamail.com", "tempmail.com", "yopmail.com", "mailinator.com", "trashmail.com", "sharklasers.com"];
@@ -723,28 +701,24 @@
     }
     function validateEmail(raw) {
       const email = raw.trim().toLowerCase();
-      if (!reEmail.test(email)) return "Correo no válido.";
+      if (!reEmail.test(email)) return "Correo no vÃ¡lido.";
       const domain = email.split('@')[1] || '';
       if (disposableDomains.includes(domain)) return "Este dominio de correo no es permitido.";
       return null;
     }
     function validatePhone(raw) {
       const tel = raw.trim();
-      if (!rePhone.test(tel)) return "El teléfono debe tener 10 dígitos.";
+      if (!rePhone.test(tel)) return "El telÃ©fono debe tener 10 dÃ­gitos.";
       return null;
     }
 
-    // ---------- Guardar en Supabase ----------
-    function formatSupabaseError(context, error) {
+    // ---------- Guardar en MySQL ----------
+    function formatMySQLError(context, error) {
       const rawMessage = error?.message || 'Error desconocido.';
       const message = `${context}: ${rawMessage}`;
 
-      if (/row-level security|permission denied|not allowed/i.test(rawMessage)) {
-        return `${message} Revisa las politicas RLS de Supabase para permitir INSERT/SELECT con la llave anon.`;
-      }
-
       if (/failed to fetch|network|load failed/i.test(rawMessage)) {
-        return `${message} Verifica Internet, CORS o que el script de Supabase haya cargado correctamente.`;
+        return `${message} Verifica que el backend Express/MySQL este corriendo y que CORS permita la solicitud.`;
       }
 
       return message;
@@ -916,107 +890,8 @@
       return `${prefix}-${suffix}`;
     }
 
-    async function guardarEnSupabaseLegacy(nombre, correo, telefono, prizeData) {
-      if (!supabaseClient) {
-        throw new Error('Supabase no se inicializo. Revisa la carga del script y la conexion a Internet.');
-      }
-
-      // 1. Insertar el GANADOR con datos completos
-      const folioNew = prizeData.folio || generatePrizeFolio(prizeData);
-      prizeData.folio = folioNew;
-
-      try {
-
-        // Calcular vigencia (30 días por defecto)
-        const validUntil = new Date();
-        validUntil.setDate(validUntil.getDate() + 30);
-
-        const { data: winnerData, error: winnerError } = await supabaseClient
-          .from('Ganadores')
-          .insert({
-            nombre,
-            correo,
-            telefono,
-            folio: folioNew,
-            valido_desde: new Date().toISOString(),
-            valido_hasta: validUntil.toISOString(),
-            estatus: 'activo',
-            tipo_entrada: getTipoEntrada(prizeData),
-            ubicacion: prizeData.lugar || 'Museo Chiapas'
-          })
-          .select('id')
-          .single();
-
-        if (winnerError) throw new Error('Error guardando Ganador: ' + winnerError.message);
-
-        const winnerID = winnerData.id;
-        console.log('[REGISTRO] Ganador guardado. ID:', winnerID);
-
-        // 2. Insertar o VINCLULAR el RECORD DEL QUIZ
-        // Intentamos usar el ID de la BD creado por app.js
-        let quizDbId = null;
-        try { quizDbId = localStorage.getItem('much_quiz_db_id'); } catch (_) { }
-
-        const quizRaw = localStorage.getItem('much_quiz_final_data');
-        let qData = {};
-        if (quizRaw) qData = JSON.parse(quizRaw);
-
-        if (quizDbId) {
-          // A) Si existe ID de quiz, lo ACTUALIZAMOS para vincularlo al participante real
-          // Y TAMBIEN aseguramos que el puntaje esté guardado (por si falló app.js)
-          console.log('[REGISTRO] Vinculando Quiz existente:', quizDbId);
-
-          const updatePayload = {
-            participante_id: winnerID,
-            estatus: 'finalizado'
-          };
-
-          // Si tenemos datos locales, los reforzamos
-          if (qData.puntaje_total !== undefined) {
-            updatePayload.puntaje_total = qData.puntaje_total;
-            updatePayload.num_correctas = qData.num_correctas;
-            updatePayload.num_preguntas = qData.num_preguntas;
-            updatePayload.finished_at = qData.finished_at || new Date().toISOString();
-          }
-
-          const { error: quizUpdateError } = await supabaseClient
-            .from('quizzes')
-            .update(updatePayload)
-            .eq('id', quizDbId);
-
-          if (quizUpdateError) console.error('Error vinculando quiz:', quizUpdateError);
-          else console.log('✅ Quiz vinculado al ganador correctamente.');
-
-        } else if (qData.sala_id) {
-          // B) Fallback: Si no hay ID de BD (se jugó offline o falló app.js), INSERTAMOS uno nuevo
-          // Esto garantiza que el ganador siempre tenga su registro de quiz
-          console.log('[REGISTRO] Insertando Quiz nuevo (Fallback)');
-          const quizPayload = {
-            sala_id: qData.sala_id,
-            participante_id: winnerID,
-            started_at: qData.started_at,
-            finished_at: qData.finished_at,
-            puntaje_total: qData.puntaje_total,
-            num_correctas: qData.num_correctas,
-            num_preguntas: qData.num_preguntas,
-            estatus: 'finalizado'
-          };
-
-          const { error: quizError } = await supabaseClient
-            .from('quizzes')
-            .insert(quizPayload);
-
-          if (quizError) console.error('Error guardando Quiz (Fallback):', quizError.message);
-          else console.log('✅ Quiz guardado correctamente linked a ganador (Fallback).');
-        }
-
-      } catch (err) {
-        console.error('Error general guardarEnSupabase:', err);
-      }
-    }
-
-    async function guardarEnSupabase(nombre, correo, telefono, prizeData) {
-      // 1. Registrar o iniciar sesión del usuario participante en MySQL
+    async function guardarEnMySQL(nombre, correo, telefono, prizeData) {
+      // 1. Registrar o iniciar sesiÃ³n del usuario participante en MySQL
       const authRes = await fetch(`${API_BASE_URL}/api/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1025,7 +900,8 @@
             nombre,
             correo,
             google_id: `reg_${correo.replace(/[^a-zA-Z0-9]/g, '')}_${telefono}`,
-            avatar_url: 'avatars/dino1.png'
+            avatar_url: 'avatars/dino1.png',
+            telefono
           }
         })
       });
@@ -1124,11 +1000,11 @@
       // Plan B si no hay nada en localStorage
       if (!prizeData) {
         prizeData = {
-          title: 'MUCH · Premio',
+          title: 'MUCH Â· Premio',
           label: 'Entrada al Museo MUCH',
           lugar: 'Museo Chiapas (MUCH)',
           date: new Date().toISOString(),
-          emoji: '🎁',
+          emoji: 'ðŸŽ',
           sala: salaSlug
         };
         try { localStorage.setItem('much_quiz_prize', JSON.stringify(prizeData)); } catch (_) { }
@@ -1149,14 +1025,14 @@
 
       // Guardar en BD
       try {
-        await guardarEnSupabase(
+        await guardarEnMySQL(
           nombre.trim().replace(/\s+/g, ' '),
           correo.trim().toLowerCase(),
           telefono.trim(),
           prizeData
         );
       } catch (err) {
-        // Si es un error de bloqueo o límites de reclamación, NO debemos proceder localmente (seguridad)
+        // Si es un error de bloqueo o lÃ­mites de reclamaciÃ³n, NO debemos proceder localmente (seguridad)
         if (err.message.includes('Ya reclamaste') || err.message.includes('bloqueado') || err.message.includes('utilizado')) {
           alert(err.message);
           submitting = false;
@@ -1165,14 +1041,14 @@
           return;
         }
 
-        console.warn('[REGISTRO] Error guardando en base de datos. Se procederá localmente:', err);
+        console.warn('[REGISTRO] Error guardando en base de datos. Se procederÃ¡ localmente:', err);
         // Fallback local: Generamos folio local
         if (!prizeData.folio) {
           prizeData.folio = generatePrizeFolio(prizeData);
         }
       }
 
-      // Parámetros para boleto.html
+      // ParÃ¡metros para boleto.html
       const tipoEntrada = getTipoEntrada(prizeData);
       const params = new URLSearchParams({
         nombre: nombre.trim().replace(/\s+/g, ' '),
@@ -1196,7 +1072,7 @@
         sala: salaSlug
       });
 
-      // Guardar datos mínimos (no sensibles) del boleto en Local Storage
+      // Guardar datos mÃ­nimos (no sensibles) del boleto en Local Storage
       try {
         window.MuchLocalStorage?.claimTicket?.(prizeData, {
           fecha_puede_volver: prizeData.fecha_puede_volver || '',
@@ -1221,7 +1097,7 @@
       window.location.href = 'boleto.html?' + params.toString();
     });
 
-    // Validación en vivo
+    // ValidaciÃ³n en vivo
     ['nombre', 'correo', 'telefono'].forEach(id => {
       $(id).addEventListener('input', () => {
         const map = {
@@ -1247,3 +1123,4 @@
       modal.classList.remove('active');
     });
   </script>
+

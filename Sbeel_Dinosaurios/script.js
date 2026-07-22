@@ -1,11 +1,11 @@
-// Validar ubicación antes de permitir jugar
+﻿// Validar ubicaciÃ³n antes de permitir jugar
 (function() {
   // DESACTIVADO TEMPORALMENTE para permitir pruebas y juego remoto
   return;
 
   const raw = sessionStorage.getItem('much_last_location_verification');
   let valid = false;
-  let msg = 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicación.';
+  let msg = 'Para jugar necesitas estar en el Museo Chiapas y verificar tu ubicaciÃ³n.';
   if (raw) {
     try {
       const verif = JSON.parse(raw);
@@ -14,16 +14,16 @@
       if (transcurrido <= vigenciaMs && verif.dentro_del_museo) {
         valid = true;
       } else if (transcurrido > vigenciaMs) {
-        msg = 'La verificación de ubicación ha expirado. Por favor, verifícala de nuevo.';
+        msg = 'La verificaciÃ³n de ubicaciÃ³n ha expirado. Por favor, verifÃ­cala de nuevo.';
       } else {
-        msg = verif.mensaje_resultado || 'No te encuentras en el Museo Chiapas de Ciencia y Tecnología.';
+        msg = verif.mensaje_resultado || 'No te encuentras en el Museo Chiapas de Ciencia y TecnologÃ­a.';
       }
     } catch (e) {}
   }
   if (!valid) {
     alert(msg);
     window.location.href = '../index.html?reason=location_required&msg=' + encodeURIComponent(msg);
-    throw new Error('Acceso denegado: ubicación no válida.');
+    throw new Error('Acceso denegado: ubicaciÃ³n no vÃ¡lida.');
   }
 })();
 
@@ -106,16 +106,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function inicializarSbeelProgreso() {
         try {
-            const progreso = await import('../supabase-utils.js');
+            const progreso = await import('../mysql-utils.js');
             const active = await progreso.comprobarEstacionActiva(6);
             if (!active) {
-                alert('Esta estación se encuentra inactiva o cerrada.');
+                alert('Esta estaciÃ³n se encuentra inactiva o cerrada.');
                 window.location.href = '../index.html';
                 return;
             }
             await progreso.inicializarProgresoUsuario(6);
             
-            // Forzar el estado de la estación a Incompleta en localStorage y base de datos
+            // Forzar el estado de la estaciÃ³n a Incompleta en localStorage y base de datos
             // No borrar el completado local al entrar; los fallos reales se guardan como intentos.
 
             await progreso.guardarProgresoUsuario(STATION_ID, {
@@ -477,13 +477,13 @@ document.addEventListener('DOMContentLoaded', () => {
             completed[STATION_ID] = true;
             localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
         } catch (e) {
-            console.warn('No se pudo marcar la estación como completa:', e);
+            console.warn('No se pudo marcar la estaciÃ³n como completa:', e);
         }
     }
 
-    async function guardarSbeelEnSupabase() {
+    async function guardarSbeelEnMySQL() {
         try {
-            const progreso = await import('../supabase-utils.js');
+            const progreso = await import('../mysql-utils.js');
             const finalScore = Math.max(0, timeRemaining);
 
             await progreso.guardarIntentoEstacion(STATION_ID, {
@@ -500,7 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 aprobada: true
             });
         } catch (error) {
-            console.error('[Supabase DB] No se pudo guardar SBEEL:', error);
+            console.error('[MySQL DB] No se pudo guardar SBEEL:', error);
         }
     }
 
@@ -513,7 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
             solvedOnTime = true;
             markStationCompleted();
             playCompletionSound();
-            await guardarSbeelEnSupabase();
+            await guardarSbeelEnMySQL();
             if (successHeading) successHeading.style.display = 'none';
             if (successText) {
                 if (!successMessageHost) {
@@ -576,8 +576,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     errores: 1
                 }, { countAttempt: true });
                 
-                // Guardar en Supabase/BD
-                const progreso = await import('../supabase-utils.js');
+                // Guardar en MySQL
+                const progreso = await import('../mysql-utils.js');
                 await progreso.guardarProgresoUsuario(STATION_ID, {
                     puntaje: 0,
                     aciertos: 0,
@@ -657,7 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         stationId: '6',
                         badge: 'Nuevo intento',
                         title: 'Sigue explorando, vas muy bien',
-                        body: 'El tiempo se terminó esta vez, pero ya tienes otra oportunidad para completar el reto. Respira, observa con calma y vuelve a intentarlo.',
+                        body: 'El tiempo se terminÃ³ esta vez, pero ya tienes otra oportunidad para completar el reto. Respira, observa con calma y vuelve a intentarlo.',
                         nextStationName: 'Nuevo intento',
                         detailLabel: 'Tu siguiente paso',
                         detailValue: 'Cierra este mensaje para volver a intentarlo',
@@ -692,3 +692,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initGame();
 });
+

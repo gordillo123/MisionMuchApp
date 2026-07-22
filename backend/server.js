@@ -103,6 +103,7 @@ async function ensurePrivacyConsentSchema() {
   );
   if (!Number(table?.total || 0)) return;
 
+  await agregarColumnaSiFalta('usuarios', 'telefono', "ALTER TABLE usuarios ADD COLUMN telefono VARCHAR(20) NULL AFTER correo");
   await agregarColumnaSiFalta('usuarios', 'acepto_privacidad', "ALTER TABLE usuarios ADD COLUMN acepto_privacidad BOOLEAN NOT NULL DEFAULT FALSE AFTER activo");
   await agregarColumnaSiFalta('usuarios', 'privacidad_aceptada_en', "ALTER TABLE usuarios ADD COLUMN privacidad_aceptada_en TIMESTAMP NULL AFTER acepto_privacidad");
 }
@@ -577,6 +578,7 @@ app.post('/api/auth/google', async (req, res) => {
   let correo = '';
   let googleId = '';
   let avatarUrl = '';
+  let telefono = '';
 
   try {
     if (credential && client) {
@@ -596,6 +598,7 @@ app.post('/api/auth/google', async (req, res) => {
       correo = (userData.email || userData.correo)?.trim().toLowerCase();
       googleId = userData.google_id || userData.id || `sim_${Date.now()}`;
       avatarUrl = userData.picture || userData.avatar_url || '';
+      telefono = String(userData.telefono || userData.phone || '').trim();
     } else {
       return res.status(400).json({
         error: 'Faltan credenciales o datos de usuario para iniciar sesión.'
@@ -610,14 +613,15 @@ app.post('/api/auth/google', async (req, res) => {
 
     // 1. Guardar o actualizar usuario en MySQL
     await pool.query(
-      `INSERT INTO usuarios (nombre, correo, google_id, avatar_url, ultimo_login)
-       VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+      `INSERT INTO usuarios (nombre, correo, telefono, google_id, avatar_url, ultimo_login)
+       VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
        ON DUPLICATE KEY UPDATE 
          nombre = VALUES(nombre), 
+         telefono = COALESCE(NULLIF(VALUES(telefono), ''), telefono),
          google_id = VALUES(google_id), 
          avatar_url = VALUES(avatar_url), 
          ultimo_login = CURRENT_TIMESTAMP`,
-      [nombre.trim(), correo, googleId, avatarUrl]
+      [nombre.trim(), correo, telefono || null, googleId, avatarUrl]
     );
 
     // Obtener el ID de usuario generado
@@ -703,6 +707,7 @@ app.post('/api/auth/google', async (req, res) => {
       id_usuario: idUsuario,
       nombre: usuario.nombre,
       correo: usuario.correo,
+      telefono: usuario.telefono,
       avatar_url: usuario.avatar_url,
       roles: userRoles,
       activo: usuario.activo,
@@ -772,6 +777,10 @@ app.get('/api/preguntas/:id_estacion', async (req, res) => {
         pregunta: p.pregunta,
         respuestas: respDePregunta
       };
+    }).filter(p => {
+      const correctas = p.respuestas.filter(r => r.es_correcta).length;
+      const incorrectas = p.respuestas.length - correctas;
+      return p.respuestas.length >= 2 && correctas === 1 && incorrectas >= 1;
     });
 
     res.json(preguntasConRespuestas);
@@ -1366,7 +1375,7 @@ app.post('/api/respuestas-usuario', permitirJugador, verificarBloqueoJugador, as
       id_pregunta = preguntaExistente.id_pregunta;
     } else {
       const [insertPregunta] = await connection.query(
-        'INSERT INTO preguntas (id_estacion, pregunta, activa) VALUES (?, ?, TRUE)',
+        'INSERT INTO preguntas (id_estacion, pregunta, activa) VALUES (?, ?, FALSE)',
         [id_estacion, pregunta_texto]
       );
       id_pregunta = insertPregunta.insertId;
@@ -1383,7 +1392,7 @@ app.post('/api/respuestas-usuario', permitirJugador, verificarBloqueoJugador, as
       id_respuesta = respuestaExistente.id_respuesta;
     } else {
       const [insertRespuesta] = await connection.query(
-        'INSERT INTO respuestas (id_pregunta, texto_respuesta, es_correcta, activa) VALUES (?, ?, ?, TRUE)',
+        'INSERT INTO respuestas (id_pregunta, texto_respuesta, es_correcta, activa) VALUES (?, ?, ?, FALSE)',
         [id_pregunta, respuesta_texto, Boolean(es_correcta)]
       );
       id_respuesta = insertRespuesta.insertId;
@@ -1691,7 +1700,7 @@ app.get('/api/boletos/qr/:qr_token', async (req, res) => {
   const qrToken = req.params.qr_token;
   try {
     const [[boleto]] = await pool.query(
-      `SELECT b.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario
+      `SELECT b.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario, u.telefono AS telefono_usuario
        FROM boletos b
        JOIN usuarios u ON b.id_usuario = u.id_usuario
        WHERE b.qr_token = ?`,
@@ -1715,7 +1724,7 @@ app.get('/api/boletos/:folio', async (req, res) => {
   const folio = req.params.folio;
   try {
     const [[boleto]] = await pool.query(
-      `SELECT b.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario
+      `SELECT b.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario, u.telefono AS telefono_usuario
        FROM boletos b
        JOIN usuarios u ON b.id_usuario = u.id_usuario
        WHERE b.folio = ?`,
@@ -1757,7 +1766,7 @@ app.get('/api/taquilla/boleto/folio/:folio', permitirTaquillaOAdmin, async (req,
 
   try {
     const [[boleto]] = await pool.query(
-      `SELECT b.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario, u.avatar_url AS avatar_usuario
+      `SELECT b.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario, u.telefono AS telefono_usuario, u.avatar_url AS avatar_usuario
        FROM boletos b
        JOIN usuarios u ON b.id_usuario = u.id_usuario
        WHERE b.folio = ?`,
@@ -1791,7 +1800,7 @@ app.get('/api/taquilla/boleto/qr/:qr_token', permitirTaquillaOAdmin, async (req,
   try {
     // 1. Buscar boleto por QR
     const [[boleto]] = await pool.query(
-      `SELECT b.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario, u.avatar_url AS avatar_usuario
+      `SELECT b.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario, u.telefono AS telefono_usuario, u.avatar_url AS avatar_usuario
        FROM boletos b
        JOIN usuarios u ON b.id_usuario = u.id_usuario
        WHERE b.qr_token = ?`,
@@ -2097,7 +2106,7 @@ app.get('/api/admin/boletos', permitirAdmin, async (req, res) => {
     }
 
     const [boletos] = await pool.query(
-      `SELECT b.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario, u2.nombre AS nombre_canjeador
+      `SELECT b.*, u.nombre AS nombre_usuario, u.correo AS correo_usuario, u.telefono AS telefono_usuario, u2.nombre AS nombre_canjeador
        FROM boletos b
        JOIN usuarios u ON b.id_usuario = u.id_usuario
        LEFT JOIN usuarios u2 ON b.canjeado_por = u2.id_usuario
@@ -2783,7 +2792,7 @@ app.get('/api/usuarios/:id_usuario/perfil', permitirJugador, async (req, res) =>
   try {
     // 1. Obtener datos del usuario
     const [[usuario]] = await pool.query(
-      'SELECT nombre, correo, avatar_url, fecha_registro FROM usuarios WHERE id_usuario = ?',
+      'SELECT nombre, correo, telefono, avatar_url, fecha_registro FROM usuarios WHERE id_usuario = ?',
       [idUsuario]
     );
 
@@ -2916,6 +2925,7 @@ app.get('/api/usuarios/:id_usuario/perfil', permitirJugador, async (req, res) =>
       usuario: {
         nombre: usuario.nombre,
         correo: usuario.correo,
+        telefono: usuario.telefono,
         avatar_url: usuario.avatar_url,
         fecha_registro: usuario.fecha_registro
       },

@@ -2394,7 +2394,7 @@
                 ticketData = {
                   nombre_usuario: dbBoleto.nombre_usuario || '—',
                   correo_usuario: dbBoleto.correo_usuario || '—',
-                  telefono: '—', // no almacenamos teléfono en usuarios mysql
+                  telefono: dbBoleto.telefono_usuario || '—',
                   tipo_entrada: dbBoleto.tipo_entrada || 'MUCH',
                   destino_boleto: dbBoleto.destino_boleto || '',
                   seccion_boleto: dbBoleto.seccion_boleto || '',
