@@ -6,8 +6,8 @@
   --quiz-card-padding-y: clamp(0.6rem, 1.6vh, 1rem);
   --quiz-section-gap: clamp(0.35rem, 1vh, 0.8rem);
   --quiz-option-gap: clamp(0.45rem, 1.15vh, 0.85rem);
-  --quiz-option-min-height: clamp(3.6rem, 8.8vh, 5.6rem);
-  --quiz-option-font: clamp(1.18rem, max(5.7vw, 2.25vh), 1.74rem);
+  --quiz-option-min-height: clamp(4.2rem, 9.4vh, 6.2rem);
+  --quiz-option-font: clamp(1.28rem, max(6.2vw, 2.5vh), 1.92rem);
   --quiz-content-max-width: min(900px, 100%);
 }
 
@@ -396,12 +396,12 @@ body {
   }
 
   :root {
-    --quiz-option-font: clamp(1.12rem, max(6.25vw, 2.4vh), 1.64rem);
+    --quiz-option-font: clamp(1.2rem, max(6.6vw, 2.65vh), 1.76rem);
   }
 
   .option-btn,
   #options .option-btn {
-    min-height: clamp(3.35rem, 8.8vh, 4.65rem) !important;
+    min-height: clamp(3.6rem, 9vh, 5rem) !important;
     font-size: var(--quiz-option-font) !important;
   }
 
@@ -446,13 +446,13 @@ body {
   }
 
   :root {
-    --quiz-option-font: clamp(1.04rem, max(5.45vw, 2.15vh), 1.46rem);
+    --quiz-option-font: clamp(1.12rem, max(5.9vw, 2.3vh), 1.58rem);
   }
 
   .option-btn,
   #options .option-btn {
-    min-height: clamp(3.1rem, 7.8vh, 4.25rem) !important;
-    padding: clamp(0.6rem, 1.35vh, 0.85rem) clamp(0.85rem, 2vw, 1.1rem) !important;
+    min-height: clamp(3.35rem, 8.2vh, 4.55rem) !important;
+    padding: clamp(0.7rem, 1.45vh, 0.95rem) clamp(0.95rem, 2vw, 1.2rem) !important;
     font-size: var(--quiz-option-font) !important;
   }
 }
@@ -512,14 +512,14 @@ body {
   }
 
   :root {
-    --quiz-option-font: clamp(0.98rem, max(5.05vw, 1.9vh), 1.32rem);
+    --quiz-option-font: clamp(1.06rem, max(5.4vw, 2.05vh), 1.44rem);
   }
 
   .option-btn,
   #options .option-btn {
-    min-height: clamp(2.85rem, 7.2vh, 3.85rem) !important;
+    min-height: clamp(3.1rem, 7.8vh, 4.15rem) !important;
     font-size: var(--quiz-option-font) !important;
-    padding: 0.55rem 0.85rem !important;
+    padding: 0.65rem 0.95rem !important;
   }
 
   .option-btn span:not(.emoji),
