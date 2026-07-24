@@ -1,5 +1,5 @@
 // backend/server.js
-// Servidor backend principal en Express para "Misión MUCH"
+// Servidor backend principal en Express para "MisiÃ³n MUCH"
 
 const express = require('express');
 const cors = require('cors');
@@ -133,7 +133,7 @@ function evaluarAprobacionEstacion(estacion = {}, puntaje = 0, aprobadaSolicitad
 }
 
 async function autoUnlockEstaciones(connection, idUsuario) {
-  // Buscar estaciones bloqueadas del usuario cuyo tiempo de bloqueo ya expiró
+  // Buscar estaciones bloqueadas del usuario cuyo tiempo de bloqueo ya expirÃ³
   const [blockedStations] = await connection.query(
     `SELECT id_estacion 
      FROM progreso_usuario 
@@ -145,9 +145,9 @@ async function autoUnlockEstaciones(connection, idUsuario) {
 
   for (const row of blockedStations) {
     const idEstacion = row.id_estacion;
-    console.log(`🔓 Auto-desbloqueando estación ${idEstacion} para el usuario ${idUsuario}`);
+    console.log(`ðŸ”“ Auto-desbloqueando estaciÃ³n ${idEstacion} para el usuario ${idUsuario}`);
     
-    // 1. Restablecer progreso de la estación
+    // 1. Restablecer progreso de la estaciÃ³n
     await connection.query(
       `UPDATE progreso_usuario 
        SET completada = FALSE,
@@ -164,7 +164,7 @@ async function autoUnlockEstaciones(connection, idUsuario) {
       [idUsuario, idEstacion]
     );
 
-    // 2. Eliminar intentos históricos de la estación para que tenga 3 intentos nuevos
+    // 2. Eliminar intentos histÃ³ricos de la estaciÃ³n para que tenga 3 intentos nuevos
     await connection.query(
       `DELETE FROM intentos_estacion WHERE id_usuario = ? AND id_estacion = ?`,
       [idUsuario, idEstacion]
@@ -200,7 +200,7 @@ async function evaluarBloqueoPorIntentos(connection, idUsuario, idEstacion) {
     ? new Date(bloqueoGlobal.fecha_puede_volver)
     : playtime.calcularFechaDesbloqueo(new Date(), await playtime.getConfig());
 
-  console.log(`⚠️ Usuario ${idUsuario} agotó sus intentos en la estación ${idEstacion}. Bloqueando hasta ${fechaPuedeVolver.toISOString()}.`);
+  console.log(`âš ï¸ Usuario ${idUsuario} agotÃ³ sus intentos en la estaciÃ³n ${idEstacion}. Bloqueando hasta ${fechaPuedeVolver.toISOString()}.`);
   await connection.query(
     `INSERT INTO progreso_usuario 
       (id_usuario, id_estacion, completada, aprobada, fallida, bloqueada, fecha_bloqueo, fecha_puede_volver_jugar, puntaje, aciertos, errores, fecha_inicio, fecha_completado)
@@ -225,16 +225,16 @@ async function evaluarBloqueoPorIntentos(connection, idUsuario, idEstacion) {
     fecha_finalizacion: new Date().toISOString(),
     fecha_puede_volver: fechaPuedeVolver.toISOString(),
     fecha_puede_volver_texto: playtime.formatFechaMX(fechaPuedeVolver),
-    mensaje: bloqueoGlobal?.mensaje || playtime.buildMensajeBloqueoIntentos(fechaPuedeVolver, bloqueoGlobal?.premio?.detalle_bloqueo || 'esta estación')
+    mensaje: bloqueoGlobal?.mensaje || playtime.buildMensajeBloqueoIntentos(fechaPuedeVolver, bloqueoGlobal?.premio?.detalle_bloqueo || 'esta estaciÃ³n')
   };
 
   return { fallos, bloqueo };
 }
 
-// Asegurar existencia de la tabla de verificación de ubicación
+// Asegurar existencia de la tabla de verificaciÃ³n de ubicaciÃ³n
 (async () => {
   try {
-    console.log('⏳ Verificando existencia de la tabla verificaciones_ubicacion...');
+    console.log('â³ Verificando existencia de la tabla verificaciones_ubicacion...');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS verificaciones_ubicacion (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -255,9 +255,9 @@ async function evaluarBloqueoPorIntentos(connection, idUsuario, idEstacion) {
         CONSTRAINT fk_vu_usuario FOREIGN KEY (user_id) REFERENCES usuarios (id_usuario) ON DELETE SET NULL
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
-    console.log('✅ Tabla verificaciones_ubicacion verificada/creada con éxito.');
+    console.log('âœ… Tabla verificaciones_ubicacion verificada/creada con Ã©xito.');
   } catch (error) {
-    console.error('❌ Error al verificar/crear la tabla verificaciones_ubicacion:', error.message);
+    console.error('âŒ Error al verificar/crear la tabla verificaciones_ubicacion:', error.message);
   }
 
   try {
@@ -265,14 +265,18 @@ async function evaluarBloqueoPorIntentos(connection, idUsuario, idEstacion) {
     await ensureTicketSchema();
     await ensureAttemptSchema();
     await ensurePrivacyConsentSchema();
-    console.log('✅ Tablas de bloqueo de juego verificadas/creadas con éxito.');
+    console.log('âœ… Tablas de bloqueo de juego verificadas/creadas con Ã©xito.');
   } catch (error) {
-    console.error('❌ Error al verificar/crear tablas de bloqueo de juego:', error.message);
+    console.error('âŒ Error al verificar/crear tablas de bloqueo de juego:', error.message);
   }
 })();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const SESSION_COOKIE_NAME = process.env.SESSION_COOKIE_NAME || 'much_session';
+const SESSION_MAX_AGE_MS = Math.max(1, Number(process.env.SESSION_MAX_AGE_HOURS || 24)) * 60 * 60 * 1000;
+const SESSION_SECRET = process.env.SESSION_SECRET || '';
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 
 // Cliente de Google OAuth
@@ -280,7 +284,11 @@ const googleClientId = process.env.GOOGLE_CLIENT_ID || '';
 const client = googleClientId ? new OAuth2Client(googleClientId) : null;
 
 // Middlewares
-app.use(cors());
+app.set('trust proxy', 1);
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 app.use(express.json());
 
 // Logger simple para peticiones
@@ -293,8 +301,8 @@ app.get('/favicon.ico', (req, res) => {
   res.status(204).end();
 });
 
-// Middleware de roles y simulación de usuario actual
-// Para fines de desarrollo local y simplicidad, el frontend enviará las cabeceras:
+// Middleware de roles y simulaciÃ³n de usuario actual
+// Para fines de desarrollo local y simplicidad, el frontend enviarÃ¡ las cabeceras:
 // 'x-user-id' con el ID del usuario actual.
 // 'x-user-email' con el correo del usuario actual.
 async function obtenerRolUsuario(idUsuario) {
@@ -314,6 +322,100 @@ async function obtenerRolUsuario(idUsuario) {
   }
 }
 
+
+function parseCookies(req) {
+  return String(req.headers.cookie || '')
+    .split(';')
+    .map(part => part.trim())
+    .filter(Boolean)
+    .reduce((cookies, part) => {
+      const index = part.indexOf('=');
+      if (index === -1) return cookies;
+      cookies[decodeURIComponent(part.slice(0, index))] = decodeURIComponent(part.slice(index + 1));
+      return cookies;
+    }, {});
+}
+
+function getSessionSecret() {
+  if (SESSION_SECRET) return SESSION_SECRET;
+  if (IS_PRODUCTION) throw new Error('SESSION_SECRET es obligatorio en producción.');
+  return 'dev-only-change-this-session-secret';
+}
+
+function signSessionPayload(payload) {
+  const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const signature = crypto.createHmac('sha256', getSessionSecret()).update(body).digest('base64url');
+  return `${body}.${signature}`;
+}
+
+function verifySessionToken(token) {
+  if (!token || typeof token !== 'string' || !token.includes('.')) return null;
+  const [body, signature] = token.split('.');
+  const expected = crypto.createHmac('sha256', getSessionSecret()).update(body).digest('base64url');
+  try {
+    if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
+  } catch (_) {
+    return null;
+  }
+  const payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
+  if (!payload?.id_usuario || !payload?.exp || Date.now() > Number(payload.exp)) return null;
+  return payload;
+}
+
+function setSessionCookie(res, usuario) {
+  const token = signSessionPayload({
+    id_usuario: usuario.id_usuario,
+    correo: usuario.correo,
+    exp: Date.now() + SESSION_MAX_AGE_MS
+  });
+  res.cookie(SESSION_COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: IS_PRODUCTION,
+    sameSite: IS_PRODUCTION ? 'none' : 'lax',
+    maxAge: SESSION_MAX_AGE_MS,
+    path: '/'
+  });
+}
+
+function clearSessionCookie(res) {
+  res.clearCookie(SESSION_COOKIE_NAME, {
+    httpOnly: true,
+    secure: IS_PRODUCTION,
+    sameSite: IS_PRODUCTION ? 'none' : 'lax',
+    path: '/'
+  });
+}
+
+async function obtenerUsuarioSesion(req) {
+  const payload = verifySessionToken(parseCookies(req)[SESSION_COOKIE_NAME]);
+  if (!payload) return null;
+  const [[usuario]] = await pool.query(
+    `SELECT id_usuario, nombre, correo, telefono, google_id, avatar_url, fecha_registro,
+            ultimo_login, activo, acepto_privacidad, privacidad_aceptada_en
+     FROM usuarios
+     WHERE id_usuario = ?
+     LIMIT 1`,
+    [payload.id_usuario]
+  );
+  if (!usuario || !usuario.activo) return null;
+  usuario.roles = await obtenerRolUsuario(usuario.id_usuario);
+  return usuario;
+}
+
+function serializarUsuarioSesion(usuario) {
+  return {
+    id_usuario: usuario.id_usuario,
+    nombre: usuario.nombre,
+    correo: usuario.correo,
+    telefono: usuario.telefono,
+    google_id: usuario.google_id,
+    avatar_url: usuario.avatar_url,
+    roles: usuario.roles || [],
+    activo: Boolean(usuario.activo),
+    acepto_privacidad: Boolean(usuario.acepto_privacidad),
+    privacidad_aceptada_en: usuario.privacidad_aceptada_en || null
+  };
+}
 async function obtenerOCrearRolId(nombreRol, descripcion = '') {
   const [[rolExistente]] = await pool.query(
     'SELECT id_rol FROM roles WHERE nombre = ? LIMIT 1',
@@ -363,7 +465,7 @@ async function usuarioExiste(idUsuario, connection = pool) {
   return Boolean(usuario);
 }
 
-// Generar Folio único de 6 caracteres alfanuméricos mezclados (ej: X7K9R2)
+// Generar Folio Ãºnico de 6 caracteres alfanumÃ©ricos mezclados (ej: X7K9R2)
 async function generarFolioUnico(connection) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let attempts = 0;
@@ -385,11 +487,13 @@ async function generarFolioUnico(connection) {
   return Date.now().toString(36).toUpperCase();
 }
 
-// Middleware de autorización de Admin
+// Middleware de autorizaciÃ³n de Admin
 async function permitirAdmin(req, res, next) {
-  const idUsuario = req.headers['x-user-id'];
+  const sesion = await obtenerUsuarioSesion(req);
+  if (sesion) req.usuarioSesion = sesion;
+  const idUsuario = sesion?.id_usuario || req.headers['x-user-id'];
   if (!idUsuario) {
-    return res.status(401).json({ error: 'No autorizado. Falta cabecera x-user-id.' });
+    return res.status(401).json({ error: 'Sesión expirada. Inicia sesión nuevamente.' });
   }
   const admin = await esAdmin(idUsuario);
   if (!admin) {
@@ -398,11 +502,13 @@ async function permitirAdmin(req, res, next) {
   next();
 }
 
-// Middleware de autorización de Taquilla o Admin
+// Middleware de autorizaciÃ³n de Taquilla o Admin
 async function permitirTaquillaOAdmin(req, res, next) {
-  const idUsuario = req.headers['x-user-id'];
+  const sesion = await obtenerUsuarioSesion(req);
+  if (sesion) req.usuarioSesion = sesion;
+  const idUsuario = sesion?.id_usuario || req.headers['x-user-id'];
   if (!idUsuario) {
-    return res.status(401).json({ error: 'No autorizado. Falta cabecera x-user-id.' });
+    return res.status(401).json({ error: 'Sesión expirada. Inicia sesión nuevamente.' });
   }
   const taquilla = await esTaquilla(idUsuario);
   if (!taquilla) {
@@ -412,7 +518,7 @@ async function permitirTaquillaOAdmin(req, res, next) {
 }
 
 function obtenerIdUsuarioDePeticion(req) {
-  return req.headers['x-user-id'] || req.body?.id_usuario || req.params?.id_usuario || req.params?.idUsuario;
+  return req.usuarioSesion?.id_usuario || req.headers['x-user-id'] || req.body?.id_usuario || req.params?.id_usuario || req.params?.idUsuario;
 }
 
 function obtenerRangoFechasAdmin(req) {
@@ -498,13 +604,15 @@ async function marcarBoletoVencidoSiAplica(boleto, connection = pool) {
 // Middleware de autorizacion de jugador.
 // Admin y taquilla pueden conservar rol "usuario" por compatibilidad, pero no deben jugar.
 async function permitirJugador(req, res, next) {
-  const idUsuario = obtenerIdUsuarioDePeticion(req);
+  const sesion = await obtenerUsuarioSesion(req);
+  if (sesion) req.usuarioSesion = sesion;
+  const idUsuario = sesion?.id_usuario || obtenerIdUsuarioDePeticion(req);
   if (!idUsuario) {
-    return res.status(401).json({ error: 'No autorizado. Falta identificador de usuario.' });
+    return res.status(401).json({ error: 'Sesión expirada. Inicia sesión nuevamente.' });
   }
 
   if (!(await usuarioExiste(idUsuario))) {
-    return res.status(401).json({ error: 'Usuario no encontrado. Inicia sesión nuevamente.' });
+    return res.status(401).json({ error: 'Usuario no encontrado. Inicia sesiÃ³n nuevamente.' });
   }
 
   const roles = await obtenerRolUsuario(idUsuario);
@@ -556,168 +664,115 @@ app.get('/api/health', async (req, res) => {
     const [result] = await pool.query('SELECT 1');
     res.json({
       status: 'success',
-      message: 'Conexión a MySQL exitosa.',
+      message: 'ConexiÃ³n a MySQL exitosa.',
       database: process.env.DB_DATABASE || 'mision_much',
       timestamp: new Date()
     });
   } catch (error) {
     res.status(500).json({
       status: 'error',
-      message: 'Falló la conexión a la base de datos MySQL.',
+      message: 'FallÃ³ la conexiÃ³n a la base de datos MySQL.',
       error: error.message
     });
   }
 });
 
 // ==========================================
-// 2. POST /api/auth/google
+// 2. Autenticacion con Google y sesion segura
 // ==========================================
-app.post('/api/auth/google', async (req, res) => {
-  const { credential, userData } = req.body;
-  let nombre = '';
-  let correo = '';
-  let googleId = '';
-  let avatarUrl = '';
-  let telefono = '';
-
+async function iniciarSesionConPayloadGoogle(payload, res) {
+  const nombre = String(payload.name || '').trim();
+  const correo = String(payload.email || '').trim().toLowerCase();
+  const googleId = String(payload.sub || '').trim();
+  const avatarUrl = String(payload.picture || '').trim();
+  if (!payload.email_verified) { const error = new Error('Google no ha verificado este correo electrónico.'); error.statusCode = 403; throw error; }
+  if (!nombre || !correo || !googleId) { const error = new Error('Google no devolvió nombre, correo o identificador suficientes.'); error.statusCode = 400; throw error; }
+  const connection = await pool.getConnection();
   try {
-    if (credential && client) {
-      // Flujo seguro: verificar el token de Google
-      const ticket = await client.verifyIdToken({
-        idToken: credential,
-        audience: googleClientId,
-      });
-      const payload = ticket.getPayload();
-      nombre = payload.name;
-      correo = payload.email?.trim().toLowerCase();
-      googleId = payload.sub;
-      avatarUrl = payload.picture || '';
-    } else if (userData) {
-      // Fallback para desarrollo local / simulación si no se configura Client ID
-      nombre = userData.name || userData.nombre;
-      correo = (userData.email || userData.correo)?.trim().toLowerCase();
-      googleId = userData.google_id || userData.id || `sim_${Date.now()}`;
-      avatarUrl = userData.picture || userData.avatar_url || '';
-      telefono = String(userData.telefono || userData.phone || '').trim();
+    await connection.beginTransaction();
+    const [[existente]] = await connection.query('SELECT * FROM usuarios WHERE correo = ? OR google_id = ? LIMIT 1 FOR UPDATE', [correo, googleId]);
+    let idUsuario;
+    if (existente) {
+      if (!existente.activo) { const error = new Error('Cuenta deshabilitada. Contacta al administrador.'); error.statusCode = 403; throw error; }
+      idUsuario = existente.id_usuario;
+      await connection.query(`UPDATE usuarios SET nombre = ?, correo = ?, google_id = ?, avatar_url = ?, ultimo_login = CURRENT_TIMESTAMP WHERE id_usuario = ?`, [nombre, correo, googleId, avatarUrl || existente.avatar_url || null, idUsuario]);
     } else {
-      return res.status(400).json({
-        error: 'Faltan credenciales o datos de usuario para iniciar sesión.'
-      });
+      const [insertResult] = await connection.query(`INSERT INTO usuarios (nombre, correo, google_id, avatar_url, ultimo_login, activo) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, TRUE)`, [nombre, correo, googleId, avatarUrl || null]);
+      idUsuario = insertResult.insertId;
     }
-
-    if (!nombre || !correo || !googleId) {
-      return res.status(400).json({
-        error: 'Faltan datos obligatorios de perfil (nombre, correo o google_id)'
-      });
-    }
-
-    // 1. Guardar o actualizar usuario en MySQL
-    await pool.query(
-      `INSERT INTO usuarios (nombre, correo, telefono, google_id, avatar_url, ultimo_login)
-       VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-       ON DUPLICATE KEY UPDATE 
-         nombre = VALUES(nombre), 
-         telefono = COALESCE(NULLIF(VALUES(telefono), ''), telefono),
-         google_id = VALUES(google_id), 
-         avatar_url = VALUES(avatar_url), 
-         ultimo_login = CURRENT_TIMESTAMP`,
-      [nombre.trim(), correo, telefono || null, googleId, avatarUrl]
-    );
-
-    // Obtener el ID de usuario generado
-    const [[usuario]] = await pool.query('SELECT * FROM usuarios WHERE correo = ?', [correo]);
-    const idUsuario = usuario.id_usuario;
-
-    // 2. Asignar rol de 'usuario' por defecto si no tiene ningún rol asignado
-    const [rolesExistentes] = await pool.query(
-      'SELECT 1 FROM usuarios_roles WHERE id_usuario = ?',
-      [idUsuario]
-    );
-
-    if (rolesExistentes.length === 0) {
-      const usuarioRoleId = await obtenerOCrearRolId(
-        'usuario',
-        'Usuario regular que juega las estaciones del recorrido'
-      );
-      await pool.query(
-        'INSERT INTO usuarios_roles (id_usuario, id_rol) VALUES (?, ?)',
-        [idUsuario, usuarioRoleId]
-      );
-    }
-
-    // Para cuentas especiales, auto-asignar rol admin si el correo es planetariotuxtla@gmail.com, muchtuxtla@gmail.com o luceroynn@gmail.com
-    const correosEspeciales = ['planetariotuxtla@gmail.com', 'muchtuxtla@gmail.com', 'luceroynn@gmail.com'];
-    if (correosEspeciales.includes(correo)) {
-      const adminRoleId = await obtenerOCrearRolId(
-        'admin',
-        'Administrador general del sistema con acceso completo a métricas y registros'
-      );
-      const taquillaRoleId = await obtenerOCrearRolId(
-        'taquilla',
-        'Operador de taquilla encargado de validar, escanear y canjear boletos'
-      );
-
-      // Verificar si ya tiene el rol admin y taquilla.
-      const [adminRoleCheck] = await pool.query(
-        'SELECT 1 FROM usuarios_roles WHERE id_usuario = ? AND id_rol = ?',
-        [idUsuario, adminRoleId]
-      );
-      if (adminRoleCheck.length === 0) {
-        await pool.query(
-          'INSERT INTO usuarios_roles (id_usuario, id_rol) VALUES (?, ?)',
-          [idUsuario, adminRoleId]
-        );
-      }
-      const [taquillaRoleCheck] = await pool.query(
-        'SELECT 1 FROM usuarios_roles WHERE id_usuario = ? AND id_rol = ?',
-        [idUsuario, taquillaRoleId]
-      );
-      if (taquillaRoleCheck.length === 0) {
-        await pool.query(
-          'INSERT INTO usuarios_roles (id_usuario, id_rol) VALUES (?, ?)',
-          [idUsuario, taquillaRoleId]
-        );
-      }
-    }
-
-    // Para operadores de taquilla especiales, auto-asignar rol taquilla
-    const correosTaquilla = ['yadiran0514@gmail.com'];
-    if (correosTaquilla.includes(correo)) {
-      const taquillaRoleId = await obtenerOCrearRolId(
-        'taquilla',
-        'Operador de taquilla encargado de validar, escanear y canjear boletos'
-      );
-      const [taquillaRoleCheck] = await pool.query(
-        'SELECT 1 FROM usuarios_roles WHERE id_usuario = ? AND id_rol = ?',
-        [idUsuario, taquillaRoleId]
-      );
-      if (taquillaRoleCheck.length === 0) {
-        await pool.query(
-          'INSERT INTO usuarios_roles (id_usuario, id_rol) VALUES (?, ?)',
-          [idUsuario, taquillaRoleId]
-        );
-      }
-    }
-
-    // 3. Obtener todos los roles asignados a este usuario
-    const userRoles = await obtenerRolUsuario(idUsuario);
-
-    // Devolver objeto completo de sesión
-    res.json({
-      id_usuario: idUsuario,
-      nombre: usuario.nombre,
-      correo: usuario.correo,
-      telefono: usuario.telefono,
-      avatar_url: usuario.avatar_url,
-      roles: userRoles,
-      activo: usuario.activo,
-      acepto_privacidad: Boolean(usuario.acepto_privacidad),
-      privacidad_aceptada_en: usuario.privacidad_aceptada_en
-    });
-
+    const usuarioRoleId = await obtenerOCrearRolId('usuario', 'Jugador regular que usa las estaciones del recorrido');
+    const [rolesExistentes] = await connection.query('SELECT 1 FROM usuarios_roles WHERE id_usuario = ? LIMIT 1', [idUsuario]);
+    if (rolesExistentes.length === 0) await connection.query('INSERT INTO usuarios_roles (id_usuario, id_rol) VALUES (?, ?)', [idUsuario, usuarioRoleId]);
+    await connection.commit();
+    const [[usuario]] = await pool.query(`SELECT id_usuario, nombre, correo, telefono, google_id, avatar_url, activo, acepto_privacidad, privacidad_aceptada_en FROM usuarios WHERE id_usuario = ?`, [idUsuario]);
+    usuario.roles = await obtenerRolUsuario(idUsuario);
+    setSessionCookie(res, usuario);
+    return serializarUsuarioSesion(usuario);
   } catch (error) {
-    console.error('Error al iniciar sesión con Google:', error);
-    res.status(500).json({ error: error.message });
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+
+app.get('/api/auth/config', (req, res) => {
+  res.json({ googleClientId: googleClientId || '' });
+});
+
+app.get('/api/auth/google/start', (req, res) => {
+  if (!googleClientId) return res.status(500).send('GOOGLE_CLIENT_ID no está configurado.');
+  const redirectUri = process.env.GOOGLE_REDIRECT_URI || ('http://localhost:' + PORT + '/api/auth/google/callback');
+  const oauthClient = new OAuth2Client(googleClientId, process.env.GOOGLE_CLIENT_SECRET || '', redirectUri);
+  const url = oauthClient.generateAuthUrl({ access_type: 'online', scope: ['openid', 'email', 'profile'], prompt: 'select_account' });
+  res.redirect(url);
+});
+
+app.get('/api/auth/google/callback', async (req, res) => {
+  const redirectUri = process.env.GOOGLE_REDIRECT_URI || ('http://localhost:' + PORT + '/api/auth/google/callback');
+  const returnTo = process.env.GOOGLE_LOGIN_SUCCESS_URL || '/?login=success';
+  try {
+    if (!process.env.GOOGLE_CLIENT_SECRET) throw new Error('GOOGLE_CLIENT_SECRET no está configurado en .env.');
+    const oauthClient = new OAuth2Client(googleClientId, process.env.GOOGLE_CLIENT_SECRET, redirectUri);
+    const { tokens } = await oauthClient.getToken(req.query.code);
+    if (!tokens.id_token) throw new Error('Google no devolvió id_token.');
+    const ticket = await client.verifyIdToken({ idToken: tokens.id_token, audience: googleClientId });
+    await iniciarSesionConPayloadGoogle(ticket.getPayload(), res);
+    res.redirect(returnTo);
+  } catch (error) {
+    console.error('Error en callback de Google:', error.message);
+    res.redirect('/?login=error&msg=' + encodeURIComponent(error.message || 'Error de Google'));
+  }
+});
+
+app.get('/api/auth/session', async (req, res) => {
+  try {
+    const usuario = await obtenerUsuarioSesion(req);
+    if (!usuario) {
+      return res.status(401).json({ error: 'Sesión expirada. Inicia sesión nuevamente.' });
+    }
+    res.json({ user: serializarUsuarioSesion(usuario) });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al validar la sesión.' });
+  }
+});
+
+app.post('/api/auth/logout', async (req, res) => {
+  clearSessionCookie(res);
+  res.json({ message: 'Sesión cerrada correctamente.' });
+});
+
+app.post('/api/auth/google', async (req, res) => {
+  const { credential } = req.body;
+  if (!googleClientId || !client) return res.status(500).json({ error: 'Google Client ID no está configurado en el servidor.' });
+  if (!credential || typeof credential !== 'string') return res.status(400).json({ error: 'Token de Google faltante o inválido.' });
+  try {
+    const ticket = await client.verifyIdToken({ idToken: credential, audience: googleClientId });
+    const usuario = await iniciarSesionConPayloadGoogle(ticket.getPayload(), res);
+    res.json(usuario);
+  } catch (error) {
+    console.error('Error al consultar o registrar usuario Google en MySQL:', error);
+    res.status(error.statusCode || 500).json({ error: error.statusCode ? error.message : 'Error al consultar o registrar el usuario en MySQL.' });
   }
 });
 
@@ -739,13 +794,13 @@ app.get('/api/estaciones', async (req, res) => {
 app.get('/api/preguntas/:id_estacion', async (req, res) => {
   const idEstacion = req.params.id_estacion;
   try {
-    // Verificar si la estación está activa
+    // Verificar si la estaciÃ³n estÃ¡ activa
     const [[estacion]] = await pool.query('SELECT activa FROM estaciones WHERE id_estacion = ?', [idEstacion]);
     if (!estacion || !estacion.activa) {
-      return res.status(403).json({ error: 'La estación se encuentra inactiva.' });
+      return res.status(403).json({ error: 'La estaciÃ³n se encuentra inactiva.' });
     }
 
-    // 1. Obtener todas las preguntas de la estación
+    // 1. Obtener todas las preguntas de la estaciÃ³n
     const [preguntas] = await pool.query(
       'SELECT id_pregunta, pregunta FROM preguntas WHERE id_estacion = ? AND activa = TRUE',
       [idEstacion]
@@ -796,14 +851,14 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
   const { id_usuario, id_estacion, puntaje, aciertos, errores, aprobada } = req.body;
 
   if (!id_usuario || !id_estacion) {
-    return res.status(400).json({ error: 'Faltan parámetros obligatorios: id_usuario o id_estacion.' });
+    return res.status(400).json({ error: 'Faltan parÃ¡metros obligatorios: id_usuario o id_estacion.' });
   }
 
   let estacion = null;
   try {
     [[estacion]] = await pool.query('SELECT activa, nombre, puntos, puntaje_minimo FROM estaciones WHERE id_estacion = ?', [id_estacion]);
     if (!estacion || !estacion.activa) {
-      return res.status(403).json({ error: 'La estación se encuentra inactiva y no se puede guardar progreso.' });
+      return res.status(403).json({ error: 'La estaciÃ³n se encuentra inactiva y no se puede guardar progreso.' });
     }
   } catch (err) {
     return res.status(500).json({ error: err.message });
@@ -816,7 +871,7 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
     const validacionEstacion = evaluarAprobacionEstacion(estacion, puntaje, aprobada);
     const isPassed = validacionEstacion.aprobada;
 
-    // 1. Consultar el progreso actual del usuario para esta estación
+    // 1. Consultar el progreso actual del usuario para esta estaciÃ³n
     const [[progresoExistente]] = await connection.query(
       'SELECT * FROM progreso_usuario WHERE id_usuario = ? AND id_estacion = ?',
       [id_usuario, id_estacion]
@@ -834,7 +889,7 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
       nuevoCompletada = progresoPrevioValido || isPassed;
       nuevoAprobada = progresoPrevioValido || isPassed;
 
-      // Mantener la mejor puntuación válida ya ganada si el intento actual no mejora el progreso.
+      // Mantener la mejor puntuaciÃ³n vÃ¡lida ya ganada si el intento actual no mejora el progreso.
       if (progresoPrevioValido && (!isPassed || progresoExistente.puntaje >= nuevoPuntaje)) {
         nuevoPuntaje = progresoExistente.puntaje;
         nuevosAciertos = progresoExistente.aciertos;
@@ -859,11 +914,11 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
       [id_usuario, id_estacion, nuevoCompletada, nuevoAprobada, nuevoPuntaje, nuevosAciertos, nuevosErrores, nuevoFechaCompletado]
     );
 
-    // Registrar en auditoria_acciones que el usuario completó la estación
+    // Registrar en auditoria_acciones que el usuario completÃ³ la estaciÃ³n
     await connection.query(
       `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
        VALUES (?, 'usuario', 'COMPLETAR_ESTACION', 'progreso_usuario', ?, ?)`,
-      [id_usuario, String(id_estacion), `Usuario registró estación ${id_estacion} con puntaje ${puntaje} de ${validacionEstacion.puntaje_minimo} requeridos (aprobada: ${isPassed})`]
+      [id_usuario, String(id_estacion), `Usuario registrÃ³ estaciÃ³n ${id_estacion} con puntaje ${puntaje} de ${validacionEstacion.puntaje_minimo} requeridos (aprobada: ${isPassed})`]
     );
 
     // 3. Verificar si el usuario ha completado todas las estaciones obligatorias [1, 2, 3, 4, 5, 6]
@@ -880,12 +935,12 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
     let bloqueoFinalizacion = null;
 
     if (tieneTodoAprobado) {
-      console.log(`🎉 Usuario ${id_usuario} ha completado todo el recorrido!`);
+      console.log(`ðŸŽ‰ Usuario ${id_usuario} ha completado todo el recorrido!`);
 
       // Registrar auditoria de completar recorrido
       await connection.query(
         `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
-         VALUES (?, 'usuario', 'COMPLETAR_RECORRIDO', 'progreso_usuario', ?, 'Usuario completó la totalidad del recorrido del museo (estaciones 1, 2, 3, 4, 5, 6)')`,
+         VALUES (?, 'usuario', 'COMPLETAR_RECORRIDO', 'progreso_usuario', ?, 'Usuario completÃ³ la totalidad del recorrido del museo (estaciones 1, 2, 3, 4, 5, 6)')`,
         [id_usuario, String(id_usuario)]
       );
 
@@ -903,7 +958,7 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
       );
 
       if (!boletoExistente) {
-        // Generar Folio y QR token únicos
+        // Generar Folio y QR token Ãºnicos
         const folio = await generarFolioUnico(connection);
         const qrToken = crypto.randomBytes(16).toString('hex');
         const host = req.get('host') || 'localhost:3000';
@@ -921,14 +976,14 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
         // Registrar movimiento del boleto (Historial)
         await connection.query(
           `INSERT INTO movimientos_boleto (id_boleto, id_usuario, tipo_movimiento, observaciones)
-           VALUES (?, ?, 'generacion', 'Boleto generado automáticamente por completar la totalidad del recorrido del museo')`,
+           VALUES (?, ?, 'generacion', 'Boleto generado automÃ¡ticamente por completar la totalidad del recorrido del museo')`,
           [newBoletoId, id_usuario]
         );
 
-        // Registrar auditoría de boleto generado
+        // Registrar auditorÃ­a de boleto generado
         await connection.query(
           `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
-           VALUES (?, 'usuario', 'GENERAR_BOLETO', 'boletos', ?, 'Boleto generado automáticamente por completar recorrido')`,
+           VALUES (?, 'usuario', 'GENERAR_BOLETO', 'boletos', ?, 'Boleto generado automÃ¡ticamente por completar recorrido')`,
           [id_usuario, String(newBoletoId)]
         );
 
@@ -973,7 +1028,7 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
     });
   } catch (error) {
     await connection.rollback();
-    console.error('Error guardando progreso con transacción:', error.message);
+    console.error('Error guardando progreso con transacciÃ³n:', error.message);
     res.status(500).json({ error: error.message });
   } finally {
     connection.release();
@@ -987,14 +1042,14 @@ app.post('/api/progreso/inicializar', permitirJugador, verificarBloqueoJugador, 
   const { id_usuario, id_estacion } = req.body;
 
   if (!id_usuario || !id_estacion) {
-    return res.status(400).json({ error: 'Faltan parámetros obligatorios: id_usuario o id_estacion.' });
+    return res.status(400).json({ error: 'Faltan parÃ¡metros obligatorios: id_usuario o id_estacion.' });
   }
 
   try {
-    // Verificar si la estación está activa
+    // Verificar si la estaciÃ³n estÃ¡ activa
     const [[estacion]] = await pool.query('SELECT activa, nombre, puntos, puntaje_minimo FROM estaciones WHERE id_estacion = ?', [id_estacion]);
     if (!estacion || !estacion.activa) {
-      return res.status(403).json({ error: 'La estación se encuentra inactiva.' });
+      return res.status(403).json({ error: 'La estaciÃ³n se encuentra inactiva.' });
     }
 
     await playtime.asegurarParticipacionActiva(pool, id_usuario);
@@ -1035,7 +1090,7 @@ app.post('/api/progreso/reset', permitirJugador, verificarBloqueoExceptoReinicio
   const idUsuarioAutorizado = req.idUsuario;
 
   if (!id_usuario) {
-    return res.status(400).json({ error: 'Falta el parámetro id_usuario.' });
+    return res.status(400).json({ error: 'Falta el parÃ¡metro id_usuario.' });
   }
 
   if (String(id_usuario) !== String(idUsuarioAutorizado)) {
@@ -1083,7 +1138,7 @@ app.post('/api/progreso/reset', permitirJugador, verificarBloqueoExceptoReinicio
         String(id_usuario),
         forceReset
           ? 'Usuario reinicio todo su progreso desde el boton de prueba'
-          : 'Usuario reinició todo su progreso de estaciones y boletos'
+          : 'Usuario reiniciÃ³ todo su progreso de estaciones y boletos'
       ]
     );
 
@@ -1108,7 +1163,7 @@ app.post('/api/partidas-minijuego', permitirJugador, verificarBloqueoJugador, as
   const { id_usuario, id_estacion, puntaje, aprobado } = req.body;
 
   if (!id_usuario) {
-    return res.status(400).json({ error: 'Falta el parámetro id_usuario.' });
+    return res.status(400).json({ error: 'Falta el parÃ¡metro id_usuario.' });
   }
 
   try {
@@ -1135,7 +1190,7 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
   const { id_usuario, id_estacion, puntaje, aciertos, errores, aprobado, finalizado } = req.body;
 
   if (!id_usuario || !id_estacion) {
-    return res.status(400).json({ error: 'Faltan parámetros: id_usuario o id_estacion' });
+    return res.status(400).json({ error: 'Faltan parÃ¡metros: id_usuario o id_estacion' });
   }
 
   const connection = await pool.getConnection();
@@ -1148,7 +1203,7 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
     const [[estacion]] = await connection.query('SELECT activa, nombre, puntos, puntaje_minimo FROM estaciones WHERE id_estacion = ?', [id_estacion]);
     if (!estacion || !estacion.activa) {
       await connection.rollback();
-      return res.status(403).json({ error: 'La estación se encuentra inactiva.' });
+      return res.status(403).json({ error: 'La estaciÃ³n se encuentra inactiva.' });
     }
 
     const [[progress]] = await connection.query(
@@ -1158,19 +1213,19 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
 
     if (progress?.aprobada || progress?.completada) {
       await connection.rollback();
-      return res.status(403).json({ error: 'Ya has aprobado esta estación.' });
+      return res.status(403).json({ error: 'Ya has aprobado esta estaciÃ³n.' });
     }
 
     if (progress?.bloqueada) {
       await connection.rollback();
       return res.status(403).json({
         error: 'estacion_bloqueada',
-        mensaje: 'Esta estación está bloqueada temporalmente por límite de intentos.',
+        mensaje: 'Esta estaciÃ³n estÃ¡ bloqueada temporalmente por lÃ­mite de intentos.',
         fecha_puede_volver_jugar: progress.fecha_puede_volver_jugar
       });
     }
 
-    // Buscar si ya hay un intento activo no finalizado para este usuario y estación
+    // Buscar si ya hay un intento activo no finalizado para este usuario y estaciÃ³n
     const [[activeAttempt]] = await connection.query(
       `SELECT id_intento 
        FROM intentos_estacion 
@@ -1193,7 +1248,7 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
 
       await connection.commit();
       return res.status(200).json({
-        message: 'Intento de estación activo reutilizado.',
+        message: 'Intento de estaciÃ³n activo reutilizado.',
         id_intento: activeAttempt.id_intento,
         finalizado: false,
         aprobado: false,
@@ -1219,7 +1274,7 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
     await connection.commit();
 
     res.status(201).json({
-      message: 'Intento de estación registrado correctamente.',
+      message: 'Intento de estaciÃ³n registrado correctamente.',
       id_intento: result.insertId,
       finalizado: intentoFinalizado,
       aprobado: aprobadoValidado,
@@ -1239,14 +1294,14 @@ async function intentosLegacyDisabledNotMounted(req, res) {
   const { id_usuario, id_estacion, puntaje, aciertos, errores, aprobado, finalizado } = req.body;
 
   if (!id_usuario || !id_estacion) {
-    return res.status(400).json({ error: 'Faltan parámetros: id_usuario o id_estacion' });
+    return res.status(400).json({ error: 'Faltan parÃ¡metros: id_usuario o id_estacion' });
   }
 
   try {
-    // Verificar si la estación está activa
+    // Verificar si la estaciÃ³n estÃ¡ activa
     const [[estacion]] = await pool.query('SELECT activa, nombre, puntos, puntaje_minimo FROM estaciones WHERE id_estacion = ?', [id_estacion]);
     if (!estacion || !estacion.activa) {
-      return res.status(403).json({ error: 'La estación se encuentra inactiva.' });
+      return res.status(403).json({ error: 'La estaciÃ³n se encuentra inactiva.' });
     }
 
     const [result] = await pool.query(
@@ -1256,7 +1311,7 @@ async function intentosLegacyDisabledNotMounted(req, res) {
     );
 
     res.status(201).json({
-      message: 'Intento de estación registrado correctamente.',
+      message: 'Intento de estaciÃ³n registrado correctamente.',
       id_intento: result.insertId
     });
   } catch (error) {
@@ -1290,7 +1345,7 @@ app.put('/api/intentos/:id_intento', permitirJugador, verificarBloqueoJugador, a
 
     if (!intentoActual.activa) {
       await connection.rollback();
-      return res.status(403).json({ error: 'La estación se encuentra inactiva.' });
+      return res.status(403).json({ error: 'La estaciÃ³n se encuentra inactiva.' });
     }
 
     const validacionEstacion = evaluarAprobacionEstacion(intentoActual, puntaje, aprobado);
@@ -1315,7 +1370,7 @@ app.put('/api/intentos/:id_intento', permitirJugador, verificarBloqueoJugador, a
     await connection.commit();
 
     res.json({
-      message: 'Intento de estación actualizado correctamente.',
+      message: 'Intento de estaciÃ³n actualizado correctamente.',
       finalizado: intentoFinalizado,
       aprobado: aprobadoValidado,
       intentos_fallidos: intentos.fallos,
@@ -1343,7 +1398,7 @@ async function actualizarIntentoLegacyDisabledNotMounted(req, res) {
       [puntaje || 0, aciertos || 0, errores || 0, Boolean(aprobado), idIntento]
     );
 
-    res.json({ message: 'Intento de estación actualizado correctamente.' });
+    res.json({ message: 'Intento de estaciÃ³n actualizado correctamente.' });
   } catch (error) {
     console.error('Error al actualizar intento:', error.message);
     res.status(500).json({ error: error.message });
@@ -1357,7 +1412,7 @@ app.post('/api/respuestas-usuario', permitirJugador, verificarBloqueoJugador, as
   const { id_intento, id_usuario, id_estacion, pregunta_texto, respuesta_texto, es_correcta } = req.body;
 
   if (!id_intento || !id_usuario || !id_estacion || !pregunta_texto || !respuesta_texto) {
-    return res.status(400).json({ error: 'Faltan parámetros obligatorios en la petición.' });
+    return res.status(400).json({ error: 'Faltan parÃ¡metros obligatorios en la peticiÃ³n.' });
   }
 
   const connection = await pool.getConnection();
@@ -1426,7 +1481,7 @@ app.post('/api/respuestas-usuario', permitirJugador, verificarBloqueoJugador, as
     res.status(201).json({ message: 'Respuesta guardada correctamente.', id_pregunta, id_respuesta });
   } catch (error) {
     await connection.rollback();
-    console.error('Error guardando respuestas del usuario dinámicamente:', error.message);
+    console.error('Error guardando respuestas del usuario dinÃ¡micamente:', error.message);
     res.status(500).json({ error: error.message });
   } finally {
     connection.release();
@@ -1470,7 +1525,7 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
   try {
     await connection.beginTransaction();
 
-    // 1. Verificar si el usuario está bloqueado por el playtime block
+    // 1. Verificar si el usuario estÃ¡ bloqueado por el playtime block
     const estadoBloqueo = await playtime.getEstadoBloqueo(id_usuario);
     const puedeReclamarPremioPendiente = Boolean(
       reclamar
@@ -1479,7 +1534,7 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
       && estadoBloqueo.premio.estado === 'pendiente'
     );
     if (estadoBloqueo.bloqueado && !puedeReclamarPremioPendiente) {
-      console.warn(`Usuario ${id_usuario} intentó generar boleto estando bloqueado. Vuelve el:`, estadoBloqueo.fecha_puede_volver);
+      console.warn(`Usuario ${id_usuario} intentÃ³ generar boleto estando bloqueado. Vuelve el:`, estadoBloqueo.fecha_puede_volver);
       await connection.rollback();
       return res.status(403).json({
         error: 'usuario_bloqueado',
@@ -1504,7 +1559,7 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
     );
 
     if (boletoExistente && (boletoExistente.usado || boletoExistente.estado === 'canjeado')) {
-      console.warn(`Usuario ${id_usuario} intentó generar/modificar un boleto que ya fue usado o canjeado.`);
+      console.warn(`Usuario ${id_usuario} intentÃ³ generar/modificar un boleto que ya fue usado o canjeado.`);
       await connection.rollback();
       return res.status(403).json({
         error: 'usuario_bloqueado',
@@ -1531,7 +1586,7 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
       return res.status(403).json({
         error: 'requisitos_insuficientes',
         mensaje: tieneAlgunaFallidaOBloqueada
-          ? 'No puedes reclamar tu boleto porque tienes una estación fallida o bloqueada.'
+          ? 'No puedes reclamar tu boleto porque tienes una estaciÃ³n fallida o bloqueada.'
           : 'Debes completar y aprobar todas las estaciones antes de reclamar tu boleto.'
       });
     }
@@ -1544,7 +1599,7 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
     const seccionBoleto = destinoNormalizado ? (esBoletoPlanetario(destinoNormalizado) ? 'Planetario' : 'MUCH') : '';
     const lugarBoleto = typeof lugar === 'string' && lugar.trim()
       ? lugar.trim()
-      : (destinoNormalizado ? (esBoletoPlanetario(destinoNormalizado) ? 'Planetario Tuxtla' : 'Museo Chiapas de Ciencia y Tecnología') : '');
+      : (destinoNormalizado ? (esBoletoPlanetario(destinoNormalizado) ? 'Planetario Tuxtla' : 'Museo Chiapas de Ciencia y TecnologÃ­a') : '');
     const ticketMetadata = recibioSeleccionBoleto ? {
       tipo_entrada: tipoEntradaNormalizado,
       destino_boleto: destinoNormalizado,
@@ -1811,7 +1866,7 @@ app.get('/api/taquilla/boleto/qr/:qr_token', permitirTaquillaOAdmin, async (req,
       // Registrar escaneo como no encontrado
       await pool.query(
         `INSERT INTO escaneos_qr_boleto (qr_token, escaneado_por, resultado, observaciones)
-         VALUES (?, ?, 'no_encontrado', 'QR no coincide con ningún boleto registrado')`,
+         VALUES (?, ?, 'no_encontrado', 'QR no coincide con ningÃºn boleto registrado')`,
         [qrToken, idOperador]
       );
       return res.status(404).json({ error: 'QR de boleto no registrado.' });
@@ -1830,7 +1885,7 @@ app.get('/api/taquilla/boleto/qr/:qr_token', permitirTaquillaOAdmin, async (req,
       [boleto.id_boleto, qrToken, idOperador, resultadoEscaneo]
     );
 
-    // 3. Actualizar último escaneo
+    // 3. Actualizar Ãºltimo escaneo
     await pool.query(
       'UPDATE boletos SET ultimo_escaneo = CURRENT_TIMESTAMP WHERE id_boleto = ?',
       [boleto.id_boleto]
@@ -1839,7 +1894,7 @@ app.get('/api/taquilla/boleto/qr/:qr_token', permitirTaquillaOAdmin, async (req,
     // 4. Registrar movimiento tipo consulta_qr
     await pool.query(
       `INSERT INTO movimientos_boleto (id_boleto, id_usuario, realizado_por, tipo_movimiento, observaciones)
-       VALUES (?, ?, ?, 'consulta_qr', 'Boleto escaneado y consultado vía QR')`,
+       VALUES (?, ?, ?, 'consulta_qr', 'Boleto escaneado y consultado vÃ­a QR')`,
       [boleto.id_boleto, boleto.id_usuario, idOperador]
     );
 
@@ -1865,7 +1920,7 @@ app.post('/api/taquilla/boletos/:id_boleto/canjear', permitirTaquillaOAdmin, asy
       return res.status(404).json({ error: 'Boleto no encontrado.' });
     }
 
-    // 2. Validar que esté activo y no canjeado
+    // 2. Validar que estÃ© activo y no canjeado
     const vencido = boleto.valido_hasta && new Date(boleto.valido_hasta).getTime() < Date.now();
     if (vencido && boleto.estado === 'activo' && !boleto.usado) {
       await pool.query(
@@ -1879,13 +1934,13 @@ app.post('/api/taquilla/boletos/:id_boleto/canjear', permitirTaquillaOAdmin, asy
       );
       return res.status(400).json({
         error: 'boleto_vencido',
-        mensaje: 'El boleto está vencido y no puede validarse.'
+        mensaje: 'El boleto estÃ¡ vencido y no puede validarse.'
       });
     }
 
     if (boleto.estado !== 'activo' || boleto.usado) {
       return res.status(400).json({
-        error: `No se puede canjear el boleto. Estatus actual: ${boleto.estado}, Usado: ${boleto.usado ? 'Sí' : 'No'}`
+        error: `No se puede canjear el boleto. Estatus actual: ${boleto.estado}, Usado: ${boleto.usado ? 'SÃ­' : 'No'}`
       });
     }
 
@@ -1908,7 +1963,7 @@ app.post('/api/taquilla/boletos/:id_boleto/canjear', permitirTaquillaOAdmin, asy
     if (!canjeResult.affectedRows) {
       return res.status(409).json({
         error: 'boleto_no_disponible',
-        mensaje: 'El boleto ya no está disponible para validarse.'
+        mensaje: 'El boleto ya no estÃ¡ disponible para validarse.'
       });
     }
 
@@ -1919,7 +1974,7 @@ app.post('/api/taquilla/boletos/:id_boleto/canjear', permitirTaquillaOAdmin, asy
       [idBoleto, boleto.id_usuario, idOperador, observaciones || 'Boleto canjeado en taquilla']
     );
 
-    // 5. Registrar auditoría
+    // 5. Registrar auditorÃ­a
     await pool.query(
       `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
        VALUES (?, 'taquilla', 'CANJEAR_BOLETO', 'boletos', ?, 'Boleto canjeado por operador')`,
@@ -1968,7 +2023,7 @@ app.post('/api/taquilla/boletos/:id_boleto/cancelar', permitirTaquillaOAdmin, as
       [idBoleto, boleto.id_usuario, idOperador, observaciones || 'Boleto cancelado / dado de baja']
     );
 
-    // Registrar auditoría
+    // Registrar auditorÃ­a
     await pool.query(
       `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
        VALUES (?, 'taquilla', 'CANCELAR_BOLETO', 'boletos', ?, 'Boleto cancelado por operador')`,
@@ -2009,7 +2064,7 @@ app.post('/api/admin/boletos/:id_boleto/activar', permitirTaquillaOAdmin, async 
       [idBoleto, boleto.id_usuario, idOperador, observaciones || 'Boleto reactivado / activado']
     );
 
-    // Registrar auditoría
+    // Registrar auditorÃ­a
     await pool.query(
       `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
        VALUES (?, 'taquilla', 'REACTIVAR_BOLETO', 'boletos', ?, 'Boleto reactivado por operador')`,
@@ -2039,7 +2094,7 @@ app.delete('/api/admin/boletos/:id_boleto', permitirTaquillaOAdmin, async (req, 
     // Eliminar boleto (las relaciones cascade se encargan de movimientos y escaneos asociados)
     await pool.query('DELETE FROM boletos WHERE id_boleto = ?', [idBoleto]);
 
-    // Registrar auditoría
+    // Registrar auditorÃ­a
     await pool.query(
       `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
        VALUES (?, 'taquilla', 'ELIMINAR_BOLETO', 'boletos', ?, ?)`,
@@ -2593,7 +2648,7 @@ app.post('/api/taquilla/escaneo-qr', permitirTaquillaOAdmin, async (req, res) =>
       [idBoleto, qr_token, idOperador, resultado, observaciones]
     );
 
-    res.json({ message: 'Escaneo registrado con éxito.' });
+    res.json({ message: 'Escaneo registrado con Ã©xito.' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -2608,7 +2663,7 @@ app.post('/api/admin/usuarios/:id_usuario/roles', permitirAdmin, async (req, res
   const asignadoPor = req.headers['x-user-id'] || null;
 
   if (!Array.isArray(roles) || roles.length === 0) {
-    return res.status(400).json({ error: 'Se requiere una lista de roles válida (arreglo no vacío).' });
+    return res.status(400).json({ error: 'Se requiere una lista de roles vÃ¡lida (arreglo no vacÃ­o).' });
   }
 
   try {
@@ -2627,7 +2682,7 @@ app.post('/api/admin/usuarios/:id_usuario/roles', permitirAdmin, async (req, res
         );
       }
 
-      // Registrar en auditoría
+      // Registrar en auditorÃ­a
       await connection.query(
         `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
          VALUES (?, 'admin', 'MODIFICAR_ROLES', 'usuarios_roles', ?, ?)`,
@@ -2664,7 +2719,7 @@ app.post('/api/admin/usuarios/:id_usuario/toggle-activo', permitirAdmin, async (
 
     await pool.query('UPDATE usuarios SET activo = ? WHERE id_usuario = ?', [Boolean(activo), idUsuario]);
 
-    // Registrar en auditoría
+    // Registrar en auditorÃ­a
     const accion = activo ? 'ACTIVAR_USUARIO' : 'DESACTIVAR_USUARIO';
     const desc = `El usuario ${idUsuario} fue ${activo ? 'activado' : 'desactivado'} por administrador`;
     await pool.query(
@@ -2696,7 +2751,7 @@ app.delete('/api/admin/usuarios/:id_usuario', permitirAdmin, async (req, res) =>
     // Eliminar usuario (las relaciones cascade se encargan de eliminar dependencias en usuarios_roles, progreso_usuario, boletos etc.)
     await pool.query('DELETE FROM usuarios WHERE id_usuario = ?', [idUsuario]);
 
-    // Registrar en auditoría
+    // Registrar en auditorÃ­a
     await pool.query(
       `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
        VALUES (?, 'admin', 'ELIMINAR_USUARIO', 'usuarios', ?, ?)`,
@@ -2710,7 +2765,7 @@ app.delete('/api/admin/usuarios/:id_usuario', permitirAdmin, async (req, res) =>
 });
 
 // ==========================================
-// 19k. PUT /api/admin/estaciones/:id_estacion/toggle (Solo Admin - Activar/desactivar estación)
+// 19k. PUT /api/admin/estaciones/:id_estacion/toggle (Solo Admin - Activar/desactivar estaciÃ³n)
 // ==========================================
 app.put('/api/admin/estaciones/:id_estacion/toggle', permitirAdmin, async (req, res) => {
   const idEstacion = req.params.id_estacion;
@@ -2718,17 +2773,17 @@ app.put('/api/admin/estaciones/:id_estacion/toggle', permitirAdmin, async (req, 
   try {
     const [[estacion]] = await pool.query('SELECT activa FROM estaciones WHERE id_estacion = ?', [idEstacion]);
     if (!estacion) {
-      return res.status(404).json({ error: 'Estación no encontrada.' });
+      return res.status(404).json({ error: 'EstaciÃ³n no encontrada.' });
     }
 
     const nuevoEstado = estacion.activa ? 0 : 1;
     await pool.query('UPDATE estaciones SET activa = ? WHERE id_estacion = ?', [nuevoEstado, idEstacion]);
 
-    // Registrar en auditoría
+    // Registrar en auditorÃ­a
     await pool.query(
       `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
        VALUES (?, 'admin', 'TOGGLE_ESTACION', 'estaciones', ?, ?)`,
-      [realizadoPor, String(idEstacion), `Estación ${idEstacion} cambiada a ${nuevoEstado ? 'activa' : 'inactiva'}`]
+      [realizadoPor, String(idEstacion), `EstaciÃ³n ${idEstacion} cambiada a ${nuevoEstado ? 'activa' : 'inactiva'}`]
     );
 
     res.json({ id_estacion: idEstacion, activa: nuevoEstado });
@@ -2752,7 +2807,7 @@ app.put('/api/admin/preguntas/:id_pregunta/toggle', permitirAdmin, async (req, r
     const nuevoEstado = pregunta.activa ? 0 : 1;
     await pool.query('UPDATE preguntas SET activa = ? WHERE id_pregunta = ?', [nuevoEstado, idPregunta]);
 
-    // Registrar en auditoría
+    // Registrar en auditorÃ­a
     await pool.query(
       `INSERT INTO auditoria_acciones (id_usuario, rol_accion, accion, tabla_afectada, id_registro, descripcion)
        VALUES (?, 'admin', 'TOGGLE_PREGUNTA', 'preguntas', ?, ?)`,
@@ -2766,7 +2821,7 @@ app.put('/api/admin/preguntas/:id_pregunta/toggle', permitirAdmin, async (req, r
 });
 
 // ==========================================
-// 20. GET /api/leaderboard (Leaderboard público)
+// 20. GET /api/leaderboard (Leaderboard pÃºblico)
 // ==========================================
 app.get('/api/leaderboard', async (req, res) => {
   try {
@@ -2800,13 +2855,13 @@ app.get('/api/usuarios/:id_usuario/perfil', permitirJugador, async (req, res) =>
       return res.status(404).json({ error: 'Usuario no encontrado.' });
     }
 
-    // 2. Obtener progreso y puntuación
+    // 2. Obtener progreso y puntuaciÃ³n
     const [progreso] = await pool.query(
       'SELECT id_estacion, completada, aprobada, puntaje, aciertos, errores FROM progreso_usuario WHERE id_usuario = ?',
       [idUsuario]
     );
 
-    // Obtener estaciones activas del recorrido (excluyendo la estación 1 de bienvenida)
+    // Obtener estaciones activas del recorrido (excluyendo la estaciÃ³n 1 de bienvenida)
     const [estacionesRecorrido] = await pool.query(
       'SELECT id_estacion AS id, nombre, puntos AS puntos_base, tipo FROM estaciones WHERE activa = TRUE AND id_estacion != 1 ORDER BY orden ASC'
     );
@@ -2816,7 +2871,7 @@ app.get('/api/usuarios/:id_usuario/perfil', permitirJugador, async (req, res) =>
     let puntajeAcumuladoDB = 0;
     const progresoEstaciones = [];
 
-    // Determinar estación actual
+    // Determinar estaciÃ³n actual
     let estacionActual = 'Recorrido completado';
     let primeraFaltanteEncontrada = false;
 
@@ -2859,7 +2914,7 @@ app.get('/api/usuarios/:id_usuario/perfil', permitirJugador, async (req, res) =>
     const faltantes = totalEstaciones - totalCompletadas;
     const porcentajeAvance = Math.round((totalCompletadas / totalEstaciones) * 100);
 
-    // 3. Rango del usuario según puntaje base acumulado
+    // 3. Rango del usuario segÃºn puntaje base acumulado
     let rango = 'Novato';
     if (puntajeAcumuladoBase >= 50) rango = 'Leyenda';
     else if (puntajeAcumuladoBase >= 35) rango = 'Experto';
@@ -2971,7 +3026,7 @@ app.post('/api/verificaciones-ubicacion', async (req, res) => {
   } = req.body;
 
   if (!direccion_museo || latitud_museo === undefined || longitud_museo === undefined) {
-    return res.status(400).json({ error: 'Faltan parámetros obligatorios de la ubicación del museo.' });
+    return res.status(400).json({ error: 'Faltan parÃ¡metros obligatorios de la ubicaciÃ³n del museo.' });
   }
 
   try {
@@ -2999,11 +3054,11 @@ app.post('/api/verificaciones-ubicacion', async (req, res) => {
     );
 
     res.status(201).json({
-      message: 'Verificación de ubicación guardada correctamente.',
+      message: 'VerificaciÃ³n de ubicaciÃ³n guardada correctamente.',
       id_verificacion: result.insertId
     });
   } catch (error) {
-    console.error('Error al guardar verificación de ubicación:', error.message);
+    console.error('Error al guardar verificaciÃ³n de ubicaciÃ³n:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
@@ -3039,7 +3094,7 @@ app.get('/api/verificaciones-ubicacion/ultima', async (req, res) => {
 
     res.json(ultima || null);
   } catch (error) {
-    console.error('Error al obtener última verificación de ubicación:', error.message);
+    console.error('Error al obtener Ãºltima verificaciÃ³n de ubicaciÃ³n:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
@@ -3055,7 +3110,7 @@ app.post('/api/verificaciones-ubicacion/invalidar', async (req, res) => {
   }
 
   try {
-    let query = `UPDATE verificaciones_ubicacion SET dentro_del_museo = false, mensaje_resultado = 'Verificación invalidada por cambio de sesión/cierre de sesión' WHERE `;
+    let query = `UPDATE verificaciones_ubicacion SET dentro_del_museo = false, mensaje_resultado = 'VerificaciÃ³n invalidada por cambio de sesiÃ³n/cierre de sesiÃ³n' WHERE `;
     let params = [];
 
     if (user_id && session_id) {
@@ -3072,13 +3127,13 @@ app.post('/api/verificaciones-ubicacion/invalidar', async (req, res) => {
     await pool.query(query, params);
     res.json({ message: 'Verificaciones invalidadas correctamente.' });
   } catch (error) {
-    console.error('Error al invalidar verificaciones de ubicación:', error.message);
+    console.error('Error al invalidar verificaciones de ubicaciÃ³n:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
 
 // ==========================================
-// Bloqueo de tiempo de juego — jugador
+// Bloqueo de tiempo de juego â€” jugador
 // ==========================================
 app.get('/api/juego/estado-bloqueo', permitirJugador, async (req, res) => {
   try {
@@ -3091,7 +3146,7 @@ app.get('/api/juego/estado-bloqueo', permitirJugador, async (req, res) => {
 });
 
 // ==========================================
-// Bloqueo de tiempo de juego — administración
+// Bloqueo de tiempo de juego â€” administraciÃ³n
 // ==========================================
 app.get('/api/admin/configuracion-juego', permitirAdmin, async (req, res) => {
   try {
@@ -3164,10 +3219,13 @@ app.post('/api/admin/premios/:id_premio/entregado', permitirAdmin, async (req, r
   }
 });
 
-// Ruta por defecto para index.html o frontend si se sirve de forma estática
+// Ruta por defecto para index.html o frontend si se sirve de forma estÃ¡tica
 app.use(express.static(path.join(__dirname, '../')));
 
 // Iniciar servidor local
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Servidor de Misión MUCH corriendo en http://localhost:${PORT}`);
+  console.log(`ðŸš€ Servidor de MisiÃ³n MUCH corriendo en http://localhost:${PORT}`);
 });
+
+
+

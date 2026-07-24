@@ -1,17 +1,17 @@
-﻿// mysql-utils.js
+// mysql-utils.js
 // Utilidades de comunicacion del frontend con el Backend Express + MySQL.
 // Toda la persistencia remota pasa por la API local.
 
 const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
 
 // ==========================================
-// CONFIGURACIÓN DE GEOLOCALIZACIÓN DEL MUSEO
+// CONFIGURACIÃƒâ€œN DE GEOLOCALIZACIÃƒâ€œN DEL MUSEO
 // ==========================================
-const DIRECCION_MUSEO = "Calz. Cerro Hueco 3000, Rivera Cerro Hueco, FSTSE, 29094 Tuxtla Gutiérrez, Chiapas";
-const LATITUD_MUSEO = 16.72248; // Coloca la latitud real aquí (ej: 16.72248)
-const LONGITUD_MUSEO = -93.09100; // Coloca la longitud real aquí (ej: -93.09100)
+const DIRECCION_MUSEO = "Calz. Cerro Hueco 3000, Rivera Cerro Hueco, FSTSE, 29094 Tuxtla GutiÃƒÂ©rrez, Chiapas";
+const LATITUD_MUSEO = 16.72248; // Coloca la latitud real aquÃƒÂ­ (ej: 16.72248)
+const LONGITUD_MUSEO = -93.09100; // Coloca la longitud real aquÃƒÂ­ (ej: -93.09100)
 const RADIO_PERMITIDO_METROS = 150;
-const TIEMPO_VALIDACION_MINUTOS = 15; // 15 minutos de vigencia de verificación
+const TIEMPO_VALIDACION_MINUTOS = 15; // 15 minutos de vigencia de verificaciÃƒÂ³n
 
 function calcularDistanciaHaversine(lat1, lon1, lat2, lon2) {
   const R = 6371e3; // Radio de la Tierra en metros
@@ -44,23 +44,23 @@ async function guardarVerificacionUbicacion(datos) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(datos)
     });
-    if (!res.ok) throw new Error('Error en el servidor al guardar verificación');
+    if (!res.ok) throw new Error('Error en el servidor al guardar verificaciÃƒÂ³n');
     const data = await res.json();
     return data;
   } catch (e) {
-    console.error('Error guardando verificación de ubicación en base de datos:', e.message);
+    console.error('Error guardando verificaciÃƒÂ³n de ubicaciÃƒÂ³n en base de datos:', e.message);
     throw e;
   }
 }
 
 async function verificarUbicacionYRegistrar() {
   return new Promise((resolve) => {
-    // Verificación de ubicación desactivada temporalmente para facilitar pruebas y juego remoto.
-    // Esto evita requerir permisos GPS (que fallan en HTTP móvil) y confirmaciones.
+    // VerificaciÃƒÂ³n de ubicaciÃƒÂ³n desactivada temporalmente para facilitar pruebas y juego remoto.
+    // Esto evita requerir permisos GPS (que fallan en HTTP mÃƒÂ³vil) y confirmaciones.
     const verifLocal = {
       dentro_del_museo: true,
       timestamp: Date.now(),
-      mensaje_resultado: 'Ubicación válida (Verificación de geolocalización desactivada temporalmente).'
+      mensaje_resultado: 'UbicaciÃƒÂ³n vÃƒÂ¡lida (VerificaciÃƒÂ³n de geolocalizaciÃƒÂ³n desactivada temporalmente).'
     };
     sessionStorage.setItem('much_last_location_verification', JSON.stringify(verifLocal));
     
@@ -75,24 +75,24 @@ async function verificarUbicacionYRegistrar() {
 
 function comprobarUbicacionVigente() {
   try {
-    // Simular verificación de ubicación exitosa temporalmente para pruebas y juego remoto
+    // Simular verificaciÃƒÂ³n de ubicaciÃƒÂ³n exitosa temporalmente para pruebas y juego remoto
     const verifLocal = {
       dentro_del_museo: true,
       timestamp: Date.now(),
-      mensaje_resultado: 'Ubicación válida (Verificación de geolocalización desactivada temporalmente).'
+      mensaje_resultado: 'UbicaciÃƒÂ³n vÃƒÂ¡lida (VerificaciÃƒÂ³n de geolocalizaciÃƒÂ³n desactivada temporalmente).'
     };
     sessionStorage.setItem('much_last_location_verification', JSON.stringify(verifLocal));
-    return { ok: true, message: 'Ubicación válida (Verificación desactivada).' };
+    return { ok: true, message: 'UbicaciÃƒÂ³n vÃƒÂ¡lida (VerificaciÃƒÂ³n desactivada).' };
   } catch (e) {
-    console.error('Error al comprobar vigencia de ubicación:', e);
-    return { ok: true, message: 'Ubicación válida (Verificación desactivada).' };
+    console.error('Error al comprobar vigencia de ubicaciÃƒÂ³n:', e);
+    return { ok: true, message: 'UbicaciÃƒÂ³n vÃƒÂ¡lida (VerificaciÃƒÂ³n desactivada).' };
   }
 }
 
 function asegurarUbicacionVigente() {
   const estado = comprobarUbicacionVigente();
   if (!estado.ok) {
-    throw new Error('Acción bloqueada: ' + estado.message);
+    throw new Error('AcciÃƒÂ³n bloqueada: ' + estado.message);
   }
 }
 
@@ -186,9 +186,9 @@ function sincronizarBloqueoPorIntentos(data = {}) {
 
     if (window.MuchStationCompletion?.showFloatingNotice) {
       window.MuchStationCompletion.showFloatingNotice({
-        badge: 'Estación bloqueada',
-        title: 'Límite de intentos superado',
-        body: `Has agotado tus 3 intentos en esta estación. Estará bloqueada hasta el <b>${b.fecha_puede_volver_texto}</b>.<br><br>Puedes seguir jugando en las demás estaciones.`,
+        badge: 'EstaciÃƒÂ³n bloqueada',
+        title: 'LÃƒÂ­mite de intentos superado',
+        body: `Has agotado tus 3 intentos en esta estaciÃƒÂ³n. EstarÃƒÂ¡ bloqueada hasta el <b>${b.fecha_puede_volver_texto}</b>.<br><br>Puedes seguir jugando en las demÃƒÂ¡s estaciones.`,
         ctaLabel: 'Regresar al mapa',
         onCta: () => {
           if (typeof showView === 'function') {
@@ -197,7 +197,7 @@ function sincronizarBloqueoPorIntentos(data = {}) {
         }
       });
     } else {
-      alert(`Has superado el límite de intentos en esta estación. Estará bloqueada hasta el ${b.fecha_puede_volver_texto}.`);
+      alert(`Has superado el lÃƒÂ­mite de intentos en esta estaciÃƒÂ³n. EstarÃƒÂ¡ bloqueada hasta el ${b.fecha_puede_volver_texto}.`);
       if (typeof showView === 'function') {
         showView('viewPrep');
       }
@@ -223,14 +223,14 @@ function mostrarAvisoBloqueoJuego(estado) {
   const fecha = estado?.fecha_puede_volver_texto || '';
   const esBloqueoPorIntentos = estado?.motivo_bloqueo === 'intentos';
   const mensaje = estado?.mensaje || (esBloqueoPorIntentos
-    ? `Has agotado tus 3 intentos en esta estación. Tu acceso al juego ha sido bloqueado temporalmente. Podrás volver a jugar después de una semana.`
+    ? `Has agotado tus 3 intentos en esta estaciÃƒÂ³n. Tu acceso al juego ha sido bloqueado temporalmente. PodrÃƒÂ¡s volver a jugar despuÃƒÂ©s de una semana.`
     : fecha
-    ? `¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrás volver a jugar el ${fecha}.`
-    : 'Tu misión ya fue completada. Debes esperar para comenzar una nueva aventura.');
+    ? `Ã‚Â¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrÃƒÂ¡s volver a jugar el ${fecha}.`
+    : 'Tu misiÃƒÂ³n ya fue completada. Debes esperar para comenzar una nueva aventura.');
   if (window.MuchStationCompletion?.showFloatingNotice) {
     window.MuchStationCompletion.showFloatingNotice({
-      badge: esBloqueoPorIntentos ? 'Limite de intentos' : '⏳ Misión completada',
-      title: esBloqueoPorIntentos ? 'Juego bloqueado temporalmente' : '¡Aventura completada!',
+      badge: esBloqueoPorIntentos ? 'Limite de intentos' : 'Ã¢ÂÂ³ MisiÃƒÂ³n completada',
+      title: esBloqueoPorIntentos ? 'Juego bloqueado temporalmente' : 'Ã‚Â¡Aventura completada!',
       body: mensaje.replace(/\n/g, '<br>'),
       ctaLabel: 'Entendido'
     });
@@ -242,15 +242,15 @@ function mostrarAvisoBloqueoJuego(estado) {
 function mostrarAvisoFinalizacionJuego(finalizacion) {
   if (!finalizacion?.recorrido_completado || !finalizacion.fecha_puede_volver_texto) return;
   const fecha = finalizacion.fecha_puede_volver_texto;
-  const mensaje = `¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrás volver a jugar el ${fecha}.`;
+  const mensaje = `Ã‚Â¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrÃƒÂ¡s volver a jugar el ${fecha}.`;
   localStorage.setItem('much_playtime_block_msg', finalizacion.mensaje || mensaje);
   window.MuchLocalStorage?.completeRoute?.(finalizacion);
   invalidarCacheBloqueoJuego();
 
   if (window.MuchStationCompletion?.showFloatingNotice) {
     window.MuchStationCompletion.showFloatingNotice({
-      badge: '🏆 Aventura completada',
-      title: '¡Aventura completada!',
+      badge: 'Ã°Å¸Ââ€  Aventura completada',
+      title: 'Ã‚Â¡Aventura completada!',
       body: mensaje.replace(/\n/g, '<br>'),
       ctaLabel: 'Ver mi recompensa'
     });
@@ -309,16 +309,16 @@ async function consultarUltimaVerificacion() {
     if (sessionId) params.append('session_id', sessionId);
 
     const res = await fetch(`${API_BASE_URL}/api/verificaciones-ubicacion/ultima?${params.toString()}`);
-    if (!res.ok) throw new Error('Error al obtener la última verificación');
+    if (!res.ok) throw new Error('Error al obtener la ÃƒÂºltima verificaciÃƒÂ³n');
     return await res.json();
   } catch (e) {
-    console.error('Error al consultar última verificación:', e);
+    console.error('Error al consultar ÃƒÂºltima verificaciÃƒÂ³n:', e);
     return null;
   }
 }
 
 async function intentarRestaurarVerificacionDesdeServidor() {
-  // Deshabilitado por solicitud del usuario para forzar solicitud de GPS en cada sesión nueva
+  // Deshabilitado por solicitud del usuario para forzar solicitud de GPS en cada sesiÃƒÂ³n nueva
   return { ok: false };
 }
 
@@ -352,285 +352,153 @@ async function manejarFalloSync(res, fallbackMessage) {
   return null;
 }
 
+async function fetchJson(url, options = {}) {
+  const res = await fetch(url, {
+    credentials: 'include',
+    ...options,
+    headers: {
+      ...(options.headers || {})
+    }
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || data.message || `HTTP ${res.status}`);
+  return data;
+}
+
+function guardarUsuarioSesion(data) {
+  const source = data?.user || data;
+  if (!source?.id_usuario) return null;
+  const sessionUser = normalizarUsuarioMySQL(source);
+  localStorage.setItem('much_google_user', JSON.stringify(sessionUser));
+  return sessionUser;
+}
+
 async function obtenerSesionActual() {
-  const user = obtenerUsuarioLocal();
-  if (user) {
-    return { user };
+  try {
+    const data = await fetchJson(`${API_BASE_URL}/api/auth/session`);
+    const user = guardarUsuarioSesion(data);
+    return user ? { user } : null;
+  } catch (error) {
+    localStorage.removeItem('much_google_user');
+    return null;
   }
-  return null;
 }
 
 async function obtenerUsuarioActual() {
-  return obtenerUsuarioLocal();
+  const session = await obtenerSesionActual();
+  return session?.user || null;
 }
 
-// Iniciar sesión con Google (utiliza el login simulado/real integrado)
-async function iniciarSesionConGoogle() {
-  // Para pruebas rápidas en local sin depender de credenciales GCP obligatorias en todos los equipos,
-  // abriremos un modal de diálogo nativo interactivo elegante si el script de Google no se ha cargado,
-  // permitiendo ingresar nombre y correo, simulando una ventana de Google de forma premium.
-  // Si se prefiere usar las credenciales de Google GSI oficiales, se pueden pasar al backend.
-  
+function cargarGoogleIdentityServices() {
+  if (window.google?.accounts?.id) return Promise.resolve();
   return new Promise((resolve, reject) => {
-    // Buscar si ya existe un modal de login
-    let loginModal = document.getElementById('much-google-sim-modal');
-    if (!loginModal) {
-      loginModal = document.createElement('div');
-      loginModal.id = 'much-google-sim-modal';
-      loginModal.style.cssText = `
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(10, 15, 30, 0.9);
-        display: flex; align-items: center; justify-content: center;
-        z-index: 999999; font-family: 'Outfit', 'Inter', sans-serif;
-      `;
-      loginModal.innerHTML = `
-        <div style="
-          background: linear-gradient(135deg, #18224b 0%, #0d122b 100%);
-          border: 2px solid #3c54b4;
-          border-radius: 20px;
-          padding: 30px;
-          width: 90%;
-          max-width: 420px;
-          box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 0 20px rgba(60,84,180,0.2);
-          text-align: center;
-          color: white;
-          position: relative;
-        ">
-          <div style="font-size: 40px; margin-bottom: 10px;">🛡️</div>
-          <h2 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 700; background: linear-gradient(90deg, #ffc000, #ff8000); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Google Login</h2>
-          <p style="margin: 0 0 20px 0; font-size: 14px; color: #a0aec0;">Simulador de Acceso Seguro para desarrollo local</p>
-          
-          <div style="text-align: left; margin-bottom: 15px;">
-            <label style="display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: #718096; margin-bottom: 5px;">Nombre Completo</label>
-            <input type="text" id="sim-google-name" placeholder="Tu nombre completo" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d3748; background: #0c1024; color: white; outline: none; box-sizing: border-box;">
-          </div>
-          
-          <div style="text-align: left; margin-bottom: 20px;">
-            <label style="display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: #718096; margin-bottom: 5px;">Correo de Google</label>
-            <input type="email" id="sim-google-email" placeholder="ejemplo@gmail.com" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d3748; background: #0c1024; color: white; outline: none; box-sizing: border-box;">
-          </div>
-          
-          <button id="sim-google-btn-submit" style="
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            background: linear-gradient(90deg, #3c54b4, #5c74d4);
-            color: white;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(60,84,180,0.4);
-          ">Iniciar sesión con Google</button>
-          
-          <button id="sim-google-btn-cancel" style="
-            margin-top: 12px;
-            background: transparent;
-            border: none;
-            color: #718096;
-            cursor: pointer;
-            font-size: 13px;
-          ">Cancelar</button>
-        </div>
-      `;
-      document.body.appendChild(loginModal);
+    const existing = document.querySelector('script[data-google-identity-services]');
+    if (existing) {
+      existing.addEventListener('load', () => resolve(), { once: true });
+      existing.addEventListener('error', () => reject(new Error('Error de conexion con Google.')), { once: true });
+      return;
     }
-
-    loginModal.style.display = 'flex';
-
-    document.getElementById('sim-google-btn-submit').onclick = async () => {
-      const nombre = document.getElementById('sim-google-name').value.trim();
-      const correo = document.getElementById('sim-google-email').value.trim();
-
-      if (!nombre || !correo) {
-        alert('Por favor ingresa tu nombre y correo.');
-        return;
-      }
-
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/auth/google`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            userData: {
-              name: nombre,
-              email: correo,
-              google_id: `gsim_${correo.replace(/[^a-zA-Z0-9]/g, '')}`,
-              picture: 'avatars/dino1.png'
-            }
-          })
-        });
-
-        if (!res.ok) {
-          throw new Error('Error al conectar con el backend de autenticación.');
-        }
-
-        const data = await res.json();
-        console.log('[Auth] Login exitoso:', data);
-
-        // Invalidar ubicación previa del usuario e invitado para exigir verificación fresca
-        const sessionId = localStorage.getItem('much_session_id');
-        const userId = data.id_usuario;
-        sessionStorage.removeItem('much_last_location_verification');
-
-        if (userId || sessionId) {
-          try {
-            await fetch(`${API_BASE_URL}/api/verificaciones-ubicacion/invalidar`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ user_id: userId, session_id: sessionId })
-            });
-          } catch (e) {
-            console.error('Error al invalidar ubicación al iniciar sesión:', e);
-          }
-        }
-
-        // Guardar sesión en localStorage
-        const sessionUser = {
-          id: data.id_usuario,
-          id_usuario: data.id_usuario,
-          name: data.nombre,
-          email: data.correo,
-          picture: data.avatar_url,
-          avatar_url: data.avatar_url,
-          roles: data.roles || ['usuario'],
-          acepto_privacidad: Boolean(data.acepto_privacidad),
-          privacidad_aceptada_en: data.privacidad_aceptada_en || null
-        };
-        localStorage.setItem('much_google_user', JSON.stringify(sessionUser));
-
-        loginModal.style.display = 'none';
-
-        if (window.MuchRoleAccess) {
-          const access = window.MuchRoleAccess.getAccessInfo(sessionUser);
-          if (access.isInternal) {
-            const didRedirect = window.MuchRoleAccess.redirectToRoleHome({
-              user: sessionUser,
-              basePath: './'
-            });
-            if (didRedirect) {
-              resolve(data);
-              return;
-            }
-          }
-        } else {
-          const roles = Array.isArray(sessionUser.roles)
-            ? sessionUser.roles.map(r => String(r).toLowerCase())
-            : [];
-          if (roles.includes('admin') || roles.includes('administrador')) {
-            window.location.href = 'ADMINISTRADOR.html';
-            resolve(data);
-            return;
-          }
-          if (roles.includes('taquilla') || roles.includes('taquillero')) {
-            window.location.href = 'ADMINISTRADOR.html?section=taquilla';
-            resolve(data);
-            return;
-          }
-        }
-        
-        // Disparar evento para actualizar vistas
-        window.dispatchEvent(new Event('storage'));
-        
-        // Recargar página para aplicar sesión limpia en index.html
-        window.location.reload();
-        resolve(data);
-      } catch (error) {
-        alert(`No se pudo establecer conexión con el backend Express. Asegúrate de que esté corriendo en ${API_BASE_URL}`);
-        console.error(error);
-        reject(error);
-      }
-    };
-
-    document.getElementById('sim-google-btn-cancel').onclick = () => {
-      loginModal.style.display = 'none';
-      reject(new Error('Login cancelado por el usuario.'));
-    };
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.dataset.googleIdentityServices = 'true';
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('Error de conexion con Google.'));
+    document.head.appendChild(script);
   });
 }
 
+async function obtenerGoogleClientId() {
+  const data = await fetchJson(`${API_BASE_URL}/api/auth/config`);
+  if (!data.googleClientId) throw new Error('Google Client ID no esta configurado en el backend.');
+  return data.googleClientId;
+}
+
+async function autenticarCredentialGoogle(credential) {
+  const data = await fetchJson(`${API_BASE_URL}/api/auth/google`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ credential })
+  });
+  const user = guardarUsuarioSesion(data);
+  const sessionId = localStorage.getItem('much_session_id');
+  sessionStorage.removeItem('much_last_location_verification');
+  if (user?.id_usuario || sessionId) {
+    try {
+      await fetch(`${API_BASE_URL}/api/verificaciones-ubicacion/invalidar`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user?.id_usuario, session_id: sessionId })
+      });
+    } catch (error) {
+      console.info('No se pudo invalidar ubicacion previa:', error.message);
+    }
+  }
+  return user;
+}
+
+async function iniciarSesionConGoogle() {
+  const loginNote = document.getElementById('loginNote');
+  if (loginNote) loginNote.innerText = 'Abriendo Google...';
+  window.location.href = `${API_BASE_URL}/api/auth/google/start`;
+  return null;
+}
 async function cerrarSesion(options = {}) {
-  console.log('🚪 Cerrando sesión y limpiando datos del usuario...');
-  
-  // Obtener IDs antes de borrar storage
   const user = obtenerUsuarioLocal();
   const userId = user ? (user.id_usuario || user.id) : null;
   const sessionId = localStorage.getItem('much_session_id');
-
+  try {
+    await fetch(`${API_BASE_URL}/api/auth/logout`, { method: 'POST', credentials: 'include' });
+  } catch (error) {
+    console.info('No se pudo cerrar sesion en backend:', error.message);
+  }
   if (userId || sessionId) {
     try {
       await fetch(`${API_BASE_URL}/api/verificaciones-ubicacion/invalidar`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId, session_id: sessionId })
       });
     } catch (e) {
-      console.error('Error al invalidar ubicación en el servidor:', e);
+      console.error('Error al invalidar ubicacion en el servidor:', e);
     }
   }
-
   const lugarSeguro = localStorage.getItem('much_lugar_seguro');
-
-  // Limpiar completamente localStorage y sessionStorage para eliminar todo rastro del progreso anterior
   localStorage.clear();
   sessionStorage.clear();
-
-  // Conservar la ubicación QR para conveniencia del usuario en el museo
-  if (lugarSeguro) {
-    localStorage.setItem('much_lugar_seguro', lugarSeguro);
-  }
-  
-  // Recargar o redirigir de inmediato para reiniciar estado
-  if (options.preserveAdminNav) {
-    sessionStorage.setItem('much_internal_navigation', 'true');
-  }
-
-  if (options.redirectTo) {
-    window.location.replace(options.redirectTo);
-  } else if (options.reload !== false) {
-    window.location.reload();
-  }
+  if (lugarSeguro) localStorage.setItem('much_lugar_seguro', lugarSeguro);
+  if (options.preserveAdminNav) sessionStorage.setItem('much_internal_navigation', 'true');
+  if (window.google?.accounts?.id) window.google.accounts.id.disableAutoSelect();
+  if (options.redirectTo) window.location.replace(options.redirectTo);
+  else if (options.reload !== false) window.location.reload();
   return true;
 }
 
 function normalizarUsuarioMySQL(user) {
-  return user;
+  if (!user) return null;
+  return {
+    id: user.id_usuario || user.id,
+    id_usuario: user.id_usuario || user.id,
+    name: user.nombre || user.name || user.correo || user.email,
+    nombre: user.nombre || user.name || '',
+    email: user.correo || user.email || '',
+    correo: user.correo || user.email || '',
+    google_id: user.google_id || '',
+    picture: user.avatar_url || user.picture || '',
+    avatar_url: user.avatar_url || user.picture || '',
+    roles: Array.isArray(user.roles) && user.roles.length ? user.roles : ['usuario'],
+    activo: user.activo !== false,
+    acepto_privacidad: Boolean(user.acepto_privacidad),
+    privacidad_aceptada_en: user.privacidad_aceptada_en || null
+  };
 }
 
 async function verificarUsuarioEnTabla() {
-  const user = obtenerUsuarioLocal();
-  const userId = obtenerIdUsuarioLocal(user);
-  if (!user || !userId) return user;
-
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/usuarios/${userId}/roles`);
-    if (!res.ok) {
-      console.info('[Auth] No se pudo verificar el usuario local en backend.');
-      return user;
-    }
-
-    const data = await res.json();
-    if (data.exists === false) {
-      console.info('[Auth] Sesión local descartada porque el usuario no existe en backend.');
-      localStorage.removeItem('much_google_user');
-      sessionStorage.removeItem('much_current_attempt_id');
-      return null;
-    }
-
-    const verifiedUser = {
-      ...user,
-      roles: Array.isArray(data.roles) && data.roles.length ? data.roles : (user.roles || ['usuario'])
-    };
-    localStorage.setItem('much_google_user', JSON.stringify(verifiedUser));
-    return verifiedUser;
-  } catch (error) {
-    console.info('[Auth] No se pudo verificar el usuario local en backend.', error.message);
-    return user;
-  }
+  const user = await obtenerUsuarioActual();
+  return user || null;
 }
 
 function usuarioTieneConsentimientoLocal(user = obtenerUsuarioLocal()) {
@@ -711,7 +579,7 @@ function crearModalConsentimientoPrivacidad() {
         <p style="margin: 0; color: #f6c453; font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;">Acceso requerido</p>
         <h2 id="muchPrivacyTitle" style="margin: 0; font-size: clamp(24px, 5vw, 34px); line-height: 1.08;">Aviso de privacidad</h2>
         <p style="margin: 0; color: #c7d2fe; font-size: 15px; line-height: 1.5;">
-          Para continuar con Misión MUCH necesitamos tu aceptación del uso de datos de la cuenta para guardar progreso, premios y actividad de juego.
+          Para continuar con MisiÃƒÂ³n MUCH necesitamos tu aceptaciÃƒÂ³n del uso de datos de la cuenta para guardar progreso, premios y actividad de juego.
         </p>
       </div>
 
@@ -808,7 +676,7 @@ function mostrarModalConsentimientoPrivacidad() {
       } catch (error) {
         if (error instanceof TypeError && String(error.message || '').toLowerCase().includes('fetch')) {
           aceptarConsentimientoPrivacidadLocalPendiente();
-          console.warn('[Privacidad] Backend no disponible; consentimiento guardado localmente para sincronizar después.');
+          console.warn('[Privacidad] Backend no disponible; consentimiento guardado localmente para sincronizar despuÃƒÂ©s.');
           modal.style.display = 'none';
           resolve({ acepto_privacidad: true, privacidad_aceptada_en: new Date().toISOString(), pendiente_sync: true });
           return;
@@ -855,7 +723,7 @@ async function consultarEstaciones() {
   }
 }
 
-// Comprobar si una estación específica está activa
+// Comprobar si una estaciÃƒÂ³n especÃƒÂ­fica estÃƒÂ¡ activa
 async function comprobarEstacionActiva(estacionId) {
   try {
     const estaciones = await consultarEstaciones();
@@ -867,7 +735,7 @@ async function comprobarEstacionActiva(estacionId) {
   }
 }
 
-// Guardar progreso del usuario en una estación
+// Guardar progreso del usuario en una estaciÃƒÂ³n
 async function guardarProgresoUsuario(estacionId, extra = {}) {
   asegurarUbicacionVigente();
   await asegurarJuegoPermitido();
@@ -923,7 +791,7 @@ async function guardarProgresoUsuario(estacionId, extra = {}) {
   }
 }
 
-// Inicializar progreso del usuario al entrar a una estación
+// Inicializar progreso del usuario al entrar a una estaciÃƒÂ³n
 async function inicializarProgresoUsuario(estacionId) {
   asegurarUbicacionVigente();
   await asegurarJuegoPermitido();
@@ -931,7 +799,7 @@ async function inicializarProgresoUsuario(estacionId) {
   const userId = obtenerIdUsuarioLocal(user);
   if (!userId) return null;
 
-  // Limpiar el estado de completado en el almacenamiento local al iniciar la estación
+  // Limpiar el estado de completado en el almacenamiento local al iniciar la estaciÃƒÂ³n
   try {
     // No borrar estaciones ya completadas al entrar. Los intentos fallidos se guardan aparte.
   } catch (e) {
@@ -1001,7 +869,7 @@ async function reiniciarProgresoUsuario(options = {}) {
   }
 }
 
-// Guardar intento en una estación
+// Guardar intento en una estaciÃƒÂ³n
 async function guardarIntentoEstacion(estacionId, intento = {}) {
   asegurarUbicacionVigente();
   await asegurarJuegoPermitido();
@@ -1050,7 +918,7 @@ async function guardarIntentoEstacion(estacionId, intento = {}) {
   }
 }
 
-// Actualizar intento de estación existente
+// Actualizar intento de estaciÃƒÂ³n existente
 async function actualizarIntentoEstacion(idIntento, intento = {}) {
   asegurarUbicacionVigente();
   await asegurarJuegoPermitido();
@@ -1120,7 +988,7 @@ async function guardarPartidaMinijuego(partida = {}) {
       },
       body: JSON.stringify({
         id_usuario: userId,
-        id_estacion: 2, // Spinosaurio es la estación 2
+        id_estacion: 2, // Spinosaurio es la estaciÃƒÂ³n 2
         puntaje: Number(partida.puntaje || 0),
         aprobado: Boolean(partida.aprobado)
       })
@@ -1214,18 +1082,18 @@ async function generarBoletoFinal(reclamar = false) {
   }
 }
 
-// Métodos legacy para retrocompatibilidad
+// MÃƒÂ©todos legacy para retrocompatibilidad
 async function iniciarJuego(nombreJugador) {
   console.log('Iniciar juego:', nombreJugador);
 }
 async function cargarPreguntas(codigoEstacion) {
-  console.log('Cargar preguntas de estación:', codigoEstacion);
+  console.log('Cargar preguntas de estaciÃƒÂ³n:', codigoEstacion);
 }
 async function responderPregunta(preguntaId, opcionId) {
   console.log('Responder pregunta:', preguntaId, opcionId);
 }
 
-// Inyección en el objeto global window
+// InyecciÃƒÂ³n en el objeto global window
 window.initMySQLApi = initMySQLApi;
 window.obtenerSesionActual = obtenerSesionActual;
 window.obtenerUsuarioActual = obtenerUsuarioActual;
@@ -1330,5 +1198,7 @@ export {
   intentarRestaurarVerificacionDesdeServidor,
   comprobarEstacionActiva
 };
+
+
 
 
