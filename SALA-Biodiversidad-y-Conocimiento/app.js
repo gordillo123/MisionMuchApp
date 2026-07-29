@@ -1018,11 +1018,6 @@ class UIManager {
         this.sound.victory();
         this.playCompletionSound();
         try { playBgMusic(); } catch (e) {}
-        // Avanzar avatar en el mapa
-        localStorage.setItem('much_current_station', '4');
-        let completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
-        completed['3'] = true;
-        localStorage.setItem('much_completed_stations', JSON.stringify(completed));
       } else {
         window.MuchLocalStorage?.recordStationAttempt?.('3', {
           aprobada: false,

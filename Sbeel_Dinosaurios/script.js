@@ -471,15 +471,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function markStationCompleted() {
-        try {
-            const completed = JSON.parse(localStorage.getItem(COMPLETED_STATIONS_KEY) || '{}');
-            completed[STATION_ID] = true;
-            localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
-        } catch (e) {
-            console.warn('No se pudo marcar la estación como completa:', e);
-        }
-    }
 
     async function guardarSbeelEnMySQL() {
         try {
@@ -511,7 +502,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (timeRemaining > 0) {
             solvedOnTime = true;
-            markStationCompleted();
             playCompletionSound();
             await guardarSbeelEnMySQL();
             if (successHeading) successHeading.style.display = 'none';

@@ -814,7 +814,6 @@ class UIManager {
           window.MuchStationCompletion?.renderInline(e.finalMsg, {
             stationId: '1',
             nextStationId: '2',
-            badge: 'Estación completada',
             onReturnToMap: () => {
               this.goBackToMap();
             }
@@ -829,11 +828,6 @@ class UIManager {
           try { playBgMusic(); } catch (e) {}
           this.confetti.launch(120);
 
-          // Avanzar progreso y marcar estación 1 completada en local storage
-          localStorage.setItem('much_current_station', '2');
-          let completed = JSON.parse(localStorage.getItem('much_completed_stations') || '{}');
-          completed['1'] = true;
-          localStorage.setItem('much_completed_stations', JSON.stringify(completed));
 
           // Guardar progreso en el backend
           (async () => {
@@ -842,7 +836,7 @@ class UIManager {
               await progreso.guardarProgresoUsuario(1, {
                 puntaje: puntajeFinal,
                 aciertos: s.correct,
-                errores: 0,
+                errores: Math.max(0, QUESTIONS.length - (s.correct || 0)),
                 aprobada: true
               });
               console.log("✅ Progreso de Estación 1 guardado exitosamente en MySQL.");
@@ -857,7 +851,7 @@ class UIManager {
           aprobada: false,
           puntaje: 0,
           aciertos: s.correct || 0,
-          errores: 1
+          errores: Math.max(0, QUESTIONS.length - (s.correct || 0))
         }, { countAttempt: true });
 
         e.finalTitle.classList.remove('visually-hidden');

@@ -179,15 +179,6 @@ function playIncorrectSound() {
   }
 }
 
-function markStationCompleted() {
-  try {
-    const completed = JSON.parse(localStorage.getItem(COMPLETED_STATIONS_KEY) || '{}');
-    completed[STATION_ID] = true;
-    localStorage.setItem(COMPLETED_STATIONS_KEY, JSON.stringify(completed));
-  } catch (e) {
-    console.warn('No se pudo marcar estación completa:', e);
-  }
-}
 
 function isStationCompleted(stationId) {
   try {
@@ -1087,12 +1078,9 @@ async function validarQuiz() {
     playCompletionSound();
 
     // Marcar completado y avanzar avatar, guardando solo una vez por estación
-    var alreadyCompleted = isStationCompleted(STATION_ID);
-    if (!alreadyCompleted) {
-      markStationCompleted();
+    if (!isStationCompleted(STATION_ID)) {
       await guardarSpinosaurioEnMySQL(Number(score), true);
     }
-    localStorage.setItem('much_current_station', '3');
     navigatingToRegistro = true;
 
     // Retrasar el cierre 1.8 segundos para que se aprecien los triggers sonoros/visuales
