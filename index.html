@@ -19,6 +19,7 @@
     window.MuchRoleAccess?.redirectIfInternalUserOnPlayerPage({ basePath: './' });
   </script>
   <link rel="stylesheet" href="assets/station-completion.css" />
+  <link rel="stylesheet" href="assets/instruction-carousel.css" />
   <style>
     /* ────────────────────────────────────────────────
        MISIÓN MUCH — STYLES (TODO EN UNO)
@@ -13896,13 +13897,8 @@
       overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('open'); };
 
       const rulesOverlay = document.getElementById('rulesOverlay');
-      const btnCerrarReglas = document.getElementById('btnCerrarReglas');
-      const rulesTitle = rulesOverlay ? rulesOverlay.querySelector('.modal-title') : null;
-      const rulesSubtitle = rulesOverlay ? rulesOverlay.querySelector('.modal-header p') : null;
-      const rulesBoard = rulesOverlay ? rulesOverlay.querySelector('.rules-board') : null;
       const prepRulesList = document.getElementById('prepRulesList');
       const prepRulesTitle = document.querySelector('.rules-col .section-title');
-      const defaultRulesBoardMarkup = rulesBoard ? rulesBoard.innerHTML : '';
       const defaultPrepRulesMarkup = prepRulesList ? prepRulesList.innerHTML : '';
       const TICKET_STATION_ID = '1';
       const SPINO_STATION_ID = '2';
@@ -13911,6 +13907,40 @@
       const SUSTAINABLE_STATION_ID = '5';
       const SBEEL_STATION_ID = '6';
       let pendingStartAfterRules = false;
+      let activeCarouselInstance = null;
+
+      const generalRules = [
+        {
+          icon: '&#128247;',
+          title: 'Escanea y comienza tu aventura',
+          copy: 'Inicia el recorrido desde cualquier estaci&oacute;n escaneando su <strong>c&oacute;digo QR</strong>.'
+        },
+        {
+          icon: '&#128506;',
+          title: 'Explora a tu ritmo',
+          copy: 'No necesitas seguir un orden. Avanza <strong>libremente</strong> por el museo y descubre cada estaci&oacute;n.'
+        },
+        {
+          icon: '&#129504;',
+          title: 'Completa los retos',
+          copy: 'En cada estaci&oacute;n deber&aacute;s responder <strong>10 preguntas</strong> y acertar m&iacute;nimo <strong>7</strong> para superarla.'
+        },
+        {
+          icon: '&#11088;',
+          title: 'Suma puntos en tu misi&oacute;n',
+          copy: '<strong>Puntaje m&aacute;ximo:</strong> 65 puntos.<br><strong>Puntaje m&iacute;nimo para ganar:</strong> 53 puntos.'
+        },
+        {
+          icon: '&#127942;',
+          title: 'Gana tu recompensa final',
+          copy: 'Completa tu misi&oacute;n cient&iacute;fica con el puntaje m&iacute;nimo y termina el recorrido para desbloquear tu premio.'
+        },
+        {
+          icon: '&#127903;',
+          title: 'Celebra tu gran logro',
+          copy: 'Al finalizar, recibe un <strong>boleto gratis</strong> para <strong>MUCH</strong> o <strong>Planetario</strong> y sigue disfrutando la aventura.'
+        }
+      ];
 
       const station1TicketRules = [
         {
@@ -13926,26 +13956,14 @@
           copy: 'Encuentra los pares de cartas relacionadas con el Museo Chiapas de Ciencia y Tecnolog&iacute;a.'
         },
         {
-          icon: '&#128064;',
-          step: '03',
-          title: 'Toca para descubrir',
-          copy: 'Voltea las cartas una a una y recuerda d&oacute;nde est&aacute; cada imagen del museo.'
-        },
-        {
-          icon: '&#128260;',
-          step: '04',
-          title: 'Busca las parejas',
-          copy: 'Si dos cartas coinciden, se quedan descubiertas. Completa todos los pares para ganar la estaci&oacute;n.'
-        },
-        {
           icon: '&#9201;',
-          step: '05',
+          step: '03',
           title: 'Cuida el tiempo',
           copy: 'Tienes <strong>1 minuto</strong> para encontrar todos los pares.'
         },
         {
           icon: '&#128640;',
-          step: '06',
+          step: '04',
           title: '&iexcl;Completa la Estaci&oacute;n 1!',
           copy: 'Si completas el memorama antes de que termine el minuto, ganas <strong>10 puntos</strong> y podr&aacute;s continuar tu misi&oacute;n.'
         }
@@ -13953,38 +13971,26 @@
 
       const station2SpinoRules = [
         {
-          icon: '&#129430;',
-          step: '01',
-          title: '&iexcl;Conoce al Espinosaurio!',
-          copy: 'Antes de comenzar, observa con atenci&oacute;n a este gran dinosaurio y prep&aacute;rate para ayudarlo en su aventura.'
-        },
-        {
           icon: '&#127775;',
-          step: '02',
+          step: '01',
           title: '&iexcl;Prep&aacute;rate, peque&ntilde;o explorador!',
           copy: 'Ayuda al Espinosaurio a comenzar su gran reto.'
         },
         {
           icon: '&#11014;',
-          step: '03',
+          step: '02',
           title: '&iexcl;Salta, salta, salta!',
           copy: 'Haz que el dinosaurio brinque hasta completar <strong>15 saltos</strong>.'
         },
         {
-          icon: '&#9888;',
-          step: '04',
-          title: '&iexcl;Cuidado con el camino!',
-          copy: 'Mantente atento y no dejes que el Espinosaurio pierda el ritmo.'
-        },
-        {
           icon: '&#10067;',
-          step: '05',
+          step: '03',
           title: '&iexcl;Responde la pregunta secreta!',
           copy: 'Despu&eacute;s de los <strong>15 saltos</strong>, contesta una pregunta especial.'
         },
         {
           icon: '&#127942;',
-          step: '06',
+          step: '04',
           title: '&iexcl;Gana tus puntos de campe&oacute;n!',
           copy: 'Si respondes bien, ganas los <strong>15 puntos</strong> del reto del Espinosaurio.'
         }
@@ -13992,38 +13998,20 @@
 
       const station6SbeelRules = [
         {
-          icon: '&#129513;',
-          step: '01',
-          title: '&iexcl;Conoce el reto de SBEEL!',
-          copy: 'Antes de comenzar, observa el rompecabezas y prep&aacute;rate para armarlo con mucha atenci&oacute;n.'
-        },
-        {
           icon: '&#127775;',
-          step: '02',
+          step: '01',
           title: '&iexcl;Bienvenido al reto de SBEEL!',
           copy: 'Prep&aacute;rate para vivir una aventura divertida mientras completas el rompecabezas.'
         },
         {
-          icon: '&#129513;',
-          step: '03',
-          title: '&iexcl;Encuentra cada pieza!',
-          copy: 'Observa bien las formas y coloca cada pieza en su lugar correcto.'
-        },
-        {
           icon: '&#9201;',
-          step: '04',
+          step: '02',
           title: '&iexcl;El tiempo corre!',
           copy: 'Tienes <strong>2 minutos</strong> para completar todo el rompecabezas.'
         },
         {
-          icon: '&#128170;',
-          step: '05',
-          title: '&iexcl;No te rindas, explorador!',
-          copy: 'Si una pieza no queda bien, int&eacute;ntalo de nuevo hasta encontrar su lugar.'
-        },
-        {
           icon: '&#127942;',
-          step: '06',
+          step: '03',
           title: '&iexcl;Completa el reto y gana!',
           copy: 'Si armas el rompecabezas antes de que termine el tiempo, completas la estaci&oacute;n de SBEEL y ganas tus puntos del reto.'
         }
@@ -14037,32 +14025,14 @@
           copy: 'En esta sala descubrir&aacute;s animales, plantas, ecosistemas y por qu&eacute; cuidar la biodiversidad es tan importante.'
         },
         {
-          icon: '&#128064;',
-          step: '02',
-          title: 'Observa y aprende',
-          copy: 'Lee con atenci&oacute;n la informaci&oacute;n para encontrar pistas y datos clave sobre la naturaleza.'
-        },
-        {
-          icon: '&#129504;',
-          step: '03',
-          title: 'Responde el reto',
-          copy: 'Tendr&aacute;s <strong>10 preguntas</strong> sobre la Sala A de Biodiversidad.'
-        },
-        {
           icon: '&#9989;',
-          step: '04',
+          step: '02',
           title: 'Completa la estaci&oacute;n',
           copy: 'Necesitas acertar al menos <strong>7 de 10</strong> preguntas para completar la estaci&oacute;n.'
         },
         {
-          icon: '&#128257;',
-          step: '05',
-          title: 'Vuelve a intentarlo si lo necesitas',
-          copy: 'Si a&uacute;n no logras los <strong>7 aciertos</strong>, puedes repetir la estaci&oacute;n y seguir aprendiendo.'
-        },
-        {
           icon: '&#127793;',
-          step: '06',
+          step: '03',
           title: 'Gana tus puntos verdes',
           copy: 'Si completas el reto, ganas <strong>10 puntos verdes</strong> y avanzas en tu misi&oacute;n cient&iacute;fica.'
         }
@@ -14076,32 +14046,14 @@
           copy: 'En esta estaci&oacute;n conocer&aacute;s diferentes formas de energ&iacute;a, c&oacute;mo se producen y por qu&eacute; son importantes en la vida diaria.'
         },
         {
-          icon: '&#128161;',
-          step: '02',
-          title: 'Observa y aprende',
-          copy: 'Lee con atenci&oacute;n la informaci&oacute;n de la sala para descubrir datos importantes sobre la energ&iacute;a y su uso.'
-        },
-        {
           icon: '&#129504;',
-          step: '03',
+          step: '02',
           title: 'Responde el reto',
           copy: 'Tendr&aacute;s <strong>10 preguntas</strong> sobre el &Aacute;rea de Energ&iacute;a.'
         },
         {
-          icon: '&#9989;',
-          step: '04',
-          title: 'Completa la estaci&oacute;n',
-          copy: 'Para superar el reto, necesitas responder correctamente m&iacute;nimo <strong>7 de 10</strong> preguntas.'
-        },
-        {
-          icon: '&#128257;',
-          step: '05',
-          title: 'Vuelve a intentarlo si lo necesitas',
-          copy: 'Si no alcanzas los <strong>7 aciertos</strong>, podr&aacute;s repetir la estaci&oacute;n y seguir aprendiendo.'
-        },
-        {
           icon: '&#128267;',
-          step: '06',
+          step: '03',
           title: 'Gana tus puntos de energ&iacute;a',
           copy: 'Si completas el reto, ganas <strong>10 puntos</strong> y avanzas en tu misi&oacute;n cient&iacute;fica.'
         }
@@ -14115,32 +14067,14 @@
           copy: 'En esta estaci&oacute;n aprender&aacute;s c&oacute;mo cuidar el planeta y usar los recursos de manera responsable.'
         },
         {
-          icon: '&#9851;',
-          step: '02',
-          title: 'Observa y aprende',
-          copy: 'Lee con atenci&oacute;n la informaci&oacute;n de la sala para descubrir acciones que ayudan al medio ambiente.'
-        },
-        {
           icon: '&#129504;',
-          step: '03',
+          step: '02',
           title: 'Responde el reto',
           copy: 'Tendr&aacute;s <strong>10 preguntas</strong> sobre el &Aacute;rea de Desarrollo Sustentable.'
         },
         {
-          icon: '&#9989;',
-          step: '04',
-          title: 'Completa la estaci&oacute;n',
-          copy: 'Para superar el reto, necesitas responder correctamente m&iacute;nimo <strong>7 de 10</strong> preguntas.'
-        },
-        {
-          icon: '&#128257;',
-          step: '05',
-          title: 'Vuelve a intentarlo si lo necesitas',
-          copy: 'Si no alcanzas los <strong>7 aciertos</strong>, podr&aacute;s repetir la estaci&oacute;n y seguir aprendiendo.'
-        },
-        {
           icon: '&#127793;',
-          step: '06',
+          step: '03',
           title: 'Gana tus puntos sustentables',
           copy: 'Si completas el reto, ganas <strong>10 puntos</strong> y avanzas en tu misi&oacute;n cient&iacute;fica.'
         }
@@ -14419,147 +14353,71 @@
         }
       }
 
-      function syncRulesOverlayForStation(isStartingGame) {
-        if (!rulesOverlay || !rulesBoard) return;
-        const stationConfig = isStartingGame ? getStationRulesConfig(currentStation) : null;
-
-        resetOverlayRulesClasses();
-
-        if (stationConfig) {
-          rulesOverlay.classList.add(stationConfig.overlayModeClass);
-          if (stationConfig.boardClass) {
-            rulesBoard.classList.add(stationConfig.boardClass);
-          }
-          rulesBoard.innerHTML = stationConfig.buildOverlayMarkup();
-          rulesOverlay.dataset.stationRules = stationConfig.stationKey;
-          rulesBoard.dataset.stationRules = stationConfig.stationKey;
-        } else {
-          rulesBoard.innerHTML = defaultRulesBoardMarkup;
-          rulesOverlay.dataset.stationRules = 'default';
-          rulesBoard.dataset.stationRules = 'default';
-        }
-
-        return stationConfig;
-        const isStation2Start = isStartingGame && String(currentStation) === SPINO_STATION_ID;
-        const isStation3Start = isStartingGame && String(currentStation) === BIODIVERSITY_STATION_ID;
-        const isStation4Start = isStartingGame && String(currentStation) === ENERGY_STATION_ID;
-        const isStation5Start = isStartingGame && String(currentStation) === SUSTAINABLE_STATION_ID;
-        const isStation6Start = isStartingGame && String(currentStation) === SBEEL_STATION_ID;
-
-        rulesOverlay.classList.toggle('spino-station-rules-mode', isStation2Start);
-        rulesOverlay.classList.toggle('biodiversity-station-rules-mode', isStation3Start);
-        rulesOverlay.classList.toggle('energy-station-rules-mode', isStation4Start);
-        rulesOverlay.classList.toggle('sustainable-station-rules-mode', isStation5Start);
-        rulesOverlay.classList.toggle('sbeel-station-rules-mode', isStation6Start);
-        rulesBoard.classList.toggle('biodiversity-rules-board', isStation3Start);
-        rulesBoard.classList.toggle('energy-rules-board', isStation4Start);
-        rulesBoard.classList.toggle('sustainable-rules-board', isStation5Start);
-
-        if (isStation2Start) {
-          rulesBoard.innerHTML = buildStation2RulesBoardMarkup();
-        } else if (isStation3Start) {
-          rulesBoard.innerHTML = buildStation3RulesBoardMarkup();
-        } else if (isStation4Start) {
-          rulesBoard.innerHTML = buildStation4RulesBoardMarkup();
-        } else if (isStation5Start) {
-          rulesBoard.innerHTML = buildStation5RulesBoardMarkup();
-        } else if (isStation6Start) {
-          rulesBoard.innerHTML = buildStation6RulesBoardMarkup();
-        } else {
-          rulesBoard.innerHTML = defaultRulesBoardMarkup;
-        }
-      }
-
-      function setRulesModeForStartLegacy(isStartingGame) {
-        pendingStartAfterRules = isStartingGame;
-        if (rulesOverlay) rulesOverlay.classList.toggle('start-rules-mode', isStartingGame);
-        if (rulesTitle) rulesTitle.innerText = isStartingGame ? 'Antes de jugar' : 'Cómo Jugar';
-        if (rulesSubtitle) {
-          rulesSubtitle.innerText = isStartingGame
-            ? 'Lee estas reglas rápidas antes de entrar a la estación.'
-            : 'Lee estas reglas clave para completar tu recorrido científico dentro del museo.';
-        }
-        if (btnCerrarReglas) {
-          btnCerrarReglas.innerText = isStartingGame ? '?Enterado, a jugar!' : '¡Entendido!';
+      function closeRulesOverlay() {
+        if (rulesOverlay) rulesOverlay.classList.remove('open');
+        if (activeCarouselInstance) {
+          activeCarouselInstance.destroy();
+          activeCarouselInstance = null;
         }
       }
 
       function applyRulesModeForStart(isStartingGame) {
         pendingStartAfterRules = isStartingGame;
-        if (rulesOverlay) rulesOverlay.classList.toggle('start-rules-mode', isStartingGame);
-        const stationConfig = syncRulesOverlayForStation(isStartingGame);
 
-        if (rulesTitle) {
-          rulesTitle.innerText = stationConfig
-            ? stationConfig.overlayTitle
-            : (isStartingGame ? 'Antes de jugar' : 'Como Jugar');
-        }
-        if (rulesSubtitle) {
-          rulesSubtitle.innerText = stationConfig
-            ? stationConfig.overlaySubtitle
-            : (isStartingGame
-              ? 'Lee estas reglas rápidas antes de entrar a la estación.'
-              : 'Lee estas reglas clave para completar tu recorrido científico dentro del museo.');
-        }
-        if (btnCerrarReglas) {
-          btnCerrarReglas.innerText = stationConfig
-            ? '?Listo, vamos al reto!'
-            : (isStartingGame ? '?Enterado, a jugar!' : '?Entendido!');
+        if (activeCarouselInstance) {
+          activeCarouselInstance.destroy();
+          activeCarouselInstance = null;
         }
 
-        return;
-        syncRulesOverlayForStation(isStartingGame);
+        let steps = [];
+        let accentColor = 'var(--msf-purple)';
 
-        const isStation2Start = isStartingGame && String(currentStation) === SPINO_STATION_ID;
-        const isStation3Start = isStartingGame && String(currentStation) === BIODIVERSITY_STATION_ID;
-        const isStation4Start = isStartingGame && String(currentStation) === ENERGY_STATION_ID;
-        const isStation5Start = isStartingGame && String(currentStation) === SUSTAINABLE_STATION_ID;
-        const isStation6Start = isStartingGame && String(currentStation) === SBEEL_STATION_ID;
-
-        if (rulesTitle) {
-          if (isStation2Start) {
-            rulesTitle.innerText = 'Misión Espinosaurio';
-          } else if (isStation3Start) {
-            rulesTitle.innerText = 'Sala A - Biodiversidad';
-          } else if (isStation4Start) {
-            rulesTitle.innerText = 'Sala B de Energía';
-          } else if (isStation5Start) {
-            rulesTitle.innerText = 'Sala C - Desarrollo Sustentable';
-          } else if (isStation6Start) {
-            rulesTitle.innerText = 'Misión SBEEL Dinosaurios';
+        if (!isStartingGame) {
+          steps = generalRules;
+          accentColor = 'var(--msf-purple)';
+        } else {
+          const stationId = String(currentStation);
+          if (stationId === TICKET_STATION_ID) {
+            steps = station1TicketRules;
+            accentColor = 'var(--msf-pink)';
+          } else if (stationId === SPINO_STATION_ID) {
+            steps = station2SpinoRules;
+            accentColor = 'var(--msf-purple)';
+          } else if (stationId === BIODIVERSITY_STATION_ID) {
+            steps = station3BiodiversityRules;
+            accentColor = 'var(--msf-green)';
+          } else if (stationId === ENERGY_STATION_ID) {
+            steps = station4EnergyRules;
+            accentColor = 'var(--msf-yellow)';
+          } else if (stationId === SUSTAINABLE_STATION_ID) {
+            steps = station5SustainableRules;
+            accentColor = 'var(--msf-blue)';
+          } else if (stationId === SBEEL_STATION_ID) {
+            steps = station6SbeelRules;
+            accentColor = 'var(--msf-red)';
           } else {
-            rulesTitle.innerText = isStartingGame ? 'Antes de jugar' : 'Como Jugar';
+            steps = generalRules;
+            accentColor = 'var(--msf-purple)';
           }
         }
-        if (rulesSubtitle) {
-          if (isStation2Start) {
-            rulesSubtitle.innerText = 'Estas son las reglas de la estación 2. Cumple el reto y gana tus 15 puntos.';
-          } else if (isStation3Start) {
-            rulesSubtitle.innerText = 'Explora animales, plantas y ecosistemas. Responde 10 preguntas y logra 7 aciertos para completar tu misión verde.';
-          } else if (isStation4Start) {
-            rulesSubtitle.innerText = 'Explora las formas de energía, responde 10 preguntas del Área de Energía y consigue mínimo 7 aciertos para completar tu misión.';
-          } else if (isStation5Start) {
-            rulesSubtitle.innerText = 'Descubre acciones para cuidar el planeta, responde 10 preguntas del Área de Desarrollo Sustentable y consigue mínimo 7 aciertos para completar tu misión.';
-          } else if (isStation6Start) {
-            rulesSubtitle.innerText = 'Sigue estas reglas del rompecabezas, vence el tiempo y completa la estación 6.';
-          } else {
-            rulesSubtitle.innerText = isStartingGame
-              ? 'Lee estas reglas rápidas antes de entrar a la estación.'
-              : 'Lee estas reglas clave para completar tu recorrido científico dentro del museo.';
-          }
-        }
-        if (btnCerrarReglas) {
-          if (isStation2Start || isStation3Start || isStation4Start || isStation5Start || isStation6Start) {
-            btnCerrarReglas.innerText = 'Listo, vamos al reto!';
-          } else {
-            btnCerrarReglas.innerText = isStartingGame ? '?Enterado, a jugar!' : '?Entendido!';
-          }
-        }
-      }
 
-      function closeRulesOverlay() {
-        if (rulesOverlay) rulesOverlay.classList.remove('open');
-        applyRulesModeForStart(false);
+        const targetContainer = document.getElementById('instruction-carousel-root') || rulesOverlay;
+
+        activeCarouselInstance = new InstructionCarousel({
+          container: targetContainer,
+          steps: steps,
+          accentColor: accentColor,
+          onClose: () => {
+            closeRulesOverlay();
+          },
+          onFinish: () => {
+            const shouldStart = pendingStartAfterRules;
+            closeRulesOverlay();
+            if (shouldStart) {
+              playCurrentStation();
+            }
+          }
+        });
       }
 
       const btnComoJugar = document.getElementById('btnComoJugar');
@@ -14569,23 +14427,6 @@
           closeMobileMenu();
           applyRulesModeForStart(false);
           rulesOverlay.classList.add('open');
-        });
-      }
-      if (btnCerrarReglas) {
-        btnCerrarReglas.onclick = () => {
-          const shouldStart = pendingStartAfterRules;
-          closeRulesOverlay();
-          if (shouldStart) playCurrentStation();
-        };
-      }
-      if (rulesOverlay) {
-        rulesOverlay.addEventListener('click', (e) => {
-          const targetEl = e.target instanceof Element ? e.target : e.target.parentElement;
-          const closeButton = targetEl ? targetEl.closest('#btnBackRules') : null;
-          if (e.target === rulesOverlay || closeButton) {
-            e.preventDefault();
-            closeRulesOverlay();
-          }
         });
       }
 
@@ -16573,6 +16414,7 @@
     // Inicializar
     showAdminLogin();
   </script>
+  <script src="scripts/instruction-carousel.js"></script>
   <script src="scripts/bg-music.js"></script>
   <script src="scripts/orientation-manager.js"></script>
   <script>
