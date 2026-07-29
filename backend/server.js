@@ -13,6 +13,11 @@ require('dotenv').config();
 const playtime = createPlaytimeBlockService(pool);
 const TICKET_VALIDITY_DAYS = Math.max(1, Number(process.env.TICKET_VALIDITY_DAYS || process.env.BOLETO_VALIDEZ_DIAS || 7));
 const FAILED_ATTEMPT_LIMIT = 3;
+const QUESTION_STATION_RULES = {
+  3: { minCorrect: 7, maxQuestions: 10 },
+  4: { minCorrect: 7, maxQuestions: 10 },
+  5: { minCorrect: 7, maxQuestions: 10 }
+};
 
 function tieneTexto(value) {
   return typeof value === 'string' && value.trim().length > 0;
@@ -122,13 +127,60 @@ function calcularPuntajeMinimoEstacion(estacion = {}) {
   return Math.max(1, minimoBase, minimoConfigurado);
 }
 
-function evaluarAprobacionEstacion(estacion = {}, puntaje = 0, aprobadaSolicitada = false) {
+function getQuestionTotal(metricas = {}, aciertos = 0) {
+  if (metricas.num_preguntas !== undefined) return Math.max(0, Number(metricas.num_preguntas || 0));
+  if (metricas.totalPreguntas !== undefined) return Math.max(0, Number(metricas.totalPreguntas || 0));
+  if (metricas.total !== undefined) return Math.max(0, Number(metricas.total || 0));
+  if (metricas.errores !== undefined) return aciertos + Math.max(0, Number(metricas.errores || 0));
+  return 10;
+}
+
+function evaluarAprobacionEstacion(estacion = {}, puntaje = 0, aprobadaSolicitada = false, metricas = {}) {
   const puntajeNumerico = Math.max(0, Number(puntaje || 0));
   const puntajeMinimo = calcularPuntajeMinimoEstacion(estacion);
+  const idEstacion = Number(estacion.id_estacion || estacion.id || metricas.id_estacion || 0);
+  const reglaPreguntas = QUESTION_STATION_RULES[idEstacion];
+  const aprobacionSolicitada = Boolean(aprobadaSolicitada);
+
+  let aprobada = aprobacionSolicitada && puntajeNumerico >= puntajeMinimo;
+  if (reglaPreguntas) {
+    const aciertos = Math.max(0, Number(metricas.aciertos || metricas.num_correctas || 0));
+    const totalPreguntas = getQuestionTotal(metricas, aciertos);
+    aprobada = aprobacionSolicitada
+      && totalPreguntas > 0
+      && totalPreguntas <= reglaPreguntas.maxQuestions
+      && aciertos <= reglaPreguntas.maxQuestions
+      && aciertos >= reglaPreguntas.minCorrect;
+  }
+
   return {
     puntaje: puntajeNumerico,
     puntaje_minimo: puntajeMinimo,
-    aprobada: Boolean(aprobadaSolicitada) && puntajeNumerico >= puntajeMinimo
+    aprobada
+  };
+}
+
+function progresoCumpleAprobacionEstacion(row = {}) {
+  if (!row || !(row.aprobada || row.completada)) return false;
+  return evaluarAprobacionEstacion({
+    id_estacion: row.id_estacion,
+    puntos: row.puntos_estacion ?? row.puntos,
+    puntaje_minimo: row.puntaje_minimo_estacion ?? row.puntaje_minimo
+  }, row.puntaje, true, {
+    id_estacion: row.id_estacion,
+    aciertos: row.aciertos,
+    errores: row.errores,
+    num_preguntas: row.num_preguntas
+  }).aprobada;
+}
+
+function normalizarProgresoAprobacion(row = {}) {
+  if (!QUESTION_STATION_RULES[Number(row.id_estacion)]) return row;
+  if (progresoCumpleAprobacionEstacion(row)) return row;
+  return {
+    ...row,
+    completada: false,
+    aprobada: false
   };
 }
 
@@ -856,7 +908,7 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
 
   let estacion = null;
   try {
-    [[estacion]] = await pool.query('SELECT activa, nombre, puntos, puntaje_minimo FROM estaciones WHERE id_estacion = ?', [id_estacion]);
+    [[estacion]] = await pool.query('SELECT id_estacion, activa, nombre, puntos, puntaje_minimo FROM estaciones WHERE id_estacion = ?', [id_estacion]);
     if (!estacion || !estacion.activa) {
       return res.status(403).json({ error: 'La estaciÃ³n se encuentra inactiva y no se puede guardar progreso.' });
     }
@@ -868,7 +920,7 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
   try {
     await connection.beginTransaction();
 
-    const validacionEstacion = evaluarAprobacionEstacion(estacion, puntaje, aprobada);
+    const validacionEstacion = evaluarAprobacionEstacion(estacion, puntaje, aprobada, { id_estacion, aciertos, errores });
     const isPassed = validacionEstacion.aprobada;
 
     // 1. Consultar el progreso actual del usuario para esta estaciÃ³n
@@ -877,7 +929,9 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
       [id_usuario, id_estacion]
     );
 
-    let nuevoPuntaje = validacionEstacion.puntaje;
+    let nuevoPuntaje = isPassed
+      ? validacionEstacion.puntaje
+      : (QUESTION_STATION_RULES[Number(id_estacion)] ? 0 : validacionEstacion.puntaje);
     let nuevosAciertos = aciertos || 0;
     let nuevosErrores = errores || 0;
     let nuevoCompletada = isPassed;
@@ -885,7 +939,12 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
     let nuevoFechaCompletado = isPassed ? new Date() : null;
 
     if (progresoExistente) {
-      const progresoPrevioValido = Boolean((progresoExistente.completada || progresoExistente.aprobada) && Number(progresoExistente.puntaje || 0) >= validacionEstacion.puntaje_minimo);
+      const progresoPrevioValido = progresoCumpleAprobacionEstacion({
+        ...estacion,
+        ...progresoExistente,
+        puntos_estacion: estacion.puntos,
+        puntaje_minimo_estacion: estacion.puntaje_minimo
+      });
       nuevoCompletada = progresoPrevioValido || isPassed;
       nuevoAprobada = progresoPrevioValido || isPassed;
 
@@ -923,11 +982,17 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
 
     // 3. Verificar si el usuario ha completado todas las estaciones obligatorias [1, 2, 3, 4, 5, 6]
     const [progreso] = await connection.query(
-      'SELECT id_estacion FROM progreso_usuario WHERE id_usuario = ? AND aprobada = TRUE',
+      `SELECT p.id_estacion, p.completada, p.aprobada, p.puntaje, p.aciertos, p.errores,
+              e.puntos AS puntos_estacion, e.puntaje_minimo AS puntaje_minimo_estacion
+       FROM progreso_usuario p
+       JOIN estaciones e ON e.id_estacion = p.id_estacion
+       WHERE p.id_usuario = ?`,
       [id_usuario]
     );
 
-    const estacionesAprobadas = progreso.map(p => p.id_estacion);
+    const estacionesAprobadas = progreso
+      .filter(progresoCumpleAprobacionEstacion)
+      .map(p => p.id_estacion);
     const estacionesObligatorias = [1, 2, 3, 4, 5, 6];
     const tieneTodoAprobado = estacionesObligatorias.every(id => estacionesAprobadas.includes(id));
 
@@ -1258,7 +1323,7 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
       });
     }
 
-    const validacionEstacion = evaluarAprobacionEstacion(estacion, puntaje, aprobado);
+    const validacionEstacion = evaluarAprobacionEstacion(estacion, puntaje, aprobado, { id_estacion, aciertos, errores });
     const aprobadoValidado = validacionEstacion.aprobada;
     const intentoFinalizado = inferirIntentoFinalizado({ finalizado, aprobado: aprobadoValidado, puntaje, aciertos, errores });
     const [result] = await connection.query(
@@ -1348,7 +1413,11 @@ app.put('/api/intentos/:id_intento', permitirJugador, verificarBloqueoJugador, a
       return res.status(403).json({ error: 'La estaciÃ³n se encuentra inactiva.' });
     }
 
-    const validacionEstacion = evaluarAprobacionEstacion(intentoActual, puntaje, aprobado);
+    const validacionEstacion = evaluarAprobacionEstacion(intentoActual, puntaje, aprobado, {
+      id_estacion: intentoActual.id_estacion,
+      aciertos,
+      errores
+    });
     const aprobadoValidado = validacionEstacion.aprobada;
     const intentoFinalizado = finalizado === undefined
       ? true
@@ -1497,13 +1566,14 @@ app.get('/api/progreso/:id_usuario', permitirJugador, async (req, res) => {
   try {
     await autoUnlockEstaciones(connection, idUsuario);
     const [progreso] = await connection.query(
-      `SELECT p.*, e.nombre AS nombre_estacion, e.tipo AS tipo_estacion
+      `SELECT p.*, e.nombre AS nombre_estacion, e.tipo AS tipo_estacion,
+              e.puntos AS puntos_estacion, e.puntaje_minimo AS puntaje_minimo_estacion
        FROM progreso_usuario p
        JOIN estaciones e ON p.id_estacion = e.id_estacion
        WHERE p.id_usuario = ?`,
       [idUsuario]
     );
-    res.json(progreso);
+    res.json(progreso.map(normalizarProgresoAprobacion));
   } catch (error) {
     res.status(500).json({ error: error.message });
   } finally {
@@ -1571,11 +1641,17 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
     await autoUnlockEstaciones(connection, id_usuario);
 
     const [progreso] = await connection.query(
-      'SELECT id_estacion, aprobada, fallida, bloqueada FROM progreso_usuario WHERE id_usuario = ?',
+      `SELECT p.id_estacion, p.completada, p.aprobada, p.fallida, p.bloqueada, p.puntaje, p.aciertos, p.errores,
+              e.puntos AS puntos_estacion, e.puntaje_minimo AS puntaje_minimo_estacion
+       FROM progreso_usuario p
+       JOIN estaciones e ON e.id_estacion = p.id_estacion
+       WHERE p.id_usuario = ?`,
       [id_usuario]
     );
 
-    const estacionesAprobadas = progreso.filter(p => p.aprobada).map(p => p.id_estacion);
+    const estacionesAprobadas = progreso
+      .filter(progresoCumpleAprobacionEstacion)
+      .map(p => p.id_estacion);
     const tieneAlgunaFallidaOBloqueada = progreso.some(p => p.fallida || p.bloqueada);
     const estacionesObligatorias = [1, 2, 3, 4, 5, 6];
     const tieneTodoAprobado = estacionesObligatorias.every(id => estacionesAprobadas.includes(id));
@@ -2877,7 +2953,11 @@ app.get('/api/usuarios/:id_usuario/perfil', permitirJugador, async (req, res) =>
 
     for (const est of estacionesRecorrido) {
       const p = progreso.find(row => row.id_estacion === est.id);
-      const completada = p ? Boolean(p.aprobada || p.completada) : false;
+      const completada = p ? progresoCumpleAprobacionEstacion({
+        ...p,
+        id_estacion: est.id,
+        puntos_estacion: est.puntos_base
+      }) : false;
 
       let scoreObtenido = 0;
       let detalle = 'Pendiente';

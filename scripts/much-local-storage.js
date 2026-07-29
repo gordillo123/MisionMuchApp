@@ -39,6 +39,12 @@
     '6': { id: '6', nombre: 'SBEEL Dinosaurios', puntos: 10 }
   };
 
+  const QUESTION_STATION_RULES = {
+    '3': { minCorrect: 7, maxQuestions: 10 },
+    '4': { minCorrect: 7, maxQuestions: 10 },
+    '5': { minCorrect: 7, maxQuestions: 10 }
+  };
+
   const REQUIRED_REWARD_STATIONS = ['1', '2', '3', '4', '5', '6'];
 
   function storageAvailable() {
@@ -112,8 +118,48 @@
     return Math.max(1, toNumber(station.puntos, 10));
   }
 
-  function hasRequiredScore(stationId, score) {
-    return toNumber(score, 0) >= getRequiredScore(stationId);
+  function getQuestionTotal(result = {}, correct = 0) {
+    if (result.num_preguntas !== undefined) return Math.max(0, toNumber(result.num_preguntas, 0));
+    if (result.totalPreguntas !== undefined) return Math.max(0, toNumber(result.totalPreguntas, 0));
+    if (result.total !== undefined) return Math.max(0, toNumber(result.total, 0));
+    if (result.errores !== undefined) return correct + Math.max(0, toNumber(result.errores, 0));
+    return 10;
+  }
+
+  function getApprovalRequested(result = {}, options = {}) {
+    if (result.aprobada !== undefined) return Boolean(result.aprobada);
+    if (result.aprobado !== undefined) return Boolean(result.aprobado);
+    return Boolean(options.assumeApproved);
+  }
+
+  function isQuestionStationApproved(stationId, result = {}, options = {}) {
+    const id = toStationId(stationId);
+    const rule = QUESTION_STATION_RULES[id];
+    if (!rule) return null;
+
+    const correct = toNumber(result.aciertos ?? result.num_correctas, 0);
+    const total = getQuestionTotal(result, correct);
+    return getApprovalRequested(result, options)
+      && total > 0
+      && total <= rule.maxQuestions
+      && correct <= rule.maxQuestions
+      && correct >= rule.minCorrect;
+  }
+
+  function isStationResultApproved(stationId, result = {}, options = {}) {
+    const questionApproved = isQuestionStationApproved(stationId, result, options);
+    if (questionApproved !== null) return questionApproved;
+
+    return getApprovalRequested(result, options)
+      && toNumber(result.puntaje ?? result.puntaje_total, 0) >= getRequiredScore(stationId);
+  }
+
+  function hasRequiredScore(stationId, score, extra = {}) {
+    return isStationResultApproved(stationId, {
+      ...extra,
+      puntaje: score,
+      aprobada: true
+    }, { assumeApproved: true });
   }
 
   function toNumber(value, fallback = 0) {
@@ -167,6 +213,7 @@
 
     Object.keys(legacy).forEach((stationId) => {
       if (!merged[stationId]) {
+        if (QUESTION_STATION_RULES[stationId]) return;
         const station = getStation(stationId);
         merged[stationId] = {
           id: stationId,
@@ -184,7 +231,15 @@
   function getCompletedStationsMap() {
     const records = getCompletedRecords();
     return Object.keys(records).reduce((acc, stationId) => {
-      if (records[stationId]?.completada) acc[stationId] = true;
+      const record = records[stationId];
+      if (!record?.completada) return acc;
+      if (QUESTION_STATION_RULES[stationId] && !isStationResultApproved(stationId, {
+        ...record,
+        aprobada: true
+      }, { assumeApproved: true })) {
+        return acc;
+      }
+      acc[stationId] = true;
       return acc;
     }, {});
   }
@@ -198,6 +253,13 @@
       const record = records[stationId];
       if (!record?.completada) return;
       const station = getStation(stationId);
+      if (QUESTION_STATION_RULES[stationId] && !isStationResultApproved(stationId, {
+        ...record,
+        aprobada: true
+      }, { assumeApproved: true })) {
+        return;
+      }
+
       clean[stationId] = {
         id: stationId,
         nombre: record.nombre || station.nombre,
@@ -314,8 +376,20 @@
     const puntaje = Math.max(0, toNumber(attempt.puntaje ?? attempt.puntaje_total, previous.ultimo_puntaje || 0));
     const aprobadaSolicitada = attempt.aprobada !== undefined ? Boolean(attempt.aprobada)
       : (attempt.aprobado !== undefined ? Boolean(attempt.aprobado) : Boolean(previous.aprobada));
-    const aprobada = aprobadaSolicitada && hasRequiredScore(id, puntaje);
-    const completedAlready = Boolean((completedMap[id] || previous.completada) && hasRequiredScore(id, previous.mejor_puntaje || previous.ultimo_puntaje || 0));
+    const aprobada = isStationResultApproved(id, {
+      ...attempt,
+      puntaje,
+      aprobada: aprobadaSolicitada
+    });
+    const previousApproved = isStationResultApproved(id, {
+      ...previous,
+      puntaje: previous.mejor_puntaje || previous.ultimo_puntaje || 0,
+      aprobada: true
+    }, { assumeApproved: true });
+    const completedAlready = Boolean(
+      completedMap[id]
+      || (previous.completada && (!QUESTION_STATION_RULES[id] || previousApproved))
+    );
     const completada = aprobada || completedAlready;
     const finalizada = attempt.finalizado !== undefined ? Boolean(attempt.finalizado)
       : (options.finalizado !== undefined ? Boolean(options.finalizado)
@@ -352,7 +426,7 @@
       mejor_puntaje: Math.max(toNumber(previous.mejor_puntaje, 0), puntaje),
       aciertos: toNumber(attempt.aciertos, previous.aciertos || 0),
       errores: toNumber(attempt.errores, previous.errores || 0),
-      aprobada: Boolean(aprobada || (previous.aprobada && hasRequiredScore(id, previous.mejor_puntaje || previous.ultimo_puntaje || 0))),
+      aprobada: Boolean(aprobada || (previous.aprobada && (!QUESTION_STATION_RULES[id] || previousApproved))),
       completada,
       fallida,
       bloqueada,
@@ -402,8 +476,11 @@
       toNumber(data.puntaje ?? data.puntaje_total, station.puntos)
     );
 
-    const requiredScore = getRequiredScore(id);
-    if (puntaje < requiredScore) {
+    if (!isStationResultApproved(id, {
+      ...data,
+      puntaje,
+      aprobada: data.aprobada !== undefined ? data.aprobada : (data.aprobado !== undefined ? data.aprobado : true)
+    }, { assumeApproved: true })) {
       recordStationAttempt(id, {
         ...data,
         aprobada: false,
@@ -471,6 +548,12 @@
     const total = Object.keys(records).reduce((sum, stationId) => {
       const record = records[stationId];
       if (!record?.completada) return sum;
+      if (QUESTION_STATION_RULES[stationId] && !isStationResultApproved(stationId, {
+        ...record,
+        aprobada: true
+      }, { assumeApproved: true })) {
+        return sum;
+      }
       const station = getStation(stationId);
       const attemptScore = attempts[stationId]?.mejor_puntaje;
       const score = toNumber(attemptScore, toNumber(record.puntaje, station.puntos));
@@ -695,7 +778,14 @@
       if (!id) return;
       const station = getStation(id);
       const puntaje = Math.max(0, toNumber(row.puntaje, station.puntos));
-      const completada = Boolean(row.aprobada || row.completada);
+      const aprobadaServidor = Boolean(row.aprobada || row.completada);
+      const completada = QUESTION_STATION_RULES[id]
+        ? isStationResultApproved(id, {
+          ...row,
+          puntaje,
+          aprobada: aprobadaServidor
+        }, { assumeApproved: true })
+        : aprobadaServidor;
       const fallida = Boolean(row.fallida);
       const bloqueada = Boolean(row.bloqueada);
       const fechaBloqueo = row.fecha_bloqueo || null;

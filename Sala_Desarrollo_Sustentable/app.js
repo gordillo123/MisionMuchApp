@@ -320,6 +320,8 @@ class PrizeManager {
 /* ================================================================= */
 
 const MYSQL_ESTACION_ID = 5;
+const STATION_POINTS = 10;
+const PASSING_CORRECT = 7;
 
 // Background music helpers
 function ensureBgMusic() { try { if (!window.bgMusic) { window.bgMusic = new Audio('../Sonidos/musica fondo.mp3'); window.bgMusic.loop = true; window.bgMusic.volume = 0.18; window.bgMusic.preload = 'auto'; } } catch (e) {} }
@@ -364,24 +366,28 @@ async function guardarResultadoEstacionMySQL({ puntaje_total, num_correctas, num
   try {
     const progreso = await import('../mysql-utils.js');
     const estacionId = MYSQL_ESTACION_ID;
+    const salaAprobada = Boolean(aprobado) && num_preguntas <= NUM_QUESTIONS && num_correctas >= PASSING_CORRECT && num_correctas <= NUM_QUESTIONS;
+    const puntajeEstacion = salaAprobada ? STATION_POINTS : 0;
 
     const attemptId = sessionStorage.getItem('much_current_attempt_id');
     if (!attemptId) {
       await progreso.guardarIntentoEstacion(estacionId, {
         aciertos: num_correctas,
         errores: Math.max(0, num_preguntas - num_correctas),
-        puntaje: puntaje_total,
-        aprobado
+        puntaje: puntajeEstacion,
+        aprobado: salaAprobada,
+        finalizado: true
       });
     }
 
-    // Pasar parámetros al primer nivel directamente
-    await progreso.guardarProgresoUsuario(estacionId, {
-      puntaje: puntaje_total,
-      aciertos: num_correctas,
-      errores: Math.max(0, num_preguntas - num_correctas),
-      aprobada: aprobado
-    });
+    if (salaAprobada) {
+      await progreso.guardarProgresoUsuario(estacionId, {
+        puntaje: puntajeEstacion,
+        aciertos: num_correctas,
+        errores: Math.max(0, num_preguntas - num_correctas),
+        aprobada: true
+      });
+    }
   } catch (error) {
     console.error('[MySQL DB] No se pudo guardar desarrollo sustentable:', error);
   }
@@ -597,13 +603,15 @@ async function endQuizInDB({ puntaje_total, num_correctas, num_preguntas }) {
 
     console.log(`🏁 Finalizando intento ${attemptId} en MySQL...`);
 
-    const isPassed = num_correctas >= 7;
+    const isPassed = num_preguntas <= NUM_QUESTIONS && num_correctas >= PASSING_CORRECT && num_correctas <= NUM_QUESTIONS;
+    const puntajeEstacion = isPassed ? STATION_POINTS : 0;
 
     await progreso.actualizarIntentoEstacion(attemptId, {
-      puntaje: puntaje_total,
+      puntaje: puntajeEstacion,
       aciertos: num_correctas,
       errores: Math.max(0, num_preguntas - num_correctas),
-      aprobado: isPassed
+      aprobado: isPassed,
+      finalizado: true
     });
 
     console.log("✅ Intento actualizado en MySQL al finalizar.");
@@ -842,23 +850,38 @@ class UIManager {
 
     // Registrar intento fallido sin borrar una palomita ya ganada.
     try {
+      const progreso = await import('../mysql-utils.js');
+      const payload = {
+        puntaje: 0,
+        aciertos: 0,
+        errores: QUESTIONS.length,
+        aprobado: false,
+        finalizado: true
+      };
+      const attemptId = sessionStorage.getItem('much_current_attempt_id');
+      const result = attemptId
+        ? await progreso.actualizarIntentoEstacion(attemptId, payload)
+        : await progreso.guardarIntentoEstacion('5', payload);
+
+      if (!result) {
+        window.MuchLocalStorage?.recordStationAttempt?.('5', {
+          id_intento: attemptId,
+          aprobada: false,
+          puntaje: 0,
+          aciertos: 0,
+          errores: QUESTIONS.length,
+          finalizado: true
+        }, { countAttempt: true, countFailure: true, finalizado: true });
+      }
+    } catch (e) {
+      console.warn('Error al invalidar estación por trampa:', e);
       window.MuchLocalStorage?.recordStationAttempt?.('5', {
         aprobada: false,
         puntaje: 0,
         aciertos: 0,
-        errores: QUESTIONS.length
-      }, { countAttempt: true });
-      
-      const progreso = await import('../mysql-utils.js');
-      await progreso.guardarProgresoUsuario('5', {
-        custom: true,
-        puntaje: 0,
-        aciertos: 0,
         errores: QUESTIONS.length,
-        aprobada: false
-      });
-    } catch (e) {
-      console.warn('Error al invalidar estación por trampa:', e);
+        finalizado: true
+      }, { countAttempt: true, countFailure: true, finalizado: true });
     }
 
     let seconds = 15;
@@ -1115,8 +1138,8 @@ class UIManager {
       e.retryRow.classList.add('d-none');
       this.clearAutoTransition();
 
-      const isPassed = s.correct >= 7; // 70% or more
-      const puntajeFinal = s.correct * 10;
+      const isPassed = QUESTIONS.length <= NUM_QUESTIONS && s.correct >= PASSING_CORRECT && s.correct <= NUM_QUESTIONS; // 7 de maximo 10
+      const puntajeFinal = isPassed ? STATION_POINTS : 0;
 
       saveQuizResultLocal({
         puntaje_total: puntajeFinal,
@@ -1137,7 +1160,7 @@ class UIManager {
         aprobado: isPassed
       });
 
-      e.finalPoints.textContent = s.points.toString();
+      e.finalPoints.textContent = puntajeFinal.toString();
       e.finalCorrect.textContent = s.correct.toString();
       e.finalTotal.textContent = QUESTIONS.length.toString();
 
@@ -1145,6 +1168,10 @@ class UIManager {
         window.MuchStationCompletion?.renderInline(e.finalMsg, {
           stationId: '5',
           nextStationId: '6',
+          passed: true,
+          puntaje: puntajeFinal,
+          aciertos: s.correct,
+          errores: Math.max(0, QUESTIONS.length - (s.correct || 0)),
           onReturnToMap: () => {
             window.location.href = '../index.html?view=prep';
           }
@@ -1160,8 +1187,9 @@ class UIManager {
           aprobada: false,
           puntaje: 0,
           aciertos: s.correct || 0,
-          errores: Math.max(0, QUESTIONS.length - (s.correct || 0))
-        }, { countAttempt: true });
+          errores: Math.max(0, QUESTIONS.length - (s.correct || 0)),
+          finalizado: true
+        }, { countAttempt: true, countFailure: true, finalizado: true });
 
         e.finalTitle.classList.remove('visually-hidden');
         e.finalTitle.textContent = 'Sigue explorando ✨';
