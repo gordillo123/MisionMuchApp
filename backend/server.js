@@ -18,6 +18,11 @@ const QUESTION_STATION_RULES = {
   4: { minCorrect: 7, maxQuestions: 10 },
   5: { minCorrect: 7, maxQuestions: 10 }
 };
+const DYNAMIC_STATION_RULES = {
+  1: { minScore: 10, minCorrect: 6, maxErrors: 0 },
+  2: { minScore: 15, minCorrect: 1, maxErrors: 0 },
+  6: { minScore: 1, minCorrect: 1, maxErrors: 0 }
+};
 
 function tieneTexto(value) {
   return typeof value === 'string' && value.trim().length > 0;
@@ -135,11 +140,17 @@ function getQuestionTotal(metricas = {}, aciertos = 0) {
   return 10;
 }
 
+function estacionTieneReglaEstricta(idEstacion) {
+  const id = Number(idEstacion || 0);
+  return Boolean(QUESTION_STATION_RULES[id] || DYNAMIC_STATION_RULES[id]);
+}
+
 function evaluarAprobacionEstacion(estacion = {}, puntaje = 0, aprobadaSolicitada = false, metricas = {}) {
   const puntajeNumerico = Math.max(0, Number(puntaje || 0));
   const puntajeMinimo = calcularPuntajeMinimoEstacion(estacion);
   const idEstacion = Number(estacion.id_estacion || estacion.id || metricas.id_estacion || 0);
   const reglaPreguntas = QUESTION_STATION_RULES[idEstacion];
+  const reglaDinamica = DYNAMIC_STATION_RULES[idEstacion];
   const aprobacionSolicitada = Boolean(aprobadaSolicitada);
 
   let aprobada = aprobacionSolicitada && puntajeNumerico >= puntajeMinimo;
@@ -151,6 +162,14 @@ function evaluarAprobacionEstacion(estacion = {}, puntaje = 0, aprobadaSolicitad
       && totalPreguntas <= reglaPreguntas.maxQuestions
       && aciertos <= reglaPreguntas.maxQuestions
       && aciertos >= reglaPreguntas.minCorrect;
+  } else if (reglaDinamica) {
+    const aciertos = Math.max(0, Number(metricas.aciertos || metricas.num_correctas || 0));
+    const errores = Math.max(0, Number(metricas.errores || 0));
+    const erroresValidos = reglaDinamica.maxErrors === undefined || errores <= reglaDinamica.maxErrors;
+    aprobada = aprobacionSolicitada
+      && puntajeNumerico >= reglaDinamica.minScore
+      && aciertos >= reglaDinamica.minCorrect
+      && erroresValidos;
   }
 
   return {
@@ -175,7 +194,7 @@ function progresoCumpleAprobacionEstacion(row = {}) {
 }
 
 function normalizarProgresoAprobacion(row = {}) {
-  if (!QUESTION_STATION_RULES[Number(row.id_estacion)]) return row;
+  if (!estacionTieneReglaEstricta(row.id_estacion)) return row;
   if (progresoCumpleAprobacionEstacion(row)) return row;
   return {
     ...row,
@@ -226,10 +245,14 @@ async function autoUnlockEstaciones(connection, idUsuario) {
 
 async function evaluarBloqueoPorIntentos(connection, idUsuario, idEstacion) {
   const [[progress]] = await connection.query(
-    'SELECT aprobada, completada, fallida, bloqueada FROM progreso_usuario WHERE id_usuario = ? AND id_estacion = ?',
+    `SELECT p.id_estacion, p.aprobada, p.completada, p.fallida, p.bloqueada, p.puntaje, p.aciertos, p.errores,
+            e.puntos AS puntos_estacion, e.puntaje_minimo AS puntaje_minimo_estacion
+     FROM progreso_usuario p
+     JOIN estaciones e ON e.id_estacion = p.id_estacion
+     WHERE p.id_usuario = ? AND p.id_estacion = ?`,
     [idUsuario, idEstacion]
   );
-  if (progress?.aprobada || progress?.completada) {
+  if (progresoCumpleAprobacionEstacion(progress)) {
     return { fallos: 0, bloqueo: null };
   }
 
@@ -931,7 +954,7 @@ app.post('/api/progreso/completar', permitirJugador, verificarBloqueoJugador, as
 
     let nuevoPuntaje = isPassed
       ? validacionEstacion.puntaje
-      : (QUESTION_STATION_RULES[Number(id_estacion)] ? 0 : validacionEstacion.puntaje);
+      : (estacionTieneReglaEstricta(id_estacion) ? 0 : validacionEstacion.puntaje);
     let nuevosAciertos = aciertos || 0;
     let nuevosErrores = errores || 0;
     let nuevoCompletada = isPassed;
@@ -1272,11 +1295,19 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
     }
 
     const [[progress]] = await connection.query(
-      'SELECT completada, aprobada, bloqueada, fecha_puede_volver_jugar FROM progreso_usuario WHERE id_usuario = ? AND id_estacion = ?',
+      `SELECT id_estacion, completada, aprobada, bloqueada, fecha_puede_volver_jugar, puntaje, aciertos, errores
+       FROM progreso_usuario
+       WHERE id_usuario = ? AND id_estacion = ?`,
       [id_usuario, id_estacion]
     );
 
-    if (progress?.aprobada || progress?.completada) {
+    const progresoAprobado = progresoCumpleAprobacionEstacion({
+      ...progress,
+      puntos_estacion: estacion.puntos,
+      puntaje_minimo_estacion: estacion.puntaje_minimo
+    });
+
+    if (progresoAprobado) {
       await connection.rollback();
       return res.status(403).json({ error: 'Ya has aprobado esta estaciÃ³n.' });
     }

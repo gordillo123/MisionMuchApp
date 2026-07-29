@@ -57,6 +57,28 @@
     }
   }
 
+  function toNumber(value) {
+    var number = Number(value);
+    return Number.isFinite(number) ? number : 0;
+  }
+
+  function hasFallbackCompletionEvidence(options) {
+    var stationId = String(options.stationId || '');
+    var puntaje = toNumber(options.puntaje || options.puntaje_total);
+    var aciertos = toNumber(options.aciertos || options.num_correctas);
+    var errores = toNumber(options.errores);
+    var totalPreguntas = toNumber(options.num_preguntas || options.totalPreguntas || options.total);
+    if (!totalPreguntas && options.errores !== undefined) totalPreguntas = aciertos + errores;
+
+    if (stationId === '1') return puntaje >= 10 && aciertos >= 6 && errores <= 0;
+    if (stationId === '2') return puntaje >= 15 && aciertos >= 1 && errores <= 0;
+    if (stationId === '3' || stationId === '4' || stationId === '5') {
+      return totalPreguntas > 0 && totalPreguntas <= 10 && aciertos >= 7 && aciertos <= 10;
+    }
+    if (stationId === '6') return puntaje >= 1 && aciertos >= 1 && errores <= 0;
+    return puntaje > 0;
+  }
+
   function markCompletedLocally(options) {
     if (!options || !options.stationId) return;
 
@@ -88,6 +110,7 @@
           errores: options.errores
         });
       } else {
+        if (!hasFallbackCompletionEvidence(options)) return;
         var completed = getCompletedStations();
         completed[stationId] = true;
         localStorage.setItem('much_completed_stations', JSON.stringify(completed));

@@ -181,6 +181,9 @@ function playIncorrectSound() {
 
 
 function isStationCompleted(stationId) {
+  if (window.MuchLocalStorage?.isStationCompleted) {
+    return window.MuchLocalStorage.isStationCompleted(stationId);
+  }
   try {
     const completed = JSON.parse(localStorage.getItem(COMPLETED_STATIONS_KEY) || '{}');
     return Boolean(completed[String(stationId)]);
@@ -259,28 +262,54 @@ function goToNextStationAfterVictory(delay) {
   return;
 }
 
-async function guardarSpinosaurioEnMySQL(puntajeFinal, aprobado) {
+async function guardarSpinosaurioEnMySQL(puntajeFinal, preguntaFinalCorrecta) {
+  if (isStationCompleted(STATION_ID)) {
+    return;
+  }
+
   try {
     const progreso = await import('../mysql-utils.js');
+    const saltos = Math.max(0, Number(puntajeFinal) || 0);
+    const aprobado = Boolean(preguntaFinalCorrecta) && saltos >= WIN_SCORE;
+    const payload = {
+      id_estacion: Number(STATION_ID),
+      aciertos: aprobado ? 1 : 0,
+      errores: aprobado ? 0 : 1,
+      puntaje: saltos,
+      aprobado,
+      finalizado: true
+    };
+
     await progreso.guardarPartidaMinijuego({
-      puntaje: puntajeFinal,
+      puntaje: saltos,
       aprobado
     });
 
-    await progreso.guardarIntentoEstacion(STATION_ID, {
-      aciertos: aprobado ? 1 : 0,
-      errores: aprobado ? 0 : 1,
-      puntaje: puntajeFinal,
-      aprobado
-    });
+    const intentoId = sessionStorage.getItem("ultimo_intento_id");
+    let intentoGuardado = null;
+    if (intentoId) {
+      intentoGuardado = await progreso.actualizarIntentoEstacion(intentoId, payload);
+    }
+    if (!intentoGuardado) {
+      intentoGuardado = await progreso.guardarIntentoEstacion(STATION_ID, payload);
+    }
 
-    // Enviar los campos al primer nivel para que guardarProgresoUsuario los reciba bien
-    await progreso.guardarProgresoUsuario(STATION_ID, {
-      puntaje: puntajeFinal,
-      aciertos: aprobado ? 1 : 0,
-      errores: aprobado ? 0 : 1,
-      aprobada: aprobado
-    });
+    if (!intentoGuardado) {
+      window.MuchLocalStorage?.recordStationAttempt?.(STATION_ID, {
+        ...payload,
+        aprobada: aprobado,
+        id_intento: intentoId
+      }, { countAttempt: true, countFailure: !aprobado, finalizado: true });
+    }
+
+    if (aprobado) {
+      await progreso.guardarProgresoUsuario(STATION_ID, {
+        puntaje: saltos,
+        aciertos: 1,
+        errores: 0,
+        aprobada: true
+      });
+    }
   } catch (error) {
     console.error('[MySQL DB] No se pudo guardar Espinosaurio:', error);
   }
@@ -978,8 +1007,10 @@ function handleQuestionTimeout() {
     var inputs = document.querySelectorAll('input[name="q1"]'); inputs.forEach(inp => inp.disabled = true);
     try { document.getElementById('btnQuizNext').style.display = 'none'; } catch (e) {}
     try { document.getElementById('btnQuizOk').textContent = 'Volver a jugar'; } catch (e) {}
-    // Reiniciar juego Espinosaurio automáticamente después de una pequeña pausa
-    setTimeout(() => { location.reload(); }, 1400);
+    Promise.resolve(guardarSpinosaurioEnMySQL(Number(score), false))
+      .finally(() => {
+        setTimeout(() => { location.reload(); }, 1400);
+      });
   } catch (e) { console.warn('handleQuestionTimeout error', e); }
 }
 function mostrarQuiz() {
@@ -1093,6 +1124,9 @@ async function validarQuiz() {
         window.MuchStationCompletion?.showFloatingNotice({
           stationId: '2',
           passed: true,
+          puntaje: Number(score),
+          aciertos: 1,
+          errores: 0,
           onReturnToMap: function () {
             const mapParams = new URLSearchParams(window.location.search);
             mapParams.set('view', 'prep');
@@ -1116,8 +1150,8 @@ async function validarQuiz() {
     if (btnOk) btnOk.disabled = true;
     playIncorrectSound();
 
-    // Forzar la estación a Incompleta (en local y BD), borrando progreso previo
-    await guardarSpinosaurioEnMySQL(0, false);
+    // Registrar la pregunta final como fallida sin borrar una palomita ya ganada.
+    await guardarSpinosaurioEnMySQL(Number(score), false);
 
     // Retrasar 1.8 segundos para los efectos visuales/sonoros antes de mostrar el aviso flotante
     setTimeout(() => {
@@ -1129,6 +1163,9 @@ async function validarQuiz() {
         window.MuchStationCompletion?.showFloatingNotice({
           stationId: '2',
           passed: false,
+          puntaje: Number(score),
+          aciertos: 0,
+          errores: 1,
           onReturnToMap: function () {
             location.reload();
           }
@@ -1168,7 +1205,7 @@ async function marcarIncorrectoPorTrampa() {
     var radio = label.querySelector('input');
     if (radio) radio.disabled = true;
   });
-  await guardarSpinosaurioEnMySQL(0, false);
+  await guardarSpinosaurioEnMySQL(Number(score), false);
   setTimeout(() => {
     try { document.getElementById('quizOverlay').classList.remove('show'); } catch (e) {}
     document.body.classList.remove('quiz-mode');
@@ -1176,6 +1213,9 @@ async function marcarIncorrectoPorTrampa() {
       window.MuchStationCompletion?.showFloatingNotice({
         stationId: '2',
         passed: false,
+        puntaje: Number(score),
+        aciertos: 0,
+        errores: 1,
         onReturnToMap: function () {
           location.reload();
         }
@@ -1239,6 +1279,10 @@ function blockShortcutsDuringQuiz(e) {
 const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
 
 async function registrarIntentoInicial() {
+  if (isStationCompleted(STATION_ID)) {
+    return null;
+  }
+
   try {
     const progreso = await import('../mysql-utils.js');
     const data = await progreso.guardarIntentoEstacion(STATION_ID, {
@@ -1259,10 +1303,14 @@ async function registrarIntentoInicial() {
 }
 
 async function registrarQuizEnMySQL(puntajeFinal) {
+  if (isStationCompleted(STATION_ID)) {
+    return;
+  }
+
   try {
     const progreso = await import('../mysql-utils.js');
     const puntaje = Number(puntajeFinal);
-    const aprobado = puntaje >= WIN_SCORE;
+    const aprobado = false;
     const payload = {
       id_estacion: Number(STATION_ID),
       puntaje,

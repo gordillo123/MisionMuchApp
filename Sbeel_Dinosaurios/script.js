@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const size = 3;
     const TIME_LIMIT_SECONDS = 120;
+    const STATION_POINTS = 10;
     const COMPLETED_STATIONS_KEY = 'much_completed_stations';
     const STATION_ID = '6';
     const DRAG_START_THRESHOLD = 8;
@@ -78,6 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let solvedOnTime = false;
     let completionQueued = false;
     let completionTimeout = null;
+    let failureSaved = false;
+    let successSaved = false;
 
     function ensureBgMusic() {
         try {
@@ -114,19 +117,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             await progreso.inicializarProgresoUsuario(6);
-            
-            // Forzar el estado de la estación a Incompleta en localStorage y base de datos
-            // No borrar el completado local al entrar; los fallos reales se guardan como intentos.
-
-            await progreso.guardarProgresoUsuario(STATION_ID, {
-                puntaje: 0,
-                aciertos: 0,
-                errores: 1,
-                aprobada: false
-            });
-            console.log('Progreso de SBEEL inicializado como Incompleto.');
+            console.log('Progreso de SBEEL inicializado.');
         } catch (error) {
             console.error('Error al inicializar progreso de SBEEL:', error);
+        }
+    }
+
+    function isStationCompleted() {
+        if (window.MuchLocalStorage?.isStationCompleted) {
+            return window.MuchLocalStorage.isStationCompleted(STATION_ID);
+        }
+        try {
+            const completed = JSON.parse(localStorage.getItem(COMPLETED_STATIONS_KEY) || '{}');
+            return Boolean(completed[STATION_ID]);
+        } catch (error) {
+            return false;
         }
     }
 
@@ -473,15 +478,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     async function guardarSbeelEnMySQL() {
+        if (successSaved || isStationCompleted()) {
+            return;
+        }
+        successSaved = true;
+
         try {
             const progreso = await import('../mysql-utils.js');
-            const finalScore = Math.max(0, timeRemaining);
+            const finalScore = STATION_POINTS;
 
             await progreso.guardarIntentoEstacion(STATION_ID, {
                 aciertos: 1,
                 errores: 0,
                 puntaje: finalScore,
-                aprobado: true
+                aprobado: true,
+                finalizado: true
             });
 
             await progreso.guardarProgresoUsuario(STATION_ID, {
@@ -493,6 +504,34 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('[MySQL DB] No se pudo guardar SBEEL:', error);
         }
+    }
+
+    async function guardarIntentoSbeelFallido() {
+        if (failureSaved || solvedOnTime || isStationCompleted()) {
+            return;
+        }
+        failureSaved = true;
+
+        const payload = {
+            puntaje: 0,
+            aciertos: 0,
+            errores: 1,
+            aprobado: false,
+            finalizado: true
+        };
+
+        try {
+            const progreso = await import('../mysql-utils.js');
+            const result = await progreso.guardarIntentoEstacion(STATION_ID, payload);
+            if (result) return;
+        } catch (e) {
+            console.warn('Error al registrar intento fallido de SBEEL:', e);
+        }
+
+        window.MuchLocalStorage?.recordStationAttempt?.(STATION_ID, {
+            ...payload,
+            aprobada: false
+        }, { countAttempt: true, countFailure: true, finalizado: true });
     }
 
     async function showSuccess() {
@@ -522,6 +561,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.MuchStationCompletion?.renderInline(successMessageHost, {
                     stationId: '6',
                     isFinalStation: true,
+                    puntaje: STATION_POINTS,
+                    aciertos: 1,
+                    errores: 0,
                     onReturnToMap: () => {
                         window.location.href = '../index.html?view=prep';
                     }
@@ -557,26 +599,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function marcarIncompletoYSalir() {
         if (!solvedOnTime) {
-            try {
-                // Guardar en local
-                window.MuchLocalStorage?.recordStationAttempt?.(STATION_ID, {
-                    aprobada: false,
-                    puntaje: 0,
-                    aciertos: 0,
-                    errores: 1
-                }, { countAttempt: true });
-                
-                // Guardar en MySQL
-                const progreso = await import('../mysql-utils.js');
-                await progreso.guardarProgresoUsuario(STATION_ID, {
-                    puntaje: 0,
-                    aciertos: 0,
-                    errores: 1,
-                    aprobada: false
-                });
-            } catch (e) {
-                console.warn('Error al marcar SBEEL incompleto al salir:', e);
-            }
+            await guardarIntentoSbeelFallido();
         }
         window.location.href = '../index.html?view=prep';
     }
@@ -629,6 +652,8 @@ document.addEventListener('DOMContentLoaded', () => {
         timeRemaining = TIME_LIMIT_SECONDS;
         solvedOnTime = false;
         completionQueued = false;
+        failureSaved = false;
+        successSaved = false;
         updateTimerDisplay();
     }
 
@@ -642,6 +667,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (timeRemaining <= 0) {
                 stopTimer();
                 timerBox.classList.add('time-end');
+                guardarIntentoSbeelFallido();
                 setTimeout(() => {
                     window.MuchStationCompletion?.showFloatingNotice({
                         stationId: '6',

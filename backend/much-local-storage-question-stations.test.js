@@ -77,24 +77,60 @@ test('question stations reject impossible totals above 10', () => {
   assert.equal(api.isStationCompleted('5'), false);
 });
 
-test('legacy checkmarks do not complete question stations without answer evidence', () => {
+test('legacy checkmarks do not complete strict stations without evidence', () => {
   const { api } = loadMuchLocalStorage({
-    much_completed_stations: JSON.stringify({ 1: true, 3: true, 4: true, 5: true })
+    much_completed_stations: JSON.stringify({ 1: true, 2: true, 3: true, 4: true, 5: true, 6: true })
   });
 
-  assert.deepEqual(plain(api.getCompletedStationsMap()), { 1: true });
+  assert.deepEqual(plain(api.getCompletedStationsMap()), {});
 });
 
-test('non-question stations keep their existing score-based completion behavior', () => {
+test('dynamic stations require their own completion evidence', () => {
   const { api } = loadMuchLocalStorage();
 
-  assert.ok(api.completeStation('1', { puntaje: 10 }));
-  assert.ok(api.completeStation('2', { puntaje: 15 }));
-  assert.ok(api.completeStation('6', { puntaje: 10 }));
+  assert.equal(api.completeStation('1', { puntaje: 10 }), null);
+  assert.equal(api.completeStation('2', { puntaje: 15 }), null);
+  assert.equal(api.completeStation('6', { puntaje: 10 }), null);
+
+  assert.equal(api.completeStation('1', { puntaje: 10, aciertos: 5, errores: 0 }), null);
+  assert.equal(api.completeStation('2', { puntaje: 15, aciertos: 1, errores: 1 }), null);
+  assert.equal(api.completeStation('6', { puntaje: 10, aciertos: 1, errores: 1 }), null);
+
+  assert.ok(api.completeStation('1', { puntaje: 10, aciertos: 6, errores: 0 }));
+  assert.ok(api.completeStation('2', { puntaje: 15, aciertos: 1, errores: 0 }));
+  assert.ok(api.completeStation('6', { puntaje: 10, aciertos: 1, errores: 0 }));
 
   assert.deepEqual(plain(api.getCompletedStationsMap()), {
     1: true,
     2: true,
     6: true
   });
+});
+
+test('ticket claim remains blocked until every station has valid completion evidence', () => {
+  const { api } = loadMuchLocalStorage();
+
+  api.completeStation('1', { puntaje: 10, aciertos: 6, errores: 0 });
+  api.completeStation('2', { puntaje: 15, aciertos: 1, errores: 0 });
+  api.completeStation('3', { puntaje: 10, aciertos: 7, errores: 3 });
+  api.completeStation('4', { puntaje: 10, aciertos: 7, errores: 3 });
+  api.completeStation('5', { puntaje: 10, aciertos: 7, errores: 3 });
+
+  assert.equal(api.getRouteState(), 'en_progreso');
+  assert.equal(api.getClaimButtonState(), 'bloqueado');
+
+  api.completeStation('6', { puntaje: 10, aciertos: 1, errores: 0 });
+
+  assert.equal(api.getRouteState(), 'completado');
+  assert.equal(api.getClaimButtonState(), 'activo');
+});
+
+test('repeating a completed station does not duplicate its score', () => {
+  const { api } = loadMuchLocalStorage();
+
+  api.completeStation('1', { puntaje: 10, aciertos: 6, errores: 0 });
+  assert.equal(api.getScore(), 10);
+
+  api.completeStation('1', { puntaje: 10, aciertos: 6, errores: 0 });
+  assert.equal(api.getScore(), 10);
 });

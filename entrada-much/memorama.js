@@ -247,6 +247,33 @@
     }
   }
 
+  async function saveFailureToDB() {
+    const payload = {
+      puntaje: 0,
+      aciertos: state.matched,
+      errores: Math.max(1, NUM_PAIRS - state.matched),
+      aprobado: false,
+      finalizado: true
+    };
+
+    try {
+      const progreso = await import('../mysql-utils.js');
+      const result = state.attemptId
+        ? await progreso.actualizarIntentoEstacion(state.attemptId, payload)
+        : await progreso.guardarIntentoEstacion(Number(STATION_ID), payload);
+
+      if (result) return;
+    } catch (err) {
+      console.warn('[Memorama] No se pudo registrar intento fallido remoto:', err);
+    }
+
+    window.MuchLocalStorage?.recordStationAttempt?.(STATION_ID, {
+      ...payload,
+      aprobada: false,
+      id_intento: state.attemptId
+    }, { countAttempt: true, countFailure: true, finalizado: true });
+  }
+
   // --- Juego ---
   function buildDeck() {
     const deck = [];
@@ -377,6 +404,9 @@
       window.MuchStationCompletion.renderInline(els.victoryHost, {
         stationId: STATION_ID,
         nextStationId: '2',
+        puntaje: finalScore,
+        aciertos: NUM_PAIRS,
+        errores: 0,
         badge: 'Estación completada',
         title: '¡Estación completada!',
         body: 'Encontraste todos los pares y completaste la <strong>Estación 1</strong>. Sumaste 10 puntos para tu misión científica. Regresa al mapa para continuar el recorrido MUCH.',
@@ -397,12 +427,7 @@
     state.gameStarted = false;
     playSound('lose');
 
-    window.MuchLocalStorage?.recordStationAttempt?.(STATION_ID, {
-      aprobada: false,
-      puntaje: 0,
-      aciertos: state.matched,
-      errores: 1
-    }, { countAttempt: true });
+    saveFailureToDB();
 
     showScreen('fail');
   }
@@ -417,6 +442,7 @@
     state.timeLeft = TIME_LIMIT_SEC;
     state.lockBoard = false;
     state.gameStarted = false;
+    state.attemptId = null;
     state.completionSaved = false;
     updateStats();
     renderBoard();

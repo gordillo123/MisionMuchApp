@@ -45,6 +45,12 @@
     '5': { minCorrect: 7, maxQuestions: 10 }
   };
 
+  const DYNAMIC_STATION_RULES = {
+    '1': { minScore: 10, minCorrect: 6, maxErrors: 0 },
+    '2': { minScore: 15, minCorrect: 1, maxErrors: 0 },
+    '6': { minScore: 1, minCorrect: 1, maxErrors: 0 }
+  };
+
   const REQUIRED_REWARD_STATIONS = ['1', '2', '3', '4', '5', '6'];
 
   function storageAvailable() {
@@ -146,9 +152,32 @@
       && correct >= rule.minCorrect;
   }
 
+  function hasStrictCompletionRule(stationId) {
+    const id = toStationId(stationId);
+    return Boolean(QUESTION_STATION_RULES[id] || DYNAMIC_STATION_RULES[id]);
+  }
+
+  function isDynamicStationApproved(stationId, result = {}, options = {}) {
+    const id = toStationId(stationId);
+    const rule = DYNAMIC_STATION_RULES[id];
+    if (!rule) return null;
+
+    const score = toNumber(result.puntaje ?? result.puntaje_total, 0);
+    const correct = toNumber(result.aciertos ?? result.num_correctas, 0);
+    const errors = toNumber(result.errores, 0);
+    const errorsOk = rule.maxErrors === undefined || errors <= rule.maxErrors;
+    return getApprovalRequested(result, options)
+      && score >= rule.minScore
+      && correct >= rule.minCorrect
+      && errorsOk;
+  }
+
   function isStationResultApproved(stationId, result = {}, options = {}) {
     const questionApproved = isQuestionStationApproved(stationId, result, options);
     if (questionApproved !== null) return questionApproved;
+
+    const dynamicApproved = isDynamicStationApproved(stationId, result, options);
+    if (dynamicApproved !== null) return dynamicApproved;
 
     return getApprovalRequested(result, options)
       && toNumber(result.puntaje ?? result.puntaje_total, 0) >= getRequiredScore(stationId);
@@ -213,7 +242,7 @@
 
     Object.keys(legacy).forEach((stationId) => {
       if (!merged[stationId]) {
-        if (QUESTION_STATION_RULES[stationId]) return;
+        if (hasStrictCompletionRule(stationId)) return;
         const station = getStation(stationId);
         merged[stationId] = {
           id: stationId,
@@ -233,7 +262,7 @@
     return Object.keys(records).reduce((acc, stationId) => {
       const record = records[stationId];
       if (!record?.completada) return acc;
-      if (QUESTION_STATION_RULES[stationId] && !isStationResultApproved(stationId, {
+      if (hasStrictCompletionRule(stationId) && !isStationResultApproved(stationId, {
         ...record,
         aprobada: true
       }, { assumeApproved: true })) {
@@ -253,7 +282,7 @@
       const record = records[stationId];
       if (!record?.completada) return;
       const station = getStation(stationId);
-      if (QUESTION_STATION_RULES[stationId] && !isStationResultApproved(stationId, {
+      if (hasStrictCompletionRule(stationId) && !isStationResultApproved(stationId, {
         ...record,
         aprobada: true
       }, { assumeApproved: true })) {
@@ -388,7 +417,7 @@
     }, { assumeApproved: true });
     const completedAlready = Boolean(
       completedMap[id]
-      || (previous.completada && (!QUESTION_STATION_RULES[id] || previousApproved))
+      || (previous.completada && (!hasStrictCompletionRule(id) || previousApproved))
     );
     const completada = aprobada || completedAlready;
     const finalizada = attempt.finalizado !== undefined ? Boolean(attempt.finalizado)
@@ -426,7 +455,7 @@
       mejor_puntaje: Math.max(toNumber(previous.mejor_puntaje, 0), puntaje),
       aciertos: toNumber(attempt.aciertos, previous.aciertos || 0),
       errores: toNumber(attempt.errores, previous.errores || 0),
-      aprobada: Boolean(aprobada || (previous.aprobada && (!QUESTION_STATION_RULES[id] || previousApproved))),
+      aprobada: Boolean(aprobada || (previous.aprobada && (!hasStrictCompletionRule(id) || previousApproved))),
       completada,
       fallida,
       bloqueada,
@@ -548,7 +577,7 @@
     const total = Object.keys(records).reduce((sum, stationId) => {
       const record = records[stationId];
       if (!record?.completada) return sum;
-      if (QUESTION_STATION_RULES[stationId] && !isStationResultApproved(stationId, {
+      if (hasStrictCompletionRule(stationId) && !isStationResultApproved(stationId, {
         ...record,
         aprobada: true
       }, { assumeApproved: true })) {
@@ -779,7 +808,7 @@
       const station = getStation(id);
       const puntaje = Math.max(0, toNumber(row.puntaje, station.puntos));
       const aprobadaServidor = Boolean(row.aprobada || row.completada);
-      const completada = QUESTION_STATION_RULES[id]
+      const completada = hasStrictCompletionRule(id)
         ? isStationResultApproved(id, {
           ...row,
           puntaje,
