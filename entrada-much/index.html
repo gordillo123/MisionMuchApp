@@ -103,38 +103,14 @@
 
     <!-- Pantalla de victoria -->
     <section id="screenVictory" class="memorama-screen">
-      <div class="mm-victory">
-        <div class="mm-trophy" aria-hidden="true">🏆</div>
-        <h2>¡Estación completada!</h2>
-        <p>Encontraste todos los pares y completaste la Estación 1 de tu recorrido científico.</p>
-        <div class="mm-points-badge" id="mmVictoryPoints">+10 puntos</div>
-        <p>Sumaste 10 puntos. Regresa al mapa para continuar tu misión MUCH.</p>
-        <div id="mmVictoryHost" class="mm-victory-host"></div>
-        <button type="button" id="btnMemoramaContinue" class="mm-btn-primary">Volver al mapa</button>
-        <button type="button" class="mm-btn-back-bottom" style="visibility:hidden; pointer-events:none;" aria-hidden="true">&nbsp;</button>
-      </div>
+      <div id="mmVictoryHost" class="mm-victory-host"></div>
+      <button type="button" id="btnMemoramaContinue" class="mm-btn-primary" style="display:none;">Volver al mapa</button>
     </section>
 
     <!-- Pantalla de fallo -->
     <section id="screenFail" class="memorama-screen mm-fail">
-      <div class="station-completion-host mm-fail-host">
-        <div class="station-completion-card">
-          <div class="station-completion-card__head">
-            <div class="station-completion-card__seal station-completion-card__seal--fail" aria-hidden="true">&times;</div>
-            <div class="station-completion-card__intro">
-              <div class="station-completion-card__kicker">Misión MUCH</div>
-              <h3 class="station-completion-card__title">Sigue intentando</h3>
-            </div>
-          </div>
-          <p class="station-completion-card__body">
-            Tu misión MUCH continúa. Observa las cartas con calma y vuelve a intentarlo para completar esta estación.
-          </p>
-          <div class="station-completion-card__actions">
-            <button type="button" id="btnMemoramaRetry" class="station-completion-cta">Reintentar</button>
-            <button type="button" class="station-completion-cta station-completion-cta--secondary" onclick="window.location.href='../index.html?view=prep'">Volver al mapa</button>
-          </div>
-        </div>
-      </div>
+      <div id="mmFailHost" class="mm-fail-host"></div>
+      <button type="button" id="btnMemoramaRetry" class="station-completion-cta" style="display:none;">Reintentar</button>
     </section>
     <!-- Ya completada -->
     <section id="screenAlreadyDone" class="memorama-screen">

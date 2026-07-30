@@ -564,9 +564,9 @@ body {
 /* Final responsive lock: keep every station question clean, large, and inside the card. */
 :root {
   --quiz-question-font: clamp(1.48rem, min(5.1vw, 4.15vh), 3rem);
-  --quiz-answer-font: clamp(1.18rem, min(4.15vw, 3.2vh), 1.9rem);
+  --quiz-answer-font: clamp(1.44rem, min(4.95vw, 3.72vh), 2.24rem);
   --quiz-timer-font: clamp(1.28rem, min(4.8vw, 3.35vh), 2.15rem);
-  --quiz-list-gap: clamp(0.55rem, 1.25vh, 1rem);
+  --quiz-list-gap: clamp(0.72rem, 1.65vh, 1.28rem);
 }
 
 html,
@@ -832,9 +832,9 @@ body {
 @media (max-width: 768px) {
   :root {
     --quiz-question-font: clamp(1.32rem, min(6.7vw, 3.65vh), 2rem);
-    --quiz-answer-font: clamp(1.08rem, min(5.6vw, 2.95vh), 1.5rem);
+    --quiz-answer-font: clamp(1.26rem, min(6.25vw, 3.28vh), 1.76rem);
     --quiz-timer-font: clamp(1.12rem, min(5.4vw, 2.95vh), 1.6rem);
-    --quiz-list-gap: clamp(0.48rem, 1.08vh, 0.78rem);
+    --quiz-list-gap: clamp(0.6rem, 1.35vh, 0.95rem);
   }
 
   .quiz-card {
@@ -902,9 +902,9 @@ body {
 @media (max-height: 700px) {
   :root {
     --quiz-question-font: clamp(1.12rem, min(5vw, 3.05vh), 1.72rem);
-    --quiz-answer-font: clamp(1rem, min(4.55vw, 2.55vh), 1.34rem);
+    --quiz-answer-font: clamp(1.15rem, min(5.1vw, 2.84vh), 1.52rem);
     --quiz-timer-font: clamp(1.02rem, min(4.6vw, 2.6vh), 1.36rem);
-    --quiz-list-gap: clamp(0.38rem, 0.9vh, 0.62rem);
+    --quiz-list-gap: clamp(0.5rem, 1.12vh, 0.76rem);
   }
 
   .question-timer {
@@ -949,7 +949,7 @@ body {
   flex-direction: column !important;
   height: auto !important;
   max-height: none !important;
-  overflow: visible !important;
+  overflow: hidden !important;
 }
 
 #options > *,
@@ -986,16 +986,16 @@ body {
 
 @media (max-width: 480px), (max-height: 700px) {
   :root {
-    --quiz-answer-font: clamp(0.82rem, min(4.05vw, 2.18vh), 1.08rem);
-    --quiz-list-gap: clamp(0.34rem, 0.78vh, 0.55rem);
+    --quiz-answer-font: clamp(1.04rem, min(4.95vw, 2.54vh), 1.3rem);
+    --quiz-list-gap: clamp(0.42rem, 0.92vh, 0.62rem);
   }
 
   #options .option-btn,
   #options.options-list .option-btn,
   .options-list .option-btn,
   .option-btn {
-    min-height: clamp(3rem, 7vh, 4.25rem) !important;
-    padding: clamp(0.52rem, 1.1vh, 0.76rem) clamp(0.72rem, 2.4vw, 1rem) !important;
+    min-height: clamp(2.72rem, 6.25vh, 3.86rem) !important;
+    padding: clamp(0.44rem, 0.86vh, 0.62rem) clamp(0.68rem, 2.25vw, 0.96rem) !important;
   }
 
   #options .option-btn span:not(.emoji),

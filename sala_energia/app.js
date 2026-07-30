@@ -265,7 +265,7 @@ function ensureBgMusic() {
     }
   } catch (e) {}
 }
-function playBgMusic() { try { pauseBgMusic(); } catch (e) {} }
+function playBgMusic() { try { ensureBgMusic(); if (window.bgMusic && !window.bgMusicMuted) window.bgMusic.play().catch(() => {}); } catch (e) {} }
 function pauseBgMusic() { try { if (window.bgMusic && !window.bgMusic.paused) window.bgMusic.pause(); } catch (e) {} }
 
 async function guardarResultadoEstacionMySQL({ puntaje_total, num_correctas, num_preguntas, aprobado }) {
@@ -547,17 +547,48 @@ function saveQuizResultLocal(data) {
 
 /* =================== Clases UI =================== */
 class SoundFX {
-  constructor(toggleEl) { this.toggleEl = toggleEl; this.ctx = null; }
-  beep(freq = 880, dur = 0.15, type = 'sine', vol = 0.08) {
-    if (this.toggleEl && !this.toggleEl.checked) return;
-    this.ctx = this.ctx || new (window.AudioContext || window.webkitAudioContext)();
-    const o = this.ctx.createOscillator(), g = this.ctx.createGain();
-    o.type = type; o.frequency.value = freq; g.gain.value = vol;
-    o.connect(g); g.connect(this.ctx.destination); o.start();
-    setTimeout(() => o.stop(), dur * 1000);
+  constructor(toggleEl) { this.toggleEl = toggleEl; this.ctx = null; this.lastAt = {}; }
+  enabled() {
+    return !(this.toggleEl && !this.toggleEl.checked);
   }
-  correct() { this.beep(880, .12, 'sine', .08); setTimeout(() => this.beep(1320, .12, 'sine', .07), 130); }
-  wrong() { this.beep(200, .18, 'sawtooth', .07); }
+  getContext() {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return null;
+    try {
+      this.ctx = this.ctx || new AudioCtx();
+      return this.ctx;
+    } catch (_) {
+      return null;
+    }
+  }
+  playTone(ctx, freq = 880, dur = 0.15, type = 'sine', vol = 0.08) {
+    const start = ctx.currentTime + 0.01;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, start);
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(vol, start + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(start);
+    o.stop(start + dur + 0.03);
+  }
+  beep(freq = 880, dur = 0.15, type = 'sine', vol = 0.08, key = 'tone') {
+    if (!this.enabled()) return;
+    const nowMs = Date.now();
+    if (this.lastAt[key] && nowMs - this.lastAt[key] < 80) return;
+    this.lastAt[key] = nowMs;
+    const ctx = this.getContext();
+    if (!ctx) return;
+    const play = () => this.playTone(ctx, freq, dur, type, vol);
+    if (ctx.state === 'suspended') {
+      ctx.resume().then(play).catch(() => {});
+      return;
+    }
+    play();
+  }
+  correct() { this.beep(660, .14, 'sine', .12, 'correct-1'); setTimeout(() => this.beep(880, .16, 'sine', .13, 'correct-2'), 105); setTimeout(() => this.beep(1320, .22, 'triangle', .12, 'correct-3'), 230); }
+  wrong() { this.beep(170, .2, 'square', .11, 'wrong-1'); setTimeout(() => this.beep(130, .24, 'sawtooth', .12, 'wrong-2'), 110); setTimeout(() => this.beep(95, .18, 'square', .08, 'wrong-3'), 260); }
   victory() {
     if (this.toggleEl && !this.toggleEl.checked) return;
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -658,8 +689,13 @@ class UIManager {
 
   playCompletionSound() {
     try {
-      const audio = new Audio('../Sonidos/Estación completada.mp3');
-      audio.play().catch(e => console.warn('No se pudo reproducir audio de completado:', e));
+      if (window.playMuchSfx) {
+      window.playMuchSfx('success');
+      return;
+    }
+    const audio = new Audio('../Sonidos/Estacion completada.mp3');
+    audio.volume = 0.34;
+    audio.play().catch(e => console.warn('No se pudo reproducir audio de completado:', e));
     } catch (e) {
       console.warn('Error al reproducir audio:', e);
     }
@@ -667,8 +703,13 @@ class UIManager {
 
   playIncorrectSound() {
     try {
-      const audio = new Audio('../Sonidos/respuesta incorrecta.mp3');
-      audio.play().catch(e => console.warn('No se pudo reproducir audio de incorrecto:', e));
+      if (window.playMuchSfx) {
+      window.playMuchSfx('error');
+      return;
+    }
+    const audio = new Audio('../Sonidos/respuesta incorrecta.mp3');
+    audio.volume = 0.34;
+    audio.play().catch(e => console.warn('No se pudo reproducir audio de incorrecto:', e));
     } catch (e) {
       console.warn('Error al reproducir audio:', e);
     }
@@ -1085,8 +1126,6 @@ class UIManager {
         e.finalTitle.classList.add('visually-hidden');
         e.giftRow.classList.add('d-none');
         e.retryRow.classList.add('d-none');
-        this.sound.victory();
-        this.playCompletionSound();
         try { playBgMusic(); } catch (e) {}
       } else {
         window.MuchLocalStorage?.recordStationAttempt?.('4', {
@@ -1305,4 +1344,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initMiniMap();
 });
+
+
+
+
+
+
+
+
 

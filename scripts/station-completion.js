@@ -10,9 +10,9 @@
   };
   var STATION_MESSAGES = {
     '1': {
-      badge: 'Aventura iniciada',
-      title: 'Tu misión MUCH ya comenzó',
-      body: 'Excelente trabajo, explorador. Ya entraste al recorrido del MUCH y estás listo para descubrir estaciones, dinosaurios y nuevas aventuras.'
+      badge: 'Estación completada',
+      title: '¡Excelente trabajo, explorador!',
+      body: 'Has completado <strong>Taquilla</strong> y sigues avanzando en tu misión MUCH. Sigue aprendiendo y descubriendo nuevas aventuras.'
     },
     '2': {
       badge: 'Estación completada',
@@ -129,13 +129,48 @@
     var stationId = String(options.stationId || '');
     var stationName = getStationName(options.stationId, options.stationName);
     var stationCopy = STATION_MESSAGES[stationId] || null;
+    var attemptInfo = stationId && window.MuchLocalStorage?.getStationAttemptInfo
+      ? window.MuchLocalStorage.getStationAttemptInfo(stationId)
+      : null;
+    var remainingAttempts = Number(attemptInfo?.intentos_restantes);
+    var failureBody = 'Tu misión MUCH continúa. Vuelve a intentarlo para completar esta estación.';
+    if (Number.isFinite(remainingAttempts)) {
+      if (remainingAttempts > 0) {
+        failureBody = 'Tu misión MUCH continúa. Puedes volver a intentarlo para completar esta estación.';
+      } else {
+        var retryDate = attemptInfo?.fecha_puede_volver_jugar ? new Date(attemptInfo.fecha_puede_volver_jugar) : null;
+        var retryDateText = retryDate && !Number.isNaN(retryDate.getTime())
+          ? new Intl.DateTimeFormat('es-MX', { dateStyle: 'full', timeStyle: 'short' }).format(retryDate)
+          : 'la fecha indicada por el sistema';
+        failureBody = 'Has agotado tus 3 intentos del recorrido. Podrás volver a jugar el <strong>' + retryDateText + '</strong>.';
+      }
+    }
     var nextStationName = options.nextStationId
       ? getStationName(options.nextStationId, options.nextStationName)
       : (options.nextStationName || '');
     var isFinalStation = Boolean(options.isFinalStation || !nextStationName);
     var payload;
 
-    if (isFinalStation) {
+    var optionText = [
+      options.badge,
+      options.title,
+      options.body,
+      options.detailValue
+    ].filter(Boolean).join(' ').toLowerCase();
+    var looksLikeFailure = /fallid|error|incorrect|bloquead|inactiv|no est|denegad|limite|límite|agotad|no se pudo|requerid|intenta más tarde|intenta mas tarde/.test(optionText);
+
+    if (options.passed === false || (options.passed !== true && looksLikeFailure)) {
+      payload = {
+        badge: 'Intento fallido',
+        title: 'Sigue intentando',
+        body: failureBody,
+        detailLabel: 'Tu siguiente paso',
+        detailValue: 'Regresa al mapa',
+        ctaLabel: 'Volver al mapa',
+        dismissLabel: 'Cerrar mensaje',
+        passed: false
+      };
+    } else if (isFinalStation) {
       payload = {
         badge: (stationCopy && stationCopy.badge) || 'Misión completada',
         title: (stationCopy && stationCopy.title) || '¡Excelente trabajo, explorador!',
@@ -158,7 +193,7 @@
     }
 
     // estado de aprobación/paso: por defecto true, si options.passed === false entonces marcar como no completado
-    payload.passed = !(options && options.passed === false);
+    payload.passed = !(options && (options.passed === false || (options.passed !== true && looksLikeFailure)));
 
     ['badge', 'title', 'body', 'detailLabel', 'detailValue', 'ctaLabel', 'dismissLabel'].forEach(function (key) {
       if (typeof options[key] === 'string' && options[key].trim() !== '') {
@@ -197,6 +232,14 @@
     ].join('');
   }
 
+  function playResultSound(payload) {
+    try {
+      if (window.playMuchSfx) {
+        window.playMuchSfx(payload && payload.passed === false ? 'error' : 'success');
+      }
+    } catch (e) {}
+  }
+
   function bindCloseAction(scope, payload, onClose) {
     if (!scope || typeof onClose !== 'function') return;
     var closeButton = scope.querySelector('.station-completion-card__close');
@@ -210,6 +253,7 @@
     markCompletedLocally(options);
     var payload = buildPayload(options);
     if (!target) return payload;
+    if (!options || options.silentSound !== true) playResultSound(payload);
     target.classList.add('station-completion-host');
     target.innerHTML = buildCardHtml(payload, true);
     bindCloseAction(target, payload, function () {
@@ -301,6 +345,7 @@
     if (!document.body) return null;
     markCompletedLocally(options);
     var payload = buildPayload(options);
+    if (!options || options.silentSound !== true) playResultSound(payload);
 
     var activeNotice = document.querySelector('.station-map-toast');
     if (activeNotice) {

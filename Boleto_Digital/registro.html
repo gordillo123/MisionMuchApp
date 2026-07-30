@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="styles.css" />
 
   <script src="../scripts/much-local-storage.js"></script>
+  <script src="../scripts/bg-music.js"></script>
 
   <style>
     *, *::before, *::after {
@@ -582,6 +583,15 @@
     // Verificar si hay un boleto guardado o si el usuario logueado ya tiene uno
     (async function checkExistingTicketOnLoad() {
       try {
+        const params = new URLSearchParams(location.search);
+        const hasPendingTicketSelection = Boolean(
+          params.get('destino')
+          || params.get('destino_boleto')
+          || params.get('tipo_entrada')
+          || localStorage.getItem('much_quiz_prize')
+        );
+        if (hasPendingTicketSelection) return;
+
         const cachedTicketRaw = localStorage.getItem('much_user_ticket');
         if (cachedTicketRaw) {
           const cachedTicket = JSON.parse(cachedTicketRaw);
@@ -1011,6 +1021,10 @@
       }
 
       prizeData = applyTicketChoiceToPrize(prizeData);
+      prizeData.nombre_usuario = nombre.trim().replace(/\s+/g, ' ');
+      prizeData.correo_usuario = correo.trim().toLowerCase();
+      prizeData.telefono = telefono.trim();
+      prizeData.telefono_usuario = telefono.trim();
       try { localStorage.setItem('much_quiz_prize', JSON.stringify(prizeData)); } catch (_) { }
 
       const expectedPrefix = getPrizeFolioPrefix(prizeData);
@@ -1082,6 +1096,16 @@
           localStorage.setItem('much_user_ticket', JSON.stringify({
             folio: prizeData.folio || '',
             qr_token: prizeData.qr_token || '',
+            qr_data: prizeData.qr_data || '',
+            nombre_usuario: prizeData.nombre_usuario || '',
+            correo_usuario: prizeData.correo_usuario || '',
+            telefono: prizeData.telefono || '',
+            telefono_usuario: prizeData.telefono_usuario || prizeData.telefono || '',
+            tipo_entrada: prizeData.tipo_entrada || tipoEntrada,
+            destino_boleto: prizeData.destino_boleto || prizeData.ticketChoice?.key || '',
+            seccion_boleto: prizeData.seccion_boleto || '',
+            lugar_boleto: prizeData.lugar || '',
+            valido_desde: prizeData.valido_desde || '',
             valido_hasta: prizeData.valido_hasta || '',
             estado: prizeData.estado || 'activo'
           }));

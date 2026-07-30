@@ -784,8 +784,9 @@
 
     .quiz-options {
       display: grid;
-      gap: 10px;
-      margin: 12px 0 8px
+      gap: 9px;
+      margin: 10px 0 6px;
+      overflow: hidden;
     }
 
     .quiz-opt {
@@ -796,6 +797,8 @@
       border-radius: 12px;
       background: #f3f4f6;
       border: 1px solid #e5e7eb;
+      font-size: clamp(1.05rem, min(3.6vw, 3vh), 1.34rem);
+      line-height: 1.14;
       white-space: normal;
       overflow-wrap: break-word;
       word-break: break-word;
@@ -1216,7 +1219,7 @@
       grid-auto-rows: minmax(0, 1fr);
       flex: 1 1 auto;
       min-height: 0;
-      gap: clamp(9px, 1.7vh, 16px) !important;
+      gap: clamp(8px, 1.45vh, 14px) !important;
       width: 100%;
       max-width: min(760px, 100%);
       margin-left: auto;
@@ -1229,8 +1232,8 @@
       min-height: 0;
       height: 100%;
       align-items: center;
-      padding: clamp(12px, 2vh, 18px) clamp(16px, 3.4vw, 26px);
-      font-size: clamp(1.16rem, min(3.8vw, 3.35vh), 1.72rem);
+      padding: clamp(10px, 1.7vh, 16px) clamp(16px, 3.4vw, 26px);
+      font-size: clamp(1.24rem, min(4.05vw, 3.55vh), 1.84rem);
       line-height: 1.14;
       border-radius: 18px;
       font-weight: 900;
@@ -1567,14 +1570,14 @@
       }
 
       .quiz-options {
-        gap: 6px !important;
+        gap: 5px !important;
       }
 
       .quiz-opt {
-        padding: 6px 12px;
+        padding: 5px 12px;
         border-radius: 14px;
         font-size: clamp(0.95rem, 3.8vh, 1.12rem);
-        font-size: clamp(1rem, 4.1svh, 1.28rem);
+        font-size: clamp(1.06rem, 4.2svh, 1.34rem);
         line-height: 1.1;
       }
 
@@ -1784,7 +1787,7 @@
       <p id="quizTimer" class="quiz-timer" style="text-align:center;font-weight:900;margin:6px 0;color:#b91c1c;display:none;">15 s</p>
       <div id="quizOptions" class="quiz-options"></div>
       <div class="quiz-actions">
-        <button id="btnQuizOk" class="btn-primary">Confirmar</button>
+        <button id="btnQuizOk" class="btn-primary" style="display:none;"></button>
         <button id="btnQuizNext" class="btn-primary" style="display:none;">Volver al mapa y continuar</button>
         <button id="btnQuizCancel" class="btn-secondary">Cancelar</button>
       </div>
@@ -1798,6 +1801,7 @@
   <script src="../scripts/much-local-storage.js"></script>
   <script src="../scripts/station-completion.js"></script>
   <script src="../scripts/spinosaurio-question-pool.js"></script>
+  <script src="../scripts/bg-music.js" defer></script>
   <script src="game.js?v=5" defer></script>
 
   <script>

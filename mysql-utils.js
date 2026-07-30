@@ -5,13 +5,13 @@
 const API_BASE_URL = window.location.hostname ? `http://${window.location.hostname}:3000` : 'http://127.0.0.1:3000';
 
 // ==========================================
-// CONFIGURACIÃƒâ€œN DE GEOLOCALIZACIÃƒâ€œN DEL MUSEO
+// CONFIGURACION DE GEOLOCALIZACION DEL MUSEO
 // ==========================================
-const DIRECCION_MUSEO = "Calz. Cerro Hueco 3000, Rivera Cerro Hueco, FSTSE, 29094 Tuxtla GutiÃƒÂ©rrez, Chiapas";
-const LATITUD_MUSEO = 16.72248; // Coloca la latitud real aquÃƒÂ­ (ej: 16.72248)
-const LONGITUD_MUSEO = -93.09100; // Coloca la longitud real aquÃƒÂ­ (ej: -93.09100)
+const DIRECCION_MUSEO = "Calz. Cerro Hueco 3000, Rivera Cerro Hueco, FSTSE, 29094 Tuxtla Gutiérrez, Chiapas";
+const LATITUD_MUSEO = 16.72248; // Coloca la latitud real aqui (ej: 16.72248)
+const LONGITUD_MUSEO = -93.09100; // Coloca la longitud real aqui (ej: -93.09100)
 const RADIO_PERMITIDO_METROS = 150;
-const TIEMPO_VALIDACION_MINUTOS = 15; // 15 minutos de vigencia de verificaciÃƒÂ³n
+const TIEMPO_VALIDACION_MINUTOS = 15; // 15 minutos de vigencia de verificacion
 
 function calcularDistanciaHaversine(lat1, lon1, lat2, lon2) {
   const R = 6371e3; // Radio de la Tierra en metros
@@ -44,11 +44,11 @@ async function guardarVerificacionUbicacion(datos) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(datos)
     });
-    if (!res.ok) throw new Error('Error en el servidor al guardar verificaciÃƒÂ³n');
+    if (!res.ok) throw new Error('Error en el servidor al guardar verificación');
     const data = await res.json();
     return data;
   } catch (e) {
-    console.error('Error guardando verificaciÃƒÂ³n de ubicaciÃƒÂ³n en base de datos:', e.message);
+    console.error('Error guardando verificación de ubicación en base de datos:', e.message);
     throw e;
   }
 }
@@ -60,7 +60,7 @@ async function verificarUbicacionYRegistrar() {
     const verifLocal = {
       dentro_del_museo: true,
       timestamp: Date.now(),
-      mensaje_resultado: 'UbicaciÃƒÂ³n vÃƒÂ¡lida (VerificaciÃƒÂ³n de geolocalizaciÃƒÂ³n desactivada temporalmente).'
+      mensaje_resultado: 'Ubicación válida (verificación de geolocalización desactivada temporalmente).'
     };
     sessionStorage.setItem('much_last_location_verification', JSON.stringify(verifLocal));
     
@@ -79,20 +79,20 @@ function comprobarUbicacionVigente() {
     const verifLocal = {
       dentro_del_museo: true,
       timestamp: Date.now(),
-      mensaje_resultado: 'UbicaciÃƒÂ³n vÃƒÂ¡lida (VerificaciÃƒÂ³n de geolocalizaciÃƒÂ³n desactivada temporalmente).'
+      mensaje_resultado: 'Ubicación válida (verificación de geolocalización desactivada temporalmente).'
     };
     sessionStorage.setItem('much_last_location_verification', JSON.stringify(verifLocal));
-    return { ok: true, message: 'UbicaciÃƒÂ³n vÃƒÂ¡lida (VerificaciÃƒÂ³n desactivada).' };
+    return { ok: true, message: 'Ubicación válida (verificación desactivada).' };
   } catch (e) {
-    console.error('Error al comprobar vigencia de ubicaciÃƒÂ³n:', e);
-    return { ok: true, message: 'UbicaciÃƒÂ³n vÃƒÂ¡lida (VerificaciÃƒÂ³n desactivada).' };
+    console.error('Error al comprobar vigencia de ubicación:', e);
+    return { ok: true, message: 'Ubicación válida (verificación desactivada).' };
   }
 }
 
 function asegurarUbicacionVigente() {
   const estado = comprobarUbicacionVigente();
   if (!estado.ok) {
-    throw new Error('AcciÃƒÂ³n bloqueada: ' + estado.message);
+    throw new Error('Acción bloqueada: ' + estado.message);
   }
 }
 
@@ -186,9 +186,9 @@ function sincronizarBloqueoPorIntentos(data = {}) {
 
     if (window.MuchStationCompletion?.showFloatingNotice) {
       window.MuchStationCompletion.showFloatingNotice({
-        badge: 'EstaciÃƒÂ³n bloqueada',
-        title: 'LÃƒÂ­mite de intentos superado',
-        body: `Has agotado tus 3 intentos en esta estaciÃƒÂ³n. EstarÃƒÂ¡ bloqueada hasta el <b>${b.fecha_puede_volver_texto}</b>.<br><br>Puedes seguir jugando en las demÃƒÂ¡s estaciones.`,
+        badge: 'Recorrido bloqueado',
+        title: 'Límite de intentos superado',
+        body: `Has agotado tus 3 intentos del recorrido. Podrás volver a jugar el <b>${b.fecha_puede_volver_texto}</b>.`,
         ctaLabel: 'Regresar al mapa',
         onCta: () => {
           if (typeof showView === 'function') {
@@ -197,7 +197,7 @@ function sincronizarBloqueoPorIntentos(data = {}) {
         }
       });
     } else {
-      alert(`Has superado el lÃƒÂ­mite de intentos en esta estaciÃƒÂ³n. EstarÃƒÂ¡ bloqueada hasta el ${b.fecha_puede_volver_texto}.`);
+      alert(`Has superado el límite de intentos del recorrido. Podrás volver a jugar el ${b.fecha_puede_volver_texto}.`);
       if (typeof showView === 'function') {
         showView('viewPrep');
       }
@@ -223,14 +223,14 @@ function mostrarAvisoBloqueoJuego(estado) {
   const fecha = estado?.fecha_puede_volver_texto || '';
   const esBloqueoPorIntentos = estado?.motivo_bloqueo === 'intentos';
   const mensaje = estado?.mensaje || (esBloqueoPorIntentos
-    ? `Has agotado tus 3 intentos en esta estaciÃƒÂ³n. Tu acceso al juego ha sido bloqueado temporalmente. PodrÃƒÂ¡s volver a jugar despuÃƒÂ©s de una semana.`
+    ? `Has agotado tus 3 intentos del recorrido. Tu acceso al juego ha sido bloqueado temporalmente.${fecha ? ` Podrás volver a jugar el ${fecha}.` : ''}`
     : fecha
-    ? `Ã‚Â¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrÃƒÂ¡s volver a jugar el ${fecha}.`
-    : 'Tu misiÃƒÂ³n ya fue completada. Debes esperar para comenzar una nueva aventura.');
+    ? `¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrás volver a jugar el ${fecha}.`
+    : 'Tu misión ya fue completada. Debes esperar para comenzar una nueva aventura.');
   if (window.MuchStationCompletion?.showFloatingNotice) {
     window.MuchStationCompletion.showFloatingNotice({
-      badge: esBloqueoPorIntentos ? 'Limite de intentos' : 'Ã¢ÂÂ³ MisiÃƒÂ³n completada',
-      title: esBloqueoPorIntentos ? 'Juego bloqueado temporalmente' : 'Ã‚Â¡Aventura completada!',
+      badge: esBloqueoPorIntentos ? 'Límite de intentos' : 'Misión completada',
+      title: esBloqueoPorIntentos ? 'Juego bloqueado temporalmente' : '¡Aventura completada!',
       body: mensaje.replace(/\n/g, '<br>'),
       ctaLabel: 'Entendido'
     });
@@ -242,15 +242,15 @@ function mostrarAvisoBloqueoJuego(estado) {
 function mostrarAvisoFinalizacionJuego(finalizacion) {
   if (!finalizacion?.recorrido_completado || !finalizacion.fecha_puede_volver_texto) return;
   const fecha = finalizacion.fecha_puede_volver_texto;
-  const mensaje = `Ã‚Â¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrÃƒÂ¡s volver a jugar el ${fecha}.`;
+  const mensaje = `¡Ya completaste tu aventura!\nTu boleto fue generado correctamente.\nPodrás volver a jugar el ${fecha}.`;
   localStorage.setItem('much_playtime_block_msg', finalizacion.mensaje || mensaje);
   window.MuchLocalStorage?.completeRoute?.(finalizacion);
   invalidarCacheBloqueoJuego();
 
   if (window.MuchStationCompletion?.showFloatingNotice) {
     window.MuchStationCompletion.showFloatingNotice({
-      badge: 'Ã°Å¸Ââ€  Aventura completada',
-      title: 'Ã‚Â¡Aventura completada!',
+      badge: 'Aventura completada',
+      title: '¡Aventura completada!',
       body: mensaje.replace(/\n/g, '<br>'),
       ctaLabel: 'Ver mi recompensa'
     });
@@ -309,10 +309,10 @@ async function consultarUltimaVerificacion() {
     if (sessionId) params.append('session_id', sessionId);
 
     const res = await fetch(`${API_BASE_URL}/api/verificaciones-ubicacion/ultima?${params.toString()}`);
-    if (!res.ok) throw new Error('Error al obtener la ÃƒÂºltima verificaciÃƒÂ³n');
+    if (!res.ok) throw new Error('Error al obtener la última verificación');
     return await res.json();
   } catch (e) {
-    console.error('Error al consultar ÃƒÂºltima verificaciÃƒÂ³n:', e);
+    console.error('Error al consultar última verificación:', e);
     return null;
   }
 }
@@ -579,7 +579,7 @@ function crearModalConsentimientoPrivacidad() {
         <p style="margin: 0; color: #f6c453; font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;">Acceso requerido</p>
         <h2 id="muchPrivacyTitle" style="margin: 0; font-size: clamp(24px, 5vw, 34px); line-height: 1.08;">Aviso de privacidad</h2>
         <p style="margin: 0; color: #c7d2fe; font-size: 15px; line-height: 1.5;">
-          Para continuar con MisiÃƒÂ³n MUCH necesitamos tu aceptaciÃƒÂ³n del uso de datos de la cuenta para guardar progreso, premios y actividad de juego.
+          Para continuar con Misión MUCH necesitamos tu aceptación del uso de datos de la cuenta para guardar progreso, premios y actividad de juego.
         </p>
       </div>
 
@@ -1042,12 +1042,73 @@ async function guardarRespuestaUsuario(idIntento, estacionId, preguntaTexto, res
 }
 
 // Generar boleto final
+function normalizarSeleccionBoletoFinal(...sources) {
+  const values = sources
+    .flatMap((source) => {
+      if (!source) return [];
+      if (typeof source === 'object') {
+        return [
+          source.key,
+          source.label,
+          source.acceso,
+          source.tipo_entrada,
+          source.premio,
+          source.title,
+          source.destino,
+          source.destino_boleto,
+          source.destino_label,
+          source.lugar,
+          source.ticketChoice?.key,
+          source.ticketChoice?.label
+        ];
+      }
+      return [source];
+    })
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  const key = values.includes('planetario') ? 'planetario' : 'much';
+  return key === 'planetario'
+    ? {
+        key: 'planetario',
+        tipo_entrada: 'Planetario',
+        destino_boleto: 'planetario',
+        lugar: 'Planetario Tuxtla'
+      }
+    : {
+        key: 'much',
+        tipo_entrada: 'MUCH',
+        destino_boleto: 'much',
+        lugar: 'Museo Chiapas de Ciencia y Tecnología'
+      };
+}
+
+function obtenerSeleccionBoletoFinal() {
+  const candidates = [];
+  try {
+    const selected = window.MuchLocalStorage?.getPrizeSelected?.();
+    if (selected) candidates.push(selected);
+  } catch (_) {}
+  try {
+    const rawChoice = localStorage.getItem('much_mission_reward_ticket_choice');
+    if (rawChoice) candidates.push(JSON.parse(rawChoice));
+  } catch (_) {}
+  try {
+    const rawPrize = localStorage.getItem('much_quiz_prize');
+    if (rawPrize) candidates.push(JSON.parse(rawPrize));
+  } catch (_) {}
+
+  return normalizarSeleccionBoletoFinal(...candidates);
+}
+
 async function generarBoletoFinal(reclamar = false) {
   asegurarUbicacionVigente();
   await asegurarJuegoPermitido();
   const user = obtenerUsuarioLocal();
   const userId = obtenerIdUsuarioLocal(user);
   if (!userId) throw new Error('No hay usuario autenticado.');
+  const ticketChoice = obtenerSeleccionBoletoFinal();
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/boletos`, {
@@ -1058,7 +1119,10 @@ async function generarBoletoFinal(reclamar = false) {
       },
       body: JSON.stringify({
         id_usuario: userId,
-        reclamar: Boolean(reclamar)
+        reclamar: Boolean(reclamar),
+        tipo_entrada: ticketChoice.tipo_entrada,
+        destino_boleto: ticketChoice.destino_boleto,
+        lugar: ticketChoice.lugar
       })
     });
 

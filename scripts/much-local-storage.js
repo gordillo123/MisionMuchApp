@@ -8,6 +8,7 @@
     palomitasCompletado: 'much_palomitas_completado',
     puntajeTotal: 'much_puntaje_total',
     intentosEstaciones: 'much_intentos_estaciones',
+    intentosGenerales: 'much_intentos_generales',
     estadoRecorrido: 'much_estado_recorrido',
     premioSeleccionado: 'much_premio_seleccionado',
     boletoReclamado: 'much_boleto_reclamado',
@@ -219,7 +220,8 @@
   }
 
   function buildAttemptBlockMessage(stationName, date) {
-    return `Has agotado tus 3 intentos en esta estación. Tu acceso al juego ha sido bloqueado temporalmente. Podrás volver a jugar después de una semana.`;
+    const dateText = formatFechaMX(date);
+    return `Has agotado tus 3 intentos del recorrido. Tu acceso al juego ha sido bloqueado temporalmente.${dateText ? ` Podrás volver a jugar el ${dateText}.` : ''}`;
   }
 
   function getConfiguredBlockDays() {
@@ -319,26 +321,56 @@
     writeJson(KEYS.intentosEstaciones, attempts || {});
   }
 
-  function hasFailedStation() {
+  function getGlobalAttempts() {
+    const saved = parseJson(KEYS.intentosGenerales, null);
     const attempts = getAttempts();
-    return REQUIRED_REWARD_STATIONS.some((stationId) => {
-      const att = attempts[stationId];
-      return att && (att.intentos_fallidos >= FAILED_ATTEMPT_LIMIT || att.fallida === true || att.bloqueada === true);
-    });
+    const fallbackFailures = Object.keys(attempts).reduce((sum, stationId) => {
+      return sum + Math.max(0, toNumber(attempts[stationId]?.intentos_fallidos, 0));
+    }, 0);
+    const failedAttempts = Math.min(FAILED_ATTEMPT_LIMIT, Math.max(0, toNumber(saved?.intentos_fallidos, fallbackFailures)));
+    const nextDate = saved?.fecha_puede_volver_jugar || getItem(KEYS.fechaProximoJuego) || '';
+    const isBlocked = failedAttempts >= FAILED_ATTEMPT_LIMIT;
+    return {
+      intentos_fallidos: failedAttempts,
+      limite_intentos: FAILED_ATTEMPT_LIMIT,
+      intentos_restantes: Math.max(0, FAILED_ATTEMPT_LIMIT - failedAttempts),
+      bloqueada: isBlocked,
+      fallida: isBlocked,
+      fecha_bloqueo: isBlocked ? (saved?.fecha_bloqueo || getItem(KEYS.fechaFinalizacion) || '') : '',
+      fecha_puede_volver_jugar: isBlocked ? nextDate : ''
+    };
+  }
+
+  function writeGlobalAttempts(info = {}) {
+    const failedAttempts = Math.min(FAILED_ATTEMPT_LIMIT, Math.max(0, toNumber(info.intentos_fallidos, 0)));
+    const blocked = failedAttempts >= FAILED_ATTEMPT_LIMIT;
+    const current = getGlobalAttempts();
+    const fechaBloqueo = blocked ? (info.fecha_bloqueo || current.fecha_bloqueo || nowIso()) : '';
+    const fechaPuedeVolver = blocked
+      ? (info.fecha_puede_volver_jugar || info.fecha_puede_volver || current.fecha_puede_volver_jugar || addDays(fechaBloqueo || nowIso(), getConfiguredBlockDays()).toISOString())
+      : '';
+    const record = {
+      intentos_fallidos: failedAttempts,
+      limite_intentos: FAILED_ATTEMPT_LIMIT,
+      intentos_restantes: Math.max(0, FAILED_ATTEMPT_LIMIT - failedAttempts),
+      bloqueada: blocked,
+      fallida: blocked,
+      fecha_bloqueo: fechaBloqueo,
+      fecha_puede_volver_jugar: fechaPuedeVolver,
+      updated_at: nowIso()
+    };
+    writeJson(KEYS.intentosGenerales, record);
+    return record;
+  }
+
+  function hasFailedStation() {
+    return getGlobalAttempts().intentos_fallidos >= FAILED_ATTEMPT_LIMIT;
   }
 
   function hasBlockedStation() {
-    const attempts = getAttempts();
-    return REQUIRED_REWARD_STATIONS.some((stationId) => {
-      const att = attempts[stationId];
-      if (!att) return false;
-      const isBlocked = att.bloqueada === true;
-      const date = att.fecha_puede_volver_jugar ? new Date(att.fecha_puede_volver_jugar) : null;
-      if (isBlocked && date && date.getTime() > Date.now()) {
-        return true;
-      }
-      return false;
-    });
+    const global = getGlobalAttempts();
+    const date = global.fecha_puede_volver_jugar ? new Date(global.fecha_puede_volver_jugar) : null;
+    return global.bloqueada && (!date || date.getTime() > Date.now());
   }
 
   function getCurrentAttemptId(extra = {}) {
@@ -354,11 +386,16 @@
 
   function blockByFailedAttempts(stationId, attemptRecord = {}, options = {}) {
     const station = getStation(stationId);
-    const stationName = station?.nombre ? `la estación ${station.nombre}` : 'esta estación';
+    const stationName = 'el recorrido';
     const finishedAt = nowIso();
     const blockDays = options.dias_bloqueo || options.cantidad_bloqueo || getConfiguredBlockDays();
     const nextDate = options.fecha_puede_volver || addDays(finishedAt, blockDays).toISOString();
     const message = options.mensaje || buildAttemptBlockMessage(stationName, nextDate);
+    writeGlobalAttempts({
+      intentos_fallidos: FAILED_ATTEMPT_LIMIT,
+      fecha_bloqueo: finishedAt,
+      fecha_puede_volver_jugar: nextDate
+    });
     const detail = {
       bloqueado: true,
       habilitado: false,
@@ -425,9 +462,20 @@
         : Boolean(aprobada || puntaje > 0 || toNumber(attempt.aciertos, 0) > 0 || toNumber(attempt.errores, 0) > 0));
     const countFailure = options.countFailure === true && finalizada && !aprobada && !completedAlready;
     const shouldCountFailure = countFailure && (!attemptId || !failedIds.includes(String(attemptId)));
+    const globalBefore = getGlobalAttempts();
+    const reportedFailures = toNumber(
+      attempt.intentos_fallidos ?? attempt.limite_intentos,
+      (attempt.bloqueada || attempt.fallida) ? FAILED_ATTEMPT_LIMIT : NaN
+    );
+    const nextGlobalFailures = completada
+      ? globalBefore.intentos_fallidos
+      : (Number.isFinite(reportedFailures)
+        ? Math.max(globalBefore.intentos_fallidos, reportedFailures)
+        : globalBefore.intentos_fallidos + (shouldCountFailure ? 1 : 0));
+    const globalAfter = writeGlobalAttempts({ intentos_fallidos: nextGlobalFailures });
     const intentosFallidos = completada
-      ? 0
-      : Math.min(FAILED_ATTEMPT_LIMIT, toNumber(previous.intentos_fallidos, 0) + (shouldCountFailure ? 1 : 0));
+      ? toNumber(previous.intentos_fallidos, 0)
+      : Math.min(FAILED_ATTEMPT_LIMIT, Math.max(0, toNumber(previous.intentos_fallidos, 0) + (shouldCountFailure ? 1 : 0)));
 
     if (attemptId && !knownIds.includes(String(attemptId))) {
       knownIds.push(String(attemptId));
@@ -436,10 +484,10 @@
       failedIds.push(String(attemptId));
     }
 
-    const fallida = intentosFallidos >= FAILED_ATTEMPT_LIMIT || Boolean(previous.fallida) || Boolean(attempt.fallida);
-    const bloqueada = intentosFallidos >= FAILED_ATTEMPT_LIMIT || Boolean(previous.bloqueada) || Boolean(attempt.bloqueada);
-    const fechaBloqueo = bloqueada ? (previous.fecha_bloqueo || attempt.fecha_bloqueo || nowIso()) : null;
-    const fechaPuedeVolverJugar = bloqueada ? (previous.fecha_puede_volver_jugar || attempt.fecha_puede_volver_jugar || attempt.fecha_puede_volver || addDays(fechaBloqueo || nowIso(), getConfiguredBlockDays()).toISOString()) : null;
+    const fallida = globalAfter.intentos_fallidos >= FAILED_ATTEMPT_LIMIT;
+    const bloqueada = globalAfter.intentos_fallidos >= FAILED_ATTEMPT_LIMIT;
+    const fechaBloqueo = bloqueada ? (globalAfter.fecha_bloqueo || attempt.fecha_bloqueo || nowIso()) : null;
+    const fechaPuedeVolverJugar = bloqueada ? (globalAfter.fecha_puede_volver_jugar || attempt.fecha_puede_volver_jugar || attempt.fecha_puede_volver || addDays(fechaBloqueo || nowIso(), getConfiguredBlockDays()).toISOString()) : null;
 
     attempts[id] = {
       id_estacion: id,
@@ -450,6 +498,8 @@
       intentos_fallidos: intentosFallidos,
       ids_intentos_fallidos: completada ? [] : failedIds.slice(-12),
       limite_intentos: FAILED_ATTEMPT_LIMIT,
+      intentos_fallidos_globales: globalAfter.intentos_fallidos,
+      intentos_restantes_globales: globalAfter.intentos_restantes,
       ultimo_id_intento: attemptId || previous.ultimo_id_intento || '',
       ultimo_puntaje: puntaje,
       mejor_puntaje: Math.max(toNumber(previous.mejor_puntaje, 0), puntaje),
@@ -482,7 +532,9 @@
       dispatchProgressChanged();
     }
 
-    if (!bloqueada && getItem(KEYS.estadoRecorrido) !== 'bloqueado_temporalmente' && !aprobada) {
+    if (bloqueada) {
+      blockByFailedAttempts(id, attempts[id], { fecha_puede_volver: fechaPuedeVolverJugar });
+    } else if (getItem(KEYS.estadoRecorrido) !== 'bloqueado_temporalmente' && !aprobada) {
       setRouteState('en_progreso');
     }
 
@@ -603,6 +655,14 @@
   }
 
   function updateRouteStateFromDates() {
+    if (getItem(KEYS.motivoBloqueo) === 'intentos' && !hasBlockedStation()) {
+      removeItem(KEYS.fechaFinalizacion);
+      removeItem(KEYS.fechaProximoJuego);
+      removeItem(KEYS.motivoBloqueo);
+      removeItem(KEYS.detalleBloqueo);
+      removeItem(KEYS.legacyPlaytimeBlockMsg);
+    }
+
     const nextDate = parseDate(getItem(KEYS.fechaProximoJuego));
     if (nextDate && nextDate.getTime() > Date.now()) {
       setRouteState('bloqueado_temporalmente');
@@ -693,12 +753,18 @@
       folio,
       codigo_alfanumerico: ticket.codigo_alfanumerico || qrToken || folio,
       qr_token: qrToken,
+      qr_data: ticket.qr_data || '',
+      nombre_usuario: ticket.nombre_usuario || ticket.nombre || '',
+      correo_usuario: ticket.correo_usuario || ticket.correo || '',
+      telefono: ticket.telefono || ticket.telefono_usuario || '',
       tipo_boleto: type,
+      tipo_entrada: type,
       fecha_emision: issued,
       fecha_vencimiento: expires,
       estado: status,
       destino_boleto: ticket.destino_boleto || ticket.destino || '',
       seccion_boleto: ticket.seccion_boleto || ticket.seccion || '',
+      lugar_boleto: ticket.lugar_boleto || ticket.lugar || ticket.ubicacion || '',
       updated_at: nowIso()
     };
   }
@@ -711,6 +777,15 @@
     writeJson(KEYS.legacyUserTicket, {
       folio: sanitized.folio,
       qr_token: sanitized.qr_token,
+      qr_data: sanitized.qr_data,
+      nombre_usuario: sanitized.nombre_usuario,
+      correo_usuario: sanitized.correo_usuario,
+      telefono: sanitized.telefono,
+      tipo_entrada: sanitized.tipo_entrada,
+      destino_boleto: sanitized.destino_boleto,
+      seccion_boleto: sanitized.seccion_boleto,
+      lugar_boleto: sanitized.lugar_boleto,
+      valido_desde: sanitized.fecha_emision,
       valido_hasta: sanitized.fecha_vencimiento,
       estado: sanitized.estado
     });
@@ -783,6 +858,13 @@
       if (state.mensaje) setItem(KEYS.legacyPlaytimeBlockMsg, state.mensaje);
       if (state.motivo_bloqueo) setItem(KEYS.motivoBloqueo, state.motivo_bloqueo);
       if (state.detalle_bloqueo || state.estacion) setItem(KEYS.detalleBloqueo, state.detalle_bloqueo || state.estacion);
+      if ((state.motivo_bloqueo || state.motivo) === 'intentos') {
+        writeGlobalAttempts({
+          intentos_fallidos: state.intentos_fallidos || FAILED_ATTEMPT_LIMIT,
+          fecha_bloqueo: state.fecha_finalizacion || state.fecha_bloqueo || nowIso(),
+          fecha_puede_volver_jugar: state.fecha_puede_volver || state.fecha_puede_volver_jugar || ''
+        });
+      }
       setRouteState('bloqueado_temporalmente');
       setClaimButtonState('bloqueado');
       return;
@@ -801,6 +883,9 @@
     if (!Array.isArray(progressRows)) return;
     const records = {};
     const attempts = getAttempts();
+    const globalBefore = getGlobalAttempts();
+    let syncedFailures = globalBefore.intentos_fallidos;
+    let syncedRetryDate = globalBefore.fecha_puede_volver_jugar;
 
     progressRows.forEach((row) => {
       const id = toStationId(row.id_estacion);
@@ -817,8 +902,16 @@
         : aprobadaServidor;
       const fallida = Boolean(row.fallida);
       const bloqueada = Boolean(row.bloqueada);
+      const failedAttempts = completada
+        ? 0
+        : Math.min(FAILED_ATTEMPT_LIMIT, Math.max(0, toNumber(
+          row.intentos_fallidos ?? row.limite_intentos,
+          (fallida || bloqueada) ? FAILED_ATTEMPT_LIMIT : toNumber(attempts[id]?.intentos_fallidos, 0)
+        )));
       const fechaBloqueo = row.fecha_bloqueo || null;
       const fechaPuedeVolverJugar = row.fecha_puede_volver_jugar || null;
+      syncedFailures = Math.min(FAILED_ATTEMPT_LIMIT, Math.max(syncedFailures, failedAttempts));
+      if (fechaPuedeVolverJugar) syncedRetryDate = fechaPuedeVolverJugar;
 
       attempts[id] = {
         ...(attempts[id] || {}),
@@ -826,6 +919,8 @@
         nombre: station.nombre,
         intentado: true,
         intentos: Math.max(1, toNumber(attempts[id]?.intentos, 0)),
+        intentos_fallidos: failedAttempts,
+        limite_intentos: FAILED_ATTEMPT_LIMIT,
         ultimo_puntaje: puntaje,
         mejor_puntaje: Math.max(toNumber(attempts[id]?.mejor_puntaje, 0), puntaje),
         aciertos: toNumber(row.aciertos, attempts[id]?.aciertos || 0),
@@ -855,6 +950,10 @@
     });
 
     writeAttempts(attempts);
+    writeGlobalAttempts({
+      intentos_fallidos: syncedFailures,
+      fecha_puede_volver_jugar: syncedRetryDate
+    });
     writeCompletedRecords(records);
 
     const completedMap = getCompletedStationsMap();
@@ -910,6 +1009,7 @@
       KEYS.estacionesCompletadas,
       KEYS.palomitasCompletado,
       KEYS.intentosEstaciones,
+      KEYS.intentosGenerales,
       KEYS.premioSeleccionado,
       KEYS.boletoReclamado,
       KEYS.fechaFinalizacion,
@@ -996,17 +1096,30 @@
     getCompletedRecords,
     isStationCompleted: (stationId) => Boolean(getCompletedStationsMap()[toStationId(stationId)]),
     isStationFailed: (stationId) => {
-      const atts = getAttempts();
-      const id = toStationId(stationId);
-      return Boolean(atts[id]?.fallida === true);
+      return getGlobalAttempts().intentos_fallidos >= FAILED_ATTEMPT_LIMIT;
     },
-    isStationBlocked: (stationId) => {
+    getStationAttemptInfo: (stationId) => {
       const atts = getAttempts();
       const id = toStationId(stationId);
-      if (!atts[id]?.bloqueada) return false;
-      const date = atts[id].fecha_puede_volver_jugar ? new Date(atts[id].fecha_puede_volver_jugar) : null;
-      if (date && date.getTime() > Date.now()) return true;
-      return false;
+      const att = atts[id] || {};
+      const global = getGlobalAttempts();
+      const failedAttempts = global.intentos_fallidos;
+      const isBlocked = global.bloqueada;
+      return {
+        id_estacion: id,
+        intentos_fallidos: failedAttempts,
+        intentos_fallidos_estacion: Math.min(FAILED_ATTEMPT_LIMIT, Math.max(0, toNumber(att.intentos_fallidos, 0))),
+        limite_intentos: FAILED_ATTEMPT_LIMIT,
+        intentos_restantes: global.intentos_restantes,
+        debe_reintentar: !att.completada && failedAttempts < FAILED_ATTEMPT_LIMIT,
+        fallida: isBlocked,
+        bloqueada: isBlocked,
+        fecha_puede_volver_jugar: isBlocked ? (global.fecha_puede_volver_jugar || att.fecha_puede_volver_jugar || '') : ''
+      };
+    },
+    getGlobalAttemptInfo: getGlobalAttempts,
+    isStationBlocked: (stationId) => {
+      return hasBlockedStation();
     },
     getAttempts,
     completeStation,

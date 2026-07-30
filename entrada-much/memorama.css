@@ -662,9 +662,9 @@ body.memorama-body {
   height: clamp(19px, 3.5dvh, 28px);
 }
 
-#screenVictory,
-#screenFail,
-#screenAlreadyDone {
+#screenVictory.memorama-screen.is-active,
+#screenFail.memorama-screen.is-active,
+#screenAlreadyDone.memorama-screen.is-active {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -685,11 +685,13 @@ body.memorama-body {
   padding: clamp(18px, 5dvh, 48px) 0;
 }
 
+.mm-victory-host,
 .mm-fail-host {
   width: 100%;
   padding: 0;
 }
 
+.mm-victory-host .station-completion-card,
 .mm-fail .station-completion-card {
   margin: 0 auto;
   max-width: min(100%, 440px);

@@ -94,10 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function playBgMusic() {
-        try {
-            pauseBgMusic();
-        } catch (e) {}
-    }
+  try {
+    ensureBgMusic();
+    if (window.bgMusic && !window.bgMusicMuted) window.bgMusic.play().catch(() => {});
+  } catch (e) {}
+}
 
     function pauseBgMusic() {
         try {
@@ -460,8 +461,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function playCompletionSound() {
         try {
-            const audio = new Audio('../Sonidos/Estación completada.mp3');
-            audio.play().catch(e => console.warn('No se pudo reproducir audio de completado:', e));
+            if (window.playMuchSfx) {
+      window.playMuchSfx('success');
+      return;
+    }
+    const audio = new Audio('../Sonidos/Estacion completada.mp3');
+    audio.volume = 0.34;
+    audio.play().catch(e => console.warn('No se pudo reproducir audio de completado:', e));
         } catch (e) {
             console.warn('Error al reproducir audio:', e);
         }
@@ -469,8 +475,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function playIncorrectSound() {
         try {
-            const audio = new Audio('../Sonidos/respuesta incorrecta.mp3');
-            audio.play().catch(e => console.warn('No se pudo reproducir audio de incorrecto:', e));
+            if (window.playMuchSfx) {
+      window.playMuchSfx('error');
+      return;
+    }
+    const audio = new Audio('../Sonidos/respuesta incorrecta.mp3');
+    audio.volume = 0.34;
+    audio.play().catch(e => console.warn('No se pudo reproducir audio de incorrecto:', e));
         } catch (e) {
             console.warn('Error al reproducir audio:', e);
         }
@@ -541,7 +552,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (timeRemaining > 0) {
             solvedOnTime = true;
-            playCompletionSound();
             await guardarSbeelEnMySQL();
             if (successHeading) successHeading.style.display = 'none';
             if (successText) {
@@ -559,8 +569,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 window.MuchStationCompletion?.renderInline(successMessageHost, {
-                    stationId: '6',
-                    isFinalStation: true,
+                        stationId: '6',
+                        isFinalStation: true,
                     puntaje: STATION_POINTS,
                     aciertos: 1,
                     errores: 0,
@@ -671,9 +681,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     window.MuchStationCompletion?.showFloatingNotice({
                         stationId: '6',
+                        passed: false,
                         badge: 'Nuevo intento',
                         title: 'Sigue explorando, vas muy bien',
                         body: 'El tiempo se terminó esta vez, pero ya tienes otra oportunidad para completar el reto. Respira, observa con calma y vuelve a intentarlo.',
+                        puntaje: 0,
+                        aciertos: 0,
+                        errores: 1,
                         nextStationName: 'Nuevo intento',
                         detailLabel: 'Tu siguiente paso',
                         detailValue: 'Cierra este mensaje para volver a intentarlo',
@@ -708,4 +722,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initGame();
 });
+
+
+
+
 

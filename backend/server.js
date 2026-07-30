@@ -244,26 +244,13 @@ async function autoUnlockEstaciones(connection, idUsuario) {
 }
 
 async function evaluarBloqueoPorIntentos(connection, idUsuario, idEstacion) {
-  const [[progress]] = await connection.query(
-    `SELECT p.id_estacion, p.aprobada, p.completada, p.fallida, p.bloqueada, p.puntaje, p.aciertos, p.errores,
-            e.puntos AS puntos_estacion, e.puntaje_minimo AS puntaje_minimo_estacion
-     FROM progreso_usuario p
-     JOIN estaciones e ON e.id_estacion = p.id_estacion
-     WHERE p.id_usuario = ? AND p.id_estacion = ?`,
-    [idUsuario, idEstacion]
-  );
-  if (progresoCumpleAprobacionEstacion(progress)) {
-    return { fallos: 0, bloqueo: null };
-  }
-
   const [[row]] = await connection.query(
     `SELECT COUNT(*) AS fallos
      FROM intentos_estacion
      WHERE id_usuario = ?
-       AND id_estacion = ?
        AND aprobado = FALSE
        AND finalizado = TRUE`,
-    [idUsuario, idEstacion]
+    [idUsuario]
   );
   const fallos = Number(row?.fallos || 0);
   if (fallos < FAILED_ATTEMPT_LIMIT) {
@@ -275,7 +262,7 @@ async function evaluarBloqueoPorIntentos(connection, idUsuario, idEstacion) {
     ? new Date(bloqueoGlobal.fecha_puede_volver)
     : playtime.calcularFechaDesbloqueo(new Date(), await playtime.getConfig());
 
-  console.log(`âš ï¸ Usuario ${idUsuario} agotÃ³ sus intentos en la estaciÃ³n ${idEstacion}. Bloqueando hasta ${fechaPuedeVolver.toISOString()}.`);
+  console.log(`Usuario ${idUsuario} agotó sus intentos del recorrido. Bloqueando hasta ${fechaPuedeVolver.toISOString()}.`);
   await connection.query(
     `INSERT INTO progreso_usuario 
       (id_usuario, id_estacion, completada, aprobada, fallida, bloqueada, fecha_bloqueo, fecha_puede_volver_jugar, puntaje, aciertos, errores, fecha_inicio, fecha_completado)
@@ -300,7 +287,7 @@ async function evaluarBloqueoPorIntentos(connection, idUsuario, idEstacion) {
     fecha_finalizacion: new Date().toISOString(),
     fecha_puede_volver: fechaPuedeVolver.toISOString(),
     fecha_puede_volver_texto: playtime.formatFechaMX(fechaPuedeVolver),
-    mensaje: bloqueoGlobal?.mensaje || playtime.buildMensajeBloqueoIntentos(fechaPuedeVolver, bloqueoGlobal?.premio?.detalle_bloqueo || 'esta estaciÃ³n')
+    mensaje: bloqueoGlobal?.mensaje || playtime.buildMensajeBloqueoIntentos(fechaPuedeVolver, bloqueoGlobal?.premio?.detalle_bloqueo || 'el recorrido')
   };
 
   return { fallos, bloqueo };
@@ -872,7 +859,7 @@ app.get('/api/preguntas/:id_estacion', async (req, res) => {
     // Verificar si la estaciÃ³n estÃ¡ activa
     const [[estacion]] = await pool.query('SELECT activa FROM estaciones WHERE id_estacion = ?', [idEstacion]);
     if (!estacion || !estacion.activa) {
-      return res.status(403).json({ error: 'La estaciÃ³n se encuentra inactiva.' });
+      return res.status(403).json({ error: 'La estación se encuentra inactiva.' });
     }
 
     // 1. Obtener todas las preguntas de la estaciÃ³n
@@ -1309,14 +1296,14 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
 
     if (progresoAprobado) {
       await connection.rollback();
-      return res.status(403).json({ error: 'Ya has aprobado esta estaciÃ³n.' });
+      return res.status(403).json({ error: 'Ya has aprobado esta estación.' });
     }
 
     if (progress?.bloqueada) {
       await connection.rollback();
       return res.status(403).json({
         error: 'estacion_bloqueada',
-        mensaje: 'Esta estaciÃ³n estÃ¡ bloqueada temporalmente por lÃ­mite de intentos.',
+        mensaje: 'El recorrido está bloqueado temporalmente por límite de intentos.',
         fecha_puede_volver_jugar: progress.fecha_puede_volver_jugar
       });
     }
@@ -1335,16 +1322,15 @@ app.post('/api/intentos', permitirJugador, verificarBloqueoJugador, async (req, 
         `SELECT COUNT(*) AS fallos
          FROM intentos_estacion
          WHERE id_usuario = ?
-           AND id_estacion = ?
            AND aprobado = FALSE
            AND finalizado = TRUE`,
-        [id_usuario, id_estacion]
+        [id_usuario]
       );
       const fallos = Number(failuresRow?.fallos || 0);
 
       await connection.commit();
       return res.status(200).json({
-        message: 'Intento de estaciÃ³n activo reutilizado.',
+        message: 'Intento de estación activo reutilizado.',
         id_intento: activeAttempt.id_intento,
         finalizado: false,
         aprobado: false,
@@ -1693,7 +1679,7 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
       return res.status(403).json({
         error: 'requisitos_insuficientes',
         mensaje: tieneAlgunaFallidaOBloqueada
-          ? 'No puedes reclamar tu boleto porque tienes una estaciÃ³n fallida o bloqueada.'
+          ? 'No puedes reclamar tu boleto porque el recorrido tiene intentos agotados o bloqueo activo.'
           : 'Debes completar y aprobar todas las estaciones antes de reclamar tu boleto.'
       });
     }
@@ -1706,7 +1692,7 @@ app.post('/api/boletos', permitirJugador, async (req, res) => {
     const seccionBoleto = destinoNormalizado ? (esBoletoPlanetario(destinoNormalizado) ? 'Planetario' : 'MUCH') : '';
     const lugarBoleto = typeof lugar === 'string' && lugar.trim()
       ? lugar.trim()
-      : (destinoNormalizado ? (esBoletoPlanetario(destinoNormalizado) ? 'Planetario Tuxtla' : 'Museo Chiapas de Ciencia y TecnologÃ­a') : '');
+      : (destinoNormalizado ? (esBoletoPlanetario(destinoNormalizado) ? 'Planetario Tuxtla' : 'Museo Chiapas de Ciencia y Tecnología') : '');
     const ticketMetadata = recibioSeleccionBoleto ? {
       tipo_entrada: tipoEntradaNormalizado,
       destino_boleto: destinoNormalizado,
@@ -2041,13 +2027,13 @@ app.post('/api/taquilla/boletos/:id_boleto/canjear', permitirTaquillaOAdmin, asy
       );
       return res.status(400).json({
         error: 'boleto_vencido',
-        mensaje: 'El boleto estÃ¡ vencido y no puede validarse.'
+        mensaje: 'El boleto está vencido y no puede validarse.'
       });
     }
 
     if (boleto.estado !== 'activo' || boleto.usado) {
       return res.status(400).json({
-        error: `No se puede canjear el boleto. Estatus actual: ${boleto.estado}, Usado: ${boleto.usado ? 'SÃ­' : 'No'}`
+        error: `No se puede canjear el boleto. Estatus actual: ${boleto.estado}, usado: ${boleto.usado ? 'Sí' : 'No'}`
       });
     }
 
@@ -2070,7 +2056,7 @@ app.post('/api/taquilla/boletos/:id_boleto/canjear', permitirTaquillaOAdmin, asy
     if (!canjeResult.affectedRows) {
       return res.status(409).json({
         error: 'boleto_no_disponible',
-        mensaje: 'El boleto ya no estÃ¡ disponible para validarse.'
+        mensaje: 'El boleto ya no está disponible para validarse.'
       });
     }
 
@@ -2755,7 +2741,7 @@ app.post('/api/taquilla/escaneo-qr', permitirTaquillaOAdmin, async (req, res) =>
       [idBoleto, qr_token, idOperador, resultado, observaciones]
     );
 
-    res.json({ message: 'Escaneo registrado con Ã©xito.' });
+    res.json({ message: 'Escaneo registrado con éxito.' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -2770,7 +2756,7 @@ app.post('/api/admin/usuarios/:id_usuario/roles', permitirAdmin, async (req, res
   const asignadoPor = req.headers['x-user-id'] || null;
 
   if (!Array.isArray(roles) || roles.length === 0) {
-    return res.status(400).json({ error: 'Se requiere una lista de roles vÃ¡lida (arreglo no vacÃ­o).' });
+    return res.status(400).json({ error: 'Se requiere una lista de roles válida (arreglo no vacío).' });
   }
 
   try {

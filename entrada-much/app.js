@@ -184,7 +184,7 @@ const DAILY_TICKET_LIMIT = 50;
 
 // Background music helpers
 function ensureBgMusic() { try { if (!window.bgMusic) { window.bgMusic = new Audio('../Sonidos/musica fondo.mp3'); window.bgMusic.loop = true; window.bgMusic.volume = 0.18; window.bgMusic.preload = 'auto'; } } catch (e) {} }
-function playBgMusic() { try { pauseBgMusic(); } catch (e) {} }
+function playBgMusic() { try { ensureBgMusic(); if (window.bgMusic && !window.bgMusicMuted) window.bgMusic.play().catch(() => {}); } catch (e) {} }
 function pauseBgMusic() { try { if (window.bgMusic && !window.bgMusic.paused) window.bgMusic.pause(); } catch (e) {} }
 
 // ⏰ FUNCIÓN CRÍTICA: Obtener hora exacta de México
@@ -408,17 +408,49 @@ function saveQuizResultLocal(data) {
 
 /* =================== Clases UI =================== */
 class SoundFX {
-  constructor(toggleEl) { this.toggleEl = toggleEl; this.ctx = null; }
-  beep(freq = 880, dur = 0.15, type = 'sine', vol = 0.08) {
-    if (this.toggleEl && !this.toggleEl.checked) return;
-    this.ctx = this.ctx || new (window.AudioContext || window.webkitAudioContext)();
-    const o = this.ctx.createOscillator(), g = this.ctx.createGain();
-    o.type = type; o.frequency.value = freq; g.gain.value = vol;
-    o.connect(g); g.connect(this.ctx.destination); o.start();
-    setTimeout(() => o.stop(), dur * 1000);
+  constructor(toggleEl) { this.toggleEl = toggleEl; this.ctx = null; this.lastAt = {}; }
+  enabled() {
+    if (this.toggleEl && !this.toggleEl.checked) return false;
+    return localStorage.getItem('much_landing_sound') !== 'off';
   }
-  correct() { this.beep(880, .12, 'sine', .08); setTimeout(() => this.beep(1320, .12, 'sine', .07), 130); }
-  wrong() { this.beep(200, .18, 'sawtooth', .07); }
+  getContext() {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return null;
+    try {
+      this.ctx = this.ctx || new AudioCtx();
+      return this.ctx;
+    } catch (_) {
+      return null;
+    }
+  }
+  async unlock() {
+    const ctx = this.getContext();
+    if (!ctx) return null;
+    if (ctx.state === 'suspended') {
+      try { await ctx.resume(); } catch (_) {}
+    }
+    return ctx;
+  }
+  async beep(freq = 880, dur = 0.15, type = 'sine', vol = 0.08, key = 'tone') {
+    if (!this.enabled()) return;
+    const nowMs = Date.now();
+    if (this.lastAt[key] && nowMs - this.lastAt[key] < 80) return;
+    this.lastAt[key] = nowMs;
+    const ctx = await this.unlock();
+    if (!ctx || ctx.state !== 'running') return;
+    const start = ctx.currentTime + 0.01;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, start);
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(vol, start + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(start);
+    o.stop(start + dur + 0.03);
+  }
+  correct() { this.beep(880, .12, 'sine', .08, 'correct-1'); setTimeout(() => this.beep(1320, .12, 'sine', .07, 'correct-2'), 130); }
+  wrong() { this.beep(200, .18, 'sawtooth', .07, 'wrong'); }
   victory() {
     if (this.toggleEl && !this.toggleEl.checked) return;
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -561,8 +593,13 @@ class UIManager {
 
   playCompletionSound() {
     try {
-      const audio = new Audio('../Sonidos/Estación completada.mp3');
-      audio.play().catch(e => console.warn('No se pudo reproducir audio de completado:', e));
+      if (window.playMuchSfx) {
+      window.playMuchSfx('success');
+      return;
+    }
+    const audio = new Audio('../Sonidos/Estacion completada.mp3');
+    audio.volume = 0.34;
+    audio.play().catch(e => console.warn('No se pudo reproducir audio de completado:', e));
     } catch (e) {
       console.warn('Error al reproducir audio:', e);
     }
@@ -570,8 +607,13 @@ class UIManager {
 
   playIncorrectSound() {
     try {
-      const audio = new Audio('../Sonidos/respuesta incorrecta.mp3');
-      audio.play().catch(e => console.warn('No se pudo reproducir audio de incorrecto:', e));
+      if (window.playMuchSfx) {
+      window.playMuchSfx('error');
+      return;
+    }
+    const audio = new Audio('../Sonidos/respuesta incorrecta.mp3');
+    audio.volume = 0.34;
+    audio.play().catch(e => console.warn('No se pudo reproducir audio de incorrecto:', e));
     } catch (e) {
       console.warn('Error al reproducir audio:', e);
     }
@@ -823,8 +865,6 @@ class UIManager {
           e.giftRow.classList.add('d-none');
           e.retryRow.classList.add('d-none');
 
-          this.sound.victory();
-          this.playCompletionSound();
           try { playBgMusic(); } catch (e) {}
           this.confetti.launch(120);
 
@@ -1049,4 +1089,9 @@ document.addEventListener('DOMContentLoaded', () => {
     start();
   }
 });
+
+
+
+
+
 

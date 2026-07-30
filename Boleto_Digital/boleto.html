@@ -12,6 +12,7 @@
     window.MuchRoleAccess?.redirectIfInternalUserOnPlayerPage({ basePath: '../' });
   </script>
   <script src="../scripts/much-local-storage.js"></script>
+  <script src="../scripts/bg-music.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
@@ -2340,6 +2341,7 @@
         const acceso = destinationMeta.acceso;
         const folio = qs.get('folio') || qs.get('ticket') || '';
         const qr_token = qs.get('qr_token') || qs.get('token') || '';
+        const codigo_alfanumerico = qs.get('codigo_alfanumerico') || qs.get('codigo') || qr_token || folio;
         const estadoRaw = (qs.get('estado') || 'activo').toLowerCase();
         const valido_desde = qs.get('valido_desde') || '';
         const valido_hasta = qs.get('valido_hasta') || '';
@@ -2349,10 +2351,11 @@
           correo_usuario: qs.get('correo') || '—',
           telefono: qs.get('telefono') || '—',
           tipo_entrada: acceso,
-          destino_boleto: destinationMeta.acceso,
-          seccion_boleto: qs.get('seccion') || '',
+          destino_boleto: destinationMeta.key,
+          seccion_boleto: qs.get('seccion') || destinationMeta.acceso,
           lugar_boleto: qs.get('ubicacion') || qs.get('lugar') || destinationMeta.ubicacion,
           folio: folio,
+          codigo_alfanumerico: codigo_alfanumerico,
           qr_token: qr_token,
           qr_data: qs.get('qr_data') || '',
           estado: estadoRaw,
@@ -2371,12 +2374,22 @@
             fecha_finalizacion: localStorage.getItem('much_fecha_finalizacion') || ''
           });
           if (!window.MuchLocalStorage?.claimTicket) {
-            localStorage.setItem('much_user_ticket', JSON.stringify({
-              folio: folio,
-              qr_token: qr_token,
-              valido_hasta: valido_hasta,
-              estado: estadoRaw
-            }));
+              localStorage.setItem('much_user_ticket', JSON.stringify({
+                folio: folio,
+                qr_token: qr_token,
+                qr_data: ticketData.qr_data || '',
+                codigo_alfanumerico: codigo_alfanumerico,
+                nombre_usuario: ticketData.nombre_usuario,
+                correo_usuario: ticketData.correo_usuario,
+                telefono: ticketData.telefono,
+                tipo_entrada: ticketData.tipo_entrada,
+                destino_boleto: ticketData.destino_boleto,
+                seccion_boleto: ticketData.seccion_boleto,
+                lugar_boleto: ticketData.lugar_boleto,
+                valido_desde: valido_desde,
+                valido_hasta: valido_hasta,
+                estado: estadoRaw
+              }));
           }
         } catch (e) {
           console.error('[BOLETO] Error al guardar en Local Storage:', e);
@@ -2400,6 +2413,7 @@
                   seccion_boleto: dbBoleto.seccion_boleto || '',
                   lugar_boleto: dbBoleto.lugar_boleto || '',
                   folio: dbBoleto.folio,
+                  codigo_alfanumerico: dbBoleto.codigo_alfanumerico || dbBoleto.qr_token || dbBoleto.folio,
                   qr_token: dbBoleto.qr_token || '',
                   qr_data: dbBoleto.qr_data || '',
                   estado: dbBoleto.estado || 'activo',
@@ -2415,12 +2429,38 @@
                   localStorage.setItem('much_user_ticket', JSON.stringify({
                     folio: dbBoleto.folio,
                     qr_token: dbBoleto.qr_token || '',
+                    qr_data: dbBoleto.qr_data || '',
+                    codigo_alfanumerico: dbBoleto.codigo_alfanumerico || dbBoleto.qr_token || dbBoleto.folio,
+                    nombre_usuario: dbBoleto.nombre_usuario || '',
+                    correo_usuario: dbBoleto.correo_usuario || '',
+                    telefono: dbBoleto.telefono_usuario || '',
+                    tipo_entrada: dbBoleto.tipo_entrada || '',
+                    destino_boleto: dbBoleto.destino_boleto || '',
+                    seccion_boleto: dbBoleto.seccion_boleto || '',
+                    lugar_boleto: dbBoleto.lugar_boleto || '',
+                    valido_desde: dbBoleto.valido_desde || '',
                     valido_hasta: dbBoleto.valido_hasta || '',
                     estado: dbBoleto.estado || 'activo'
                   }));
                 }
               } else {
                 console.warn('[BOLETO] El boleto en Local Storage no se validó en BD.');
+                ticketData = {
+                  nombre_usuario: cachedTicket.nombre_usuario || cachedTicket.nombre || '—',
+                  correo_usuario: cachedTicket.correo_usuario || cachedTicket.correo || '—',
+                  telefono: cachedTicket.telefono || cachedTicket.telefono_usuario || '—',
+                  tipo_entrada: cachedTicket.tipo_entrada || cachedTicket.tipo_boleto || cachedTicket.acceso || 'MUCH',
+                  destino_boleto: cachedTicket.destino_boleto || cachedTicket.destino || '',
+                  seccion_boleto: cachedTicket.seccion_boleto || cachedTicket.seccion || '',
+                  lugar_boleto: cachedTicket.lugar_boleto || cachedTicket.lugar || cachedTicket.ubicacion || '',
+                  folio: cachedTicket.folio,
+                  codigo_alfanumerico: cachedTicket.codigo_alfanumerico || cachedTicket.qr_token || cachedTicket.folio,
+                  qr_token: cachedTicket.qr_token || '',
+                  qr_data: cachedTicket.qr_data || '',
+                  estado: cachedTicket.estado || 'activo',
+                  valido_desde: cachedTicket.valido_desde || cachedTicket.fecha_emision || '',
+                  valido_hasta: cachedTicket.valido_hasta || cachedTicket.fecha_vencimiento || ''
+                };
               }
             }
           }
@@ -2442,7 +2482,7 @@
       const destinationMeta = getDestinationMeta(destinationKey);
       const isPlanetario = destinationKey === 'planetario';
       ticketData.tipo_entrada = destinationMeta.acceso;
-      ticketData.destino_boleto = destinationMeta.acceso;
+      ticketData.destino_boleto = destinationMeta.key;
       ticketData.seccion_boleto = ticketData.seccion_boleto || destinationMeta.acceso;
       ticketData.lugar_boleto = ticketData.lugar_boleto || destinationMeta.ubicacion;
       const acceso = ticketData.tipo_entrada;
@@ -2484,6 +2524,7 @@
       }
 
       document.body.classList.add('streamlined-ticket');
+      window.playMuchSfx?.('success');
       document.querySelectorAll('[data-hide-for-planetarium]').forEach((field) => field.remove());
       if (el('tLugarLabel')) el('tLugarLabel').textContent = 'Acceso';
       if (el('ticketRestrictionText')) {
@@ -2506,7 +2547,7 @@
       if (el('tTitle')) el('tTitle').textContent = titulo;
       
       const folioBoleto = ticketData.folio || 'Folio: ...';
-      const codigoBoleto = folioBoleto.replace('Folio:', '').trim() || ticketData.qr_token || '';
+      const codigoBoleto = ticketData.codigo_alfanumerico || ticketData.qr_token || folioBoleto.replace('Folio:', '').trim() || '';
       if (el('tFolio')) el('tFolio').textContent = 'Folio: ' + folioBoleto.replace('Folio:', '').trim();
       
       const elAlfa = el('tAlfanumerico');

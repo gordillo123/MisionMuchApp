@@ -22,7 +22,7 @@
   }
   if (!valid) {
     alert(msg);
-    window.location.href = '../index.htmlÁreason=location_required&msg=' + encodeURIComponent(msg);
+    window.location.href = '../index.html?reason=location_required&msg=' + encodeURIComponent(msg);
     throw new Error('Acceso denegado: ubicación no válida.');
   }
 })();
@@ -66,6 +66,7 @@ var victoryAudioContext = null;
 var quizData = null;
 var quizAnswerIndex = null;
 var quizVisible = false;
+var quizAutoSubmitted = false;
 var quizWarningShown = false;
 var navigatingToRegistro = false;
 var spinosaurioPlayerId = null;
@@ -163,7 +164,12 @@ function resolveSpinosaurioQuizData() {
 
 function playCompletionSound() {
   try {
-    const audio = new Audio('../Sonidos/Estación completada.mp3');
+    if (window.playMuchSfx) {
+      window.playMuchSfx('success');
+      return;
+    }
+    const audio = new Audio('../Sonidos/Estacion completada.mp3');
+    audio.volume = 0.34;
     audio.play().catch(e => console.warn('No se pudo reproducir audio de completado:', e));
   } catch (e) {
     console.warn('Error al reproducir audio:', e);
@@ -172,7 +178,12 @@ function playCompletionSound() {
 
 function playIncorrectSound() {
   try {
+    if (window.playMuchSfx) {
+      window.playMuchSfx('error');
+      return;
+    }
     const audio = new Audio('../Sonidos/respuesta incorrecta.mp3');
+    audio.volume = 0.34;
     audio.play().catch(e => console.warn('No se pudo reproducir audio de incorrecto:', e));
   } catch (e) {
     console.warn('Error al reproducir audio:', e);
@@ -205,7 +216,10 @@ function ensureBgMusic() {
 }
 
 function playBgMusic() {
-  try { pauseBgMusic(); } catch (e) {}
+  try {
+    ensureBgMusic();
+    if (window.bgMusic && !window.bgMusicMuted) window.bgMusic.play().catch(() => {});
+  } catch (e) {}
 }
 
 function pauseBgMusic() {
@@ -271,11 +285,12 @@ async function guardarSpinosaurioEnMySQL(puntajeFinal, preguntaFinalCorrecta) {
     const progreso = await import('../mysql-utils.js');
     const saltos = Math.max(0, Number(puntajeFinal) || 0);
     const aprobado = Boolean(preguntaFinalCorrecta) && saltos >= WIN_SCORE;
+    const puntajeEstacion = aprobado ? WIN_SCORE : 0;
     const payload = {
       id_estacion: Number(STATION_ID),
       aciertos: aprobado ? 1 : 0,
       errores: aprobado ? 0 : 1,
-      puntaje: saltos,
+      puntaje: puntajeEstacion,
       aprobado,
       finalizado: true
     };
@@ -304,7 +319,7 @@ async function guardarSpinosaurioEnMySQL(puntajeFinal, preguntaFinalCorrecta) {
 
     if (aprobado) {
       await progreso.guardarProgresoUsuario(STATION_ID, {
-        puntaje: saltos,
+        puntaje: puntajeEstacion,
         aciertos: 1,
         errores: 0,
         aprobada: true
@@ -1036,14 +1051,23 @@ function mostrarQuiz() {
   (preparedQuiz.options || []).forEach(function (txt, i) {
     var label = document.createElement("label"); label.className = "quiz-opt";
     label.innerHTML = '<input type="radio" name="q1" value="' + i + '"> <span>' + txt + "</span>";
+    var input = label.querySelector('input');
+    if (input) {
+      input.addEventListener('change', function () {
+        if (quizAutoSubmitted) return;
+        quizAutoSubmitted = true;
+        validarQuiz();
+      });
+    }
     box.appendChild(label);
   });
 
   var o = document.getElementById("quizOverlay");
   var msg = document.getElementById("quizMsg"); msg.textContent = ""; msg.className = "quiz-msg";
-  // Preparar botones: ocultar 'Siguiente' y restaurar 'Confirmar'
+  quizAutoSubmitted = false;
+  // La pregunta final se valida al tocar una opción; no se muestra botón Confirmar.
   try { document.getElementById('btnQuizNext').style.display = 'none'; } catch (e) {}
-  try { const b = document.getElementById('btnQuizOk'); if (b) { b.disabled = false; b.style.display = 'inline-block'; b.textContent = 'Confirmar'; } } catch (e) {}
+  try { const b = document.getElementById('btnQuizOk'); if (b) { b.disabled = false; b.style.display = 'none'; b.textContent = ''; } } catch (e) {}
 
   o.classList.add("show"); quizVisible = true;
   try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { }
@@ -1105,7 +1129,6 @@ async function validarQuiz() {
     }
     if (btnOk) btnOk.disabled = true;
 
-    playVictoryMusic();
     playCompletionSound();
 
     // Marcar completado y avanzar avatar, guardando solo una vez por estación
@@ -1124,9 +1147,10 @@ async function validarQuiz() {
         window.MuchStationCompletion?.showFloatingNotice({
           stationId: '2',
           passed: true,
-          puntaje: Number(score),
+          puntaje: WIN_SCORE,
           aciertos: 1,
           errores: 0,
+          silentSound: true,
           onReturnToMap: function () {
             const mapParams = new URLSearchParams(window.location.search);
             mapParams.set('view', 'prep');
@@ -1163,9 +1187,10 @@ async function validarQuiz() {
         window.MuchStationCompletion?.showFloatingNotice({
           stationId: '2',
           passed: false,
-          puntaje: Number(score),
+          puntaje: 0,
           aciertos: 0,
           errores: 1,
+          silentSound: true,
           onReturnToMap: function () {
             location.reload();
           }
@@ -1213,9 +1238,10 @@ async function marcarIncorrectoPorTrampa() {
       window.MuchStationCompletion?.showFloatingNotice({
         stationId: '2',
         passed: false,
-        puntaje: Number(score),
+        puntaje: 0,
         aciertos: 0,
         errores: 1,
+        silentSound: true,
         onReturnToMap: function () {
           location.reload();
         }
@@ -1309,13 +1335,12 @@ async function registrarQuizEnMySQL(puntajeFinal) {
 
   try {
     const progreso = await import('../mysql-utils.js');
-    const puntaje = Number(puntajeFinal);
     const aprobado = false;
     const payload = {
       id_estacion: Number(STATION_ID),
-      puntaje,
-      aciertos: puntaje,
-      errores: aprobado ? 0 : 1,
+      puntaje: 0,
+      aciertos: 0,
+      errores: 1,
       aprobado,
       finalizado: true
     };
@@ -1380,5 +1405,9 @@ function initMiniMap() {
 
 // Inicializar Mini-Mapa inmediatamente
 initMiniMap();
+
+
+
+
 
 

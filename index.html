@@ -480,10 +480,41 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    .screen-sound-toggle:not(.is-muted) {
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 42%),
+        linear-gradient(135deg, #ffb24d, #ff7a45);
+      border-color: rgba(255, 255, 255, 0.95);
+      color: #fff;
+      box-shadow:
+        0 14px 30px rgba(255, 122, 69, 0.36),
+        0 4px 10px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.48);
+    }
+
+    .screen-sound-toggle.is-muted {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: rgba(255, 255, 255, 0.86);
+      box-shadow: none;
+    }
+
     .screen-sound-toggle:hover {
       background: rgba(255, 255, 255, 0.14);
       border-color: rgba(255, 255, 255, 0.26);
       transform: translateY(-1px);
+    }
+
+    .screen-sound-toggle:not(.is-muted):hover {
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0) 42%),
+        linear-gradient(135deg, #ffc063, #ff854f);
+      border-color: #fff;
+    }
+
+    .screen-sound-toggle.is-muted:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.26);
     }
 
     .screen-sound-toggle:active {
@@ -530,14 +561,7 @@
       margin-left: 0;
       border-radius: 50%;
       z-index: 1020;
-      background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 42%),
-        linear-gradient(135deg, var(--msf-pink), var(--msf-yellow));
-      border: 3px solid rgba(255, 255, 255, 0.92);
-      box-shadow:
-        0 14px 30px rgba(255, 118, 180, 0.3),
-        0 4px 10px rgba(0, 0, 0, 0.18),
-        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      border-width: 3px;
     }
 
 
@@ -545,14 +569,7 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 42%),
-        linear-gradient(135deg, var(--msf-pink), var(--msf-yellow));
-      border: 3px solid rgba(255, 255, 255, 0.92);
-      box-shadow:
-        0 14px 30px rgba(255, 118, 180, 0.3),
-        0 4px 10px rgba(0, 0, 0, 0.18),
-        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      border-width: 3px;
     }
     @media (max-width: 992px) {
       .nav-slogan {
@@ -755,6 +772,35 @@
       letter-spacing: 0.03em;
     }
 
+    .nav-credits {
+      display: none;
+      color: rgba(226, 232, 240, 0.82);
+      font-size: 0.72rem;
+      line-height: 1.35;
+      text-align: left;
+      word-break: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .nav-credits-title {
+      margin: 0 0 0.35rem;
+      color: #E2C288;
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .nav-credits-list {
+      margin: 0;
+      display: grid;
+      gap: 0.18rem;
+    }
+
+    .nav-credits-list span {
+      display: block;
+    }
+
     .nav-avatar {
       width: 40px;
       height: 40px;
@@ -888,6 +934,13 @@
         height: 30px;
         margin-left: 0;
         border-width: 1.5px;
+      }
+
+      .nav-credits {
+        display: block;
+        margin-top: auto;
+        padding: 1rem 0.9rem 0.1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
       }
     }
 
@@ -1105,6 +1158,11 @@
       box-shadow: 
         0 12px 0px rgba(0,0,0,0.2),
         0 20px 40px rgba(255, 118, 180, 0.5);
+    }
+
+    #btnComenzar {
+      text-transform: none;
+      letter-spacing: 0;
     }
 
     .btn-play:active {
@@ -13675,6 +13733,23 @@
           const label = profileButton.querySelector('.nav-label');
           if (label) label.textContent = 'Perfil';
         }
+
+        let credits = document.getElementById('navCredits');
+        if (!credits) {
+          credits = document.createElement('div');
+          credits.id = 'navCredits';
+          credits.className = 'nav-credits';
+          credits.setAttribute('aria-label', 'Créditos del proyecto');
+          credits.innerHTML = `
+            <p class="nav-credits-title">Créditos</p>
+            <div class="nav-credits-list">
+              <span>Ing. Orquídea Alondra Rodríguez Solórzano</span>
+              <span>Ing. Lucero Yadira Navarro Navarro</span>
+              <span>Ing. José Luis Gordillo Ramírez</span>
+            </div>
+          `;
+        }
+        menu.appendChild(credits);
       }
 
       async function actualizarVisibilidadMenuRoles() {
@@ -14659,7 +14734,6 @@
       function hasMissionRewardClaimStarted() {
         return Boolean(
           window.MuchLocalStorage?.isTicketClaimed?.()
-          || window.MuchLocalStorage?.hasClaimFlowStarted?.()
           || localStorage.getItem(MISSION_REWARD_CLAIMED_KEY) === 'true'
         );
       }
@@ -14847,6 +14921,7 @@
         missionRewardOverlayOpen = true;
         overlay.setAttribute('aria-hidden', 'false');
         overlay.classList.add('open');
+        window.playMuchSfx?.('success');
         document.body.classList.add('mission-reward-open');
 
         window.setTimeout(() => {
@@ -14878,13 +14953,14 @@
 
         const prize = buildMissionPrize(option);
         saveMissionTicketChoice(option);
-        window.MuchLocalStorage?.setClaimFlowStarted?.(true);
         localStorage.setItem('much_quiz_prize', JSON.stringify(prize));
-        localStorage.setItem(MISSION_REWARD_CLAIMED_KEY, 'true');
         const params = new URLSearchParams({
           sala: 'mision-much',
           premio: 'entrada-gratis',
-          destino: option.key
+          destino: option.key,
+          destino_boleto: option.key,
+          tipo_entrada: option.acceso,
+          lugar: option.lugar
         });
         window.location.href = `Boleto_Digital/registro.html?${params.toString()}`;
       }
@@ -15059,27 +15135,30 @@
           const completed = getCompletedStations();
           const failed = getFailedStations();
           const blocked = getBlockedStations();
+          const attemptInfo = window.MuchLocalStorage?.getStationAttemptInfo?.(stationId);
+          const remainingAttempts = Number(attemptInfo?.intentos_restantes ?? 3);
           updateRewardClaimUI(completed);
           const btnComenzar = document.getElementById('btnComenzar');
           if (btnComenzar) {
             const isActive = !activeStationIds || activeStationIds.has(String(stationId));
+            btnComenzar.disabled = false;
+            btnComenzar.style.pointerEvents = '';
+            btnComenzar.dataset.stationId = String(stationId);
+            btnComenzar.textContent = 'Comenzar';
             if (!isActive) {
-              btnComenzar.innerHTML = '🔒 ESTACIÓN INACTIVA';
+              btnComenzar.dataset.startState = 'inactive';
               btnComenzar.style.background = '#e11d48';
-              btnComenzar.style.opacity = '0.7';
-              btnComenzar.style.pointerEvents = 'none';
+              btnComenzar.style.opacity = '0.7';
             } else if (completed[String(stationId)]) {
-              btnComenzar.innerHTML = '🔒 ESTACIÓN COMPLETADA';
+              btnComenzar.dataset.startState = 'completed';
               btnComenzar.style.background = '#00B487';
-              btnComenzar.style.opacity = '0.7';
-              btnComenzar.style.pointerEvents = 'none';
-            } else if (failed[String(stationId)] || blocked[String(stationId)]) {
-              btnComenzar.innerHTML = '🔒 ESTACIÓN BLOQUEADA';
+              btnComenzar.style.opacity = '0.7';
+            } else if (blocked[String(stationId)] || remainingAttempts <= 0 || failed[String(stationId)]) {
+              btnComenzar.dataset.startState = 'blocked';
               btnComenzar.style.background = '#e11d48';
-              btnComenzar.style.opacity = '0.7';
-              btnComenzar.style.pointerEvents = 'none';
+              btnComenzar.style.opacity = '0.7';
             } else {
-              btnComenzar.innerHTML = '🚀 ¡COMENZAR!';
+              btnComenzar.dataset.startState = 'ready';
               btnComenzar.style.background = '';
               btnComenzar.style.opacity = '';
               btnComenzar.style.pointerEvents = '';
@@ -15271,107 +15350,67 @@
         });
       }
 
-      document.getElementById('btnComenzar').onclick = async () => {
+      let startButtonBusy = false;
+      let lastStartButtonAt = 0;
+
+      function showStartBlockedMessage(reason) {
+        if (reason === 'completed') {
+          window.MuchStationCompletion?.showFloatingNotice({ badge: 'Estación ya completada', title: 'Excelente trabajo, explorador', body: 'Esta estación ya fue completada con éxito. Continúa con la siguiente aventura para seguir avanzando en tu misión científica.', ctaLabel: 'Entendido' });
+          return;
+        }
+        if (reason === 'inactive') {
+          window.MuchStationCompletion?.showFloatingNotice({ badge: 'Estación inactiva', title: 'Aventura no disponible', body: 'Esta estación se encuentra inactiva por el momento. Elige otra estación disponible en el mapa.', ctaLabel: 'Entendido' });
+          return;
+        }
+        const attemptInfo = window.MuchLocalStorage?.getStationAttemptInfo?.(currentStation);
+        const dateValue = attemptInfo?.fecha_puede_volver_jugar || localStorage.getItem('much_fecha_proximo_juego') || '';
+        const date = dateValue ? new Date(dateValue) : null;
+        const dateText = date && !Number.isNaN(date.getTime()) ? new Intl.DateTimeFormat('es-MX', { dateStyle: 'full', timeStyle: 'short' }).format(date) : 'la fecha indicada por el sistema';
+        window.MuchStationCompletion?.showFloatingNotice({ badge: 'Límite de intentos', title: 'Recorrido bloqueado', body: `Has agotado tus 3 intentos del recorrido. Podrás volver a jugar el <strong>${dateText}</strong>.`, ctaLabel: 'Entendido' });
+      }
+
+      async function handleStartButtonActivate(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        const nowStartButton = Date.now();
+        if (nowStartButton - lastStartButtonAt < 650) return;
+        lastStartButtonAt = nowStartButton;
+        if (startButtonBusy) return;
+        startButtonBusy = true;
         const btnComenzar = document.getElementById('btnComenzar');
-        const originalHTML = btnComenzar ? btnComenzar.innerHTML : '🚀 ¡COMENZAR!';
-
-        if (window.asegurarJuegoPermitido) {
-          try {
-            await window.asegurarJuegoPermitido();
-          } catch (error) {
-            return;
-          }
-        }
-
-        // Verificar ubicación vigente antes de comenzar cualquier estación
-        let estadoUbi = window.comprobarUbicacionVigente ? window.comprobarUbicacionVigente() : { ok: false, message: 'Función de ubicación no disponible.' };
-        
-        if (!estadoUbi.ok) {
-          // Si no está vigente localmente, intentar restaurar desde el servidor primero (silenciosamente)
-          if (window.intentarRestaurarVerificacionDesdeServidor) {
+        const originalHTML = 'Comenzar';
+        const startState = btnComenzar?.dataset?.startState || 'ready';
+        try {
+          if (startState !== 'ready') { showStartBlockedMessage(startState); return; }
+          if (window.asegurarJuegoPermitido) { try { await window.asegurarJuegoPermitido(); } catch (error) { return; } }
+          let estadoUbi = window.comprobarUbicacionVigente ? window.comprobarUbicacionVigente() : { ok: true };
+          if (!estadoUbi.ok && window.verificarUbicacionYRegistrar) {
             try {
-              const res = await window.intentarRestaurarVerificacionDesdeServidor();
-              if (res.ok) {
-                estadoUbi = { ok: true };
-              }
-            } catch (e) {
-              console.error('Error al intentar restaurar ubicación:', e);
-            }
-          }
-        }
-
-        if (!estadoUbi.ok) {
-          // Si sigue sin estar validada, disparar la geolocalización de forma interactiva justo en este momento
-          if (window.verificarUbicacionYRegistrar) {
-            try {
-              if (btnComenzar) {
-                btnComenzar.disabled = true;
-                btnComenzar.innerHTML = '⏳ VALIDANDO GPS...';
-                btnComenzar.style.opacity = '0.7';
-              }
-
+              if (btnComenzar) { btnComenzar.disabled = true; btnComenzar.textContent = originalHTML; btnComenzar.style.opacity = '0.7'; }
               const res = await window.verificarUbicacionYRegistrar();
-              if (res.ok) {
-                estadoUbi = { ok: true };
-                window.MuchStationCompletion?.showFloatingNotice({
-                  badge: '📍 Ubicación OK',
-                  title: '¡Ubicación validada!',
-                  body: 'Estás en el Museo Chiapas de Ciencia y Tecnología. ¡Que comience el juego!',
-                  detailLabel: 'Acción',
-                  detailValue: 'Listo para jugar'
-                });
-              } else {
-                window.MuchStationCompletion?.showFloatingNotice({
-                  badge: '📍 Ubicación incorrecta',
-                  title: 'No estás en el museo',
-                  body: res.message,
-                  detailLabel: 'GPS',
-                  detailValue: 'Acceso denegado'
-                });
-              }
-            } catch (e) {
-              window.MuchStationCompletion?.showFloatingNotice({
-                badge: '📍 Error GPS',
-                title: 'Error de validación',
-                body: 'Ocurrió un error al obtener tu geolocalización: ' + e.message,
-                detailLabel: 'Detalle',
-                detailValue: 'Reinténtalo'
-              });
+              if (res.ok) estadoUbi = { ok: true };
+              else window.MuchStationCompletion?.showFloatingNotice({ badge: 'Ubicación incorrecta', title: 'No estás en el museo', body: res.message, ctaLabel: 'Entendido' });
             } finally {
-              if (btnComenzar) {
-                btnComenzar.disabled = false;
-                btnComenzar.innerHTML = originalHTML;
-                btnComenzar.style.opacity = '';
-              }
+              if (btnComenzar) { btnComenzar.disabled = false; btnComenzar.textContent = originalHTML; btnComenzar.style.opacity = ''; }
             }
           }
-        }
-
-        if (!estadoUbi.ok) {
-          // Si después de todo no se pudo verificar, detenemos el flujo
-          return;
-        }
-
-        const completed = getCompletedStations();
-        if (completed[currentStation]) {
-          window.MuchStationCompletion?.showFloatingNotice({
-            badge: 'Estación ya completada',
-            title: 'Excelente trabajo, explorador',
-            body: 'Esta estación ya fue completada con éxito. Continúa con la siguiente aventura para seguir avanzando en tu misión científica.',
-            detailLabel: 'Siguiente paso',
-            detailValue: 'Avanza a otra estación'
-          });
-          return;
-        }
-
-        if (!getCurrentStationGameUrl()) {
+          if (!estadoUbi.ok) return;
+          const completed = getCompletedStations();
+          if (completed[currentStation]) { showStartBlockedMessage('completed'); return; }
           playCurrentStation();
-          return;
+        } catch (error) {
+          console.error('Error al iniciar estación:', error);
+          playCurrentStation();
+        } finally {
+          startButtonBusy = false;
         }
+      }
 
-        applyRulesModeForStart(true);
-        rulesOverlay.classList.add('open');
-      };
+      const btnComenzarStart = document.getElementById('btnComenzar');
+      if (btnComenzarStart) {
+        btnComenzarStart.onclick = null;
+        btnComenzarStart.addEventListener('click', handleStartButtonActivate);
+        btnComenzarStart.addEventListener('touchend', handleStartButtonActivate, { passive: false });
+      }
 
       // 6. Hamburguesa Móvil
       const hamburger = document.getElementById('hamburgerBtn');

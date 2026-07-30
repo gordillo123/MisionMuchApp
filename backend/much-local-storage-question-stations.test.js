@@ -107,6 +107,38 @@ test('dynamic stations require their own completion evidence', () => {
   });
 });
 
+test('spinosaurio requires 15 jumps and a correct final answer', () => {
+  const { api } = loadMuchLocalStorage();
+
+  assert.equal(api.completeStation('2', { puntaje: 15, aciertos: 0, errores: 0, aprobada: true }), null);
+  assert.equal(api.isStationCompleted('2'), false);
+
+  assert.equal(api.completeStation('2', { puntaje: 15, aciertos: 1, errores: 1, aprobada: true }), null);
+  assert.equal(api.isStationCompleted('2'), false);
+
+  assert.ok(api.completeStation('2', { puntaje: 15, aciertos: 1, errores: 0, aprobada: true }));
+  assert.equal(api.isStationCompleted('2'), true);
+  assert.equal(api.getScore(), 15);
+});
+
+test('failed spinosaurio final question does not add score or completion', () => {
+  const { api } = loadMuchLocalStorage();
+
+  const attempt = api.recordStationAttempt('2', {
+    puntaje: 0,
+    aciertos: 0,
+    errores: 1,
+    aprobado: false,
+    finalizado: true,
+    id_intento: 'spinosaurio-final-wrong'
+  }, { countAttempt: true, countFailure: true, finalizado: true });
+
+  assert.equal(api.isStationCompleted('2'), false);
+  assert.equal(api.getScore(), 0);
+  assert.equal(attempt.completada, false);
+  assert.equal(attempt.ultimo_puntaje, 0);
+});
+
 test('ticket claim remains blocked until every station has valid completion evidence', () => {
   const { api } = loadMuchLocalStorage();
 
@@ -133,4 +165,54 @@ test('repeating a completed station does not duplicate its score', () => {
 
   api.completeStation('1', { puntaje: 10, aciertos: 6, errores: 0 });
   assert.equal(api.getScore(), 10);
+});
+
+test('the route remains retryable until three global failed attempts are exhausted', () => {
+  const { api } = loadMuchLocalStorage();
+
+  let attempt = api.recordStationAttempt('1', {
+    puntaje: 0,
+    aciertos: 5,
+    errores: 1,
+    aprobado: false,
+    finalizado: true,
+    id_intento: 'taquilla-1'
+  }, { countAttempt: true, countFailure: true, finalizado: true });
+
+  assert.equal(api.isStationCompleted('1'), false);
+  assert.equal(api.isStationFailed('1'), false);
+  assert.equal(api.isStationBlocked('1'), false);
+  assert.equal(attempt.intentos_fallidos, 1);
+  assert.equal(api.getStationAttemptInfo('1').intentos_restantes, 2);
+
+  attempt = api.recordStationAttempt('2', {
+    puntaje: 0,
+    aciertos: 0,
+    errores: 1,
+    aprobado: false,
+    finalizado: true,
+    id_intento: 'spinosaurio-1'
+  }, { countAttempt: true, countFailure: true, finalizado: true });
+
+  assert.equal(api.isStationFailed('2'), false);
+  assert.equal(attempt.intentos_fallidos_globales, 2);
+  assert.equal(api.getStationAttemptInfo('1').intentos_restantes, 1);
+  assert.equal(api.getStationAttemptInfo('2').intentos_restantes, 1);
+
+  attempt = api.recordStationAttempt('3', {
+    puntaje: 0,
+    aciertos: 6,
+    errores: 4,
+    aprobado: false,
+    finalizado: true,
+    id_intento: 'biodiversidad-1'
+  }, { countAttempt: true, countFailure: true, finalizado: true });
+
+  assert.equal(api.isStationCompleted('1'), false);
+  assert.equal(api.isStationFailed('1'), true);
+  assert.equal(api.isStationBlocked('2'), true);
+  assert.equal(api.isStationBlocked('3'), true);
+  assert.equal(attempt.intentos_fallidos_globales, 3);
+  assert.equal(api.getStationAttemptInfo('1').intentos_restantes, 0);
+  assert.equal(api.getStationAttemptInfo('3').intentos_restantes, 0);
 });
