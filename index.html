@@ -492,11 +492,30 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.48);
     }
 
+    .screen-sound-toggle.is-sound-on {
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 42%),
+        linear-gradient(135deg, #ffb24d, #ff7a45) !important;
+      border-color: rgba(255, 255, 255, 0.95) !important;
+      color: #fff !important;
+      box-shadow:
+        0 14px 30px rgba(255, 122, 69, 0.36),
+        0 4px 10px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.48) !important;
+    }
+
     .screen-sound-toggle.is-muted {
       background: rgba(255, 255, 255, 0.08);
       border-color: rgba(255, 255, 255, 0.15);
       color: rgba(255, 255, 255, 0.86);
       box-shadow: none;
+    }
+
+    .screen-sound-toggle.is-muted:not(.is-sound-on) {
+      background: rgba(255, 255, 255, 0.08) !important;
+      border-color: rgba(255, 255, 255, 0.15) !important;
+      color: rgba(255, 255, 255, 0.86) !important;
+      box-shadow: none !important;
     }
 
     .screen-sound-toggle:hover {
@@ -510,6 +529,13 @@
         linear-gradient(135deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0) 42%),
         linear-gradient(135deg, #ffc063, #ff854f);
       border-color: #fff;
+    }
+
+    .screen-sound-toggle.is-sound-on:hover {
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0) 42%),
+        linear-gradient(135deg, #ffc063, #ff854f) !important;
+      border-color: #fff !important;
     }
 
     .screen-sound-toggle.is-muted:hover {
@@ -12911,9 +12937,11 @@
         const enabled = isLandingSoundEnabled();
         screenSoundToggles.forEach((toggle) => {
           toggle.classList.toggle('is-muted', !enabled);
+          toggle.classList.toggle('is-sound-on', enabled);
           toggle.setAttribute('aria-pressed', enabled ? 'true' : 'false');
           toggle.setAttribute('aria-label', enabled ? 'Quitar sonido' : 'Poner sonido');
           toggle.setAttribute('title', enabled ? 'Quitar sonido' : 'Poner sonido');
+          toggle.dataset.soundState = enabled ? 'on' : 'off';
         });
       }
 
@@ -13972,6 +14000,7 @@
       overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('open'); };
 
       const rulesOverlay = document.getElementById('rulesOverlay');
+      const rulesBoard = rulesOverlay ? rulesOverlay.querySelector('.rules-board') : null;
       const prepRulesList = document.getElementById('prepRulesList');
       const prepRulesTitle = document.querySelector('.rules-col .section-title');
       const defaultPrepRulesMarkup = prepRulesList ? prepRulesList.innerHTML : '';
@@ -14276,11 +14305,11 @@
         [TICKET_STATION_ID]: {
           stationKey: TICKET_STATION_ID,
           prepListClass: 'ticket-station-rules-list',
-          prepTitle: 'Estaci\u00f3n 1: Memorama',
-          prepTitleMarkup: '<span>Estaci&oacute;n 1: Memorama</span><small>Memorama del MUCH</small>',
+          prepTitle: 'Reglas Estación 1 - Taquilla',
+          prepTitleMarkup: '<span>Estaci&oacute;n 1: Taquilla</span><small>Memorama del MUCH</small>',
           overlayModeClass: 'ticket-station-rules-mode',
           boardClass: 'ticket-rules-board',
-          overlayTitle: 'Estaci\u00f3n 1: Memorama',
+          overlayTitle: 'Estación 1: Taquilla',
           overlaySubtitle: 'Encuentra todos los pares en 1 minuto para ganar 10 puntos.',
           buildPrepMarkup: buildStation1PrepRulesMarkup,
           buildOverlayMarkup: buildStation1RulesBoardMarkup
@@ -14288,9 +14317,9 @@
         [SPINO_STATION_ID]: {
           stationKey: SPINO_STATION_ID,
           prepListClass: 'station2-rules-list',
-          prepTitle: 'Reglas Estación 2 - Espinosaurio',
+          prepTitle: 'Reglas Estación 2 - Spinosaurio',
           overlayModeClass: 'spino-station-rules-mode',
-          overlayTitle: 'Misión Espinosaurio',
+          overlayTitle: 'Estación 2: Spinosaurio',
           overlaySubtitle: 'Estas son las reglas de la estación 2. Cumple el reto y gana tus 15 puntos.',
           buildPrepMarkup: buildStation2PrepRulesMarkup,
           buildOverlayMarkup: buildStation2RulesBoardMarkup
@@ -14298,10 +14327,10 @@
         [BIODIVERSITY_STATION_ID]: {
           stationKey: BIODIVERSITY_STATION_ID,
           prepListClass: 'biodiversity-station-rules-list',
-          prepTitle: 'Reglas Estación 3 - Sala A - Biodiversidad y Conocimiento',
+          prepTitle: 'Reglas Estación 3 - Sala A',
           overlayModeClass: 'biodiversity-station-rules-mode',
           boardClass: 'biodiversity-rules-board',
-          overlayTitle: 'Sala A - Biodiversidad',
+          overlayTitle: 'Estación 3: Sala A',
           overlaySubtitle: 'Explora animales, plantas y ecosistemas. Responde 10 preguntas y logra 7 aciertos para completar tu misión verde.',
           buildPrepMarkup: buildStation3PrepRulesMarkup,
           buildOverlayMarkup: buildStation3RulesBoardMarkup
@@ -14309,10 +14338,10 @@
         [ENERGY_STATION_ID]: {
           stationKey: ENERGY_STATION_ID,
           prepListClass: 'energy-station-rules-list',
-          prepTitle: 'Reglas Estación 4 - Sala B - Energía',
+          prepTitle: 'Reglas Estación 4 - Sala B',
           overlayModeClass: 'energy-station-rules-mode',
           boardClass: 'energy-rules-board',
-          overlayTitle: 'Sala B de Energía',
+          overlayTitle: 'Estación 4: Sala B',
           overlaySubtitle: 'Explora las formas de energía, responde 10 preguntas del Área de Energía y consigue mínimo 7 aciertos para completar tu misión.',
           buildPrepMarkup: buildStation4PrepRulesMarkup,
           buildOverlayMarkup: buildStation4RulesBoardMarkup
@@ -14320,10 +14349,10 @@
         [SUSTAINABLE_STATION_ID]: {
           stationKey: SUSTAINABLE_STATION_ID,
           prepListClass: 'sustainable-station-rules-list',
-          prepTitle: 'Reglas Estación 5 - Sala C - Desarrollo Sustentable',
+          prepTitle: 'Reglas Estación 5 - Sala C',
           overlayModeClass: 'sustainable-station-rules-mode',
           boardClass: 'sustainable-rules-board',
-          overlayTitle: 'Sala C - Desarrollo Sustentable',
+          overlayTitle: 'Estación 5: Sala C',
           overlaySubtitle: 'Descubre acciones para cuidar el planeta, responde 10 preguntas del Área de Desarrollo Sustentable y consigue mínimo 7 aciertos para completar tu misión.',
           buildPrepMarkup: buildStation5PrepRulesMarkup,
           buildOverlayMarkup: buildStation5RulesBoardMarkup
@@ -14333,7 +14362,7 @@
           prepListClass: 'sbeel-station-rules-list',
           prepTitle: 'Reglas Estación 6 - SBEEL Dinosaurios',
           overlayModeClass: 'sbeel-station-rules-mode',
-          overlayTitle: 'Misión SBEEL Dinosaurios',
+          overlayTitle: 'Estación 6: SBEEL Dinosaurios',
           overlaySubtitle: 'Sigue estas reglas del rompecabezas, vence el tiempo y completa la estación 6.',
           buildPrepMarkup: buildStation6PrepRulesMarkup,
           buildOverlayMarkup: buildStation6RulesBoardMarkup
@@ -14377,55 +14406,27 @@
             prepRulesTitle.textContent = stationConfig ? stationConfig.prepTitle : 'Reglas';
           }
         }
+      }
 
-        return;
-        const isStation2 = String(stationId) === SPINO_STATION_ID;
-        const isStation3 = String(stationId) === BIODIVERSITY_STATION_ID;
-        const isStation4 = String(stationId) === ENERGY_STATION_ID;
-        const isStation5 = String(stationId) === SUSTAINABLE_STATION_ID;
-        const isStation6 = String(stationId) === SBEEL_STATION_ID;
+      function syncRulesOverlayForStation(stationId) {
+        if (!rulesOverlay || !rulesBoard) return;
+        const stationConfig = getStationRulesConfig(stationId);
+        resetOverlayRulesClasses();
 
-        prepRulesList.classList.toggle('station2-rules-list', isStation2);
-        prepRulesList.classList.toggle('biodiversity-station-rules-list', isStation3);
-        prepRulesList.classList.toggle('energy-station-rules-list', isStation4);
-        prepRulesList.classList.toggle('sustainable-station-rules-list', isStation5);
-        prepRulesList.classList.toggle('sbeel-station-rules-list', isStation6);
-
-        if (isStation2) {
-          prepRulesList.innerHTML = buildStation2PrepRulesMarkup();
-        } else if (isStation3) {
-          prepRulesList.innerHTML = buildStation3PrepRulesMarkup();
-        } else if (isStation4) {
-          prepRulesList.innerHTML = buildStation4PrepRulesMarkup();
-        } else if (isStation5) {
-          prepRulesList.innerHTML = buildStation5PrepRulesMarkup();
-        } else if (isStation6) {
-          prepRulesList.innerHTML = buildStation6PrepRulesMarkup();
-        } else {
-          prepRulesList.innerHTML = defaultPrepRulesMarkup;
+        if (stationConfig) {
+          if (stationConfig.overlayModeClass) rulesOverlay.classList.add(stationConfig.overlayModeClass);
+          if (stationConfig.boardClass) rulesBoard.classList.add(stationConfig.boardClass);
+          rulesBoard.innerHTML = stationConfig.buildOverlayMarkup();
+          rulesBoard.dataset.stationRules = stationConfig.stationKey;
+          const modalTitle = rulesOverlay.querySelector('.modal-title');
+          const modalSubtitle = rulesOverlay.querySelector('.rules-header p');
+          if (modalTitle) modalTitle.textContent = stationConfig.overlayTitle || stationConfig.prepTitle || 'Reglas';
+          if (modalSubtitle) modalSubtitle.textContent = stationConfig.overlaySubtitle || 'Sigue estas reglas para completar la estación.';
+          return;
         }
 
-        if (prepRulesTitle) {
-          if (isStation2) {
-            prepRulesTitle.textContent = 'Reglas Estación 2 · Espinosaurio';
-          } else if (isStation3) {
-            prepRulesTitle.textContent = 'Reglas Estación 3 · Sala A - Biodiversidad y Conocimiento';
-          } else if (isStation4) {
-            prepRulesTitle.textContent = 'Reglas Estación 4 - Sala B de Energía';
-          } else if (isStation6) {
-            prepRulesTitle.textContent = 'Reglas Estación 6 · SBEEL Dinosaurios';
-          } else {
-            prepRulesTitle.textContent = 'Reglas';
-          }
-        }
-
-        if (prepRulesTitle && isStation3) {
-          prepRulesTitle.textContent = 'Reglas Estación 3 - Sala A - Biodiversidad y Conocimiento';
-        }
-
-        if (prepRulesTitle && isStation5) {
-          prepRulesTitle.textContent = 'Reglas Estación 5 - Sala C - Desarrollo Sustentable';
-        }
+        rulesBoard.innerHTML = buildRulesBoardMarkup(generalRules);
+        rulesBoard.dataset.stationRules = 'general';
       }
 
       function closeRulesOverlay() {
@@ -14436,7 +14437,7 @@
         }
       }
 
-      function applyRulesModeForStart(isStartingGame) {
+      function applyRulesModeForStart(isStartingGame, forceCurrentStationRules = false) {
         pendingStartAfterRules = isStartingGame;
 
         if (activeCarouselInstance) {
@@ -14447,10 +14448,11 @@
         let steps = [];
         let accentColor = 'var(--msf-purple)';
 
-        if (!isStartingGame) {
+        if (!isStartingGame && !forceCurrentStationRules) {
           steps = generalRules;
           accentColor = 'var(--msf-purple)';
         } else {
+          syncRulesOverlayForStation(currentStation);
           const stationId = String(currentStation);
           if (stationId === TICKET_STATION_ID) {
             steps = station1TicketRules;
@@ -14500,7 +14502,8 @@
         btnComoJugar.addEventListener('click', (e) => {
           e.preventDefault();
           closeMobileMenu();
-          applyRulesModeForStart(false);
+          const isPrepActive = document.getElementById('viewPrep')?.classList.contains('active');
+          applyRulesModeForStart(false, isPrepActive);
           rulesOverlay.classList.add('open');
         });
       }
@@ -15153,7 +15156,7 @@
               btnComenzar.dataset.startState = 'completed';
               btnComenzar.style.background = '#00B487';
               btnComenzar.style.opacity = '0.7';
-            } else if (blocked[String(stationId)] || remainingAttempts <= 0 || failed[String(stationId)]) {
+            } else if (blocked[String(stationId)] || remainingAttempts <= 0) {
               btnComenzar.dataset.startState = 'blocked';
               btnComenzar.style.background = '#e11d48';
               btnComenzar.style.opacity = '0.7';
@@ -15350,6 +15353,16 @@
         });
       }
 
+      function showCurrentStationRulesBeforeStart() {
+        if (!rulesOverlay) {
+          playCurrentStation();
+          return;
+        }
+
+        applyRulesModeForStart(true, true);
+        rulesOverlay.classList.add('open');
+      }
+
       let startButtonBusy = false;
       let lastStartButtonAt = 0;
 
@@ -15396,10 +15409,10 @@
           if (!estadoUbi.ok) return;
           const completed = getCompletedStations();
           if (completed[currentStation]) { showStartBlockedMessage('completed'); return; }
-          playCurrentStation();
+          showCurrentStationRulesBeforeStart();
         } catch (error) {
           console.error('Error al iniciar estación:', error);
-          playCurrentStation();
+          showCurrentStationRulesBeforeStart();
         } finally {
           startButtonBusy = false;
         }

@@ -327,8 +327,20 @@
     const fallbackFailures = Object.keys(attempts).reduce((sum, stationId) => {
       return sum + Math.max(0, toNumber(attempts[stationId]?.intentos_fallidos, 0));
     }, 0);
-    const failedAttempts = Math.min(FAILED_ATTEMPT_LIMIT, Math.max(0, toNumber(saved?.intentos_fallidos, fallbackFailures)));
     const nextDate = saved?.fecha_puede_volver_jugar || getItem(KEYS.fechaProximoJuego) || '';
+    const retryDate = parseDate(nextDate);
+    if (saved?.bloqueada && retryDate && retryDate.getTime() <= Date.now()) {
+      return {
+        intentos_fallidos: 0,
+        limite_intentos: FAILED_ATTEMPT_LIMIT,
+        intentos_restantes: FAILED_ATTEMPT_LIMIT,
+        bloqueada: false,
+        fallida: false,
+        fecha_bloqueo: '',
+        fecha_puede_volver_jugar: ''
+      };
+    }
+    const failedAttempts = Math.min(FAILED_ATTEMPT_LIMIT, Math.max(0, toNumber(saved?.intentos_fallidos, fallbackFailures)));
     const isBlocked = failedAttempts >= FAILED_ATTEMPT_LIMIT;
     return {
       intentos_fallidos: failedAttempts,
@@ -364,7 +376,7 @@
   }
 
   function hasFailedStation() {
-    return getGlobalAttempts().intentos_fallidos >= FAILED_ATTEMPT_LIMIT;
+    return hasBlockedStation();
   }
 
   function hasBlockedStation() {
@@ -464,7 +476,7 @@
     const shouldCountFailure = countFailure && (!attemptId || !failedIds.includes(String(attemptId)));
     const globalBefore = getGlobalAttempts();
     const reportedFailures = toNumber(
-      attempt.intentos_fallidos ?? attempt.limite_intentos,
+      attempt.intentos_fallidos ?? attempt.intentos_fallidos_globales,
       (attempt.bloqueada || attempt.fallida) ? FAILED_ATTEMPT_LIMIT : NaN
     );
     const nextGlobalFailures = completada
@@ -472,7 +484,13 @@
       : (Number.isFinite(reportedFailures)
         ? Math.max(globalBefore.intentos_fallidos, reportedFailures)
         : globalBefore.intentos_fallidos + (shouldCountFailure ? 1 : 0));
-    const globalAfter = writeGlobalAttempts({ intentos_fallidos: nextGlobalFailures });
+    const nextGlobalBlockDate = nextGlobalFailures >= FAILED_ATTEMPT_LIMIT
+      ? (attempt.fecha_puede_volver_jugar || attempt.fecha_puede_volver || globalBefore.fecha_puede_volver_jugar || '')
+      : '';
+    const globalAfter = writeGlobalAttempts({
+      intentos_fallidos: nextGlobalFailures,
+      fecha_puede_volver_jugar: nextGlobalBlockDate
+    });
     const intentosFallidos = completada
       ? toNumber(previous.intentos_fallidos, 0)
       : Math.min(FAILED_ATTEMPT_LIMIT, Math.max(0, toNumber(previous.intentos_fallidos, 0) + (shouldCountFailure ? 1 : 0)));
@@ -902,15 +920,22 @@
         : aprobadaServidor;
       const fallida = Boolean(row.fallida);
       const bloqueada = Boolean(row.bloqueada);
+      const serverFailures = row.intentos_fallidos ?? row.intentos_fallidos_globales ?? null;
+      const hasServerFailures = serverFailures !== null && serverFailures !== undefined && serverFailures !== '';
+      const localStationFailures = Math.min(FAILED_ATTEMPT_LIMIT, Math.max(0, toNumber(attempts[id]?.intentos_fallidos, 0)));
       const failedAttempts = completada
         ? 0
-        : Math.min(FAILED_ATTEMPT_LIMIT, Math.max(0, toNumber(
-          row.intentos_fallidos ?? row.limite_intentos,
-          (fallida || bloqueada) ? FAILED_ATTEMPT_LIMIT : toNumber(attempts[id]?.intentos_fallidos, 0)
-        )));
+        : Math.min(FAILED_ATTEMPT_LIMIT, Math.max(0,
+          hasServerFailures
+            ? toNumber(serverFailures, localStationFailures)
+            : localStationFailures
+        ));
       const fechaBloqueo = row.fecha_bloqueo || null;
       const fechaPuedeVolverJugar = row.fecha_puede_volver_jugar || null;
+      const blockedUntil = parseDate(fechaPuedeVolverJugar);
+      const hasActiveServerBlock = bloqueada && (!blockedUntil || blockedUntil.getTime() > Date.now());
       syncedFailures = Math.min(FAILED_ATTEMPT_LIMIT, Math.max(syncedFailures, failedAttempts));
+      if (hasActiveServerBlock) syncedFailures = FAILED_ATTEMPT_LIMIT;
       if (fechaPuedeVolverJugar) syncedRetryDate = fechaPuedeVolverJugar;
 
       attempts[id] = {
@@ -927,11 +952,11 @@
         errores: toNumber(row.errores, attempts[id]?.errores || 0),
         aprobada: completada,
         completada,
-        fallida,
-        bloqueada,
+        fallida: (fallida && failedAttempts >= FAILED_ATTEMPT_LIMIT) || hasActiveServerBlock,
+        bloqueada: hasActiveServerBlock,
         fecha_bloqueo: fechaBloqueo,
         fecha_puede_volver_jugar: fechaPuedeVolverJugar,
-        debe_reintentar: !completada && !bloqueada,
+        debe_reintentar: !completada && !hasActiveServerBlock && failedAttempts < FAILED_ATTEMPT_LIMIT,
         ultimo_intento_at: row.updated_at || row.fecha_inicio || nowIso(),
         completado_at: row.fecha_completado || attempts[id]?.completado_at || null
       };

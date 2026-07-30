@@ -951,6 +951,74 @@
       display: none;
     }
 
+    #boletoCaptura.is-capturing {
+      display: block !important;
+      width: 620px !important;
+      max-width: 620px !important;
+      height: auto !important;
+      min-height: 0 !important;
+      overflow: visible !important;
+      border-radius: 24px !important;
+      padding: 26px 24px 28px !important;
+    }
+
+    #boletoCaptura.is-capturing .ticket-header,
+    #boletoCaptura.is-capturing .ticket-info-section,
+    #boletoCaptura.is-capturing .ticket-stub {
+      overflow: visible !important;
+    }
+
+    #boletoCaptura.is-capturing .header-left {
+      min-height: 104px !important;
+      overflow: visible !important;
+    }
+
+    #boletoCaptura.is-capturing .logo-agencia,
+    #boletoCaptura.is-capturing .logo-destino,
+    #boletoCaptura.is-capturing .brand-strip img {
+      object-fit: contain !important;
+      object-position: center !important;
+      flex-shrink: 0 !important;
+    }
+
+    #boletoCaptura.is-capturing .logo-agencia {
+      width: min(88%, 340px) !important;
+      height: auto !important;
+      max-width: 340px !important;
+      max-height: 104px !important;
+    }
+
+    #boletoCaptura.is-capturing .ticket-destination-mark .logo-destino {
+      width: auto !important;
+      height: 66px !important;
+      max-width: 230px !important;
+    }
+
+    #boletoCaptura.is-capturing .brand-strip {
+      width: calc(100% + 48px) !important;
+      min-height: 66px !important;
+      margin: 14px -24px -28px !important;
+      padding: 10px 24px !important;
+      overflow: visible !important;
+      border-radius: 0 0 23px 23px !important;
+    }
+
+    #boletoCaptura.is-capturing .brand-strip img {
+      height: 38px !important;
+      max-width: 132px !important;
+    }
+
+    #boletoCaptura.is-capturing .brand-strip .brand-much,
+    #boletoCaptura.is-capturing .brand-strip .brand-sbeel {
+      height: 46px !important;
+      max-width: 150px !important;
+    }
+
+    #boletoCaptura.is-capturing .brand-strip .brand-planetario {
+      height: 42px !important;
+      max-width: 138px !important;
+    }
+
     body.planetarium-ticket .btn-link {
       background: rgba(30, 41, 59, 0.5);
       color: #f8fafc;
@@ -2166,7 +2234,7 @@
       <!-- Ticket Header with Logos -->
       <div class="ticket-header">
         <div class="header-left">
-          <img class="logo-agencia" src="Logo-Ag-14.png" alt="Agencia Digital" crossorigin="anonymous"
+          <img class="logo-agencia" src="Logo-Ag-14.png" alt="Agencia Digital"
             onerror="this.style.display='none'">
         </div>
       </div>
@@ -2184,7 +2252,7 @@
       </div>
 
       <div class="ticket-destination-mark" aria-label="Destino seleccionado">
-        <img id="tDynamicLogo" class="logo-destino" src="logo-much.png" alt="Destino" crossorigin="anonymous"
+        <img id="tDynamicLogo" class="logo-destino" src="logo-much.png" alt="Destino"
           onerror="this.style.display='none'">
       </div>
 
@@ -2288,7 +2356,7 @@
       <h2 id="exitFarewellTitle" class="exit-farewell-title">¡Gracias por jugar!</h2>
       <p class="exit-farewell-copy">Fue increíble compartir esta aventura contigo. Sigue explorando, aprendiendo y descubriendo.</p>
       <div class="exit-return-date">
-        <span>Nos vemos el</span>
+        <span>Puedes volver a jugar el</span>
         <strong id="exitReturnDate">Próximamente</strong>
       </div>
       <div class="exit-farewell-actions">
@@ -2672,6 +2740,30 @@
         if (!image.complete) image.addEventListener('load', scheduleTicketFit, { once: true });
       });
 
+      async function waitForTicketAssets(scope) {
+        const images = Array.from(scope.querySelectorAll('img'));
+        await Promise.all(images.map((image) => {
+          if (image.complete && image.naturalWidth > 0) return Promise.resolve();
+          return new Promise((resolve) => {
+            image.addEventListener('load', resolve, { once: true });
+            image.addEventListener('error', resolve, { once: true });
+          });
+        }));
+        if (document.fonts?.ready) {
+          try { await document.fonts.ready; } catch (_) {}
+        }
+      }
+
+      function addCanvasPadding(sourceCanvas, padding = 42) {
+        const padded = document.createElement('canvas');
+        padded.width = sourceCanvas.width + padding * 2;
+        padded.height = sourceCanvas.height + padding * 2;
+        const ctx = padded.getContext('2d');
+        ctx.clearRect(0, 0, padded.width, padded.height);
+        ctx.drawImage(sourceCanvas, padding, padding);
+        return padded;
+      }
+
       // ─── DESCARGAR IMAGEN ───
       const btnDownload = document.getElementById('btnDownloadImage');
       if (btnDownload) {
@@ -2685,12 +2777,18 @@
           let shell = null;
           let origShellTransform = '';
           let origShellTransition = '';
+          let origHeight = '';
+          let origMinHeight = '';
+          let origOverflow = '';
           try {
             element = document.getElementById('boletoCaptura');
             if (!element) throw new Error('No se encontro el boleto para descargar.');
             shell = element.closest('.ticket-shell');
             origWidth = element.style.width;
             origMaxW = element.style.maxWidth;
+            origHeight = element.style.height;
+            origMinHeight = element.style.minHeight;
+            origOverflow = element.style.overflow;
             if (shell) {
               origShellTransform = shell.style.transform;
               origShellTransition = shell.style.transition;
@@ -2698,26 +2796,35 @@
               shell.style.transform = 'none';
             }
             element.classList.add('is-capturing');
-            element.style.width = '580px';
-            element.style.maxWidth = '580px';
+            element.style.width = '620px';
+            element.style.maxWidth = '620px';
+            element.style.height = 'auto';
+            element.style.minHeight = '0';
+            element.style.overflow = 'visible';
+            await waitForTicketAssets(element);
             await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-            const captureWidth = Math.ceil(element.scrollWidth || element.getBoundingClientRect().width || 580);
-            const captureHeight = Math.ceil(element.scrollHeight || element.getBoundingClientRect().height || 820);
+            const rect = element.getBoundingClientRect();
+            const captureWidth = Math.ceil(Math.max(element.scrollWidth, rect.width, 620));
+            const captureHeight = Math.ceil(Math.max(element.scrollHeight, rect.height, element.offsetHeight));
 
             const canvas = await html2canvas(element, {
               scale: Math.min(3, Math.max(2, window.devicePixelRatio || 2)),
               backgroundColor: null,
               useCORS: true,
+              allowTaint: true,
               width: captureWidth,
               height: captureHeight,
               windowWidth: Math.max(captureWidth, document.documentElement.clientWidth),
               windowHeight: Math.max(captureHeight, document.documentElement.clientHeight),
               scrollX: 0,
-              scrollY: 0
+              scrollY: 0,
+              x: 0,
+              y: 0
             });
 
-            const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+            const finalCanvas = addCanvasPadding(canvas, 42);
+            const blob = await new Promise((resolve) => finalCanvas.toBlob(resolve, 'image/png'));
             if (!blob) throw new Error('No se pudo crear la imagen del boleto.');
             const fileName = `Boleto_${isPlanetario ? 'Planetario' : 'MUCH'}_${ticketData.folio || Date.now()}.png`;
             downloadImage(blob, fileName);
@@ -2730,6 +2837,9 @@
             if (element) {
               element.style.width = origWidth;
               element.style.maxWidth = origMaxW;
+              element.style.height = origHeight;
+              element.style.minHeight = origMinHeight;
+              element.style.overflow = origOverflow;
               element.classList.remove('is-capturing');
             }
             if (shell) {
@@ -2785,7 +2895,7 @@
 
         try {
           const storedMessage = localStorage.getItem('much_playtime_block_msg') || '';
-          const match = storedMessage.match(/(?:volver a jugar el|nos vemos el)\s+([^\n.]+)/i);
+          const match = storedMessage.match(/(?:puedes volver a jugar el|volver a jugar el|nos vemos el)\s+([^\n.]+)/i);
           if (match?.[1]) return capitalizeDateLabel(match[1]);
         } catch (_) {}
 
@@ -2813,7 +2923,7 @@
         try {
           localStorage.setItem(
             'much_playtime_block_msg',
-            `¡Gracias por jugar! Tu misión fue completada con éxito. Nos vemos el ${returnDate}. ¡Tu próxima aventura te estará esperando!`
+            `¡Gracias por jugar! Tu misión fue completada con éxito. Puedes volver a jugar el ${returnDate}. ¡Tu próxima aventura te estará esperando!`
           );
         } catch (_) {}
 
@@ -2834,7 +2944,7 @@
       });
       confirmExitButton?.addEventListener('click', () => {
         try { sessionStorage.setItem('much_internal_navigation', 'true'); } catch (_) {}
-        window.location.href = '../index.htmlÁreason=playtime_blocked';
+        window.location.href = '../index.html?reason=playtime_blocked';
       });
 
       // ─── POLLING DE ESTADO ───

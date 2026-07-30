@@ -216,3 +216,26 @@ test('the route remains retryable until three global failed attempts are exhaust
   assert.equal(api.getStationAttemptInfo('1').intentos_restantes, 0);
   assert.equal(api.getStationAttemptInfo('3').intentos_restantes, 0);
 });
+
+test('server sync does not treat one failed station as three global attempts', () => {
+  const { api } = loadMuchLocalStorage();
+
+  api.syncFromServerProgress([
+    {
+      id_estacion: 1,
+      completada: false,
+      aprobada: false,
+      fallida: true,
+      bloqueada: false,
+      puntaje: 0,
+      aciertos: 5,
+      errores: 1
+    }
+  ]);
+
+  assert.equal(api.isStationCompleted('1'), false);
+  assert.equal(api.isStationFailed('1'), false);
+  assert.equal(api.isStationBlocked('1'), false);
+  assert.equal(api.getStationAttemptInfo('1').intentos_restantes, 3);
+  assert.equal(api.getRouteState(), 'en_progreso');
+});

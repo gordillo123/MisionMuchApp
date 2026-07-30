@@ -38,6 +38,12 @@
         window.bgMusic.loop = true;
         window.bgMusic.volume = 0.18;
         window.bgMusic.preload = 'auto';
+        window.bgMusic.addEventListener('ended', () => {
+          try {
+            window.bgMusic.currentTime = 0;
+            if (canUseBgMusic()) window.bgMusic.play().catch(()=>{});
+          } catch(e) {}
+        });
       }
       window.bgMusic.muted = false;
     }catch(e){/* ignore */}
@@ -195,6 +201,11 @@
   window.bindGlobalButtonSounds = bindGlobalButtonSounds;
   bindMuchAudioUnlock();
   window.setTimeout(initBgAutoPlay, 60);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && canUseBgMusic()) {
+      playBgMusic();
+    }
+  });
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => bindGlobalButtonSounds(document), { once: true });
   } else {
