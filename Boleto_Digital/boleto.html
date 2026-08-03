@@ -2059,6 +2059,132 @@
       line-height: 1.08;
     }
 
+    body.streamlined-ticket.planetarium-ticket .ticket-destination-mark {
+      margin: 0 auto 7px;
+    }
+
+    body.streamlined-ticket.planetarium-ticket .ticket-destination-mark .logo-destino,
+    body.streamlined-ticket.planetarium-ticket #boletoCaptura.is-capturing .ticket-destination-mark .logo-destino {
+      width: 138px !important;
+      height: 64px !important;
+      max-width: 138px !important;
+      max-height: 64px !important;
+      padding: 5px 9px !important;
+      object-fit: contain !important;
+      object-position: center !important;
+      border-radius: 8px !important;
+      background: #fff !important;
+    }
+
+    body.streamlined-ticket.planetarium-ticket .info-grid,
+    body.streamlined-ticket.planetarium-ticket #boletoCaptura.is-capturing .info-grid {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+      grid-template-areas: "access deadline" !important;
+      gap: 8px !important;
+      align-items: stretch !important;
+    }
+
+    body.streamlined-ticket.planetarium-ticket .planetarium-access-detail,
+    body.streamlined-ticket.planetarium-ticket #boletoCaptura.is-capturing .planetarium-access-detail {
+      grid-area: access !important;
+    }
+
+    body.streamlined-ticket.planetarium-ticket .planetarium-deadline-detail,
+    body.streamlined-ticket.planetarium-ticket #boletoCaptura.is-capturing .planetarium-deadline-detail {
+      grid-area: deadline !important;
+    }
+
+    body.streamlined-ticket.planetarium-ticket .info-label,
+    body.streamlined-ticket.planetarium-ticket #boletoCaptura.is-capturing .info-label {
+      font-size: 0.74rem !important;
+      line-height: 1.05 !important;
+    }
+
+    body.streamlined-ticket.planetarium-ticket .info-value,
+    body.streamlined-ticket.planetarium-ticket #boletoCaptura.is-capturing .info-value {
+      font-size: 0.96rem !important;
+      line-height: 1.12 !important;
+    }
+
+    body.streamlined-ticket.planetarium-ticket .name-value,
+    body.streamlined-ticket.planetarium-ticket #boletoCaptura.is-capturing .name-value {
+      font-size: 1.35rem !important;
+      line-height: 1.05 !important;
+    }
+
+    body.streamlined-ticket.planetarium-ticket .value-deadline,
+    body.streamlined-ticket.planetarium-ticket #boletoCaptura.is-capturing .value-deadline {
+      font-size: 0.98rem !important;
+      line-height: 1.12 !important;
+    }
+
+    body.streamlined-ticket.planetarium-ticket #boletoCaptura.is-capturing .qr-hint {
+      margin-bottom: 6px !important;
+    }
+
+    body.streamlined-ticket.planetarium-ticket #boletoCaptura.is-capturing .ticket-restriction {
+      margin-bottom: 6px !important;
+    }
+
+    body.streamlined-ticket.planetarium-ticket .ticket-restriction {
+      margin-bottom: 6px !important;
+    }
+
+    body.streamlined-ticket.planetarium-ticket .qr-hint {
+      margin-bottom: 6px !important;
+    }
+
+    body.streamlined-ticket.planetarium-ticket #boletoCaptura.is-capturing .note {
+      display: none !important;
+    }
+
+    body.streamlined-ticket.planetarium-ticket .note {
+      display: none !important;
+    }
+
+    body.streamlined-ticket.planetarium-ticket .brand-strip .brand-planetario,
+    body.streamlined-ticket.planetarium-ticket #boletoCaptura.is-capturing .brand-strip .brand-planetario {
+      width: 92px !important;
+      height: 36px !important;
+      max-width: 92px !important;
+      max-height: 36px !important;
+      object-fit: contain !important;
+      object-position: center !important;
+    }
+
+    body.streamlined-ticket.planetarium-ticket #boletoCaptura.is-capturing .brand-strip {
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      width: calc(100% + 48px) !important;
+      min-height: 70px !important;
+      margin: 14px -24px -28px !important;
+      padding: 10px 24px !important;
+      overflow: visible !important;
+      background: #ffffff !important;
+    }
+
+    body.streamlined-ticket.planetarium-ticket .brand-strip {
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      width: calc(100% + 24px) !important;
+      min-height: 58px !important;
+      margin: 8px -12px -10px !important;
+      padding: 7px 12px !important;
+      overflow: visible !important;
+      background: #ffffff !important;
+      border-radius: 0 0 16px 16px !important;
+    }
+
+    body.streamlined-ticket.much-ticket .ticket-destination-mark .logo-destino {
+      width: auto;
+      height: clamp(50px, 8vw, 68px);
+      max-width: min(72%, 220px);
+      object-fit: contain;
+    }
+
     @media (max-width: 900px), (max-height: 900px) {
       body.streamlined-ticket .ticket-shell {
         border: 0;
@@ -2336,7 +2462,7 @@
           <img src="../entrada-much/logo-much.png" alt="MUCH · Museo Chiapas" class="brand-much">
           <img src="../entrada-much/logo-sata.png" alt="SATA">
           <img src="../Sbeel_Dinosaurios/logo-sbeel-dinosaurios.png" alt="SBEEL" class="brand-sbeel">
-          <img src="../assets/logo-planetario-tuxtla.svg" alt="Planetario Tuxtla" class="brand-planetario">
+          <img src="../assets/logo-planetario-ticket.png" alt="Planetario Tuxtla" class="brand-planetario">
         </div>
       </div>
     </div>
@@ -2577,7 +2703,7 @@
         document.title = 'Boleto al Planetario · Planetario Tuxtla';
         if (congratsText) congratsText.textContent = '¡Felicidades, ganaste un boleto al Planetario!';
         if (dynamicLogo) {
-          dynamicLogo.src = '../assets/logo-planetario-tuxtla.svg';
+          dynamicLogo.src = '../assets/logo-planetario-ticket.png';
           dynamicLogo.alt = 'Planetario Tuxtla';
         }
       } else {
@@ -2745,12 +2871,22 @@
         await Promise.all(images.map((image) => {
           if (image.complete && image.naturalWidth > 0) return Promise.resolve();
           return new Promise((resolve) => {
-            image.addEventListener('load', resolve, { once: true });
-            image.addEventListener('error', resolve, { once: true });
+            const done = () => {
+              clearTimeout(timeout);
+              resolve();
+            };
+            const timeout = setTimeout(done, 1800);
+            image.addEventListener('load', done, { once: true });
+            image.addEventListener('error', done, { once: true });
           });
         }));
         if (document.fonts?.ready) {
-          try { await document.fonts.ready; } catch (_) {}
+          try {
+            await Promise.race([
+              document.fonts.ready,
+              new Promise((resolve) => setTimeout(resolve, 1800))
+            ]);
+          } catch (_) {}
         }
       }
 
@@ -2764,6 +2900,58 @@
         return padded;
       }
 
+      function getTicketCaptureSize(element) {
+        const rect = element.getBoundingClientRect();
+        return {
+          width: Math.ceil(Math.max(element.scrollWidth, element.offsetWidth, rect.width, 620)),
+          height: Math.ceil(Math.max(element.scrollHeight, element.offsetHeight, rect.height))
+        };
+      }
+
+      async function captureTicketImage(element) {
+        await waitForTicketAssets(element);
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+        const captureWidth = 620;
+        const currentRect = element.getBoundingClientRect();
+        const estimatedHeight = Math.ceil(Math.max(element.scrollHeight, element.offsetHeight, currentRect.height, 1180));
+
+        return await html2canvas(element, {
+          scale: Math.min(3, Math.max(2, window.devicePixelRatio || 2)),
+          backgroundColor: null,
+          useCORS: true,
+          allowTaint: true,
+          width: captureWidth,
+          height: estimatedHeight,
+          windowWidth: captureWidth,
+          windowHeight: Math.max(estimatedHeight, window.innerHeight || estimatedHeight),
+          scrollX: -window.scrollX,
+          scrollY: -window.scrollY,
+          onclone: (clonedDocument) => {
+            const clonedElement = clonedDocument.getElementById('boletoCaptura');
+            const clonedShell = clonedElement?.closest('.ticket-shell');
+            clonedDocument.body.style.overflow = 'visible';
+            if (clonedShell) {
+              clonedShell.style.transform = 'none';
+              clonedShell.style.transition = 'none';
+              clonedShell.style.width = `${captureWidth}px`;
+              clonedShell.style.maxWidth = `${captureWidth}px`;
+              clonedShell.style.height = 'auto';
+              clonedShell.style.maxHeight = 'none';
+              clonedShell.style.overflow = 'visible';
+            }
+            if (clonedElement) {
+              clonedElement.classList.add('is-capturing');
+              clonedElement.style.width = `${captureWidth}px`;
+              clonedElement.style.maxWidth = `${captureWidth}px`;
+              clonedElement.style.height = 'auto';
+              clonedElement.style.minHeight = '0';
+              clonedElement.style.overflow = 'visible';
+            }
+          }
+        });
+      }
+
       // ─── DESCARGAR IMAGEN ───
       const btnDownload = document.getElementById('btnDownloadImage');
       if (btnDownload) {
@@ -2771,57 +2959,10 @@
           const originalText = btnDownload.textContent;
           btnDownload.textContent = 'Generando descarga... 📥';
           btnDownload.disabled = true;
-          let element = null;
-          let origWidth = '';
-          let origMaxW = '';
-          let shell = null;
-          let origShellTransform = '';
-          let origShellTransition = '';
-          let origHeight = '';
-          let origMinHeight = '';
-          let origOverflow = '';
           try {
-            element = document.getElementById('boletoCaptura');
+            const element = document.getElementById('boletoCaptura');
             if (!element) throw new Error('No se encontro el boleto para descargar.');
-            shell = element.closest('.ticket-shell');
-            origWidth = element.style.width;
-            origMaxW = element.style.maxWidth;
-            origHeight = element.style.height;
-            origMinHeight = element.style.minHeight;
-            origOverflow = element.style.overflow;
-            if (shell) {
-              origShellTransform = shell.style.transform;
-              origShellTransition = shell.style.transition;
-              shell.style.transition = 'none';
-              shell.style.transform = 'none';
-            }
-            element.classList.add('is-capturing');
-            element.style.width = '620px';
-            element.style.maxWidth = '620px';
-            element.style.height = 'auto';
-            element.style.minHeight = '0';
-            element.style.overflow = 'visible';
-            await waitForTicketAssets(element);
-            await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-
-            const rect = element.getBoundingClientRect();
-            const captureWidth = Math.ceil(Math.max(element.scrollWidth, rect.width, 620));
-            const captureHeight = Math.ceil(Math.max(element.scrollHeight, rect.height, element.offsetHeight));
-
-            const canvas = await html2canvas(element, {
-              scale: Math.min(3, Math.max(2, window.devicePixelRatio || 2)),
-              backgroundColor: null,
-              useCORS: true,
-              allowTaint: true,
-              width: captureWidth,
-              height: captureHeight,
-              windowWidth: Math.max(captureWidth, document.documentElement.clientWidth),
-              windowHeight: Math.max(captureHeight, document.documentElement.clientHeight),
-              scrollX: 0,
-              scrollY: 0,
-              x: 0,
-              y: 0
-            });
+            const canvas = await captureTicketImage(element);
 
             const finalCanvas = addCanvasPadding(canvas, 42);
             const blob = await new Promise((resolve) => finalCanvas.toBlob(resolve, 'image/png'));
@@ -2834,18 +2975,6 @@
             console.error(err); alert("Error al descargar imagen.");
             btnDownload.textContent = originalText; btnDownload.disabled = false;
           } finally {
-            if (element) {
-              element.style.width = origWidth;
-              element.style.maxWidth = origMaxW;
-              element.style.height = origHeight;
-              element.style.minHeight = origMinHeight;
-              element.style.overflow = origOverflow;
-              element.classList.remove('is-capturing');
-            }
-            if (shell) {
-              shell.style.transform = origShellTransform;
-              shell.style.transition = origShellTransition;
-            }
             scheduleTicketFit();
           }
         });
