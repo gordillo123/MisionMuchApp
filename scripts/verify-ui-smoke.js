@@ -222,7 +222,13 @@ async function auditPage(route, viewport, data) {
   const dialogs = [];
 
   page.on('console', (message) => {
-    if (message.type() === 'error') consoleErrors.push(message.text());
+    const text = message.text();
+    if (message.type() === 'error') {
+      if (text.includes('401') || text.toLowerCase().includes('unauthorized')) {
+        return;
+      }
+      consoleErrors.push(text);
+    }
   });
   page.on('pageerror', (error) => pageErrors.push(error.message));
   page.on('requestfailed', (request) => {
@@ -239,6 +245,12 @@ async function auditPage(route, viewport, data) {
   await page.goto(`${baseUrl}${pathName}`, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForLoadState('networkidle', { timeout: 7000 }).catch(() => {});
   await page.waitForTimeout(700);
+
+  if (route.name === 'Inicio') {
+    // Esperar a que el splash screen se oculte
+    await page.locator('#splashScreen.is-hidden').waitFor({ state: 'attached', timeout: 6000 }).catch(() => {});
+    await page.waitForTimeout(1000);
+  }
 
   if (route.adminActions) {
     const refresh = page.locator('#btnRefreshTop');

@@ -2742,10 +2742,18 @@
       
       const folioBoleto = ticketData.folio || 'Folio: ...';
       const codigoBoleto = ticketData.codigo_alfanumerico || ticketData.qr_token || folioBoleto.replace('Folio:', '').trim() || '';
-      if (el('tFolio')) el('tFolio').textContent = 'Folio: ' + folioBoleto.replace('Folio:', '').trim();
+      
+      // Si el código es un hash largo (como el token MD5 de 32 chars), preferimos mostrar el folio corto
+      const shortCodigo = (codigoBoleto.length > 12 && ticketData.folio) ? ticketData.folio : codigoBoleto;
+      
+      // Clean prefix "PLAN-" if present
+      const cleanFolioBoleto = folioBoleto.replace('Folio:', '').trim().replace(/^PLAN-/, '');
+      const cleanCodigoBoleto = shortCodigo.replace(/^PLAN-/, '');
+
+      if (el('tFolio')) el('tFolio').textContent = 'Folio: ' + cleanFolioBoleto;
       
       const elAlfa = el('tAlfanumerico');
-      if (elAlfa) elAlfa.textContent = codigoBoleto;
+      if (elAlfa) elAlfa.textContent = cleanCodigoBoleto;
       
       if (el('tNombre')) el('tNombre').textContent = ticketData.nombre_usuario || '—';
       if (el('tPremio')) el('tPremio').textContent = acceso;
@@ -2890,13 +2898,36 @@
         }
       }
 
-      function addCanvasPadding(sourceCanvas, padding = 42) {
+      function addCanvasPadding(sourceCanvas, minPadding = 32) {
+        const ticketW = sourceCanvas.width;
+        const ticketH = sourceCanvas.height;
+        const ticketRatio = ticketW / ticketH;
+        const targetRatio = 9 / 16;
+
+        let finalW, finalH;
+        let padX = 0;
+        let padY = 0;
+
+        if (ticketRatio < targetRatio) {
+          // El boleto es más alto/estrecho que 9:16 (añadimos espacio horizontal)
+          finalH = ticketH + minPadding * 2;
+          finalW = Math.round(finalH * targetRatio);
+          padX = (finalW - ticketW) / 2;
+          padY = minPadding;
+        } else {
+          // El boleto es más ancho/corto que 9:16 (añadimos espacio vertical)
+          finalW = ticketW + minPadding * 2;
+          finalH = Math.round(finalW / targetRatio);
+          padX = minPadding;
+          padY = (finalH - ticketH) / 2;
+        }
+
         const padded = document.createElement('canvas');
-        padded.width = sourceCanvas.width + padding * 2;
-        padded.height = sourceCanvas.height + padding * 2;
+        padded.width = finalW;
+        padded.height = finalH;
         const ctx = padded.getContext('2d');
-        ctx.clearRect(0, 0, padded.width, padded.height);
-        ctx.drawImage(sourceCanvas, padding, padding);
+        ctx.clearRect(0, 0, finalW, finalH);
+        ctx.drawImage(sourceCanvas, padX, padY);
         return padded;
       }
 
@@ -2913,24 +2944,44 @@
         await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
         const captureWidth = 620;
-        const currentRect = element.getBoundingClientRect();
-        const estimatedHeight = Math.ceil(Math.max(element.scrollHeight, element.offsetHeight, currentRect.height, 1180));
 
         return await html2canvas(element, {
           scale: Math.min(3, Math.max(2, window.devicePixelRatio || 2)),
           backgroundColor: null,
           useCORS: true,
-          allowTaint: true,
-          width: captureWidth,
-          height: estimatedHeight,
+          allowTaint: false,
+          logging: false,
           windowWidth: captureWidth,
-          windowHeight: Math.max(estimatedHeight, window.innerHeight || estimatedHeight),
-          scrollX: -window.scrollX,
-          scrollY: -window.scrollY,
+          windowHeight: 2000,
           onclone: (clonedDocument) => {
+            const body = clonedDocument.body;
+            const html = clonedDocument.documentElement;
+            
             const clonedElement = clonedDocument.getElementById('boletoCaptura');
             const clonedShell = clonedElement?.closest('.ticket-shell');
-            clonedDocument.body.style.overflow = 'visible';
+
+            let ticketBg = 'linear-gradient(155deg, rgba(15, 23, 42, .97), rgba(30, 41, 79, .97))';
+            if (clonedElement) {
+              const computed = window.getComputedStyle(clonedElement);
+              ticketBg = computed.backgroundImage || computed.backgroundColor || ticketBg;
+            }
+
+            if (body) {
+              body.style.width = 'auto';
+              body.style.height = 'auto';
+              body.style.minHeight = '0';
+              body.style.overflow = 'visible';
+              body.style.display = 'block';
+              body.style.padding = '0';
+              body.style.margin = '0';
+              body.style.setProperty('background', ticketBg, 'important');
+            }
+            if (html) {
+              html.style.height = 'auto';
+              html.style.overflow = 'visible';
+              html.style.setProperty('background', ticketBg, 'important');
+            }
+
             if (clonedShell) {
               clonedShell.style.transform = 'none';
               clonedShell.style.transition = 'none';
@@ -2938,15 +2989,23 @@
               clonedShell.style.maxWidth = `${captureWidth}px`;
               clonedShell.style.height = 'auto';
               clonedShell.style.maxHeight = 'none';
+              clonedShell.style.minHeight = '0';
               clonedShell.style.overflow = 'visible';
+              clonedShell.style.margin = '0';
+              clonedShell.style.border = 'none';
+              clonedShell.style.boxShadow = 'none';
+              clonedShell.style.setProperty('background', ticketBg, 'important');
             }
             if (clonedElement) {
               clonedElement.classList.add('is-capturing');
-              clonedElement.style.width = `${captureWidth}px`;
-              clonedElement.style.maxWidth = `${captureWidth}px`;
-              clonedElement.style.height = 'auto';
-              clonedElement.style.minHeight = '0';
-              clonedElement.style.overflow = 'visible';
+              clonedElement.style.setProperty('width', `${captureWidth}px`, 'important');
+              clonedElement.style.setProperty('max-width', `${captureWidth}px`, 'important');
+              clonedElement.style.setProperty('height', 'auto', 'important');
+              clonedElement.style.setProperty('min-height', '0', 'important');
+              clonedElement.style.setProperty('max-height', 'none', 'important');
+              clonedElement.style.setProperty('overflow', 'hidden', 'important'); // Clip brand-strip to prevent white bleed!
+              clonedElement.style.setProperty('border', 'none', 'important');
+              clonedElement.style.setProperty('box-shadow', 'none', 'important');
             }
           }
         });
@@ -2955,26 +3014,40 @@
       // ─── DESCARGAR IMAGEN ───
       const btnDownload = document.getElementById('btnDownloadImage');
       if (btnDownload) {
-        btnDownload.addEventListener('click', async () => {
-          const originalText = btnDownload.textContent;
+        btnDownload.addEventListener('click', async (event) => {
+          if (event) event.preventDefault();
+
+          const originalText = "Descargar boleto";
           btnDownload.textContent = 'Generando descarga... 📥';
           btnDownload.disabled = true;
-          try {
-            const element = document.getElementById('boletoCaptura');
-            if (!element) throw new Error('No se encontro el boleto para descargar.');
-            const canvas = await captureTicketImage(element);
 
-            const finalCanvas = addCanvasPadding(canvas, 42);
+          try {
+            if (typeof html2canvas === 'undefined') {
+              throw new Error('La biblioteca html2canvas no está cargada en la página.');
+            }
+
+            const element = document.getElementById('boletoCaptura');
+            if (!element) throw new Error('No se encontró el boleto para descargar.');
+
+            const canvas = await captureTicketImage(element);
+            const finalCanvas = canvas; 
             const blob = await new Promise((resolve) => finalCanvas.toBlob(resolve, 'image/png'));
-            if (!blob) throw new Error('No se pudo crear la imagen del boleto.');
-            const fileName = `Boleto_${isPlanetario ? 'Planetario' : 'MUCH'}_${ticketData.folio || Date.now()}.png`;
+            if (!blob) throw new Error('No se pudo crear el archivo de imagen del boleto.');
+
+            const cleanFolio = (ticketData.folio || '').replace(/^PLAN-/, '');
+            const fileName = `Boleto_${isPlanetario ? 'Planetario' : 'MUCH'}_${cleanFolio || Date.now()}.png`;
+
             downloadImage(blob, fileName);
+
             btnDownload.textContent = 'Descargado';
-            setTimeout(() => { btnDownload.textContent = originalText; btnDownload.disabled = false; }, 2000);
+            // Esperar 2 segundos antes de que el finally restaure el estado del botón en caso de éxito
+            await new Promise((resolve) => setTimeout(resolve, 2000));
           } catch (err) {
-            console.error(err); alert("Error al descargar imagen.");
-            btnDownload.textContent = originalText; btnDownload.disabled = false;
+            console.error('Error durante la generación o descarga del boleto:', err);
+            alert("No se pudo descargar el boleto. Inténtalo nuevamente.");
           } finally {
+            btnDownload.textContent = originalText;
+            btnDownload.disabled = false;
             scheduleTicketFit();
           }
         });
@@ -2982,13 +3055,86 @@
 
       function downloadImage(blob, fileName) {
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName || 'Boleto.png';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        
+        // Detectar si es iOS o Safari
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+        if (isIOS || isSafari) {
+          // En iPhone/Safari, abrimos la imagen en una nueva pestaña para que el usuario pueda guardarla manualmente
+          const newTab = window.open();
+          if (newTab) {
+            newTab.document.write(`
+              <!DOCTYPE html>
+              <html lang="es">
+                <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <title>Boleto Digital</title>
+                  <style>
+                    body {
+                      margin: 0;
+                      background-color: #0f172a;
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      justify-content: center;
+                      min-height: 100vh;
+                      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                      color: #ffffff;
+                      padding: 20px;
+                      box-sizing: border-box;
+                    }
+                    .container {
+                      text-align: center;
+                      max-width: 100%;
+                    }
+                    img {
+                      max-width: 100%;
+                      height: auto;
+                      border-radius: 16px;
+                      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+                      margin-bottom: 20px;
+                    }
+                    .info {
+                      background-color: rgba(255, 255, 255, 0.1);
+                      padding: 12px 24px;
+                      border-radius: 30px;
+                      font-size: 15px;
+                      backdrop-filter: blur(5px);
+                      -webkit-backdrop-filter: blur(5px);
+                      display: inline-block;
+                    }
+                  </style>
+                </head>
+                <body>
+                  <div class="container">
+                    <img src="${url}" alt="Boleto Digital">
+                    <div>
+                      <span class="info">Mantén presionada la imagen para guardarla en Fotos 📸</span>
+                    </div>
+                  </div>
+                </body>
+              </html>
+            `);
+            newTab.document.close();
+          } else {
+            // Si la ventana emergente es bloqueada, redirigimos la ventana actual
+            window.location.href = url;
+          }
+          // En iOS/Safari retrasamos la liberación del objeto para que dé tiempo de cargar/guardar la imagen
+          setTimeout(() => URL.revokeObjectURL(url), 20000);
+        } else {
+          // Descarga directa normal para otros navegadores (Android, Chrome, Firefox, etc.)
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName || 'Boleto.png';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 2000);
+        }
       }
 
       // ─── SALIDA / FAREWELL OVERLAY ───
